@@ -1,0 +1,25 @@
+name: IAM Least Privilege
+version: "1.0"
+type: security
+provider: aws
+resource_type: rds_instance
+description: Ensure database instances follow least-privilege access
+tags: [security, iam, rds]
+rules:
+  - id: SEC-IAM-001
+    description: RDS instance is publicly accessible
+    severity: critical
+    conditions:
+      - field: publicly_accessible
+        operator: eq
+        value: true
+    remediation: Disable public accessibility and use VPC security groups
+
+  - id: SEC-IAM-002
+    description: RDS instance does not have encryption enabled
+    severity: high
+    conditions:
+      - field: storage_encrypted
+        operator: eq
+        value: false
+    remediation: Enable storage encryption (requires instance restart or migration)

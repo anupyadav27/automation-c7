@@ -1,0 +1,80 @@
+policies:
+
+  # ---------------------------------------------------------------
+  # 1. Find EBS volumes that are NOT attached to any instance.
+  # ---------------------------------------------------------------
+  - name: ebs-unattached-volumes
+    resource: ebs
+    description: >
+      Identify EBS volumes in 'available' state (not attached
+      to any EC2 instance). These represent wasted spend.
+    filters:
+      - type: value
+        key: State
+        value: available
+    actions:
+      - type: tag
+        key: c7n:status
+        value: "unattached-review-needed"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Unattached EBS volumes found – review for deletion or re-attachment"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 2. Unattached EBS volumes older than 30 days – snapshot & delete.
+  # ---------------------------------------------------------------
+  - name: ebs-unattached-30d-cleanup
+    resource: ebs
+    description: >
+      EBS volumes unattached for more than 30 days. Create a
+      snapshot for safety, then delete the volume.
+    filters:
+      - type: value
+        key: State
+        value: available
+      - type: value
+        key: "tag:c7n:status"
+        value: "unattached-review-needed"
+      - type: age
+        days: 30
+        op: greater-than
+    actions:
+      - type: snapshot
+        copy-tags:
+          - Name
+          - Environment
+          - Owner
+      - type: delete
+
+  # ---------------------------------------------------------------
+  # 3. Mark unattached volumes for deletion in 14 days.
+  # ---------------------------------------------------------------
+  - name: ebs-unattached-mark-for-deletion
+    resource: ebs
+    description: >
+      Mark unattached EBS volumes for deletion after 14 days.
+      Owners receive a notification and can exempt the volume
+      by removing the tag.
+    filters:
+      - type: value
+        key: State
+        value: available
+      - "tag:c7n:marked-for-deletion": absent
+    actions:
+      - type: mark-for-op
+        tag: c7n:marked-for-deletion
+        op: delete
+        days: 14
+      - type: notify
+        template: default.html
+        subject: "[c7n] EBS volume marked for deletion in 14 days"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

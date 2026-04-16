@@ -1,0 +1,128 @@
+policies:
+
+  # ---------------------------------------------------------------
+  # 1. S3 buckets with incomplete multipart uploads (wasted storage)
+  # ---------------------------------------------------------------
+  - name: s3-incomplete-multipart-uploads
+    resource: s3
+    description: >
+      Detect buckets that may have incomplete multipart
+      uploads consuming storage. Suggest adding a lifecycle
+      rule to abort incomplete uploads after 7 days.
+    filters:
+      - not:
+          - type: value
+            key: "Lifecycle"
+            value: not-null
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "add-abort-incomplete-multipart-rule"
+      - type: notify
+        template: default.html
+        subject: "[c7n] S3 bucket may have orphaned multipart uploads – add cleanup rule"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 2. S3 buckets with old non-current versions piling up
+  # ---------------------------------------------------------------
+  - name: s3-versioned-no-noncurrent-expiration
+    resource: s3
+    description: >
+      Versioned buckets without a lifecycle rule to expire
+      non-current object versions. Old versions accumulate
+      silently and inflate storage costs.
+    filters:
+      - type: bucket-versioning
+        state: true
+      - not:
+          - type: value
+            key: "Lifecycle"
+            value: not-null
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "versioned-add-noncurrent-expiration"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Versioned S3 bucket missing non-current version expiration rule"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 3. S3 buckets using expensive storage class with low access
+  # ---------------------------------------------------------------
+  - name: s3-standard-storage-high-cost
+    resource: s3
+    description: >
+      Buckets using Standard storage class with high
+      BucketSizeBytes (> 100 GB) but low request volume.
+      Candidates for Intelligent-Tiering.
+    filters:
+      - type: metrics
+        name: BucketSizeBytes
+        namespace: AWS/S3
+        dimensions:
+          StorageType: StandardStorage
+        statistics: Average
+        days: 1
+        value: 107374182400  # 100 GB
+        op: greater-than
+      - type: metrics
+        name: GetRequests
+        namespace: AWS/S3
+        statistics: Sum
+        days: 30
+        value: 1000
+        op: less-than
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "100GB+-low-access-use-intelligent-tiering"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Large S3 bucket (>100GB) with low access – switch to Intelligent-Tiering"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 4. S3 buckets with transfer acceleration enabled but low traffic
+  # ---------------------------------------------------------------
+  - name: s3-transfer-acceleration-unused
+    resource: s3
+    description: >
+      Buckets with transfer acceleration enabled but very
+      low PUT/GET activity. Transfer acceleration incurs
+      extra per-GB charges.
+    filters:
+      - type: bucket-acceleration
+        state: true
+      - type: metrics
+        name: GetRequests
+        namespace: AWS/S3
+        statistics: Sum
+        days: 30
+        value: 100
+        op: less-than
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "transfer-acceleration-unnecessary"
+      - type: notify
+        template: default.html
+        subject: "[c7n] S3 transfer acceleration enabled but traffic is very low – disable to save"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

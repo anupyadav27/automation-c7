@@ -1,0 +1,154 @@
+policies:
+
+  # ---------------------------------------------------------------
+  # 1. ENIs not attached to any instance
+  # ---------------------------------------------------------------
+  - name: eni-unattached
+    resource: eni
+    description: >
+      Elastic Network Interfaces in 'available' state
+      (not attached). Often left behind after instance
+      termination or failed Lambda/ECS deployments.
+    filters:
+      - type: value
+        key: Status
+        value: available
+    actions:
+      - type: tag
+        key: c7n:status
+        value: "unattached-eni-review"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Unattached ENI found – review for deletion"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 2. Unattached ENIs older than 30 days — safe to delete
+  # ---------------------------------------------------------------
+  - name: eni-unattached-30d-cleanup
+    resource: eni
+    description: >
+      ENIs unattached for over 30 days. These are almost
+      certainly orphaned and can be deleted.
+    filters:
+      - type: value
+        key: Status
+        value: available
+      - type: value
+        key: "tag:c7n:status"
+        value: "unattached-eni-review"
+    actions:
+      - type: mark-for-op
+        tag: c7n:marked-for-deletion
+        op: delete
+        days: 7
+      - type: notify
+        template: default.html
+        subject: "[c7n] Unattached ENI marked for deletion in 7 days"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 3. Execute deletion of marked ENIs
+  # ---------------------------------------------------------------
+  - name: eni-marked-delete
+    resource: eni
+    description: >
+      Delete ENIs that have passed their grace period.
+    filters:
+      - type: marked-for-op
+        tag: c7n:marked-for-deletion
+        op: delete
+    actions:
+      - type: delete
+      - type: notify
+        template: default.html
+        subject: "[c7n] Orphaned ENI deleted"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 4. ENIs without a Name tag (hard to identify owner)
+  # ---------------------------------------------------------------
+  - name: eni-untagged
+    resource: eni
+    description: >
+      ENIs without a Name tag. Untagged ENIs are
+      impossible to attribute to a team or service.
+    filters:
+      - "tag:Name": absent
+      - type: value
+        key: Status
+        value: available
+    actions:
+      - type: tag
+        key: c7n:compliance
+        value: "untagged-eni"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Unattached ENI without Name tag – identify owner or delete"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 5. ENIs with unused Elastic IPs (cost: $3.65/month each)
+  # ---------------------------------------------------------------
+  - name: eip-unattached
+    resource: network-addr
+    description: >
+      Elastic IP addresses not associated with any running
+      instance or ENI. Unattached EIPs cost $3.65/month.
+    filters:
+      - type: value
+        key: AssociationId
+        value: absent
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "unused-eip-release"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Unattached Elastic IP ($3.65/mo waste) – release or attach"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 6. Unattached EIPs — mark for release after 7 days
+  # ---------------------------------------------------------------
+  - name: eip-unattached-release
+    resource: network-addr
+    description: >
+      Release Elastic IPs unattached for more than 7 days.
+    filters:
+      - type: value
+        key: AssociationId
+        value: absent
+      - type: value
+        key: "tag:c7n:recommendation"
+        value: "unused-eip-release"
+    actions:
+      - type: release
+      - type: notify
+        template: default.html
+        subject: "[c7n] Unattached Elastic IP released"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #1e1e2e;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 3px;
+  }
+}
+
+/* filter bar utilities */
+.filter-label {
+  @apply block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5;
+}
+.filter-select {
+  @apply w-full px-3 py-2 text-sm bg-gray-950 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:border-blue-500;
+}
+.filter-display {
+  @apply px-3 py-2 text-sm bg-gray-950 border border-gray-700 rounded-lg min-h-[38px] flex items-center;
+}

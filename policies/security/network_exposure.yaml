@@ -1,0 +1,25 @@
+name: Network Exposure
+version: "1.0"
+type: security
+provider: aws
+resource_type: security_group
+description: Detect security groups with overly permissive rules
+tags: [security, network, security-groups]
+rules:
+  - id: SEC-NET-001
+    description: Security group allows inbound traffic from 0.0.0.0/0
+    severity: high
+    conditions:
+      - field: open_to_world
+        operator: eq
+        value: true
+    remediation: Restrict inbound rules to specific IP ranges or security groups
+
+  - id: SEC-NET-002
+    description: Security group has excessive inbound rules
+    severity: medium
+    conditions:
+      - field: inbound_rules_count
+        operator: gt
+        value: 20
+    remediation: Consolidate inbound rules and remove unnecessary entries

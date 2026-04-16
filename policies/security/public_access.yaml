@@ -1,0 +1,16 @@
+name: Public Access Controls
+version: "1.0"
+type: security
+provider: aws
+resource_type: s3_bucket
+description: Prevent unintended public access to S3 buckets
+tags: [security, s3, public-access]
+rules:
+  - id: SEC-PUB-001
+    description: S3 bucket public access block is not fully enabled
+    severity: critical
+    conditions:
+      - field: public_access_blocked
+        operator: eq
+        value: false
+    remediation: Enable all four public access block settings on the bucket

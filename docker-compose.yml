@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  ui:
+    build:
+      context: ./ui
+      args:
+        VITE_API_ENDPOINT: ${VITE_API_ENDPOINT:-http://localhost:8080}
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+
+  # Optional: local mock API for development/testing
+  # Uncomment below to test UI without deploying Lambda
+  # mock-api:
+  #   image: python:3.11-slim
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./policies:/app/policies:ro
+  #     - ./mock-api.py:/app/mock-api.py:ro
+  #   command: python /app/mock-api.py

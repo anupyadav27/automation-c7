@@ -1,0 +1,12 @@
+click>=8.0
+pydantic>=2.0
+pyyaml>=6.0
+
+# Cloud providers (install as needed)
+# boto3>=1.28          # AWS
+# azure-identity>=1.15 # Azure
+# azure-mgmt-resource>=23.0
+# google-cloud-asset>=3.0  # GCP
+
+# Dev
+pytest>=7.0

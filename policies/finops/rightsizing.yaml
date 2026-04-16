@@ -1,0 +1,25 @@
+name: Rightsizing Recommendations
+version: "1.0"
+type: finops
+provider: aws
+resource_type: rds_instance
+description: Identify over-provisioned RDS instances
+tags: [cost, rds, rightsizing]
+rules:
+  - id: FINOPS-RDS-001
+    description: RDS instance using expensive instance class
+    severity: low
+    conditions:
+      - field: instance_class
+        operator: regex
+        value: "db\\.(r5|r6g|x1|x2)\\."
+    remediation: Review if a smaller instance class meets workload requirements
+
+  - id: FINOPS-RDS-002
+    description: RDS instance has low backup retention
+    severity: info
+    conditions:
+      - field: backup_retention_period
+        operator: lt
+        value: 7
+    remediation: Increase backup retention to at least 7 days

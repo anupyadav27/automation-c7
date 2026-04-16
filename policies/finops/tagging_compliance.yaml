@@ -1,0 +1,34 @@
+name: Tagging Compliance
+version: "1.0"
+type: finops
+provider: all
+resource_type: ec2_instance
+description: Ensure resources have required cost-allocation tags
+tags: [cost, tags, governance]
+rules:
+  - id: FINOPS-TAG-001
+    description: Resource missing 'Environment' tag
+    severity: medium
+    conditions:
+      - field: tags.Environment
+        operator: exists
+        value: false
+    remediation: Add 'Environment' tag (dev/staging/prod) for cost allocation
+
+  - id: FINOPS-TAG-002
+    description: Resource missing 'Owner' tag
+    severity: medium
+    conditions:
+      - field: tags.Owner
+        operator: exists
+        value: false
+    remediation: Add 'Owner' tag to identify responsible team
+
+  - id: FINOPS-TAG-003
+    description: Resource missing 'CostCenter' tag
+    severity: high
+    conditions:
+      - field: tags.CostCenter
+        operator: exists
+        value: false
+    remediation: Add 'CostCenter' tag for financial tracking

@@ -1,0 +1,34 @@
+name: Cost Anomaly Detection
+version: "1.0"
+type: finops
+provider: aws
+resource_type: ec2_instance
+description: Detect EC2 instances that may be wasting money
+tags: [cost, ec2, idle]
+rules:
+  - id: FINOPS-EC2-001
+    description: EC2 instance is stopped (still incurring EBS costs)
+    severity: low
+    conditions:
+      - field: state
+        operator: eq
+        value: stopped
+    remediation: Terminate stopped instances or snapshot and delete their EBS volumes
+
+  - id: FINOPS-EC2-002
+    description: EC2 instance is not EBS-optimized
+    severity: info
+    conditions:
+      - field: ebs_optimized
+        operator: eq
+        value: false
+    remediation: Enable EBS optimization for better I/O performance and cost efficiency
+
+  - id: FINOPS-EC2-003
+    description: EC2 instance lacks detailed monitoring
+    severity: info
+    conditions:
+      - field: monitoring
+        operator: ne
+        value: enabled
+    remediation: Enable detailed monitoring for better utilization visibility

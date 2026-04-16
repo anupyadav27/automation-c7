@@ -1,0 +1,186 @@
+policies:
+
+  # ---------------------------------------------------------------
+  # 1. Security groups with 0.0.0.0/0 SSH (port 22) access
+  # ---------------------------------------------------------------
+  - name: sg-open-ssh
+    resource: security-group
+    description: >
+      Security groups allowing SSH (port 22) from 0.0.0.0/0
+      or ::/0. This is a critical security risk.
+    filters:
+      - type: ingress
+        Ports: [22]
+        Cidr:
+          value: "0.0.0.0/0"
+    actions:
+      - type: tag
+        key: c7n:security-alert
+        value: "open-ssh-from-internet"
+      - type: notify
+        template: default.html
+        subject: "[c7n] CRITICAL: Security group allows SSH from 0.0.0.0/0"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 2. Security groups with 0.0.0.0/0 RDP (port 3389) access
+  # ---------------------------------------------------------------
+  - name: sg-open-rdp
+    resource: security-group
+    description: >
+      Security groups allowing RDP (port 3389) from
+      0.0.0.0/0. Windows servers should never be exposed
+      directly.
+    filters:
+      - type: ingress
+        Ports: [3389]
+        Cidr:
+          value: "0.0.0.0/0"
+    actions:
+      - type: tag
+        key: c7n:security-alert
+        value: "open-rdp-from-internet"
+      - type: notify
+        template: default.html
+        subject: "[c7n] CRITICAL: Security group allows RDP from 0.0.0.0/0"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 3. Security groups with ALL ports open to 0.0.0.0/0
+  # ---------------------------------------------------------------
+  - name: sg-all-ports-open
+    resource: security-group
+    description: >
+      Security groups with all traffic (all ports/protocols)
+      open from 0.0.0.0/0. This exposes every service.
+    filters:
+      - type: ingress
+        IpProtocol: "-1"
+        Cidr:
+          value: "0.0.0.0/0"
+    actions:
+      - type: tag
+        key: c7n:security-alert
+        value: "all-ports-open-to-internet"
+      - type: notify
+        template: default.html
+        subject: "[c7n] CRITICAL: Security group allows ALL traffic from internet"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 4. Security groups not attached to any resource (orphaned)
+  # ---------------------------------------------------------------
+  - name: sg-unused
+    resource: security-group
+    description: >
+      Security groups not used by any EC2 instance, ENI,
+      Lambda, RDS, or ELB. Orphaned SGs add clutter and
+      can confuse audits.
+    filters:
+      - not:
+          - type: used
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "unused-security-group-delete"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Unused security group detected – review for deletion"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 5. Security groups with database ports open to internet
+  # ---------------------------------------------------------------
+  - name: sg-open-database-ports
+    resource: security-group
+    description: >
+      Security groups allowing internet access to database
+      ports (3306 MySQL, 5432 PostgreSQL, 1433 MSSQL,
+      27017 MongoDB, 6379 Redis).
+    filters:
+      - type: ingress
+        Ports: [3306, 5432, 1433, 27017, 6379]
+        Cidr:
+          value: "0.0.0.0/0"
+    actions:
+      - type: tag
+        key: c7n:security-alert
+        value: "database-ports-open-to-internet"
+      - type: notify
+        template: default.html
+        subject: "[c7n] CRITICAL: Security group exposes database ports to internet"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 6. EC2 instances with no IAM instance profile
+  # ---------------------------------------------------------------
+  - name: ec2-no-iam-role
+    resource: ec2
+    description: >
+      Running instances without an IAM instance profile.
+      Instances using long-term credentials (access keys)
+      instead of IAM roles are a security risk.
+    filters:
+      - "State.Name": running
+      - type: value
+        key: IamInstanceProfile
+        value: absent
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "no-iam-role-attached"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EC2 instance running without IAM role – attach role, remove access keys"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 7. EC2 instances with key pairs (prefer SSM Session Manager)
+  # ---------------------------------------------------------------
+  - name: ec2-has-key-pair
+    resource: ec2
+    description: >
+      Running instances launched with SSH key pairs.
+      Prefer SSM Session Manager for access — no need
+      to manage or rotate SSH keys.
+    filters:
+      - "State.Name": running
+      - type: value
+        key: KeyName
+        value: not-null
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "migrate-from-ssh-keys-to-ssm"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EC2 instance uses SSH key pair – consider SSM Session Manager"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

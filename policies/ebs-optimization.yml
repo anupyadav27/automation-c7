@@ -1,0 +1,202 @@
+policies:
+
+  # ---------------------------------------------------------------
+  # 1. EBS volumes using old gp2 type (upgrade to gp3)
+  # ---------------------------------------------------------------
+  - name: ebs-gp2-upgrade-to-gp3
+    resource: ebs
+    description: >
+      EBS volumes still using gp2. gp3 is 20% cheaper
+      with better baseline performance. Upgrade recommended.
+    filters:
+      - type: value
+        key: VolumeType
+        value: gp2
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "upgrade-gp2-to-gp3"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EBS volume using gp2 – upgrade to gp3 for 20% cost savings"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 2. EBS volumes with low IOPS utilisation (over-provisioned io1/io2)
+  # ---------------------------------------------------------------
+  - name: ebs-overprovisioned-iops
+    resource: ebs
+    description: >
+      io1/io2 volumes with average IOPS usage below 10%
+      of provisioned capacity over 14 days. Downgrade to
+      gp3 or reduce provisioned IOPS.
+    filters:
+      - type: value
+        key: VolumeType
+        op: in
+        value:
+          - io1
+          - io2
+      - type: metrics
+        name: VolumeReadOps
+        namespace: AWS/EBS
+        statistics: Sum
+        days: 14
+        value: 1000
+        op: less-than
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "overprovisioned-iops-downgrade"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EBS io1/io2 volume underutilised – downgrade to gp3 or reduce IOPS"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 3. EBS volumes without encryption
+  # ---------------------------------------------------------------
+  - name: ebs-unencrypted
+    resource: ebs
+    description: >
+      EBS volumes without encryption at rest. All new
+      volumes should be encrypted (default encryption
+      should be enabled at account level).
+    filters:
+      - type: value
+        key: Encrypted
+        value: false
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "unencrypted-volume"
+      - type: notify
+        template: default.html
+        subject: "[c7n] SECURITY: Unencrypted EBS volume found"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 4. EBS volumes without tags
+  # ---------------------------------------------------------------
+  - name: ebs-untagged
+    resource: ebs
+    description: >
+      EBS volumes missing required tags. Untagged volumes
+      are hard to attribute in cost reports.
+    filters:
+      - "tag:Name": absent
+    actions:
+      - type: tag
+        key: c7n:compliance
+        value: "missing-name-tag"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EBS volume missing Name tag – add for cost attribution"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 5. EBS snapshots older than 180 days
+  # ---------------------------------------------------------------
+  - name: ebs-old-snapshots
+    resource: ebs-snapshot
+    description: >
+      EBS snapshots older than 180 days. Old snapshots
+      accumulate cost. Review and delete if no longer
+      needed.
+    filters:
+      - type: age
+        days: 180
+        op: greater-than
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "snapshot-older-than-180d-review"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EBS snapshot older than 180 days – review for deletion"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 6. Orphaned EBS snapshots (source volume deleted)
+  # ---------------------------------------------------------------
+  - name: ebs-orphaned-snapshots
+    resource: ebs-snapshot
+    description: >
+      Snapshots whose source volume no longer exists.
+      These are orphaned and likely safe to delete
+      after verification.
+    filters:
+      - type: value
+        key: VolumeId
+        value: not-null
+      - type: value
+        key: Status
+        value: completed
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "orphaned-snapshot-source-volume-gone"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Orphaned EBS snapshot – source volume deleted, review for cleanup"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 7. EBS volumes with low throughput (over-provisioned size)
+  # ---------------------------------------------------------------
+  - name: ebs-large-low-throughput
+    resource: ebs
+    description: >
+      Large EBS volumes (> 500 GB) with very low read/write
+      activity. May be over-sized for their workload.
+    filters:
+      - type: value
+        key: Size
+        value: 500
+        op: greater-than
+      - type: value
+        key: State
+        value: in-use
+      - type: metrics
+        name: VolumeWriteBytes
+        namespace: AWS/EBS
+        statistics: Sum
+        days: 14
+        value: 1073741824  # 1 GB total writes in 14 days
+        op: less-than
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "large-volume-low-throughput-resize"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Large EBS volume (>500GB) with low throughput – consider resizing"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

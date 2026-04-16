@@ -1,0 +1,286 @@
+policies:
+
+  # ---------------------------------------------------------------
+  # 1. EC2 instances running but with low CPU utilisation
+  # ---------------------------------------------------------------
+  - name: ec2-underutilised-instances
+    resource: ec2
+    description: >
+      Running instances with average CPU utilisation below
+      10% over 14 days. Candidates for rightsizing or
+      stopping.
+    filters:
+      - "State.Name": running
+      - type: metrics
+        name: CPUUtilization
+        namespace: AWS/EC2
+        statistics: Average
+        days: 14
+        value: 10
+        op: less-than
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "underutilised-rightsize-or-stop"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EC2 instance underutilised (<10% CPU for 14d) – rightsize or stop"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 2. Stopped instances running for over 30 days (still incur
+  #    EBS charges)
+  # ---------------------------------------------------------------
+  - name: ec2-stopped-30d
+    resource: ec2
+    description: >
+      Instances in stopped state for over 30 days. They
+      still incur EBS storage charges. Create AMI and
+      terminate, or restart.
+    filters:
+      - "State.Name": stopped
+      - type: state-age
+        days: 30
+        op: greater-than
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "stopped-30d-terminate-or-create-ami"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EC2 instance stopped for 30+ days – terminate or create AMI"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 3. Stopped instances 60+ days — mark for termination
+  # ---------------------------------------------------------------
+  - name: ec2-stopped-60d-mark-terminate
+    resource: ec2
+    description: >
+      Instances stopped for over 60 days. Mark for
+      termination after 14-day grace period.
+    filters:
+      - "State.Name": stopped
+      - type: state-age
+        days: 60
+        op: greater-than
+      - "tag:c7n:marked-for-termination": absent
+    actions:
+      - type: mark-for-op
+        tag: c7n:marked-for-termination
+        op: terminate
+        days: 14
+      - type: notify
+        template: default.html
+        subject: "[c7n] EC2 stopped 60+ days – marked for termination in 14 days"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 4. EC2 instances without required tags
+  # ---------------------------------------------------------------
+  - name: ec2-missing-tags
+    resource: ec2
+    description: >
+      Running instances missing required governance tags
+      (Owner, Environment, Project). Tag compliance is
+      critical for cost allocation and accountability.
+    filters:
+      - "State.Name": running
+      - or:
+          - type: value
+            key: "tag:Owner"
+            value: absent
+          - type: value
+            key: "tag:Environment"
+            value: absent
+          - type: value
+            key: "tag:Project"
+            value: absent
+    actions:
+      - type: tag
+        key: c7n:compliance
+        value: "missing-required-tags"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EC2 instance missing required tags (Owner/Environment/Project)"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 5. EC2 instances using previous-generation instance types
+  # ---------------------------------------------------------------
+  - name: ec2-old-generation-instance-type
+    resource: ec2
+    description: >
+      Running instances using previous-generation types
+      (m3, m4, c3, c4, r3, r4, t2, i2, d2). Newer
+      generations offer better price/performance.
+    filters:
+      - "State.Name": running
+      - type: value
+        key: InstanceType
+        op: regex
+        value: "^(m[34]|c[34]|r[34]|t2|i2|d2)\\."
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "upgrade-instance-generation"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EC2 instance using old-gen type – upgrade for better price/performance"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 6. EC2 instances without CloudWatch detailed monitoring
+  # ---------------------------------------------------------------
+  - name: ec2-no-detailed-monitoring
+    resource: ec2
+    description: >
+      Running instances without detailed (1-minute)
+      CloudWatch monitoring. Basic monitoring (5-min)
+      may miss short spikes.
+    filters:
+      - "State.Name": running
+      - type: value
+        key: Monitoring.State
+        value: disabled
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "enable-detailed-monitoring"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EC2 instance without detailed monitoring – enable for better visibility"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 7. EC2 instances not using IMDSv2 (security risk)
+  # ---------------------------------------------------------------
+  - name: ec2-imdsv1-enabled
+    resource: ec2
+    description: >
+      Instances allowing IMDSv1 (Instance Metadata Service
+      v1). IMDSv1 is vulnerable to SSRF attacks. Enforce
+      IMDSv2 (HttpTokens=required).
+    filters:
+      - "State.Name": running
+      - type: value
+        key: MetadataOptions.HttpTokens
+        value: optional
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "enforce-imdsv2"
+      - type: notify
+        template: default.html
+        subject: "[c7n] SECURITY: EC2 instance allows IMDSv1 – enforce IMDSv2"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 8. EC2 instances with public IP (potential exposure)
+  # ---------------------------------------------------------------
+  - name: ec2-public-ip-check
+    resource: ec2
+    description: >
+      Running instances with a public IP address. Review
+      whether public access is intended or if the instance
+      should be behind a load balancer / private subnet.
+    filters:
+      - "State.Name": running
+      - type: value
+        key: PublicIpAddress
+        value: not-null
+    actions:
+      - type: tag
+        key: c7n:review
+        value: "has-public-ip"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EC2 instance has public IP – verify this is intended"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 9. EC2 instances not covered by a backup plan
+  # ---------------------------------------------------------------
+  - name: ec2-no-backup-tag
+    resource: ec2
+    description: >
+      Running instances without a backup tag. These may
+      not be included in AWS Backup plans.
+    filters:
+      - "State.Name": running
+      - "tag:Backup": absent
+      - "tag:backup": absent
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "add-backup-tag"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EC2 instance missing Backup tag – may not be in backup plan"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 10. EC2 instances running for 1+ year without reservation
+  # ---------------------------------------------------------------
+  - name: ec2-long-running-no-ri
+    resource: ec2
+    description: >
+      Instances running for over 365 days that are
+      on-demand. Consider Reserved Instances or Savings
+      Plans for significant cost reduction.
+    filters:
+      - "State.Name": running
+      - type: instance-age
+        days: 365
+        op: greater-than
+      - type: value
+        key: InstanceLifecycle
+        value: absent
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "running-1yr-consider-reserved-instance"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EC2 instance running 1+ year on-demand – consider RI/Savings Plan"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

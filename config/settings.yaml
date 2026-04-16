@@ -1,0 +1,31 @@
+default:
+  policy_dir: policies
+  output_format: console
+  log_level: INFO
+
+providers:
+  aws:
+    default_region: us-east-1
+    services:
+      - ec2
+      - s3
+      - rds
+      - ebs
+      - security_groups
+  azure:
+    services:
+      - vm
+      - storage
+      - sql
+      - nsg
+  gcp:
+    services:
+      - compute
+      - storage
+      - sql
+      - firewall
+
+thresholds:
+  cost_anomaly_percent: 20
+  idle_days: 30
+  max_open_ports: 5
