@@ -276,6 +276,334 @@ POLICY_META = {
         "recommendation": "Deregister AMI and delete associated snapshots:\n  aws ec2 deregister-image --image-id <ImageId>\n  aws ec2 delete-snapshot --snapshot-id <snap-id>",
         "meta": ["ImageId", "Name", "CreationDate", "State"],
     },
+    "ami-unused-90d-mark": {
+        "severity": "COST", "id_field": "ImageId",
+        "finding": "AMI unused for 90+ days — marked for deregistration in 14 days",
+        "recommendation": "Review and confirm. Exempt by removing the c7n:marked-for-deregister tag if still needed.",
+        "meta": ["ImageId", "Name", "CreationDate", "State"],
+    },
+    "ami-unused-deregister": {
+        "severity": "COST", "id_field": "ImageId",
+        "finding": "AMI grace period expired — deregistered and associated snapshots deleted",
+        "recommendation": "Restore from a backup AMI if needed. Ensure future AMIs are tagged with an owner.",
+        "meta": ["ImageId", "Name", "CreationDate", "State"],
+    },
+    "ami-not-in-launch-config": {
+        "severity": "COST", "id_field": "ImageId",
+        "finding": "AMI not referenced by any instance, Launch Template, or ASG config",
+        "recommendation": "Deregister if confirmed unused:\n  aws ec2 deregister-image --image-id <ImageId>",
+        "meta": ["ImageId", "Name", "CreationDate", "State"],
+    },
+    # EBS Optimization
+    "ebs-overprovisioned-iops": {
+        "severity": "COST", "id_field": "VolumeId",
+        "finding": "io1/io2 EBS volume — IOPS utilization < 10% for 14 days (over-provisioned)",
+        "recommendation": "Downgrade to gp3 or reduce provisioned IOPS to match actual usage:\n  aws ec2 modify-volume --volume-id <id> --volume-type gp3",
+        "meta": ["VolumeId", "Size", "VolumeType", "Iops", "AvailabilityZone"],
+    },
+    "ebs-untagged": {
+        "severity": "MEDIUM", "id_field": "VolumeId",
+        "finding": "EBS volume missing Name tag — cannot be attributed in cost reports",
+        "recommendation": "Add a Name tag:\n  aws ec2 create-tags --resources <VolumeId> --tags Key=Name,Value=<service-name>",
+        "meta": ["VolumeId", "Size", "VolumeType", "AvailabilityZone"],
+    },
+    "ebs-orphaned-snapshots": {
+        "severity": "COST", "id_field": "SnapshotId",
+        "finding": "EBS snapshot whose source volume no longer exists — likely orphaned",
+        "recommendation": "Delete if no longer needed:\n  aws ec2 delete-snapshot --snapshot-id <SnapshotId>",
+        "meta": ["SnapshotId", "VolumeId", "StartTime", "Description"],
+    },
+    "ebs-large-low-throughput": {
+        "severity": "COST", "id_field": "VolumeId",
+        "finding": "EBS volume > 500 GB with very low read/write activity — likely over-sized",
+        "recommendation": "Snapshot and resize to a smaller volume:\n  aws ec2 create-snapshot --volume-id <id> --description before-resize",
+        "meta": ["VolumeId", "Size", "VolumeType", "AvailabilityZone"],
+    },
+    "ebs-unattached-30d-cleanup": {
+        "severity": "COST", "id_field": "VolumeId",
+        "finding": "EBS volume unattached for 30+ days — snapshot created and volume deleted",
+        "recommendation": "Volume has been automatically cleaned up. Verify snapshot exists:\n  aws ec2 describe-snapshots --filters Name=volume-id,Values=<VolumeId>",
+        "meta": ["VolumeId", "Size", "VolumeType", "AvailabilityZone", "CreateTime"],
+    },
+    "ebs-unattached-mark-for-deletion": {
+        "severity": "COST", "id_field": "VolumeId",
+        "finding": "Unattached EBS volume marked for deletion in 14 days",
+        "recommendation": "Reattach or snapshot the volume before deletion:\n  aws ec2 create-snapshot --volume-id <id> --description manual-backup",
+        "meta": ["VolumeId", "Size", "VolumeType", "AvailabilityZone", "CreateTime"],
+    },
+    # ENI action policies
+    "eni-unattached-30d-cleanup": {
+        "severity": "COST", "id_field": "NetworkInterfaceId",
+        "finding": "ENI unattached for 30+ days — marked for deletion in 7 days",
+        "recommendation": "Identify owner and delete if confirmed orphaned:\n  aws ec2 delete-network-interface --network-interface-id <id>",
+        "meta": ["NetworkInterfaceId", "VpcId", "SubnetId", "AvailabilityZone"],
+    },
+    "eni-marked-delete": {
+        "severity": "COST", "id_field": "NetworkInterfaceId",
+        "finding": "ENI grace period expired — will be deleted",
+        "recommendation": "Remove the c7n:marked-for-deletion tag to exempt this ENI if it is still needed.",
+        "meta": ["NetworkInterfaceId", "VpcId", "SubnetId", "AvailabilityZone"],
+    },
+    "eni-untagged": {
+        "severity": "LOW", "id_field": "NetworkInterfaceId",
+        "finding": "ENI missing Name tag — owner and purpose cannot be determined",
+        "recommendation": "Add a Name tag to identify the owning service:\n  aws ec2 create-tags --resources <id> --tags Key=Name,Value=<service>",
+        "meta": ["NetworkInterfaceId", "VpcId", "SubnetId", "Description"],
+    },
+    "eip-unattached-release": {
+        "severity": "COST", "id_field": "PublicIp",
+        "finding": "Elastic IP unattached for 7+ days — released to stop charges",
+        "recommendation": "Allocate a new EIP if needed:\n  aws ec2 allocate-address --domain vpc",
+        "meta": ["PublicIp", "AllocationId", "Domain"],
+    },
+    # S3 Lifecycle (additional)
+    "s3-low-access-suggest-lifecycle": {
+        "severity": "COST", "id_field": "Name",
+        "finding": "S3 bucket with < 100 GET requests in 14 days — candidate for IA/Glacier transition",
+        "recommendation": "Add lifecycle rule to transition to S3-IA after 30 days, Glacier after 90 days.",
+        "meta": ["Name", "CreationDate"],
+    },
+    "s3-large-bucket-low-access": {
+        "severity": "COST", "id_field": "Name",
+        "finding": "S3 bucket > 50 GB with fewer than 500 GET requests in 14 days — high cost, low use",
+        "recommendation": "Enable S3 Intelligent-Tiering:\n  aws s3api put-bucket-intelligent-tiering-configuration --bucket <name> ...",
+        "meta": ["Name", "CreationDate"],
+    },
+    # ── finops/cost_anomaly.yaml ──
+    "ec2-not-ebs-optimized": {
+        "severity": "COST", "id_field": "InstanceId",
+        "finding": "EC2 instance running without EBS optimization — I/O contention possible",
+        "recommendation": "Enable EBS optimization via the console or:\n  aws ec2 modify-instance-attribute --instance-id <id> --ebs-optimized '{\"Value\":true}'",
+        "meta": ["InstanceType", "State.Name", "LaunchTime"],
+    },
+    "lambda-not-invoked-30d": {
+        "severity": "COST", "id_field": "FunctionName",
+        "finding": "Lambda function has zero invocations in the past 30 days — may be unused",
+        "recommendation": "Review and delete if no longer needed:\n  aws lambda delete-function --function-name <FunctionName>",
+        "meta": ["FunctionName", "Runtime", "LastModified", "CodeSize"],
+    },
+    # ── finops/idle_resources.yaml ──
+    "rds-idle-instance": {
+        "severity": "COST", "id_field": "DBInstanceIdentifier",
+        "finding": "RDS instance with 0 database connections for 14 days — idle and billing",
+        "recommendation": "Stop or delete the instance:\n  aws rds stop-db-instance --db-instance-identifier <id>\n  or snapshot and delete for permanent removal.",
+        "meta": ["DBInstanceIdentifier", "DBInstanceClass", "Engine", "DBInstanceStatus"],
+    },
+    "rds-stopped-7d": {
+        "severity": "COST", "id_field": "DBInstanceIdentifier",
+        "finding": "RDS instance stopped — AWS auto-restarts after 7 days resuming billing",
+        "recommendation": "Snapshot and delete if not needed:\n  aws rds create-db-snapshot --db-instance-identifier <id> --db-snapshot-identifier <snap>\n  aws rds delete-db-instance --db-instance-identifier <id> --skip-final-snapshot",
+        "meta": ["DBInstanceIdentifier", "DBInstanceClass", "Engine", "DBInstanceStatus"],
+    },
+    # ── finops/rightsizing.yaml ──
+    "rds-oversized-instance": {
+        "severity": "COST", "id_field": "DBInstanceIdentifier",
+        "finding": "RDS memory-optimised instance (r5/r6g/x1) with fewer than 10 connections — oversized",
+        "recommendation": "Downsize to db.m6i or db.t3 family based on actual workload:\n  aws rds modify-db-instance --db-instance-identifier <id> --db-instance-class db.m6i.large --apply-immediately",
+        "meta": ["DBInstanceIdentifier", "DBInstanceClass", "Engine", "MultiAZ"],
+    },
+    "rds-no-reserved-instance": {
+        "severity": "COST", "id_field": "DBInstanceIdentifier",
+        "finding": "RDS instance running on-demand for 90+ days — no Reserved Instance",
+        "recommendation": "Purchase Reserved Instance for up to 72% savings:\n  aws rds describe-reserved-db-instances-offerings",
+        "meta": ["DBInstanceIdentifier", "DBInstanceClass", "Engine", "MultiAZ"],
+    },
+    # ── finops/tagging_compliance.yaml ──
+    "lambda-missing-tags": {
+        "severity": "MEDIUM", "id_field": "FunctionName",
+        "finding": "Lambda function missing required tags (Owner/Environment/Project)",
+        "recommendation": "Add required tags:\n  aws lambda tag-resource --resource <arn> --tags Owner=team,Environment=dev,Project=name",
+        "meta": ["FunctionName", "Runtime", "LastModified"],
+    },
+    "rds-missing-tags": {
+        "severity": "MEDIUM", "id_field": "DBInstanceIdentifier",
+        "finding": "RDS instance missing required tags (Owner/Environment/Project)",
+        "recommendation": "Add required tags:\n  aws rds add-tags-to-resource --resource-name <arn> \\\n    --tags Key=Owner,Value=team Key=Environment,Value=dev",
+        "meta": ["DBInstanceIdentifier", "DBInstanceClass", "Engine"],
+    },
+    # ── security/encryption_at_rest.yaml ──
+    "rds-snapshot-unencrypted": {
+        "severity": "HIGH", "id_field": "DBSnapshotIdentifier",
+        "finding": "RDS snapshot is not encrypted — sensitive data at rest unprotected",
+        "recommendation": "Copy snapshot with encryption enabled:\n  aws rds copy-db-snapshot --source-db-snapshot-identifier <snap> \\\n    --target-db-snapshot-identifier <snap>-enc --kms-key-id <key-arn>",
+        "meta": ["DBSnapshotIdentifier", "DBInstanceIdentifier", "SnapshotCreateTime", "Encrypted"],
+    },
+    "rds-no-auto-minor-upgrade": {
+        "severity": "MEDIUM", "id_field": "DBInstanceIdentifier",
+        "finding": "RDS auto minor version upgrade disabled — security patches not applied",
+        "recommendation": "Enable auto minor version upgrade:\n  aws rds modify-db-instance --db-instance-identifier <id> \\\n    --auto-minor-version-upgrade --apply-immediately",
+        "meta": ["DBInstanceIdentifier", "DBInstanceClass", "Engine", "EngineVersion"],
+    },
+    # ── security/iam_least_privilege.yaml ──
+    "iam-user-no-mfa": {
+        "severity": "CRITICAL", "id_field": "UserName",
+        "finding": "IAM user has console password but no MFA device enrolled",
+        "recommendation": "Enforce MFA for all console users:\n  1. Go to IAM → Users → <user> → Security credentials → Assign MFA\n  2. Add SCP to deny non-MFA API calls",
+        "meta": ["UserName", "CreateDate", "PasswordLastUsed"],
+    },
+    "iam-inactive-user": {
+        "severity": "HIGH", "id_field": "UserName",
+        "finding": "IAM user credentials (password or access keys) unused for 90+ days",
+        "recommendation": "Disable or delete dormant credentials:\n  aws iam update-login-profile --user-name <user> --password-reset-required\n  aws iam update-access-key --access-key-id <key> --status Inactive --user-name <user>",
+        "meta": ["UserName", "CreateDate", "PasswordLastUsed"],
+    },
+    # ── security/network_exposure.yaml ──
+    "sg-high-rule-count": {
+        "severity": "MEDIUM", "id_field": "GroupId",
+        "finding": "Security group has many inbound rules open to 0.0.0.0/0 — audit needed",
+        "recommendation": "Review and consolidate inbound rules. Remove stale entries:\n  aws ec2 describe-security-groups --group-ids <GroupId>",
+        "meta": ["GroupName", "VpcId", "Description"],
+    },
+    "vpc-default-sg-has-rules": {
+        "severity": "HIGH", "id_field": "GroupId",
+        "finding": "Default VPC security group has inbound/outbound rules — CIS Benchmark 4.3 violation",
+        "recommendation": "Remove all rules from the default security group:\n  aws ec2 revoke-security-group-ingress --group-id <GroupId> ...",
+        "meta": ["GroupName", "VpcId", "Description"],
+    },
+    # ── security/public_access.yaml ──
+    "lambda-public-url-no-auth": {
+        "severity": "CRITICAL", "id_field": "FunctionName",
+        "finding": "Lambda function URL is public with AuthType NONE — unauthenticated invoke allowed",
+        "recommendation": "Change AuthType to AWS_IAM or delete the function URL:\n  aws lambda update-function-url-config --function-name <name> --auth-type AWS_IAM",
+        "meta": ["FunctionName", "Runtime", "LastModified"],
+    },
+    "lambda-public-invoke-policy": {
+        "severity": "HIGH", "id_field": "FunctionName",
+        "finding": "Lambda resource policy allows cross-account or public invocation",
+        "recommendation": "Review and restrict the resource-based policy:\n  aws lambda get-policy --function-name <name>\n  Remove Principal: * statements.",
+        "meta": ["FunctionName", "Runtime", "LastModified"],
+    },
+    # ── rds-security.yml ──
+    "rds-public-access": {
+        "severity": "CRITICAL", "id_field": "DBInstanceIdentifier",
+        "finding": "RDS instance has PubliclyAccessible=true — reachable from the internet",
+        "recommendation": "Disable public access:\n  aws rds modify-db-instance --db-instance-identifier <id> \\\n    --no-publicly-accessible --apply-immediately",
+        "meta": ["DBInstanceIdentifier", "DBInstanceClass", "Engine", "Endpoint.Address"],
+    },
+    "rds-unencrypted": {
+        "severity": "HIGH", "id_field": "DBInstanceIdentifier",
+        "finding": "RDS instance storage is not encrypted — data at rest unprotected",
+        "recommendation": "Encrypt via snapshot restore:\n  1. Create snapshot\n  2. Copy snapshot with --kms-key-id\n  3. Restore new instance from encrypted snapshot",
+        "meta": ["DBInstanceIdentifier", "DBInstanceClass", "Engine", "StorageEncrypted"],
+    },
+    "rds-no-multi-az": {
+        "severity": "MEDIUM", "id_field": "DBInstanceIdentifier",
+        "finding": "RDS production instance running Single-AZ — no automatic failover",
+        "recommendation": "Enable Multi-AZ (brief failover during conversion):\n  aws rds modify-db-instance --db-instance-identifier <id> --multi-az --apply-immediately",
+        "meta": ["DBInstanceIdentifier", "DBInstanceClass", "Engine", "AvailabilityZone"],
+    },
+    "rds-no-backup": {
+        "severity": "HIGH", "id_field": "DBInstanceIdentifier",
+        "finding": "RDS backup retention period is less than 7 days",
+        "recommendation": "Increase backup retention to at least 7 days:\n  aws rds modify-db-instance --db-instance-identifier <id> --backup-retention-period 7",
+        "meta": ["DBInstanceIdentifier", "DBInstanceClass", "Engine", "BackupRetentionPeriod"],
+    },
+    "rds-old-snapshot": {
+        "severity": "COST", "id_field": "DBSnapshotIdentifier",
+        "finding": "Manual RDS snapshot older than 90 days — accumulating storage cost",
+        "recommendation": "Delete if no longer needed for recovery or compliance:\n  aws rds delete-db-snapshot --db-snapshot-identifier <id>",
+        "meta": ["DBSnapshotIdentifier", "DBInstanceIdentifier", "SnapshotCreateTime", "AllocatedStorage"],
+    },
+    "rds-no-deletion-protection": {
+        "severity": "HIGH", "id_field": "DBInstanceIdentifier",
+        "finding": "RDS production instance has deletion protection disabled",
+        "recommendation": "Enable deletion protection:\n  aws rds modify-db-instance --db-instance-identifier <id> \\\n    --deletion-protection --apply-immediately",
+        "meta": ["DBInstanceIdentifier", "DBInstanceClass", "Engine", "DeletionProtection"],
+    },
+    # ── iam-compliance.yml ──
+    "iam-unused-access-key": {
+        "severity": "HIGH", "id_field": "UserName",
+        "finding": "IAM access key not rotated in 90+ days — long-lived credential risk",
+        "recommendation": "Create new key, update applications, then deactivate old key:\n  aws iam create-access-key --user-name <user>\n  aws iam update-access-key --access-key-id <old-key> --status Inactive --user-name <user>",
+        "meta": ["UserName", "CreateDate", "PasswordLastUsed"],
+    },
+    "iam-overly-broad-policy": {
+        "severity": "CRITICAL", "id_field": "PolicyName",
+        "finding": "IAM policy contains wildcard Action ('*') or Resource ('*') — violates least-privilege",
+        "recommendation": "Replace wildcard statements with specific actions and resources.\n  Review: aws iam get-policy-version --policy-arn <arn> --version-id v1",
+        "meta": ["PolicyName", "PolicyId", "CreateDate", "UpdateDate"],
+    },
+    "iam-unused-role": {
+        "severity": "HIGH", "id_field": "RoleName",
+        "finding": "IAM role not used in 90+ days — dormant permissions present risk",
+        "recommendation": "Delete or disable if confirmed unused:\n  aws iam delete-role --role-name <RoleName>\n  (remove attached policies and instance profiles first)",
+        "meta": ["RoleName", "CreateDate", "RoleLastUsed.LastUsedDate"],
+    },
+    "iam-user-inline-policy": {
+        "severity": "MEDIUM", "id_field": "UserName",
+        "finding": "IAM user has inline or directly-attached policies — should use groups",
+        "recommendation": "Move permissions to an IAM group and add the user to the group:\n  aws iam attach-group-policy / aws iam add-user-to-group",
+        "meta": ["UserName", "CreateDate"],
+    },
+    # ── cloudtrail-compliance.yml ──
+    "cloudtrail-not-logging": {
+        "severity": "CRITICAL", "id_field": "TrailARN",
+        "finding": "CloudTrail trail exists but logging is disabled — API activity not recorded",
+        "recommendation": "Enable logging immediately:\n  aws cloudtrail start-logging --name <trail-name>",
+        "meta": ["Name", "HomeRegion", "IsMultiRegionTrail", "HasCustomEventSelectors"],
+    },
+    "cloudtrail-no-log-validation": {
+        "severity": "HIGH", "id_field": "TrailARN",
+        "finding": "CloudTrail log file validation disabled — logs may be tampered with undetected",
+        "recommendation": "Enable log file validation:\n  aws cloudtrail update-trail --name <trail-name> --enable-log-file-validation",
+        "meta": ["Name", "HomeRegion", "LogFileValidationEnabled"],
+    },
+    "cloudtrail-no-kms-encryption": {
+        "severity": "MEDIUM", "id_field": "TrailARN",
+        "finding": "CloudTrail logs not encrypted with KMS — S3 SSE-S3 only",
+        "recommendation": "Encrypt trail logs with a KMS CMK:\n  aws cloudtrail update-trail --name <trail-name> --kms-key-id <key-arn>",
+        "meta": ["Name", "HomeRegion", "KMSKeyId"],
+    },
+    "cloudtrail-no-cloudwatch-logs": {
+        "severity": "MEDIUM", "id_field": "TrailARN",
+        "finding": "CloudTrail not integrated with CloudWatch Logs — no real-time alerting",
+        "recommendation": "Enable CloudWatch Logs integration for real-time security monitoring:\n  aws cloudtrail update-trail --name <trail-name> --cloud-watch-logs-log-group-arn <arn>",
+        "meta": ["Name", "HomeRegion", "CloudWatchLogsLogGroupArn"],
+    },
+    # ── vpc-compliance.yml ──
+    "vpc-no-flow-logs": {
+        "severity": "HIGH", "id_field": "VpcId",
+        "finding": "VPC has no flow logs enabled — network traffic not logged for security analysis",
+        "recommendation": "Enable VPC flow logs:\n  aws ec2 create-flow-logs --resource-type VPC --resource-ids <VpcId> \\\n    --traffic-type ALL --log-destination-type cloud-watch-logs \\\n    --log-group-name /aws/vpc/flowlogs",
+        "meta": ["VpcId", "CidrBlock", "State", "IsDefault"],
+    },
+    "vpc-default-in-use": {
+        "severity": "MEDIUM", "id_field": "VpcId",
+        "finding": "Default VPC contains EC2 instances — workloads should use custom VPCs",
+        "recommendation": "Migrate workloads to a custom VPC with proper network segmentation.\n  The default VPC should have no running instances.",
+        "meta": ["VpcId", "CidrBlock", "IsDefault"],
+    },
+    "subnet-auto-assign-public-ip": {
+        "severity": "MEDIUM", "id_field": "SubnetId",
+        "finding": "Subnet auto-assigns public IPs — instances launched here are internet-exposed",
+        "recommendation": "Disable MapPublicIpOnLaunch:\n  aws ec2 modify-subnet-attribute --subnet-id <SubnetId> --no-map-public-ip-on-launch",
+        "meta": ["SubnetId", "VpcId", "CidrBlock", "AvailabilityZone"],
+    },
+    "igw-attached-non-prod-vpc": {
+        "severity": "MEDIUM", "id_field": "InternetGatewayId",
+        "finding": "Internet Gateway attached to a non-production VPC — verify necessity",
+        "recommendation": "For egress-only access, replace the IGW with a NAT Gateway.\n  For dev/staging, consider removing internet access entirely.",
+        "meta": ["InternetGatewayId", "Attachments"],
+    },
+    # ── secretsmanager-compliance.yml ──
+    "secret-not-rotated": {
+        "severity": "HIGH", "id_field": "Name",
+        "finding": "Secrets Manager secret not rotated in 90+ days",
+        "recommendation": "Enable automatic rotation:\n  aws secretsmanager rotate-secret --secret-id <name>\n  Or configure rotation Lambda for custom rotation.",
+        "meta": ["Name", "ARN", "LastRotatedDate", "RotationEnabled"],
+    },
+    "secret-rotation-disabled": {
+        "severity": "MEDIUM", "id_field": "Name",
+        "finding": "Secrets Manager secret has automatic rotation disabled",
+        "recommendation": "Enable automatic rotation with a schedule:\n  aws secretsmanager rotate-secret --secret-id <name> \\\n    --rotation-rules AutomaticallyAfterDays=90",
+        "meta": ["Name", "ARN", "RotationEnabled", "LastChangedDate"],
+    },
+    "secret-missing-tags": {
+        "severity": "LOW", "id_field": "Name",
+        "finding": "Secrets Manager secret missing Owner or Environment tag",
+        "recommendation": "Add tags to identify secret ownership:\n  aws secretsmanager tag-resource --secret-id <name> \\\n    --tags Key=Owner,Value=team Key=Environment,Value=prod",
+        "meta": ["Name", "ARN", "LastChangedDate"],
+    },
 }
 
 # Fallback for any policy not in the map above
@@ -291,36 +619,61 @@ GROUP_MAP = {
     "s3-security":    ["s3-security-compliance.yml"],
     "s3-cost":        ["s3-cost-optimization.yml"],
     "s3":             ["s3-infrequent-access-lifecycle.yml", "s3-security-compliance.yml", "s3-cost-optimization.yml"],
-    "ebs":            ["ebs-unattached.yml"],
+    "ebs":            ["ebs-unattached.yml", "ebs-optimization.yml"],
     "ebs-optimize":   ["ebs-optimization.yml"],
-    "ec2":            ["ec2-instances.yml"],
+    "ec2":            ["ec2-instances.yml", "ec2-security.yml"],
     "ec2-security":   ["ec2-security.yml"],
     "eni":            ["eni-cleanup.yml"],
     "ami":            ["ami-unused-cleanup.yml"],
+    "rds":            ["rds-security.yml"],
+    "iam":            ["iam-compliance.yml"],
+    "cloudtrail":     ["cloudtrail-compliance.yml"],
+    "vpc":            ["vpc-compliance.yml"],
+    "secretsmanager": ["secretsmanager-compliance.yml"],
+    "security":       ["ec2-security.yml", "s3-security-compliance.yml", "ebs-optimization.yml",
+                       "rds-security.yml", "iam-compliance.yml", "cloudtrail-compliance.yml",
+                       "vpc-compliance.yml", "secretsmanager-compliance.yml"],
+    "cost":           ["ebs-unattached.yml", "ebs-optimization.yml", "eni-cleanup.yml",
+                       "ami-unused-cleanup.yml", "ec2-instances.yml",
+                       "s3-cost-optimization.yml", "s3-infrequent-access-lifecycle.yml"],
+    "all":            ["ec2-security.yml", "ec2-instances.yml",
+                       "s3-security-compliance.yml", "s3-cost-optimization.yml", "s3-infrequent-access-lifecycle.yml",
+                       "ebs-unattached.yml", "ebs-optimization.yml",
+                       "eni-cleanup.yml", "ami-unused-cleanup.yml",
+                       "rds-security.yml", "iam-compliance.yml",
+                       "cloudtrail-compliance.yml", "vpc-compliance.yml", "secretsmanager-compliance.yml"],
 }
+
+
+def _iter_policy_files(base_dir):
+    """Yield (relative_path, absolute_path) for every .yml/.yaml under base_dir."""
+    for root, dirs, files in os.walk(base_dir):
+        dirs.sort()
+        for filename in sorted(files):
+            if filename.endswith(".yml") or filename.endswith(".yaml"):
+                abs_path = os.path.join(root, filename)
+                rel_path = os.path.relpath(abs_path, base_dir)
+                yield rel_path, abs_path
 
 
 def _build_policy_index():
     """
-    Scan all YAML files and build a map of:
-      policy_name → { "file": "ec2-instances.yml", "policy": { ... } }
+    Recursively scan all .yml/.yaml files under POLICY_DIR and build:
+      policy_name → { "file": "subdir/file.yml", "policy": { ... } }
     Called once per Lambda cold start.
     """
     index = {}
-    for filename in sorted(os.listdir(POLICY_DIR)):
-        if not filename.endswith(".yml"):
-            continue
-        filepath = os.path.join(POLICY_DIR, filename)
+    for rel_path, abs_path in _iter_policy_files(POLICY_DIR):
         try:
-            with open(filepath) as f:
+            with open(abs_path) as f:
                 data = yaml.safe_load(f)
             for pol in data.get("policies", []):
                 index[pol["name"]] = {
-                    "file": filename,
+                    "file": rel_path,
                     "policy": pol,
                 }
         except Exception as e:
-            logger.warning(f"Failed to parse {filename}: {e}")
+            logger.warning(f"Failed to parse {rel_path}: {e}")
     return index
 
 
@@ -423,12 +776,11 @@ def _resolve_policies(policy_input, region=None):
     Resolve input to a list of { file, filter_name }.
     Returns None if input is invalid.
     """
-    # 1. "all" → every yml file, no filter
+    # 1. "all" → every yml/yaml file recursively, no filter
     if policy_input == "all":
         return [
-            {"file": os.path.join(POLICY_DIR, f)}
-            for f in sorted(os.listdir(POLICY_DIR))
-            if f.endswith(".yml")
+            {"file": abs_path}
+            for _, abs_path in _iter_policy_files(POLICY_DIR)
         ]
 
     # 2. Group name → one or more files, no filter
@@ -436,6 +788,7 @@ def _resolve_policies(policy_input, region=None):
         return [
             {"file": os.path.join(POLICY_DIR, f)}
             for f in GROUP_MAP[policy_input]
+            if os.path.exists(os.path.join(POLICY_DIR, f))
         ]
 
     # 3. Individual policy name → single file with filter
@@ -549,17 +902,14 @@ def _extract_single_policy(policy_file, policy_name, output_dir):
 def _list_policies():
     """Return structured list of all available groups and policies."""
     groups = {}
-    for filename in sorted(os.listdir(POLICY_DIR)):
-        if not filename.endswith(".yml"):
-            continue
-        filepath = os.path.join(POLICY_DIR, filename)
+    for rel_path, abs_path in _iter_policy_files(POLICY_DIR):
         try:
-            with open(filepath) as f:
+            with open(abs_path) as f:
                 data = yaml.safe_load(f)
             policies = [p["name"] for p in data.get("policies", [])]
-            groups[filename] = policies
+            groups[rel_path] = policies
         except Exception:
-            groups[filename] = []
+            groups[rel_path] = []
 
     # Find which group keys map to which files
     group_keys = {k: v for k, v in GROUP_MAP.items()}
@@ -758,16 +1108,50 @@ def _build_action_config(action_type, region=None):
             },
         }
     simple = {
+        # EC2
         "stop":                  {"type": "stop"},
         "terminate":             {"type": "terminate"},
         "mark-for-op":           {"type": "mark-for-op", "tag": "c7n:marked-for-termination", "op": "terminate", "days": 14},
         "revoke":                {"type": "revoke"},
+        # EBS / AMI
         "snapshot":              {"type": "snapshot"},
         "delete":                {"type": "delete"},
+        "deregister":            {"type": "deregister"},
+        # EIP
+        "release":               {"type": "release"},
+        # S3
         "set-bucket-encryption": {"type": "set-bucket-encryption", "crypto": "AES256"},
         "toggle-versioning":     {"type": "toggle-versioning", "enabled": True},
-        "deregister":            {"type": "deregister"},
-        "release":               {"type": "release"},
+        "block-public-access":   {
+            "type": "set-public-block",
+            "BlockPublicAcls": True,
+            "IgnorePublicAcls": True,
+            "BlockPublicPolicy": True,
+            "RestrictPublicBuckets": True,
+        },
+        "enable-access-logging": {
+            "type": "toggle-logging",
+            "target_bucket": "access-logs",
+            "target_prefix": "s3-access-logs/",
+        },
+        "enforce-ssl-policy": {
+            "type": "set-statements",
+            "statements": [{
+                "Sid": "DenyNonSSL",
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:*",
+                "Resource": ["arn:aws:s3:::{bucket_name}", "arn:aws:s3:::{bucket_name}/*"],
+                "Condition": {"Bool": {"aws:SecureTransport": "false"}},
+            }],
+        },
+        # IAM
+        "disable-login-profile":  {"type": "delete-login-profile"},
+        "deactivate-access-keys": {"type": "deactivate-access-key"},
+        "detach-policy":          {"type": "detach"},
+        # CloudTrail
+        "enable-trail-logging":   {"type": "enable"},
+        "enable-log-validation":  {"type": "update-trail", "EnableLogFileValidation": True},
     }
     return simple.get(action_type)
 

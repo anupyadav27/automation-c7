@@ -1,34 +1,54 @@
-name: Tagging Compliance
-version: "1.0"
-type: finops
-provider: all
-resource_type: ec2_instance
-description: Ensure resources have required cost-allocation tags
-tags: [cost, tags, governance]
-rules:
-  - id: FINOPS-TAG-001
-    description: Resource missing 'Environment' tag
-    severity: medium
-    conditions:
-      - field: tags.Environment
-        operator: exists
-        value: false
-    remediation: Add 'Environment' tag (dev/staging/prod) for cost allocation
+policies:
 
-  - id: FINOPS-TAG-002
-    description: Resource missing 'Owner' tag
-    severity: medium
-    conditions:
-      - field: tags.Owner
-        operator: exists
-        value: false
-    remediation: Add 'Owner' tag to identify responsible team
+  # ---------------------------------------------------------------
+  # Lambda functions missing required cost-allocation tags
+  # ---------------------------------------------------------------
+  - name: lambda-missing-tags
+    resource: lambda
+    description: >
+      Lambda functions missing Owner, Environment, or Project tags.
+      Untagged functions cannot be attributed in cost reports or budgets.
+    filters:
+      - or:
+          - "tag:Owner": absent
+          - "tag:Environment": absent
+          - "tag:Project": absent
+    actions:
+      - type: tag
+        key: c7n:compliance
+        value: "missing-required-tags"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Lambda function missing required tags — add Owner/Environment/Project"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
 
-  - id: FINOPS-TAG-003
-    description: Resource missing 'CostCenter' tag
-    severity: high
-    conditions:
-      - field: tags.CostCenter
-        operator: exists
-        value: false
-    remediation: Add 'CostCenter' tag for financial tracking
+  # ---------------------------------------------------------------
+  # RDS instances missing required cost-allocation tags
+  # ---------------------------------------------------------------
+  - name: rds-missing-tags
+    resource: rds
+    description: >
+      RDS instances missing Owner, Environment, or Project tags.
+      Untagged databases skew cost allocation and make it impossible
+      to chargeback to the correct team.
+    filters:
+      - or:
+          - "tag:Owner": absent
+          - "tag:Environment": absent
+          - "tag:Project": absent
+    actions:
+      - type: tag
+        key: c7n:compliance
+        value: "missing-required-tags"
+      - type: notify
+        template: default.html
+        subject: "[c7n] RDS instance missing required tags — add Owner/Environment/Project"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

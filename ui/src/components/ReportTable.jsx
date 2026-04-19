@@ -1,17 +1,24 @@
 import { useState } from 'react'
-import { POLICY_INFO, SEV_ORDER, SEV_STYLES, RESOURCE_ACTIONS } from '../lib/policyInfo'
+import { POLICY_INFO, SEV_ORDER, SEV_STYLES, RESOURCE_ACTIONS, getActionsForFindings } from '../lib/policyInfo'
 import { runAction } from '../api'
 
 const DESTRUCTIVE = new Set(['terminate','delete','deregister','release','revoke'])
 
 const SERVICE_LABELS = {
-  ec2: 'EC2 / Security Groups',
-  s3:  'S3 Buckets',
-  ebs: 'EBS Volumes',
-  eni: 'ENI / Elastic IP',
-  ami: 'AMI Images',
+  ec2:           'EC2 / Security Groups',
+  s3:            'S3 Buckets',
+  ebs:           'EBS Volumes',
+  eni:           'ENI / Elastic IP',
+  ami:           'AMI Images',
+  rds:           'RDS Databases',
+  iam:           'IAM',
+  lambda:        'Lambda',
+  cloudtrail:    'CloudTrail',
+  vpc:           'VPC / Networking',
+  secretsmanager:'Secrets Manager',
+  other:         'Other',
 }
-const SERVICE_ORDER = ['ec2', 's3', 'ebs', 'eni', 'ami']
+const SERVICE_ORDER = ['ec2','s3','ebs','eni','ami','rds','iam','lambda','cloudtrail','vpc','secretsmanager']
 
 const CAT_BADGE = {
   security: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
@@ -26,15 +33,19 @@ function worstSev(findings) {
 }
 
 // ── Main component ─────────────────────────────────────────────────
-export default function ReportTable({ report, region, authType }) {
+export default function ReportTable({ report, region, authType, extraPolicyInfo }) {
   const results    = report?.results || []
   const account    = report?.account
   const repRegion  = report?.region || region
 
+  // extraPolicyInfo lets callers (e.g. PolicyBuilder) inject metadata for dynamic
+  // policy names that aren't in the static POLICY_INFO registry
+  const policyLookup = extraPolicyInfo ? { ...POLICY_INFO, ...extraPolicyInfo } : POLICY_INFO
+
   // ── Build tree: service → resourceType → resourceId → { baseData, findings[] }
   const tree = {}
   for (const r of results) {
-    const info = POLICY_INFO[r.policy] || {}
+    const info = policyLookup[r.policy] || {}
     const svc  = info.service      || 'other'
     const rt   = info.resourceType || 'Other'
     for (const res of (r.resources || [])) {
@@ -209,7 +220,16 @@ function ResourceTypeGroup({ resourceType, ridMap, region, authType }) {
   const [confirm, setConfirm]       = useState(null)
 
   const resources = Object.entries(ridMap)   // [[rid, {baseData, findings[]}], ...]
-  const actions   = RESOURCE_ACTIONS[resourceType] || [{ value:'tag', label:'Tag resource', destructive:false }]
+
+  // Per-resource action lists — sg-unused gets delete-only, sg-open-ssh gets revoke, etc.
+  const perResourceActions = Object.fromEntries(
+    resources.map(([rid, { findings }]) => [rid, getActionsForFindings(findings, resourceType)])
+  )
+  // Group-level bulk action list = deduplicated union of all per-resource actions
+  const seen = new Set()
+  const actions = resources
+    .flatMap(([rid]) => perResourceActions[rid])
+    .filter(a => seen.has(a.value) ? false : seen.add(a.value))
 
   const allChecked = resources.length > 0 && resources.every(([rid]) => checkedIds.has(rid))
   function toggleAll() {
@@ -318,7 +338,7 @@ function ResourceTypeGroup({ resourceType, ridMap, region, authType }) {
                 resourceId={rid}
                 baseData={baseData}
                 findings={findings}
-                actions={actions}
+                actions={perResourceActions[rid]}
                 checked={checkedIds.has(rid)}
                 onCheck={() => toggleOne(rid)}
                 onAction={(ids, action, label) => {

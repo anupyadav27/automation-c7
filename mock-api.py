@@ -78,6 +78,16 @@ POLICY_MOCKS = {
         [("CurrentLifecycle", lambda: "STANDARD -> STANDARD_IA @ 30 days"),
          ("SuggestedAddition", lambda: "STANDARD_IA -> GLACIER @ 90 days")],
     ),
+    "s3-missing-lifecycle": lambda: _s3_mock(
+        "NO LIFECYCLE RULE — Objects Never Transition to IA/Glacier",
+        "Bucket has no lifecycle policy. All objects remain in S3 Standard storage indefinitely.",
+        "Add a lifecycle rule to transition objects to cheaper storage classes:\n"
+        "  Standard → Standard-IA after 30 days\n"
+        "  Standard-IA → Glacier after 90 days\n"
+        "  Glacier → Deep Archive after 180 days\n\n"
+        "aws s3api put-bucket-lifecycle-configuration --bucket BUCKET --lifecycle-configuration file://lifecycle.json",
+        [("LifecycleRules", lambda: "None"), ("BucketAge", lambda: f"{random.randint(90, 730)} days")],
+    ),
     "s3-large-bucket-low-access": lambda: _s3_mock(
         "LARGE BUCKET, LOW ACCESS — Storage Class Optimization Needed",
         "Bucket exceeds 50 GB but has fewer than 500 GET requests in 14 days.",
@@ -600,6 +610,478 @@ def _sg_mock(finding, recommendation, port, service):
     }
 
 
+MOCK_RDS_IDS    = [f"mydb-{random.randint(1000,9999)}" for _ in range(8)]
+MOCK_TRAIL_ARNS = [f"arn:aws:cloudtrail:ap-south-1:123456789012:trail/trail-{i}" for i in range(4)]
+MOCK_VPC_IDS    = [f"vpc-0{random.randint(10000000,99999999):08x}" for _ in range(6)]
+MOCK_SUBNET_IDS = [f"subnet-0{random.randint(10000000,99999999):08x}" for _ in range(6)]
+MOCK_IGW_IDS    = [f"igw-0{random.randint(10000000,99999999):08x}" for _ in range(4)]
+MOCK_SECRET_IDS = [f"arn:aws:secretsmanager:ap-south-1:123456789012:secret:{n}" for n in
+                   ["prod/db-password", "prod/api-key", "dev/service-token", "staging/smtp-creds"]]
+MOCK_LAMBDA_IDS = [f"arn:aws:lambda:ap-south-1:123456789012:function:{n}" for n in
+                   ["data-processor", "auth-service", "report-generator", "cleanup-job", "api-handler"]]
+MOCK_IAM_USERS  = ["alice", "bob.dev", "svc-deploy", "admin-backup", "ci-runner", "legacy-tool"]
+MOCK_IAM_ROLES  = [f"arn:aws:iam::123456789012:role/{n}" for n in
+                   ["ec2-worker-role", "lambda-exec-role", "cross-account-role", "old-service-role"]]
+MOCK_IAM_POLICIES = [f"arn:aws:iam::123456789012:policy/{n}" for n in
+                     ["FullAdminAccess", "DevWildcardPolicy", "LegacySuperUser"]]
+RDS_ENGINES = ["mysql", "postgres", "mariadb", "aurora-mysql"]
+RDS_CLASSES  = ["db.r5.large", "db.r5.xlarge", "db.r6g.large", "db.m5.large", "db.t3.medium"]
+
+
+def _rds_mock(finding, description, recommendation, severity="MEDIUM", extra_fields=None):
+    rid = random.choice(MOCK_RDS_IDS)
+    result = {
+        "ResourceId": rid,
+        "DBInstanceIdentifier": rid,
+        "Engine": random.choice(RDS_ENGINES),
+        "DBInstanceClass": random.choice(RDS_CLASSES),
+        "MultiAZ": random.choice(["true", "false"]),
+        "Severity": severity,
+        "Finding": finding,
+        "Description": description,
+        "Recommendation": recommendation,
+    }
+    if extra_fields:
+        for key, val_fn in extra_fields:
+            result[key] = val_fn()
+    return result
+
+
+def _rds_snap_mock(finding, description, recommendation):
+    sid = f"rds:mydb-{random.randint(1000,9999)}-{_rand_date(30,180)[:10]}"
+    return {
+        "ResourceId": sid,
+        "DBSnapshotIdentifier": sid,
+        "Engine": random.choice(RDS_ENGINES),
+        "AllocatedStorage": f"{random.randint(20, 500)} GB",
+        "Severity": "HIGH",
+        "Finding": finding,
+        "Description": description,
+        "Recommendation": recommendation,
+    }
+
+
+def _cloudtrail_mock(trail_name, finding, description, recommendation, severity="HIGH"):
+    arn = f"arn:aws:cloudtrail:ap-south-1:123456789012:trail/{trail_name}"
+    return {
+        "ResourceId": arn,
+        "TrailARN": arn,
+        "Name": trail_name,
+        "IsMultiRegionTrail": random.choice(["true", "false"]),
+        "Severity": severity,
+        "Finding": finding,
+        "Description": description,
+        "Recommendation": recommendation,
+    }
+
+
+def _lambda_mock(finding, description, recommendation, severity="MEDIUM"):
+    fname = random.choice(["data-processor", "auth-service", "report-generator", "cleanup-job", "api-handler"])
+    arn   = f"arn:aws:lambda:ap-south-1:123456789012:function:{fname}"
+    return {
+        "ResourceId": arn,
+        "FunctionName": fname,
+        "Runtime": random.choice(["python3.9", "nodejs18.x", "java11"]),
+        "LastModified": _rand_date(30, 400),
+        "Severity": severity,
+        "Finding": finding,
+        "Description": description,
+        "Recommendation": recommendation,
+    }
+
+
+def _iam_user_mock(finding, description, recommendation, severity="HIGH", extra_fields=None):
+    uname = random.choice(MOCK_IAM_USERS)
+    result = {
+        "ResourceId": uname,
+        "UserName": uname,
+        "CreateDate": _rand_date(180, 1000),
+        "Severity": severity,
+        "Finding": finding,
+        "Description": description,
+        "Recommendation": recommendation,
+    }
+    if extra_fields:
+        for key, val_fn in extra_fields:
+            result[key] = val_fn()
+    return result
+
+
+def _iam_role_mock(finding, description, recommendation, severity="HIGH", extra_fields=None):
+    arn = random.choice(MOCK_IAM_ROLES)
+    result = {
+        "ResourceId": arn,
+        "RoleName": arn.split("/")[-1],
+        "CreateDate": _rand_date(180, 1000),
+        "Severity": severity,
+        "Finding": finding,
+        "Description": description,
+        "Recommendation": recommendation,
+    }
+    if extra_fields:
+        for key, val_fn in extra_fields:
+            result[key] = val_fn()
+    return result
+
+
+def _vpc_mock(finding, description, recommendation, severity="MEDIUM"):
+    vid = random.choice(MOCK_VPC_IDS)
+    return {
+        "ResourceId": vid,
+        "VpcId": vid,
+        "CidrBlock": f"10.{random.randint(0,10)}.0.0/16",
+        "IsDefault": "false",
+        "Severity": severity,
+        "Finding": finding,
+        "Description": description,
+        "Recommendation": recommendation,
+    }
+
+
+def _secret_mock(finding, description, recommendation, severity="HIGH"):
+    arn = random.choice(MOCK_SECRET_IDS)
+    return {
+        "ResourceId": arn,
+        "Name": arn.split(":")[-1],
+        "LastChangedDate": _rand_date(90, 400),
+        "RotationEnabled": "false",
+        "Severity": severity,
+        "Finding": finding,
+        "Description": description,
+        "Recommendation": recommendation,
+    }
+
+
+# Additional mock entries for services missing from POLICY_MOCKS
+POLICY_MOCKS_EXTRA = {
+    # ── RDS ──
+    "rds-public-access": lambda: _rds_mock(
+        "RDS PUBLICLY ACCESSIBLE — CRITICAL SECURITY RISK",
+        "PubliclyAccessible=true. This RDS instance can be reached directly from the internet.",
+        "Set PubliclyAccessible=false immediately:\n  aws rds modify-db-instance --db-instance-identifier ID "
+        "--no-publicly-accessible --apply-immediately",
+        severity="CRITICAL",
+    ),
+    "rds-unencrypted": lambda: _rds_mock(
+        "STORAGE NOT ENCRYPTED — Data At Rest Exposed",
+        "RDS instance storage is not encrypted. Data-at-rest may be accessible if disk is compromised.",
+        "Encryption cannot be enabled on existing instances. Snapshot + restore to new encrypted instance:\n"
+        "  aws rds create-db-snapshot ...\n  aws rds restore-db-instance-from-db-snapshot --storage-encrypted",
+        severity="HIGH",
+    ),
+    "rds-no-multi-az": lambda: _rds_mock(
+        "SINGLE-AZ — No High Availability",
+        "MultiAZ is disabled. An AZ outage will cause an unplanned downtime for this database.",
+        "Enable Multi-AZ (incurs cost ~2x instance price, but eliminates single-AZ SPOF):\n"
+        "  aws rds modify-db-instance --db-instance-identifier ID --multi-az --apply-immediately",
+        severity="MEDIUM", extra_fields=[("MultiAZ", lambda: "false")],
+    ),
+    "rds-no-backup": lambda: _rds_mock(
+        "BACKUP RETENTION < 7 DAYS — Data Loss Risk",
+        "Automated backup retention period is less than 7 days. Point-in-time recovery window is too short.",
+        "Set backup retention to at least 7 days:\n"
+        "  aws rds modify-db-instance --db-instance-identifier ID --backup-retention-period 7",
+        severity="HIGH", extra_fields=[("BackupRetentionPeriod", lambda: str(random.randint(0, 3)))],
+    ),
+    "rds-no-deletion-protection": lambda: _rds_mock(
+        "DELETION PROTECTION DISABLED",
+        "RDS instance can be deleted without any guard. A misconfigured script or mistake could destroy it.",
+        "Enable deletion protection:\n"
+        "  aws rds modify-db-instance --db-instance-identifier ID --deletion-protection --apply-immediately",
+        severity="HIGH",
+    ),
+    "rds-old-snapshot": lambda: _rds_snap_mock(
+        "MANUAL SNAPSHOT OLDER THAN 90 DAYS",
+        "This manual RDS snapshot is older than 90 days. Old snapshots accumulate storage cost.",
+        "Delete if no longer needed:\n  aws rds delete-db-snapshot --db-snapshot-identifier ID",
+    ),
+    "rds-snapshot-unencrypted": lambda: _rds_snap_mock(
+        "SNAPSHOT NOT ENCRYPTED",
+        "This RDS snapshot is stored unencrypted. Anyone with S3 access to the backup could read it.",
+        "Copy the snapshot with encryption enabled:\n"
+        "  aws rds copy-db-snapshot --source-db-snapshot-identifier ID "
+        "--target-db-snapshot-identifier ID-encrypted --kms-key-id alias/aws/rds",
+    ),
+    "rds-idle-instance": lambda: _rds_mock(
+        "ZERO DB CONNECTIONS FOR 14 DAYS — Likely Idle",
+        "No database connections recorded in the past 14 days. Instance may be abandoned.",
+        "Verify this instance is no longer in use, then stop or delete:\n"
+        "  aws rds stop-db-instance --db-instance-identifier ID\n"
+        "Or delete with final snapshot: aws rds delete-db-instance --final-db-snapshot-identifier ...",
+        severity="COST",
+    ),
+    "rds-stopped-7d": lambda: _rds_mock(
+        "STOPPED INSTANCE — AWS Will Auto-Restart in 7 Days",
+        "AWS automatically restarts stopped RDS instances after 7 days. "
+        "If this is intentional, you must stop it again or delete it.",
+        "If no longer needed, delete with a final snapshot:\n"
+        "  aws rds delete-db-instance --db-instance-identifier ID "
+        "--final-db-snapshot-identifier final-backup",
+        severity="COST",
+    ),
+    "rds-oversized-instance": lambda: _rds_mock(
+        "MEMORY-OPTIMISED CLASS WITH LOW USAGE — Downsize",
+        "Running on db.r5/r6 class but CPU and connections are consistently low.",
+        "Downsize to db.t3.medium or db.m5.large and monitor. Estimated savings: 40-60%.\n"
+        "  aws rds modify-db-instance --db-instance-identifier ID --db-instance-class db.t3.medium",
+        severity="COST", extra_fields=[("AvgCPU (14d)", lambda: f"{random.uniform(0.5, 5.0):.1f}%")],
+    ),
+    "rds-no-reserved-instance": lambda: _rds_mock(
+        "ON-DEMAND 90+ DAYS — No Reserved Instance",
+        "This instance has been running on-demand for over 90 days. Reserved pricing saves 30-60%.",
+        "Purchase a Reserved Instance for 1-year (36% savings) or 3-year (63% savings).\n"
+        "Check AWS Cost Explorer > Reservations for recommendations.",
+        severity="COST",
+    ),
+    "rds-missing-tags": lambda: _rds_mock(
+        "MISSING REQUIRED TAGS",
+        "RDS instance is missing Owner, Environment, or Project tags for cost allocation.",
+        "Add tags:\n  aws rds add-tags-to-resource --resource-name ARN "
+        "--tags Key=Owner,Value=team Key=Environment,Value=prod",
+        severity="MEDIUM",
+    ),
+    "rds-no-auto-minor-upgrade": lambda: _rds_mock(
+        "AUTO MINOR VERSION UPGRADE DISABLED",
+        "Minor version patches (security fixes, bug fixes) will not be applied automatically.",
+        "Enable auto minor version upgrade:\n"
+        "  aws rds modify-db-instance --db-instance-identifier ID "
+        "--auto-minor-version-upgrade --apply-immediately",
+        severity="MEDIUM",
+    ),
+
+    # ── CloudTrail ──
+    "cloudtrail-not-logging": lambda: _cloudtrail_mock(
+        random.choice(["management-events-trail", "org-trail", "prod-audit-trail"]),
+        "TRAIL LOGGING IS DISABLED — No Audit Trail",
+        "CloudTrail is configured but logging is turned off. No API events are being recorded.",
+        "Re-enable logging immediately:\n  aws cloudtrail start-logging --name TRAIL_NAME",
+        severity="CRITICAL",
+    ),
+    "cloudtrail-no-log-validation": lambda: _cloudtrail_mock(
+        random.choice(["management-events-trail", "prod-audit-trail"]),
+        "LOG FILE VALIDATION DISABLED",
+        "Without log file validation, tampered or deleted log files cannot be detected.",
+        "Enable log file validation:\n"
+        "  aws cloudtrail update-trail --name TRAIL_NAME --enable-log-file-validation",
+        severity="HIGH",
+    ),
+    "cloudtrail-no-kms-encryption": lambda: _cloudtrail_mock(
+        random.choice(["org-trail", "prod-audit-trail"]),
+        "TRAIL LOGS NOT ENCRYPTED WITH KMS",
+        "CloudTrail log files are stored in S3 without KMS encryption. "
+        "Anyone with S3 read access can read raw API events.",
+        "Encrypt with a KMS key:\n"
+        "  aws cloudtrail update-trail --name TRAIL_NAME --kms-key-id alias/cloudtrail-key",
+        severity="MEDIUM",
+    ),
+    "cloudtrail-no-cloudwatch-logs": lambda: _cloudtrail_mock(
+        random.choice(["management-events-trail", "org-trail"]),
+        "NOT STREAMING TO CLOUDWATCH LOGS",
+        "Trail is not configured to send events to CloudWatch Logs. "
+        "Real-time alerting on suspicious API calls is not possible.",
+        "Configure CloudWatch Logs integration:\n"
+        "  aws cloudtrail update-trail --name TRAIL_NAME "
+        "--cloud-watch-logs-log-group-arn ARN --cloud-watch-logs-role-arn ROLE_ARN",
+        severity="MEDIUM",
+    ),
+
+    # ── IAM ──
+    "iam-user-no-mfa": lambda: _iam_user_mock(
+        "CONSOLE ACCESS WITHOUT MFA — Critical Risk",
+        "This IAM user has a console login profile but no MFA device enrolled. "
+        "A stolen password is all an attacker needs.",
+        "Enforce MFA:\n  1. Add a virtual MFA device for the user in IAM Console\n"
+        "  2. Add SCP/policy: Deny all actions if MFA is not present (aws:MultiFactorAuthPresent=false)",
+        severity="CRITICAL",
+    ),
+    "iam-inactive-user": lambda: _iam_user_mock(
+        "CREDENTIALS UNUSED FOR 90+ DAYS",
+        "This IAM user has not logged in or used access keys in over 90 days.",
+        "Disable or delete:\n  aws iam update-login-profile --user-name USER --password-reset-required\n"
+        "  aws iam deactivate-mfa-device ...\n  aws iam delete-login-profile --user-name USER",
+        severity="HIGH", extra_fields=[("LastActivity", lambda: _rand_date(90, 400))],
+    ),
+    "iam-unused-access-key": lambda: _iam_user_mock(
+        "ACCESS KEY NOT ROTATED IN 90+ DAYS",
+        "IAM access key has not been used or rotated in over 90 days. "
+        "Long-lived keys increase the blast radius of a credential leak.",
+        "Rotate the key:\n  aws iam create-access-key --user-name USER\n"
+        "  Update apps/scripts with new key\n  aws iam delete-access-key --access-key-id OLD_KEY_ID",
+        severity="HIGH", extra_fields=[("KeyAge", lambda: f"{random.randint(90, 365)} days")],
+    ),
+    "iam-overly-broad-policy": lambda: ({
+        "ResourceId": random.choice(MOCK_IAM_POLICIES),
+        "PolicyName": random.choice(["FullAdminAccess", "DevWildcardPolicy", "LegacySuperUser"]),
+        "AttachedTo": f"{random.randint(1, 5)} principals",
+        "Severity": "CRITICAL",
+        "Finding": "WILDCARD ACTION OR RESOURCE IN POLICY",
+        "Description": "Policy contains Action: * or Resource: * granting unrestricted permissions.",
+        "Recommendation": "Replace wildcards with specific actions and resources following least-privilege:\n"
+                          "  Review what the policy is used for and enumerate only required actions.\n"
+                          "  Use IAM Access Analyzer to generate least-privilege policies from CloudTrail.",
+    }),
+    "iam-unused-role": lambda: _iam_role_mock(
+        "IAM ROLE UNUSED FOR 90+ DAYS",
+        "This role has had no API activity in over 90 days. It may be from a decommissioned service.",
+        "Verify and delete if unused:\n  aws iam get-role --role-name ROLE_NAME\n"
+        "  aws iam delete-role --role-name ROLE_NAME\n"
+        "  (detach all policies first: aws iam detach-role-policy ...)",
+        severity="HIGH", extra_fields=[("LastUsed", lambda: _rand_date(90, 400))],
+    ),
+    "iam-user-inline-policy": lambda: _iam_user_mock(
+        "USER HAS INLINE POLICY — Use Groups Instead",
+        "This IAM user has an inline policy attached directly. "
+        "Inline policies cannot be reused and are harder to audit.",
+        "Move permissions to a managed policy and attach via a group:\n"
+        "  aws iam list-user-policies --user-name USER\n"
+        "  aws iam delete-user-policy --user-name USER --policy-name POLICY_NAME\n"
+        "  Create group → attach managed policy → add user to group",
+        severity="MEDIUM",
+    ),
+
+    # ── Lambda ──
+    "lambda-not-invoked-30d": lambda: _lambda_mock(
+        "ZERO INVOCATIONS IN 30 DAYS — Possibly Orphaned",
+        "This Lambda function has not been invoked in the past 30 days. "
+        "It may be from a deprecated feature or old integration.",
+        "Check triggers and event sources. If no longer needed, delete:\n"
+        "  aws lambda delete-function --function-name FUNCTION_NAME",
+        severity="COST",
+    ),
+    "lambda-missing-tags": lambda: _lambda_mock(
+        "MISSING REQUIRED TAGS",
+        "Lambda function is missing Owner, Environment, or Project tags.",
+        "Add tags:\n  aws lambda tag-resource --resource ARN "
+        "--tags Owner=team,Environment=prod,Project=name",
+        severity="MEDIUM",
+    ),
+    "lambda-public-url-no-auth": lambda: _lambda_mock(
+        "PUBLIC FUNCTION URL — NO AUTHENTICATION",
+        "Lambda Function URL is enabled with AuthType=NONE. Anyone on the internet can invoke it.",
+        "Either:\n  1. Set auth type to AWS_IAM:\n"
+        "  aws lambda update-function-url-config --function-name NAME --auth-type AWS_IAM\n"
+        "  2. Or delete the function URL if not needed:\n"
+        "  aws lambda delete-function-url-config --function-name NAME",
+        severity="CRITICAL",
+    ),
+    "lambda-public-invoke-policy": lambda: _lambda_mock(
+        "RESOURCE POLICY ALLOWS CROSS-ACCOUNT INVOKE",
+        "Lambda resource policy grants invoke permission to Principal: * or a broad account principal.",
+        "Review and restrict resource-based policy:\n"
+        "  aws lambda get-policy --function-name NAME\n"
+        "  aws lambda remove-permission --function-name NAME --statement-id STMT_ID",
+        severity="HIGH",
+    ),
+
+    # ── VPC / Networking ──
+    "vpc-no-flow-logs": lambda: _vpc_mock(
+        "VPC HAS NO FLOW LOGS — Blind to Network Traffic",
+        "VPC Flow Logs are not enabled. Network-level threat detection and forensics are impossible.",
+        "Enable flow logs (send to CloudWatch Logs or S3):\n"
+        "  aws ec2 create-flow-logs --resource-type VPC --resource-ids VPC_ID "
+        "--traffic-type ALL --log-destination-type cloud-watch-logs "
+        "--log-group-name /aws/vpc/flowlogs --deliver-logs-permission-arn ARN",
+        severity="HIGH",
+    ),
+    "vpc-default-in-use": lambda: _vpc_mock(
+        "DEFAULT VPC HAS RUNNING INSTANCES",
+        "The default VPC (auto-created by AWS) has running EC2 instances. "
+        "Default VPCs have permissive default NACLs and no intentional design.",
+        "Migrate instances to a purpose-built VPC with proper subnet segmentation and NACLs.\n"
+        "Then delete the default VPC to reduce attack surface.",
+        severity="MEDIUM",
+    ),
+    "vpc-default-sg-has-rules": lambda: ({
+        "ResourceId": random.choice(MOCK_SG_IDS),
+        "GroupName": "default",
+        "VpcId": random.choice(MOCK_VPC_IDS),
+        "InboundRuleCount": str(random.randint(1, 5)),
+        "Severity": "HIGH",
+        "Finding": "DEFAULT SG HAS INBOUND/OUTBOUND RULES — CIS 4.3",
+        "Description": "CIS Benchmark 4.3: The default security group should restrict all traffic. "
+                       "It currently has non-empty rules.",
+        "Recommendation": "Remove all rules from the default SG. "
+                          "Never use it for actual workloads:\n"
+                          "  aws ec2 revoke-security-group-ingress --group-id SG_ID --protocol all --source-group SG_ID\n"
+                          "  aws ec2 revoke-security-group-egress --group-id SG_ID --ip-permissions ...",
+    }),
+    "subnet-auto-assign-public-ip": lambda: ({
+        "ResourceId": random.choice(MOCK_SUBNET_IDS),
+        "SubnetId": random.choice(MOCK_SUBNET_IDS),
+        "VpcId": random.choice(MOCK_VPC_IDS),
+        "AvailabilityZone": random.choice(REGIONS),
+        "Severity": "MEDIUM",
+        "Finding": "SUBNET AUTO-ASSIGNS PUBLIC IPs",
+        "Description": "MapPublicIpOnLaunch=true. New EC2 instances launched here get a public IP "
+                       "automatically, even if not intended.",
+        "Recommendation": "Disable auto-assign public IP:\n"
+                          "  aws ec2 modify-subnet-attribute --subnet-id SUBNET_ID "
+                          "--no-map-public-ip-on-launch",
+    }),
+    "igw-attached-non-prod-vpc": lambda: ({
+        "ResourceId": random.choice(MOCK_IGW_IDS),
+        "InternetGatewayId": random.choice(MOCK_IGW_IDS),
+        "AttachedVpc": random.choice(MOCK_VPC_IDS),
+        "Severity": "MEDIUM",
+        "Finding": "INTERNET GATEWAY ATTACHED TO NON-PROD VPC",
+        "Description": "An Internet Gateway is attached to a VPC tagged as dev/staging. "
+                       "Non-prod environments generally should not have direct internet access.",
+        "Recommendation": "Detach the IGW if outbound access is needed only for patching "
+                          "(use NAT Gateway instead):\n"
+                          "  aws ec2 detach-internet-gateway --internet-gateway-id IGW_ID --vpc-id VPC_ID",
+    }),
+
+    # ── Secrets Manager ──
+    "secret-not-rotated": lambda: _secret_mock(
+        "SECRET NOT ROTATED IN 90+ DAYS",
+        "This secret has not been rotated in over 90 days. Stale credentials increase breach risk.",
+        "Enable automatic rotation or rotate manually:\n"
+        "  aws secretsmanager rotate-secret --secret-id SECRET_ID\n"
+        "Or configure automatic rotation with a Lambda function.",
+        severity="HIGH",
+    ),
+    "secret-rotation-disabled": lambda: _secret_mock(
+        "AUTOMATIC ROTATION DISABLED",
+        "Secret does not have automatic rotation configured. Manual rotation is error-prone and often skipped.",
+        "Enable rotation:\n"
+        "  aws secretsmanager rotate-secret --secret-id SECRET_ID "
+        "--rotation-lambda-arn ARN --rotation-rules AutomaticallyAfterDays=30",
+        severity="MEDIUM",
+    ),
+    "secret-missing-tags": lambda: _secret_mock(
+        "MISSING OWNER / ENVIRONMENT TAG",
+        "Secret has no Owner or Environment tag. Cannot determine which team owns this credential.",
+        "Add tags:\n  aws secretsmanager tag-resource --secret-id SECRET_ID "
+        "--tags Key=Owner,Value=team Key=Environment,Value=prod",
+        severity="LOW",
+    ),
+
+    # ── EC2 (additional) ──
+    "sg-high-rule-count": lambda: ({
+        "ResourceId": random.choice(MOCK_SG_IDS),
+        "GroupName": random.choice(["web-tier-sg", "app-sg", "legacy-monolith-sg"]),
+        "InboundRuleCount": str(random.randint(40, 120)),
+        "CidrsOpenToInternet": str(random.randint(5, 20)),
+        "Severity": "MEDIUM",
+        "Finding": "HIGH INBOUND RULE COUNT — Review Needed",
+        "Description": "Security group has a large number of inbound rules, many open to 0.0.0.0/0. "
+                       "Complex SGs are hard to audit and often contain stale rules.",
+        "Recommendation": "Audit and consolidate rules. Replace individual CIDRs with security group references "
+                          "where possible. Remove any rules that are no longer needed.",
+    }),
+    "ec2-not-ebs-optimized": lambda: _ec2_mock(
+        "NOT EBS-OPTIMIZED — I/O Contention Risk",
+        "Instance is not EBS-optimized. Network and EBS I/O share the same bandwidth path.",
+        "Enable EBS optimization (free on most current-gen instance types):\n"
+        "  aws ec2 modify-instance-attribute --instance-id INSTANCE_ID --ebs-optimized '{\"Value\": true}'",
+        extra_fields=[("EbsOptimized", lambda: "false"), ("InstanceType", lambda: random.choice(INSTANCE_TYPES_OLD))],
+    ),
+}
+
+# Merge extra mocks into main dict
+POLICY_MOCKS.update(POLICY_MOCKS_EXTRA)
+
+
 # ---------------------------------------------------------------------------
 
 def load_policy_index():
@@ -641,17 +1123,78 @@ GROUP_MAP = {
 
 class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
+        length = int(self.headers.get("Content-Length", 0))
+        body = json.loads(self.rfile.read(length)) if length else {}
+
+        # ── /build endpoint — simulates PolicyBuilder dynamic policy run ──
+        if self.path == "/build":
+            spec   = body.get("spec", {})
+            resource = spec.get("resource", "ec2")
+            policy_name = spec.get("name") or f"dynamic-{resource}"
+            dryrun = body.get("dryrun", "true") == "true"
+            region = body.get("region", "ap-south-1")
+
+            # Generate 0-4 mock resources based on resource type
+            resource_type_map = {
+                "ec2": "EC2 Instance", "s3": "S3 Bucket", "ebs": "EBS Volume",
+                "security-group": "Security Group", "rds": "RDS Instance",
+                "iam-user": "IAM User", "iam-role": "IAM Role", "lambda": "Lambda Function",
+                "cloudtrail": "CloudTrail", "vpc": "VPC", "subnet": "Subnet",
+                "secrets-manager": "Secret",
+            }
+            # Pick a plausible mock generator for the resource type
+            mock_generators = {
+                "ec2": lambda: _ec2_mock("CUSTOM POLICY MATCH", "Resource matched your custom policy filters.", "Review and apply the appropriate action.", extra_fields=[("State.Name", lambda: "stopped")]),
+                "s3": lambda: _s3_mock("CUSTOM POLICY MATCH", "Bucket matched your custom policy filters.", "Review and apply the appropriate action."),
+                "ebs": lambda: _ebs_mock("CUSTOM POLICY MATCH", "Volume matched your custom policy filters.", "Review and apply the appropriate action."),
+                "security-group": lambda: {"ResourceId": random.choice(MOCK_SG_IDS), "GroupName": random.choice(["legacy-sg", "dev-sg"]), "Severity": "INFO", "Finding": "CUSTOM POLICY MATCH", "Description": "Resource matched your custom filters.", "Recommendation": "Review and take action."},
+                "rds": lambda: _rds_mock("CUSTOM POLICY MATCH", "RDS instance matched your custom policy filters.", "Review and apply the appropriate action.", severity="INFO"),
+                "lambda": lambda: _lambda_mock("CUSTOM POLICY MATCH", "Function matched your custom policy filters.", "Review and take action.", severity="INFO"),
+                "cloudtrail": lambda: _cloudtrail_mock("custom-trail", "CUSTOM POLICY MATCH", "Trail matched your custom policy filters.", "Review and take action.", severity="INFO"),
+                "vpc": lambda: _vpc_mock("CUSTOM POLICY MATCH", "VPC matched your custom policy filters.", "Review and take action.", severity="INFO"),
+                "secrets-manager": lambda: _secret_mock("CUSTOM POLICY MATCH", "Secret matched your custom policy filters.", "Review and take action.", severity="INFO"),
+                "iam-user": lambda: _iam_user_mock("CUSTOM POLICY MATCH", "IAM user matched your custom policy filters.", "Review and take action.", severity="INFO"),
+            }
+            gen = mock_generators.get(resource)
+            count = random.randint(0, 4) if gen else 0
+            resources = [gen() for _ in range(count)] if gen else []
+
+            self._send(200, {
+                "policy": policy_name,
+                "resource": resource,
+                "status": "success",
+                "return_code": 0,
+                "dryrun": dryrun,
+                "account": {"account_id": "123456789012", "region": region},
+                "generated_yaml": f"policies:\n  - name: {policy_name}\n    resource: aws.{resource}\n    filters: {spec.get('filters', [])}\n    actions: {spec.get('actions', [])}",
+                "resources_found": {policy_name: count},
+                "resources": resources,
+            })
+            return
+
+        # ── /action endpoint — mock remediation ──
+        if self.path == "/action":
+            resource_ids = body.get("resource_ids", [])
+            action = body.get("action", "tag")
+            self._send(200, {
+                "status": "success",
+                "action": action,
+                "resources_affected": len(resource_ids),
+                "resource_ids": resource_ids,
+                "dryrun": body.get("dryrun", "true") == "true",
+            })
+            return
+
         if self.path != "/run":
             self._send(404, {"error": "not found"})
             return
 
-        length = int(self.headers.get("Content-Length", 0))
-        body = json.loads(self.rfile.read(length)) if length else {}
         policy_input = body.get("policy", "all")
         dryrun = body.get("dryrun", "true") == "true"
 
         if policy_input == "list":
             self._send(200, {
+                "account": {"account_id": "123456789012", "region": body.get("region", "ap-south-1")},
                 "groups": GROUP_MAP,
                 "individual_policies": {
                     name: {
@@ -664,14 +1207,21 @@ class Handler(BaseHTTPRequestHandler):
             })
             return
 
-        # Resolve names
-        if policy_input == "all":
+        # Support array form: {"policies": ["name1", "name2"]}
+        policies_list = body.get("policies")
+        if isinstance(policies_list, list) and policies_list:
+            names = [n for n in policies_list if n in POLICY_INDEX or n in POLICY_MOCKS]
+            if not names:
+                self._send(400, {"error": "No valid policy names found in the list"})
+                return
+        # Single name / group form
+        elif policy_input == "all":
             names = list(POLICY_INDEX.keys())
         elif policy_input in GROUP_MAP:
             names = []
             for f in GROUP_MAP[policy_input]:
                 names.extend(FILE_MAP.get(f, []))
-        elif policy_input in POLICY_INDEX:
+        elif policy_input in POLICY_INDEX or policy_input in POLICY_MOCKS:
             names = [policy_input]
         else:
             self._send(400, {"error": f"Unknown policy or group: '{policy_input}'"})
@@ -698,6 +1248,7 @@ class Handler(BaseHTTPRequestHandler):
             })
 
         self._send(200, {
+            "account": {"account_id": "123456789012", "region": body.get("region", "ap-south-1")},
             "execution_time": datetime.utcnow().isoformat(),
             "dryrun": dryrun,
             "requested": policy_input,

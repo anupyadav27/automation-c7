@@ -20,6 +20,7 @@ import os
 import sys
 import logging
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
 from datetime import datetime, timezone
 
 def _now():
@@ -211,7 +212,10 @@ if __name__ == "__main__":
     print(f"  Policies  : {os.environ.get('POLICY_DIR')}")
     print(f"  Dry-run   : controlled per request (default true)\n")
 
-    server = HTTPServer(("0.0.0.0", PORT), Handler)
+    class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+        daemon_threads = True
+
+    server = ThreadedHTTPServer(("0.0.0.0", PORT), Handler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

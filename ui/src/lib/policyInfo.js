@@ -2,33 +2,37 @@
 // Used client-side to filter rules by service/category and label them.
 export const POLICY_INFO = {
   // ── Security Groups (service = ec2, resourceType = Security Group) ──
-  'sg-open-ssh':            { service:'ec2', resourceType:'Security Group', category:'security', severity:'CRITICAL', label:'SSH open to 0.0.0.0/0' },
-  'sg-open-rdp':            { service:'ec2', resourceType:'Security Group', category:'security', severity:'CRITICAL', label:'RDP open to 0.0.0.0/0' },
-  'sg-all-ports-open':      { service:'ec2', resourceType:'Security Group', category:'security', severity:'CRITICAL', label:'All ports open to internet' },
-  'sg-open-database-ports': { service:'ec2', resourceType:'Security Group', category:'security', severity:'CRITICAL', label:'Database ports exposed to internet' },
-  'sg-unused':              { service:'ec2', resourceType:'Security Group', category:'cost',     severity:'LOW',      label:'Orphaned security group' },
+  'sg-open-ssh':            { service:'ec2', resourceType:'Security Group', category:'security', severity:'CRITICAL', label:'SSH open to 0.0.0.0/0',            suggestedActions:['tag','notify','revoke','delete'] },
+  'sg-open-rdp':            { service:'ec2', resourceType:'Security Group', category:'security', severity:'CRITICAL', label:'RDP open to 0.0.0.0/0',            suggestedActions:['tag','notify','revoke','delete'] },
+  'sg-all-ports-open':      { service:'ec2', resourceType:'Security Group', category:'security', severity:'CRITICAL', label:'All ports open to internet',         suggestedActions:['tag','notify','revoke','delete'] },
+  'sg-open-database-ports': { service:'ec2', resourceType:'Security Group', category:'security', severity:'CRITICAL', label:'Database ports exposed to internet',  suggestedActions:['tag','notify','revoke','delete'] },
+  // sg-unused: SG is unattached — revoke doesn't fix it, only delete removes the resource
+  'sg-unused':              { service:'ec2', resourceType:'Security Group', category:'cost',     severity:'LOW',      label:'Orphaned security group',            suggestedActions:['tag','notify','delete'] },
   // ── EC2 Instances ──
   'ec2-no-iam-role':                  { service:'ec2', resourceType:'EC2 Instance', category:'security', severity:'HIGH',    label:'No IAM role attached' },
   'ec2-has-key-pair':                 { service:'ec2', resourceType:'EC2 Instance', category:'security', severity:'MEDIUM',  label:'SSH key pair in use' },
   'ec2-imdsv1-enabled':               { service:'ec2', resourceType:'EC2 Instance', category:'security', severity:'HIGH',    label:'IMDSv1 allowed (SSRF risk)' },
   'ec2-public-ip-check':              { service:'ec2', resourceType:'EC2 Instance', category:'security', severity:'WARNING', label:'Instance has public IP' },
-  'ec2-missing-tags':                 { service:'ec2', resourceType:'EC2 Instance', category:'security', severity:'MEDIUM',  label:'Missing required tags' },
-  'ec2-no-detailed-monitoring':       { service:'ec2', resourceType:'EC2 Instance', category:'security', severity:'LOW',     label:'No detailed CloudWatch monitoring' },
+  'ec2-missing-tags':                 { service:'ec2', resourceType:'EC2 Instance', category:'cost',     severity:'MEDIUM',  label:'Missing required tags' },
+  'ec2-no-detailed-monitoring':       { service:'ec2', resourceType:'EC2 Instance', category:'cost',     severity:'LOW',     label:'No detailed CloudWatch monitoring' },
   'ec2-no-backup-tag':                { service:'ec2', resourceType:'EC2 Instance', category:'security', severity:'MEDIUM',  label:'Missing backup tag' },
   'ec2-underutilised-instances':      { service:'ec2', resourceType:'EC2 Instance', category:'cost',     severity:'COST',    label:'CPU < 10% for 14 days' },
-  'ec2-stopped-30d':                  { service:'ec2', resourceType:'EC2 Instance', category:'cost',     severity:'COST',    label:'Stopped 30+ days (EBS still billed)' },
-  'ec2-stopped-60d-mark-terminate':   { service:'ec2', resourceType:'EC2 Instance', category:'cost',     severity:'COST',    label:'Stopped 60+ days — marked for termination' },
+  // already stopped — showing 'stop' again does nothing
+  'ec2-stopped-30d':                  { service:'ec2', resourceType:'EC2 Instance', category:'cost',     severity:'COST',    label:'Stopped 30+ days (EBS still billed)',         suggestedActions:['tag','notify','mark-for-op','terminate'] },
+  'ec2-stopped-60d-mark-terminate':   { service:'ec2', resourceType:'EC2 Instance', category:'cost',     severity:'COST',    label:'Stopped 60+ days — marked for termination',   suggestedActions:['tag','notify','mark-for-op','terminate'] },
   'ec2-old-generation-instance-type': { service:'ec2', resourceType:'EC2 Instance', category:'cost',     severity:'COST',    label:'Old-gen instance type (m3/m4/c3/c4/t2)' },
   'ec2-long-running-no-ri':           { service:'ec2', resourceType:'EC2 Instance', category:'cost',     severity:'COST',    label:'Running 1yr+ with no reservation' },
   // ── S3 Buckets ──
-  's3-public-access-check':               { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'CRITICAL', label:'Public access enabled' },
-  's3-no-encryption':                     { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'HIGH',     label:'No server-side encryption' },
-  's3-no-versioning':                     { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'MEDIUM',   label:'Versioning disabled' },
-  's3-no-access-logging':                 { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'MEDIUM',   label:'No access logging' },
-  's3-no-mfa-delete':                     { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'MEDIUM',   label:'MFA delete not enabled' },
-  's3-no-ssl-enforcement':                { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'HIGH',     label:'HTTP access allowed' },
-  's3-overly-permissive-policy':          { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'CRITICAL', label:'Bucket policy allows Principal: *' },
-  's3-untagged-buckets':                  { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'LOW',      label:'Missing required tags' },
+  // each S3 security policy has one specific automated fix — showing all 7 S3 actions
+  // would let users click e.g. "block-public-access" to "fix" an encryption finding (wrong)
+  's3-public-access-check':               { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'CRITICAL', label:'Public access enabled',                   suggestedActions:['tag','notify','block-public-access'] },
+  's3-no-encryption':                     { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'HIGH',     label:'No server-side encryption',               suggestedActions:['tag','notify','set-bucket-encryption'] },
+  's3-no-versioning':                     { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'MEDIUM',   label:'Versioning disabled',                     suggestedActions:['tag','notify','toggle-versioning'] },
+  's3-no-access-logging':                 { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'MEDIUM',   label:'No access logging',                       suggestedActions:['tag','notify','enable-access-logging'] },
+  's3-no-mfa-delete':                     { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'MEDIUM',   label:'MFA delete not enabled',                  suggestedActions:['tag','notify'] },
+  's3-no-ssl-enforcement':                { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'HIGH',     label:'HTTP access allowed',                     suggestedActions:['tag','notify','enforce-ssl-policy'] },
+  's3-overly-permissive-policy':          { service:'s3', resourceType:'S3 Bucket', category:'security', severity:'CRITICAL', label:'Bucket policy allows Principal: *',       suggestedActions:['tag','notify'] },
+  's3-untagged-buckets':                  { service:'s3', resourceType:'S3 Bucket', category:'cost',     severity:'LOW',      label:'Missing required tags' },
   's3-empty-buckets':                     { service:'s3', resourceType:'S3 Bucket', category:'cost',     severity:'LOW',      label:'Empty bucket (0 objects)' },
   's3-replication-no-lifecycle':          { service:'s3', resourceType:'S3 Bucket', category:'cost',     severity:'COST',     label:'Replicated bucket missing lifecycle rule' },
   's3-incomplete-multipart-uploads':      { service:'s3', resourceType:'S3 Bucket', category:'cost',     severity:'COST',     label:'Incomplete multipart uploads accumulating' },
@@ -45,7 +49,76 @@ export const POLICY_INFO = {
   'eni-unattached':   { service:'eni', resourceType:'ENI',        category:'cost', severity:'COST', label:'Unattached network interface' },
   'eip-unattached':   { service:'eni', resourceType:'Elastic IP', category:'cost', severity:'COST', label:'Unassociated Elastic IP (~$3.60/month)' },
   // ── AMI ──
-  'ami-unused-detection': { service:'ami', resourceType:'AMI', category:'cost', severity:'COST', label:'Unused AMI (no running instances for 90+ days)' },
+  'ami-unused-detection':    { service:'ami', resourceType:'AMI', category:'cost', severity:'COST', label:'Unused AMI (no running instances for 90+ days)' },
+  'ami-unused-90d-mark':     { service:'ami', resourceType:'AMI', category:'cost', severity:'COST', label:'Unused AMI 90+ days — marked for deregistration' },
+  'ami-unused-deregister':   { service:'ami', resourceType:'AMI', category:'cost', severity:'COST', label:'Unused AMI — deregistered after grace period' },
+  'ami-not-in-launch-config':{ service:'ami', resourceType:'AMI', category:'cost', severity:'COST', label:'AMI not in any Launch Template or ASG config' },
+  // ── EBS Optimization ──
+  'ebs-overprovisioned-iops':        { service:'ebs', resourceType:'EBS Volume',   category:'cost',     severity:'COST',   label:'io1/io2 IOPS < 10% utilised (over-provisioned)' },
+  'ebs-untagged':                    { service:'ebs', resourceType:'EBS Volume',   category:'cost',     severity:'MEDIUM', label:'EBS volume missing Name tag' },
+  'ebs-orphaned-snapshots':          { service:'ebs', resourceType:'EBS Snapshot', category:'cost',     severity:'COST',   label:'Orphaned snapshot — source volume gone' },
+  'ebs-large-low-throughput':        { service:'ebs', resourceType:'EBS Volume',   category:'cost',     severity:'COST',   label:'>500GB volume with very low throughput' },
+  'ebs-unattached-30d-cleanup':      { service:'ebs', resourceType:'EBS Volume',   category:'cost',     severity:'COST',   label:'Unattached 30+ days — auto-cleaned up' },
+  'ebs-unattached-mark-for-deletion':{ service:'ebs', resourceType:'EBS Volume',   category:'cost',     severity:'COST',   label:'Unattached volume — marked for deletion in 14d' },
+  // ── ENI action policies ──
+  'eni-unattached-30d-cleanup': { service:'eni', resourceType:'ENI',        category:'cost', severity:'COST', label:'ENI unattached 30+ days — marked for deletion' },
+  'eni-marked-delete':          { service:'eni', resourceType:'ENI',        category:'cost', severity:'COST', label:'ENI grace period expired — pending deletion' },
+  'eni-untagged':               { service:'eni', resourceType:'ENI',        category:'cost', severity:'LOW',  label:'ENI missing Name tag' },
+  'eip-unattached-release':     { service:'eni', resourceType:'Elastic IP', category:'cost', severity:'COST', label:'Elastic IP released after 7 days unattached' },
+  // ── S3 Lifecycle (additional) ──
+  's3-low-access-suggest-lifecycle':    { service:'s3', resourceType:'S3 Bucket', category:'cost', severity:'COST', label:'< 100 GET requests in 14d — suggest IA/Glacier' },
+  's3-large-bucket-low-access':         { service:'s3', resourceType:'S3 Bucket', category:'cost', severity:'COST', label:'>50GB bucket with < 500 GETs in 14d — high cost' },
+  's3-zero-access-30d-deep-archive':    { service:'s3', resourceType:'S3 Bucket', category:'cost', severity:'COST', label:'Zero access in 30 days — Deep Archive candidate' },
+  's3-ia-missing-glacier-transition':   { service:'s3', resourceType:'S3 Bucket', category:'cost', severity:'COST', label:'Has IA lifecycle but no Glacier transition' },
+  's3-enable-request-metrics':          { service:'s3', resourceType:'S3 Bucket', category:'cost', severity:'LOW',  label:'CloudWatch request metrics not enabled' },
+  // ── Lambda ──
+  'ec2-not-ebs-optimized':     { service:'ec2',    resourceType:'EC2 Instance',   category:'cost',     severity:'COST',     label:'Not EBS-optimized — I/O contention risk' },
+  'lambda-not-invoked-30d':    { service:'lambda', resourceType:'Lambda Function', category:'cost',     severity:'COST',     label:'Zero invocations in 30 days — possibly unused' },
+  'lambda-missing-tags':       { service:'lambda', resourceType:'Lambda Function', category:'cost',     severity:'MEDIUM',   label:'Missing required tags' },
+  'lambda-public-url-no-auth': { service:'lambda', resourceType:'Lambda Function', category:'security', severity:'CRITICAL', label:'Public function URL with no authentication' },
+  'lambda-public-invoke-policy':{ service:'lambda', resourceType:'Lambda Function', category:'security', severity:'HIGH',    label:'Resource policy allows cross-account invoke' },
+  // ── RDS ──
+  'rds-idle-instance':          { service:'rds', resourceType:'RDS Instance', category:'cost',     severity:'COST',   label:'0 connections for 14 days — idle' },
+  // already stopped — showing 'stop' again does nothing; AWS auto-restarts in 7d so delete or notify
+  'rds-stopped-7d':             { service:'rds', resourceType:'RDS Instance', category:'cost',     severity:'COST',   label:'Stopped instance (auto-restart in 7 days)',   suggestedActions:['tag','notify','delete'] },
+  'rds-oversized-instance':     { service:'rds', resourceType:'RDS Instance', category:'cost',     severity:'COST',   label:'Memory-optimised class with low usage' },
+  'rds-no-reserved-instance':   { service:'rds', resourceType:'RDS Instance', category:'cost',     severity:'COST',   label:'On-demand 90+ days — no Reserved Instance' },
+  'rds-missing-tags':           { service:'rds', resourceType:'RDS Instance', category:'cost',     severity:'MEDIUM', label:'Missing required tags' },
+  'rds-snapshot-unencrypted':   { service:'rds', resourceType:'RDS Snapshot', category:'security', severity:'HIGH',   label:'Unencrypted RDS snapshot' },
+  'rds-no-auto-minor-upgrade':  { service:'rds', resourceType:'RDS Instance', category:'security', severity:'MEDIUM', label:'Auto minor upgrade disabled — patches blocked' },
+  // ── IAM ──
+  'iam-user-no-mfa':   { service:'iam', resourceType:'IAM User', category:'security', severity:'CRITICAL', label:'Console user without MFA' },
+  'iam-inactive-user': { service:'iam', resourceType:'IAM User', category:'security', severity:'HIGH',     label:'Credentials unused for 90+ days' },
+  // ── Security Groups (additional) ──
+  'sg-high-rule-count':       { service:'ec2', resourceType:'Security Group', category:'security', severity:'MEDIUM', label:'Many inbound rules open to internet' },
+  // AWS does not allow deleting the default SG — that action would always error
+  'vpc-default-sg-has-rules': { service:'ec2', resourceType:'Security Group', category:'security', severity:'HIGH',   label:'Default SG has rules — CIS 4.3 violation', suggestedActions:['tag','notify','revoke'] },
+  // ── RDS ──
+  'rds-public-access':          { service:'rds', resourceType:'RDS Instance', category:'security', severity:'CRITICAL', label:'RDS publicly accessible from internet' },
+  'rds-unencrypted':            { service:'rds', resourceType:'RDS Instance', category:'security', severity:'HIGH',     label:'RDS storage not encrypted' },
+  'rds-no-multi-az':            { service:'rds', resourceType:'RDS Instance', category:'security', severity:'MEDIUM',   label:'Production RDS running Single-AZ' },
+  'rds-no-backup':              { service:'rds', resourceType:'RDS Instance', category:'security', severity:'HIGH',     label:'Backup retention < 7 days' },
+  'rds-old-snapshot':           { service:'rds', resourceType:'RDS Snapshot', category:'cost',     severity:'COST',     label:'Manual RDS snapshot older than 90 days' },
+  'rds-no-deletion-protection': { service:'rds', resourceType:'RDS Instance', category:'security', severity:'HIGH',     label:'Deletion protection disabled' },
+  // ── IAM ──
+  'iam-unused-access-key':    { service:'iam', resourceType:'IAM User',   category:'security', severity:'HIGH',     label:'Access key not rotated in 90+ days' },
+  'iam-overly-broad-policy':  { service:'iam', resourceType:'IAM Policy', category:'security', severity:'CRITICAL', label:'Policy has wildcard Action or Resource' },
+  'iam-unused-role':          { service:'iam', resourceType:'IAM Role',   category:'security', severity:'HIGH',     label:'IAM role unused for 90+ days' },
+  'iam-user-inline-policy':   { service:'iam', resourceType:'IAM User',   category:'security', severity:'MEDIUM',   label:'User has direct policy — use groups instead' },
+  // ── CloudTrail ──
+  'cloudtrail-not-logging':          { service:'cloudtrail', resourceType:'CloudTrail', category:'security', severity:'CRITICAL', label:'Trail logging is DISABLED',           suggestedActions:['tag','notify','enable-trail-logging'] },
+  'cloudtrail-no-log-validation':    { service:'cloudtrail', resourceType:'CloudTrail', category:'security', severity:'HIGH',     label:'Log file validation disabled',        suggestedActions:['tag','notify','enable-log-validation'] },
+  'cloudtrail-no-kms-encryption':    { service:'cloudtrail', resourceType:'CloudTrail', category:'security', severity:'MEDIUM',   label:'Trail logs not encrypted with KMS' },
+  'cloudtrail-no-cloudwatch-logs':   { service:'cloudtrail', resourceType:'CloudTrail', category:'security', severity:'MEDIUM',   label:'Not streaming to CloudWatch Logs' },
+  // ── VPC ──
+  'vpc-no-flow-logs':            { service:'vpc', resourceType:'VPC',              category:'security', severity:'HIGH',   label:'VPC has no flow logs' },
+  'vpc-default-in-use':          { service:'vpc', resourceType:'VPC',              category:'security', severity:'MEDIUM', label:'Default VPC has running instances' },
+  'subnet-auto-assign-public-ip':{ service:'vpc', resourceType:'Subnet',           category:'security', severity:'MEDIUM', label:'Subnet auto-assigns public IPs' },
+  'igw-attached-non-prod-vpc':   { service:'vpc', resourceType:'Internet Gateway', category:'security', severity:'MEDIUM', label:'IGW attached to non-prod VPC' },
+  // ── Secrets Manager ──
+  'secret-not-rotated':      { service:'secretsmanager', resourceType:'Secret', category:'security', severity:'HIGH',   label:'Secret not rotated in 90+ days' },
+  'secret-rotation-disabled':{ service:'secretsmanager', resourceType:'Secret', category:'security', severity:'MEDIUM', label:'Automatic rotation disabled' },
+  'secret-missing-tags':     { service:'secretsmanager', resourceType:'Secret', category:'cost',    severity:'LOW',    label:'Secret missing Owner or Environment tag' },
 }
 
 export const SEV_ORDER = { CRITICAL:0, HIGH:1, WARNING:2, MEDIUM:3, COST:4, LOW:5, INFO:6 }
@@ -77,10 +150,13 @@ export const RESOURCE_ACTIONS = {
     { value:'terminate',   label:'Terminate instance',             destructive:true  },
   ],
   'S3 Bucket': [
-    { value:'tag',                   label:'Tag bucket',              destructive:false },
-    { value:'notify',                label:'Send notification',        destructive:false },
-    { value:'set-bucket-encryption', label:'Enable AES-256 encryption', destructive:false },
-    { value:'toggle-versioning',     label:'Enable versioning',        destructive:false },
+    { value:'tag',                      label:'Tag bucket',                  destructive:false },
+    { value:'notify',                   label:'Send notification',            destructive:false },
+    { value:'set-bucket-encryption',    label:'Enable AES-256 encryption',   destructive:false },
+    { value:'toggle-versioning',        label:'Enable versioning',            destructive:false },
+    { value:'block-public-access',      label:'Block all public access',      destructive:false },
+    { value:'enable-access-logging',    label:'Enable access logging',        destructive:false },
+    { value:'enforce-ssl-policy',       label:'Enforce SSL-only policy',      destructive:false },
   ],
   'EBS Volume': [
     { value:'tag',      label:'Tag volume',     destructive:false },
@@ -104,4 +180,77 @@ export const RESOURCE_ACTIONS = {
     { value:'tag',        label:'Tag AMI',        destructive:false },
     { value:'deregister', label:'Deregister AMI', destructive:true  },
   ],
+  'RDS Instance': [
+    { value:'tag',    label:'Tag instance',                  destructive:false },
+    { value:'notify', label:'Send notification',              destructive:false },
+    { value:'stop',   label:'Stop instance',                  destructive:false },
+    { value:'delete', label:'Delete instance (with snapshot)', destructive:true  },
+  ],
+  'RDS Snapshot': [
+    { value:'tag',    label:'Tag snapshot',   destructive:false },
+    { value:'delete', label:'Delete snapshot', destructive:true  },
+  ],
+  'IAM User': [
+    { value:'tag',                     label:'Tag user',                       destructive:false },
+    { value:'notify',                  label:'Send notification',               destructive:false },
+    { value:'disable-login-profile',   label:'Disable console login',           destructive:false },
+    { value:'deactivate-access-keys',  label:'Deactivate all access keys',      destructive:false },
+    { value:'delete',                  label:'Delete IAM user',                 destructive:true  },
+  ],
+  'IAM Policy': [
+    { value:'tag',             label:'Tag policy',                 destructive:false },
+    { value:'notify',          label:'Send notification',           destructive:false },
+    { value:'detach-policy',   label:'Detach from all principals',  destructive:true  },
+    { value:'delete',          label:'Delete policy',               destructive:true  },
+  ],
+  'IAM Role': [
+    { value:'tag',    label:'Tag role',            destructive:false },
+    { value:'notify', label:'Send notification',    destructive:false },
+    { value:'delete', label:'Delete role',          destructive:true  },
+  ],
+  'Lambda Function': [
+    { value:'tag',    label:'Tag function',   destructive:false },
+    { value:'notify', label:'Send notification', destructive:false },
+    { value:'delete', label:'Delete function', destructive:true  },
+  ],
+  'CloudTrail': [
+    { value:'tag',                      label:'Tag trail',               destructive:false },
+    { value:'notify',                   label:'Send notification',        destructive:false },
+    { value:'enable-trail-logging',     label:'Enable logging',           destructive:false },
+    { value:'enable-log-validation',    label:'Enable log file validation', destructive:false },
+  ],
+  'VPC': [
+    { value:'tag',    label:'Tag VPC',        destructive:false },
+    { value:'notify', label:'Send notification', destructive:false },
+  ],
+  'Subnet': [
+    { value:'tag',    label:'Tag subnet',     destructive:false },
+    { value:'notify', label:'Send notification', destructive:false },
+  ],
+  'Internet Gateway': [
+    { value:'tag',    label:'Tag IGW',        destructive:false },
+    { value:'notify', label:'Send notification', destructive:false },
+  ],
+  'Secret': [
+    { value:'tag',    label:'Tag secret',     destructive:false },
+    { value:'notify', label:'Send notification', destructive:false },
+    { value:'delete', label:'Delete secret',   destructive:true  },
+  ],
+}
+
+// Returns the action list appropriate for a specific set of findings on a resource.
+// If any of the policies have suggestedActions, we filter RESOURCE_ACTIONS to that union.
+// Falls back to the full resource-type action list when no policy overrides exist.
+export function getActionsForFindings(findings, resourceType) {
+  const overrideSets = findings
+    .map(f => POLICY_INFO[f.policy]?.suggestedActions)
+    .filter(Boolean)
+
+  const base = RESOURCE_ACTIONS[resourceType]
+    || [{ value:'tag', label:'Tag resource', destructive:false }]
+
+  if (overrideSets.length === 0) return base
+
+  const allowed = new Set(overrideSets.flat())
+  return base.filter(a => allowed.has(a.value))
 }

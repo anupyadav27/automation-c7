@@ -1,0 +1,105 @@
+policies:
+
+  # ---------------------------------------------------------------
+  # 1. CloudTrail trails with logging disabled
+  # ---------------------------------------------------------------
+  - name: cloudtrail-not-logging
+    resource: cloudtrail
+    description: >
+      CloudTrail trails where IsLogging=false. When logging is off,
+      no API activity is recorded, leaving the account blind to
+      all changes. This is a critical compliance violation.
+    filters:
+      - type: status
+        key: IsLogging
+        value: false
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "cloudtrail-logging-disabled"
+      - type: notify
+        template: default.html
+        subject: "[c7n] CRITICAL: CloudTrail logging is DISABLED"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 2. CloudTrail without log file validation
+  # ---------------------------------------------------------------
+  - name: cloudtrail-no-log-validation
+    resource: cloudtrail
+    description: >
+      Trails without LogFileValidationEnabled=true. Without validation,
+      it is impossible to detect if log files have been modified,
+      deleted, or forged after delivery to S3.
+    filters:
+      - type: value
+        key: LogFileValidationEnabled
+        value: false
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "cloudtrail-no-log-validation"
+      - type: notify
+        template: default.html
+        subject: "[c7n] CloudTrail log file validation disabled — tamper detection missing"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 3. CloudTrail logs not encrypted with KMS
+  # ---------------------------------------------------------------
+  - name: cloudtrail-no-kms-encryption
+    resource: cloudtrail
+    description: >
+      Trails whose S3 log files are not encrypted with a KMS CMK.
+      Using SSE-S3 (default) provides no access control on the key.
+      KMS encryption allows fine-grained key policy controls.
+    filters:
+      - type: value
+        key: KMSKeyId
+        value: absent
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "cloudtrail-no-kms"
+      - type: notify
+        template: default.html
+        subject: "[c7n] CloudTrail logs not encrypted with KMS CMK"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 4. CloudTrail not integrated with CloudWatch Logs
+  # ---------------------------------------------------------------
+  - name: cloudtrail-no-cloudwatch-logs
+    resource: cloudtrail
+    description: >
+      Trails not streaming to CloudWatch Logs. Without this integration,
+      it is not possible to set metric filters and alarms on API
+      activity (e.g. root login, IAM changes, SG modifications).
+    filters:
+      - type: value
+        key: CloudWatchLogsLogGroupArn
+        value: absent
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "cloudtrail-no-cwl-integration"
+      - type: notify
+        template: default.html
+        subject: "[c7n] CloudTrail not streaming to CloudWatch Logs — no real-time alerting"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

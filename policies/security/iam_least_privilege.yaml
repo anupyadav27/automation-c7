@@ -1,25 +1,62 @@
-name: IAM Least Privilege
-version: "1.0"
-type: security
-provider: aws
-resource_type: rds_instance
-description: Ensure database instances follow least-privilege access
-tags: [security, iam, rds]
-rules:
-  - id: SEC-IAM-001
-    description: RDS instance is publicly accessible
-    severity: critical
-    conditions:
-      - field: publicly_accessible
-        operator: eq
-        value: true
-    remediation: Disable public accessibility and use VPC security groups
+policies:
 
-  - id: SEC-IAM-002
-    description: RDS instance does not have encryption enabled
-    severity: high
-    conditions:
-      - field: storage_encrypted
-        operator: eq
+  # ---------------------------------------------------------------
+  # IAM users without MFA enabled
+  # ---------------------------------------------------------------
+  - name: iam-user-no-mfa
+    resource: iam-user
+    description: >
+      IAM users with console access that have not enabled MFA.
+      Accounts without MFA are at high risk from credential theft.
+      All human users must have MFA enforced.
+    filters:
+      - type: credential
+        key: mfa_active
         value: false
-    remediation: Enable storage encryption (requires instance restart or migration)
+      - type: credential
+        key: password_enabled
+        value: true
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "no-mfa-enabled"
+      - type: notify
+        template: default.html
+        subject: "[c7n] CRITICAL: IAM user has console access without MFA"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # IAM users with credentials inactive for 90+ days
+  # ---------------------------------------------------------------
+  - name: iam-inactive-user
+    resource: iam-user
+    description: >
+      IAM users whose credentials (password or access keys) have
+      not been used in over 90 days. Dormant credentials are an
+      attack surface — disable or delete them.
+    filters:
+      - or:
+          - type: credential
+            key: password_last_used
+            value: 90
+            op: greater-than
+          - type: credential
+            key: access_keys.last_used_date
+            value: 90
+            op: greater-than
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "inactive-credentials-90d"
+      - type: notify
+        template: default.html
+        subject: "[c7n] IAM user credentials inactive for 90+ days — disable or delete"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

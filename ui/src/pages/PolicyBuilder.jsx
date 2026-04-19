@@ -1,7 +1,31 @@
 import { useState, useEffect, useMemo } from 'react'
-import { runBuild, getEndpoint } from '../api'
+import { runBuild } from '../api'
 import { saveToHistory } from '../lib/history'
+import { getUserRules, saveUserRule, deleteUserRule, getUserCategories } from '../lib/userRules'
 import ReportTable from '../components/ReportTable'
+
+// Maps c7n resource type names → { service, resourceType } used by ReportTable
+const C7N_RESOURCE_META = {
+  'ec2':             { service:'ec2',            resourceType:'EC2 Instance' },
+  's3':              { service:'s3',             resourceType:'S3 Bucket' },
+  'ebs':             { service:'ebs',            resourceType:'EBS Volume' },
+  'ebs-snapshot':    { service:'ebs',            resourceType:'EBS Snapshot' },
+  'eni':             { service:'eni',            resourceType:'ENI' },
+  'elastic-ip':      { service:'eni',            resourceType:'Elastic IP' },
+  'ami':             { service:'ami',            resourceType:'AMI' },
+  'security-group':  { service:'ec2',            resourceType:'Security Group' },
+  'rds':             { service:'rds',            resourceType:'RDS Instance' },
+  'rds-snapshot':    { service:'rds',            resourceType:'RDS Snapshot' },
+  'iam-user':        { service:'iam',            resourceType:'IAM User' },
+  'iam-policy':      { service:'iam',            resourceType:'IAM Policy' },
+  'iam-role':        { service:'iam',            resourceType:'IAM Role' },
+  'lambda':          { service:'lambda',         resourceType:'Lambda Function' },
+  'cloudtrail':      { service:'cloudtrail',     resourceType:'CloudTrail' },
+  'vpc':             { service:'vpc',            resourceType:'VPC' },
+  'subnet':          { service:'vpc',            resourceType:'Subnet' },
+  'internet-gateway':{ service:'vpc',            resourceType:'Internet Gateway' },
+  'secrets-manager': { service:'secretsmanager', resourceType:'Secret' },
+}
 
 // ── CSV parser (no external deps) ─────────────────────────────────
 function parseCSV(text) {
@@ -36,17 +60,6 @@ function splitCSVLine(line) {
   }
   cols.push(cur)
   return cols
-}
-
-// ── Severity colour ────────────────────────────────────────────────
-const SEV_CLASS = {
-  CRITICAL: 'bg-red-600 text-white',
-  HIGH:     'bg-orange-500 text-white',
-  WARNING:  'bg-yellow-500 text-black',
-  MEDIUM:   'bg-yellow-600 text-white',
-  COST:     'bg-violet-600 text-white',
-  LOW:      'bg-blue-600 text-white',
-  INFO:     'bg-gray-600 text-white',
 }
 
 // ── Common op values ────────────────────────────────────────────────
@@ -97,9 +110,9 @@ const RESOURCE_ATTRS = {
   'directory': {keys: ['DirectoryId','Name']},
   'distribution': {keys: ['Id','DomainName','LastModifiedTime'], enumValues: {'Status': ['Deployed','InProgress'],'HttpVersion': ['http1.1','http2','http2and3']}},
   'dynamodb-table': {keys: ['TableName','CreationDateTime'], enumValues: {'TableStatus': ['ACTIVE','CREATING','DELETING','UPDATING'],'BillingModeSummary.BillingMode': ['PAY_PER_REQUEST','PROVISIONED']}},
-  'ebs': {keys: ['VolumeId','createTime','Attachments[0].InstanceId','Size','VolumeType','KmsKeyId'], enumValues: {'State': ['available','in-use','creating','deleting','error'],'VolumeType': ['gp2','gp3','io1','io2','st1','sc1','standard'],'Encrypted': ['true','false']}},
+  'ebs': {keys: ['VolumeId','createTime','Attachments[0].InstanceId','Size','VolumeType','KmsKeyId','State','Encrypted'], enumValues: {'State': ['available','in-use','creating','deleting','error'],'VolumeType': ['gp2','gp3','io1','io2','st1','sc1','standard'],'Encrypted': ['true','false']}},
   'ebs-snapshot': {keys: ['SnapshotId','StartTime','VolumeId','VolumeSize','State'], enumValues: {'State': ['pending','completed','error']}},
-  'ec2': {keys: ['InstanceId','PublicDnsName','LaunchTime','InstanceType','VpcId','PrivateIpAddress'], enumValues: {'State.Name': ['running','stopped','terminated','pending','stopping','shutting-down'],'InstanceType': ['t3.micro','t3.small','t3.medium','t3.large','t3.xlarge','m5.large','m5.xlarge','c5.large','r5.large'],'Architecture': ['x86_64','arm64'],'Placement.Tenancy': ['default','dedicated','host']}},
+  'ec2': {keys: ['InstanceId','PublicDnsName','LaunchTime','InstanceType','State.Name','VpcId','PrivateIpAddress','Architecture','Placement.Tenancy'], enumValues: {'State.Name': ['running','stopped','terminated','pending','stopping','shutting-down'],'InstanceType': ['t3.micro','t3.small','t3.medium','t3.large','t3.xlarge','m5.large','m5.xlarge','c5.large','r5.large'],'Architecture': ['x86_64','arm64'],'Placement.Tenancy': ['default','dedicated','host']}},
   'ec2-reserved': {keys: ['ReservedInstancesId','Start']},
   'ecr': {keys: ['repositoryName'], enumValues: {'imageTagMutability': ['MUTABLE','IMMUTABLE']}},
   'ecs': {keys: ['clusterArn','clusterName'], enumValues: {'status': ['ACTIVE','PROVISIONING','FAILED','UNAVAILABLE','DELETE_IN_PROGRESS']}},
@@ -116,7 +129,7 @@ const RESOURCE_ATTRS = {
   'elasticsearch': {keys: ['DomainName','Name'], enumValues: {'ElasticsearchClusterConfig.DedicatedMasterEnabled': ['true','false']}},
   'elb': {keys: ['LoadBalancerName','DNSName','CreatedTime','VPCId'], enumValues: {'Scheme': ['internet-facing','internal']}},
   'emr': {keys: ['Id','Name','Status.Timeline.CreationDateTime'], enumValues: {'Status.State': ['STARTING','BOOTSTRAPPING','RUNNING','WAITING','TERMINATING','TERMINATED','TERMINATED_WITH_ERRORS']}},
-  'eni': {keys: ['NetworkInterfaceId'], enumValues: {'Status': ['available','in-use','associated','attaching','detaching'],'InterfaceType': ['interface','natGateway','efa','trunk']}},
+  'eni': {keys: ['NetworkInterfaceId','Status','InterfaceType'], enumValues: {'Status': ['available','in-use','associated','attaching','detaching'],'InterfaceType': ['interface','natGateway','efa','trunk']}},
   'event-bus': {keys: ['Name']},
   'firehose': {keys: ['DeliveryStreamName','CreateTimestamp'], enumValues: {'DeliveryStreamStatus': ['CREATING','DELETING','ACTIVE']}},
   'fsx': {keys: ['FileSystemId','CreationTime']},
@@ -134,7 +147,7 @@ const RESOURCE_ATTRS = {
   'kafka': {keys: ['ClusterArn','ClusterName','CreationTime']},
   'kinesis': {keys: ['StreamName'], enumValues: {'StreamStatus': ['ACTIVE','CREATING','DELETING','UPDATING']}},
   'kms-key': {keys: ['KeyId'], enumValues: {'KeyState': ['Enabled','Disabled','PendingDeletion','PendingImport'],'KeyManager': ['AWS','CUSTOMER'],'KeyUsage': ['ENCRYPT_DECRYPT','SIGN_VERIFY']}},
-  'lambda': {keys: ['FunctionName','LastModified'], enumValues: {'State': ['Active','Inactive','Pending','Failed'],'Runtime': ['python3.9','python3.10','python3.11','python3.12','nodejs18.x','nodejs20.x','java11','java17','dotnet6','go1.x'],'PackageType': ['Zip','Image']}},
+  'lambda': {keys: ['FunctionName','LastModified','State','Runtime','PackageType'], enumValues: {'State': ['Active','Inactive','Pending','Failed'],'Runtime': ['python3.9','python3.10','python3.11','python3.12','nodejs18.x','nodejs20.x','java11','java17','dotnet6','go1.x'],'PackageType': ['Zip','Image']}},
   'lambda-layer': {keys: ['LayerName']},
   'log-group': {keys: ['logGroupName','creationTime']},
   'nat-gateway': {keys: ['NatGatewayId','CreateTime'], enumValues: {'State': ['available','deleted','deleting','failed','pending']}},
@@ -178,6 +191,19 @@ const SKIP_FIELDS = new Set([
   'whitelist_orgids_from','whitelist_vpce_from','whitelist_vpc_from',
 ])
 
+// Wraps matched substring in a highlight span
+function highlightMatch(text, query) {
+  const idx = text.toLowerCase().indexOf(query.toLowerCase())
+  if (idx === -1) return text
+  return (
+    <>
+      {text.slice(0, idx)}
+      <span className="text-blue-300 font-semibold">{text.slice(idx, idx + query.length)}</span>
+      {text.slice(idx + query.length)}
+    </>
+  )
+}
+
 export default function PolicyBuilder() {
   const [schema, setSchema]         = useState([])   // all CSV rows
   const [loading, setLoading]       = useState(true)
@@ -191,11 +217,19 @@ export default function PolicyBuilder() {
   const [actions, setActions]       = useState([])   // [{type,params:{}}]
   const [policyName, setPolicyName] = useState('')
 
+  // save / edit state
+  const [savedRules,    setSavedRules]    = useState(() => getUserRules())
+  const [editingRuleId, setEditingRuleId] = useState(null)   // null = new rule
+  const [showSaveForm,  setShowSaveForm]  = useState(false)
+  const [saveForm,      setSaveForm]      = useState({ label:'', category:'security', customCategory:'', severity:'INFO' })
+  const [saveMsg,       setSaveMsg]       = useState(null)   // { ok, text }
+
   // run state
-  const [running, setRunning]       = useState(false)
-  const [result, setResult]         = useState(null)
-  const [runError, setRunError]     = useState(null)
-  const [yamlPreview, setYamlPreview] = useState('')
+  const [running,         setRunning]         = useState(false)
+  const [report,          setReport]          = useState(null)
+  const [extraPolicyInfo, setExtraPolicyInfo] = useState(null)
+  const [runError,        setRunError]        = useState(null)
+  const [yamlPreview,     setYamlPreview]     = useState('')
 
   // Load CSV once
   useEffect(() => {
@@ -234,7 +268,8 @@ export default function PolicyBuilder() {
     setSelectedResource(res)
     setFilters([])
     setActions([])
-    setResult(null)
+    setReport(null)
+    setExtraPolicyInfo(null)
     setYamlPreview('')
     setPolicyName(`dynamic-${res}`)
   }
@@ -327,16 +362,108 @@ export default function PolicyBuilder() {
     return `policies:\n  - name: ${spec.name}\n    resource: aws.${spec.resource}\n    filters:\n${filtersYaml || '      []'}\n    actions:\n${actionsYaml || '      []'}`
   }
 
+  // ── Save / Edit / Delete handlers ───────────────────────────────
+  function openSaveForm() {
+    const existingRule = savedRules.find(r => r.id === editingRuleId)
+    setSaveForm({
+      label:          existingRule?.label    || policyName || `dynamic-${selectedResource}`,
+      category:       existingRule?.category || 'security',
+      customCategory: '',
+      severity:       existingRule?.severity || 'INFO',
+    })
+    setShowSaveForm(true)
+    setSaveMsg(null)
+  }
+
+  function handleSaveRule() {
+    const spec     = buildSpec()
+    const meta     = C7N_RESOURCE_META[selectedResource] || { service:'other', resourceType: selectedResource }
+    const category = saveForm.category === '__custom__'
+      ? saveForm.customCategory.trim().toLowerCase().replace(/\s+/g, '-')
+      : saveForm.category
+
+    if (!category) { setSaveMsg({ ok:false, text:'Category is required' }); return }
+
+    const rule = saveUserRule({
+      id:           editingRuleId || undefined,
+      name:         spec.name,
+      label:        saveForm.label || spec.name,
+      category,
+      severity:     saveForm.severity,
+      service:      meta.service,
+      resourceType: meta.resourceType,
+      spec,
+    })
+    setSavedRules(getUserRules())
+    setEditingRuleId(rule.id)
+    setShowSaveForm(false)
+    setSaveMsg({ ok:true, text: editingRuleId ? 'Rule updated' : 'Rule saved' })
+    setTimeout(() => setSaveMsg(null), 3000)
+  }
+
+  function handleDeleteRule(id) {
+    deleteUserRule(id)
+    setSavedRules(getUserRules())
+    if (editingRuleId === id) {
+      setEditingRuleId(null)
+      setSaveMsg(null)
+    }
+  }
+
+  function handleLoadForEdit(rule) {
+    // Restore spec back into builder form
+    setPolicyName(rule.spec.name || '')
+    setSelectedResource(rule.spec.resource)
+    // Convert c7n flat filter objects → UI { type, params, required } format
+    const uiFilters = (rule.spec.filters || []).map(f => {
+      const { type, ...params } = f
+      return { type, params, required: [] }
+    })
+    const uiActions = (rule.spec.actions || []).map(a => {
+      const { type, ...params } = a
+      return { type, params }
+    })
+    setFilters(uiFilters)
+    setActions(uiActions)
+    setEditingRuleId(rule.id)
+    setShowSaveForm(false)
+    setSaveMsg({ ok:true, text:`Loaded "${rule.label}" for editing` })
+    setTimeout(() => setSaveMsg(null), 3000)
+  }
+
   async function runScan() {
     const spec = buildSpec()
     setRunning(true)
     setRunError(null)
-    setResult(null)
+    setReport(null)
+    setExtraPolicyInfo(null)
     try {
       const res = await runBuild(spec, { dryrun: true, region, authType })
-      setResult(res)
       if (res.generated_yaml) setYamlPreview(res.generated_yaml)
-      saveToHistory(`builder:${spec.resource}`, { results: [res], dryrun: true, region })
+
+      // Wrap single result into the format ReportTable expects
+      const wrappedReport = {
+        results: [res],
+        account: { account_id: 'builder', region },
+        region,
+        dryrun: true,
+      }
+      setReport(wrappedReport)
+
+      // Inject display metadata for this dynamic policy so ReportTable
+      // can group it under the right service + resource type + action list
+      const meta = C7N_RESOURCE_META[spec.resource] || { service: 'other', resourceType: spec.resource }
+      setExtraPolicyInfo({
+        [res.policy]: {
+          service:      meta.service,
+          resourceType: meta.resourceType,
+          category:     'security',
+          severity:     'INFO',
+          label:        spec.name || `dynamic-${spec.resource}`,
+        },
+      })
+
+      saveToHistory(`builder:${spec.resource}`, wrappedReport)
     } catch (e) {
       setRunError(e.message)
     } finally {
@@ -344,7 +471,24 @@ export default function PolicyBuilder() {
     }
   }
 
-  // ── Render ───────────────────────────────────────────────────────
+  // ── Search state — must be before early returns (React hooks rule) ──
+  const [resourceSearch, setResourceSearch] = useState('')
+
+  const filteredGroups = useMemo(() => {
+    const q = resourceSearch.trim().toLowerCase()
+    if (!q) return serviceGroups
+    const result = {}
+    for (const [group, resources] of Object.entries(serviceGroups)) {
+      const matched = resources.filter(r => r.toLowerCase().includes(q))
+      if (matched.length > 0) result[group] = matched
+    }
+    return result
+  }, [serviceGroups, resourceSearch])
+
+  const resourceCount  = Object.values(serviceGroups).reduce((s, r) => s + r.length, 0)
+  const filteredCount  = Object.values(filteredGroups).reduce((s, r) => s + r.length, 0)
+
+  // ── Early returns after all hooks ───────────────────────────────
   if (loading) return (
     <div className="flex items-center justify-center h-64 text-gray-400">
       Loading c7n schema…
@@ -354,36 +498,69 @@ export default function PolicyBuilder() {
     <div className="p-6 text-red-400">Schema load error: {error}</div>
   )
 
-  const resourceCount = Object.values(serviceGroups).reduce((s, r) => s + r.length, 0)
-
   return (
     <div className="flex h-full">
       {/* ── Left panel: resource selector ── */}
-      <aside className="w-64 border-r border-gray-800 overflow-y-auto bg-gray-900 flex-shrink-0">
-        <div className="p-4 border-b border-gray-800">
-          <h2 className="text-sm font-semibold text-gray-200">Resource Type</h2>
-          <p className="text-[11px] text-gray-500 mt-0.5">{resourceCount} resources</p>
-        </div>
-        {Object.entries(serviceGroups).map(([group, resources]) => (
-          <div key={group}>
-            <div className="px-4 py-1.5 text-[10px] font-bold uppercase text-gray-600 tracking-wider bg-gray-900">
-              {group}
-            </div>
-            {resources.map(res => (
+      <aside className="w-64 border-r border-gray-800 bg-gray-900 flex-shrink-0 flex flex-col">
+
+        {/* Header + search */}
+        <div className="p-3 border-b border-gray-800 flex-shrink-0">
+          <h2 className="text-sm font-semibold text-gray-200 mb-2">Resource Type</h2>
+          <div className="relative">
+            <svg className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+            </svg>
+            <input
+              value={resourceSearch}
+              onChange={e => setResourceSearch(e.target.value)}
+              placeholder="Search resources…"
+              className="w-full pl-7 pr-7 py-1.5 text-xs bg-gray-800 border border-gray-700 rounded-lg text-gray-300 placeholder-gray-600 focus:outline-none focus:border-blue-500"
+            />
+            {resourceSearch && (
               <button
-                key={res}
-                onClick={() => selectResource(res)}
-                className={`w-full text-left px-4 py-1.5 text-xs transition-colors ${
-                  selectedResource === res
-                    ? 'bg-blue-600/20 text-blue-400 font-medium'
-                    : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
-                }`}
-              >
-                {res}
-              </button>
-            ))}
+                onClick={() => setResourceSearch('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 text-xs leading-none"
+              >✕</button>
+            )}
           </div>
-        ))}
+          <p className="text-[10px] text-gray-600 mt-1.5">
+            {resourceSearch
+              ? `${filteredCount} of ${resourceCount} resources`
+              : `${resourceCount} resources`}
+          </p>
+        </div>
+
+        {/* Scrollable resource list */}
+        <div className="overflow-y-auto flex-1">
+          {Object.keys(filteredGroups).length === 0 ? (
+            <p className="px-4 py-6 text-xs text-gray-600 text-center">No resources match "{resourceSearch}"</p>
+          ) : (
+            Object.entries(filteredGroups).map(([group, resources]) => (
+              <div key={group}>
+                <div className="px-4 py-1.5 text-[10px] font-bold uppercase text-gray-600 tracking-wider bg-gray-900 sticky top-0 z-10">
+                  {group}
+                </div>
+                {resources.map(res => (
+                  <button
+                    key={res}
+                    onClick={() => selectResource(res)}
+                    className={`w-full text-left px-4 py-1.5 text-xs transition-colors ${
+                      selectedResource === res
+                        ? 'bg-blue-600/20 text-blue-400 font-medium'
+                        : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
+                    }`}
+                  >
+                    {resourceSearch
+                      ? highlightMatch(res, resourceSearch)
+                      : res}
+                  </button>
+                ))}
+              </div>
+            ))
+          )}
+        </div>
       </aside>
 
       {/* ── Main panel ── */}
@@ -402,33 +579,29 @@ export default function PolicyBuilder() {
                 </h2>
                 <p className="text-xs text-gray-500">
                   {availableFilters.length} filters · {availableActions.length} actions
+                  {editingRuleId && <span className="ml-2 text-blue-400">· editing saved rule</span>}
                 </p>
               </div>
               <div className="ml-auto flex items-center gap-2 flex-wrap">
-                {/* Auth type */}
-                <select
-                  value={authType}
-                  onChange={e => setAuthType(e.target.value)}
-                  className="bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5"
-                >
+                <select value={authType} onChange={e => setAuthType(e.target.value)}
+                  className="bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5">
                   <option value="access-key">Access Key (local)</option>
                   <option value="iam-role">IAM Role (Lambda)</option>
                 </select>
-                {/* Region */}
-                <input
-                  value={region}
-                  onChange={e => setRegion(e.target.value)}
+                <input value={region} onChange={e => setRegion(e.target.value)}
                   placeholder="region"
-                  className="bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5 w-36"
-                />
-                {/* Policy name */}
-                <input
-                  value={policyName}
-                  onChange={e => setPolicyName(e.target.value)}
+                  className="bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5 w-36"/>
+                <input value={policyName} onChange={e => setPolicyName(e.target.value)}
                   placeholder="policy name"
-                  className="bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5 w-44"
-                />
-                {/* Run */}
+                  className="bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5 w-44"/>
+                {/* Save Rule button */}
+                <button
+                  onClick={openSaveForm}
+                  disabled={filters.length === 0}
+                  className="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 disabled:opacity-40 text-gray-200 text-xs font-semibold rounded border border-gray-600 transition-colors"
+                >
+                  {editingRuleId ? '💾 Update Rule' : '💾 Save Rule'}
+                </button>
                 <button
                   onClick={runScan}
                   disabled={running || filters.length === 0}
@@ -438,6 +611,91 @@ export default function PolicyBuilder() {
                 </button>
               </div>
             </div>
+
+            {/* Save feedback message */}
+            {saveMsg && (
+              <div className={`text-xs px-3 py-2 rounded-lg border ${saveMsg.ok
+                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
+                {saveMsg.text}
+              </div>
+            )}
+
+            {/* ── Save Rule form ── */}
+            {showSaveForm && (
+              <div className="bg-gray-900 border border-blue-500/30 rounded-lg p-4 space-y-3">
+                <h3 className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
+                  {editingRuleId ? 'Update Saved Rule' : 'Save as Custom Rule'}
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Label */}
+                  <div className="col-span-2">
+                    <label className="text-[10px] text-gray-500 block mb-1">Display Label</label>
+                    <input
+                      value={saveForm.label}
+                      onChange={e => setSaveForm(f => ({ ...f, label: e.target.value }))}
+                      placeholder="e.g. Stopped EC2 instances"
+                      className="w-full bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  {/* Category */}
+                  <div>
+                    <label className="text-[10px] text-gray-500 block mb-1">Category</label>
+                    <select
+                      value={saveForm.category}
+                      onChange={e => setSaveForm(f => ({ ...f, category: e.target.value }))}
+                      className="w-full bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5"
+                    >
+                      <option value="security">Security</option>
+                      <option value="cost">Cost Optimisation</option>
+                      {getUserCategories().map(c => <option key={c} value={c}>{c}</option>)}
+                      <option value="__custom__">+ New category…</option>
+                    </select>
+                    {saveForm.category === '__custom__' && (
+                      <input
+                        value={saveForm.customCategory}
+                        onChange={e => setSaveForm(f => ({ ...f, customCategory: e.target.value }))}
+                        placeholder="e.g. compliance"
+                        className="mt-1 w-full bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5 focus:outline-none focus:border-blue-500"
+                      />
+                    )}
+                  </div>
+                  {/* Severity */}
+                  <div>
+                    <label className="text-[10px] text-gray-500 block mb-1">Severity</label>
+                    <select
+                      value={saveForm.severity}
+                      onChange={e => setSaveForm(f => ({ ...f, severity: e.target.value }))}
+                      className="w-full bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5"
+                    >
+                      {['CRITICAL','HIGH','WARNING','MEDIUM','COST','LOW','INFO'].map(s =>
+                        <option key={s} value={s}>{s}</option>
+                      )}
+                    </select>
+                  </div>
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <button onClick={handleSaveRule}
+                    className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded transition-colors">
+                    {editingRuleId ? 'Update' : 'Save'}
+                  </button>
+                  <button onClick={() => setShowSaveForm(false)}
+                    className="px-4 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs rounded border border-gray-700 transition-colors">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ── Saved Rules list ── */}
+            {savedRules.length > 0 && (
+              <SavedRulesList
+                rules={savedRules}
+                editingId={editingRuleId}
+                onEdit={handleLoadForEdit}
+                onDelete={handleDeleteRule}
+              />
+            )}
 
             {/* ── Filters ── */}
             <Section title="Filters" count={filters.length}>
@@ -492,60 +750,21 @@ export default function PolicyBuilder() {
               </pre>
             </Section>
 
-            {/* ── Results ── */}
+            {/* ── Error ── */}
             {runError && (
               <div className="bg-red-900/30 border border-red-700 rounded p-3 text-sm text-red-300">
                 {runError}
               </div>
             )}
-            {result && (
-              <Section title="Scan Results">
-                <div className="flex items-center gap-4 mb-3 flex-wrap">
-                  <span className={`text-xs px-2 py-0.5 rounded font-medium ${
-                    result.status === 'success' ? 'bg-green-700 text-white' : 'bg-red-700 text-white'
-                  }`}>{result.status}</span>
-                  <span className="text-xs text-gray-400">
-                    {Object.values(result.resources_found || {})[0] ?? 0} resource(s) found
-                  </span>
-                  <span className="text-xs text-gray-600">policy: {result.policy}</span>
-                </div>
-                {result.resources && result.resources.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs text-gray-300">
-                      <thead>
-                        <tr className="border-b border-gray-800">
-                          <th className="text-left py-1.5 px-2 text-gray-500 font-medium">Severity</th>
-                          <th className="text-left py-1.5 px-2 text-gray-500 font-medium">Resource ID</th>
-                          <th className="text-left py-1.5 px-2 text-gray-500 font-medium">Finding</th>
-                          <th className="text-left py-1.5 px-2 text-gray-500 font-medium">Tags</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {result.resources.map((r, i) => (
-                          <tr key={i} className="border-b border-gray-800/50 hover:bg-gray-800/30">
-                            <td className="py-1.5 px-2">
-                              <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${SEV_CLASS[r.Severity] || SEV_CLASS.INFO}`}>
-                                {r.Severity}
-                              </span>
-                            </td>
-                            <td className="py-1.5 px-2 font-mono text-gray-300">{r.ResourceId}</td>
-                            <td className="py-1.5 px-2 text-gray-400">{r.Finding}</td>
-                            <td className="py-1.5 px-2 text-gray-600 text-[11px]">{r.Tags || ''}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-500 italic">No resources matched the filters.</p>
-                )}
-                {result.stderr && (
-                  <details className="mt-2">
-                    <summary className="text-xs text-gray-600 cursor-pointer">stderr output</summary>
-                    <pre className="mt-1 text-[11px] text-gray-500 bg-gray-900 rounded p-2 overflow-x-auto">{result.stderr}</pre>
-                  </details>
-                )}
-              </Section>
+
+            {/* ── Results — full ReportTable with remediation actions ── */}
+            {report && (
+              <ReportTable
+                report={report}
+                region={region}
+                authType={authType}
+                extraPolicyInfo={extraPolicyInfo}
+              />
             )}
           </>
         )}
@@ -563,6 +782,27 @@ function Section({ title, count, children }) {
         {title}{count !== undefined && count > 0 ? ` (${count})` : ''}
       </h3>
       {children}
+    </div>
+  )
+}
+
+// ── Tooltip ────────────────────────────────────────────────────────
+function Tooltip({ text, children, width = 'w-72' }) {
+  const [visible, setVisible] = useState(false)
+  if (!text) return children
+  return (
+    <div className="relative inline-flex items-center"
+      onMouseEnter={() => setVisible(true)}
+      onMouseLeave={() => setVisible(false)}
+    >
+      {children}
+      {visible && (
+        <div className={`absolute bottom-full left-0 mb-2 z-50 ${width} bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 shadow-2xl pointer-events-none`}>
+          <p className="text-[11px] text-gray-300 leading-relaxed">{text}</p>
+          {/* arrow */}
+          <div className="absolute top-full left-4 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-700" />
+        </div>
+      )}
     </div>
   )
 }
@@ -589,15 +829,19 @@ function FilterSearchSelect({ options, onSelect, label }) {
         className="w-full bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5 placeholder-gray-600 focus:outline-none focus:border-blue-500"
       />
       {open && filtered.length > 0 && (
-        <div className="absolute z-20 mt-1 w-full bg-gray-800 border border-gray-700 rounded shadow-xl max-h-56 overflow-y-auto">
+        <div className="absolute z-20 mt-1 w-full bg-gray-800 border border-gray-700 rounded shadow-xl max-h-64 overflow-y-auto">
           {filtered.map(o => (
             <button
               key={o.name}
               onMouseDown={() => { onSelect(o.name); setQuery(''); setOpen(false) }}
-              className="w-full text-left px-3 py-1.5 hover:bg-gray-700 text-xs text-gray-300"
+              className="w-full text-left px-3 py-2 hover:bg-gray-700 border-b border-gray-700/50 last:border-0"
             >
-              <span className="font-mono text-blue-400">{o.name}</span>
-              {o.doc && <span className="ml-2 text-gray-500 truncate">{o.doc}</span>}
+              <div className="font-mono text-xs text-blue-400 font-semibold">{o.name}</div>
+              {o.doc && (
+                <div className="text-[11px] text-gray-500 mt-0.5 leading-relaxed whitespace-normal">
+                  {o.doc}
+                </div>
+              )}
             </button>
           ))}
         </div>
@@ -655,13 +899,14 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
             >
               <option value="">— select attribute —</option>
               {knownKeys.map(k2 => <option key={k2} value={k2}>{k2}</option>)}
-              <option value="__custom__">custom (type below)</option>
+              <option value="__custom__">custom (type below)…</option>
             </select>
-            {(!val || val === '__custom__') && (
+            {/* show text input when no known key is selected — persists while typing */}
+            {(!val || val === '__custom__' || !knownKeys.includes(val)) && (
               <input
-                value={val === '__custom__' ? '' : val}
+                value={val === '__custom__' ? '' : (knownKeys.includes(val) ? '' : val)}
                 onChange={e => onChange('key', e.target.value)}
-                placeholder="e.g. Tags[0].Key"
+                placeholder="e.g. State.Name or Tags[0].Key"
                 className={`${cls} w-52 mt-0.5`}
               />
             )}
@@ -788,9 +1033,11 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
       <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-800">
         <span className="font-mono text-xs text-blue-400 font-semibold">{filter.type}</span>
         {schemaRow?.doc && (
-          <span className="text-[11px] text-gray-600 truncate" title={schemaRow.doc}>
-            — {schemaRow.doc}
-          </span>
+          <Tooltip text={schemaRow.doc}>
+            <span className="w-4 h-4 rounded-full bg-gray-700 text-gray-400 text-[10px] font-bold flex items-center justify-center cursor-default select-none hover:bg-gray-600 hover:text-gray-200 transition-colors">
+              ?
+            </span>
+          </Tooltip>
         )}
         <button onClick={onRemove} className="ml-auto text-gray-600 hover:text-red-400 text-sm leading-none">✕</button>
       </div>
@@ -860,6 +1107,89 @@ function ActionRow({ action, onRemove }) {
         onClick={onRemove}
         className="ml-auto text-gray-600 hover:text-red-400 text-xs px-1"
       >✕</button>
+    </div>
+  )
+}
+
+const SEVERITY_COLORS = {
+  CRITICAL: 'bg-red-500/15 text-red-400 border-red-500/30',
+  HIGH:     'bg-orange-500/15 text-orange-400 border-orange-500/30',
+  WARNING:  'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
+  MEDIUM:   'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
+  COST:     'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  LOW:      'bg-gray-500/15 text-gray-400 border-gray-600',
+  INFO:     'bg-blue-500/10 text-blue-400 border-blue-500/20',
+}
+
+function SavedRulesList({ rules, editingId, onEdit, onDelete }) {
+  if (!rules.length) return null
+  return (
+    <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
+      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+        Saved Rules ({rules.length})
+      </h3>
+      <div className="space-y-2">
+        {rules.map(rule => {
+          const isEditing = rule.id === editingId
+          return (
+            <div
+              key={rule.id}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg border transition-colors ${
+                isEditing
+                  ? 'bg-blue-600/10 border-blue-500/40'
+                  : 'bg-gray-800/40 border-gray-800 hover:border-gray-700'
+              }`}
+            >
+              {/* Label + resource */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-medium text-gray-200 truncate">{rule.label || rule.name}</span>
+                  {isEditing && (
+                    <span className="text-[10px] bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded px-1.5 py-0.5 font-semibold">
+                      editing
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                  <span className="text-[10px] font-mono text-gray-500">
+                    aws.{rule.spec?.resource || rule.resourceType}
+                  </span>
+                  <span className="text-[10px] text-gray-700">·</span>
+                  <span className="text-[10px] bg-gray-800 text-gray-500 border border-gray-700 rounded px-1.5 py-0.5">
+                    {rule.category}
+                  </span>
+                  <span className={`text-[10px] border rounded px-1.5 py-0.5 ${SEVERITY_COLORS[rule.severity] || SEVERITY_COLORS.INFO}`}>
+                    {rule.severity}
+                  </span>
+                  {rule.spec?.filters?.length > 0 && (
+                    <span className="text-[10px] text-gray-600">
+                      {rule.spec.filters.length} filter{rule.spec.filters.length !== 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <button
+                  onClick={() => onEdit(rule)}
+                  className="px-2.5 py-1 text-[11px] font-medium rounded border border-gray-700 text-gray-300 hover:bg-gray-700 hover:text-gray-100 transition-colors"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => {
+                    if (window.confirm(`Delete "${rule.label || rule.name}"?`)) onDelete(rule.id)
+                  }}
+                  className="px-2.5 py-1 text-[11px] font-medium rounded border border-red-900/50 text-red-500 hover:bg-red-900/30 hover:text-red-400 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }

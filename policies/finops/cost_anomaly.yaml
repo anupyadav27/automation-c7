@@ -1,34 +1,67 @@
-name: Cost Anomaly Detection
-version: "1.0"
-type: finops
-provider: aws
-resource_type: ec2_instance
-description: Detect EC2 instances that may be wasting money
-tags: [cost, ec2, idle]
-rules:
-  - id: FINOPS-EC2-001
-    description: EC2 instance is stopped (still incurring EBS costs)
-    severity: low
-    conditions:
-      - field: state
-        operator: eq
-        value: stopped
-    remediation: Terminate stopped instances or snapshot and delete their EBS volumes
+policies:
 
-  - id: FINOPS-EC2-002
-    description: EC2 instance is not EBS-optimized
-    severity: info
-    conditions:
-      - field: ebs_optimized
-        operator: eq
+  # ---------------------------------------------------------------
+  # EC2 instances not EBS-optimized — dedicated I/O bandwidth
+  # ---------------------------------------------------------------
+  - name: ec2-not-ebs-optimized
+    resource: ec2
+    description: >
+      EC2 instances running without EBS optimization. EBS-optimized
+      instances use dedicated bandwidth between EC2 and EBS, reducing
+      I/O contention and improving throughput at no extra cost on
+      most modern instance types.
+    filters:
+      - type: value
+        key: EbsOptimized
         value: false
-    remediation: Enable EBS optimization for better I/O performance and cost efficiency
+      - type: value
+        key: State.Name
+        value: running
+      - not:
+          - type: value
+            key: InstanceType
+            op: regex
+            value: "^(t2|t3|t3a|t4g)\\..*"
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "enable-ebs-optimization"
+      - type: notify
+        template: default.html
+        subject: "[c7n] EC2 instance not EBS-optimized — enable for better I/O performance"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
 
-  - id: FINOPS-EC2-003
-    description: EC2 instance lacks detailed monitoring
-    severity: info
-    conditions:
-      - field: monitoring
-        operator: ne
-        value: enabled
-    remediation: Enable detailed monitoring for better utilization visibility
+  # ---------------------------------------------------------------
+  # Lambda functions not invoked in the last 30 days
+  # ---------------------------------------------------------------
+  - name: lambda-not-invoked-30d
+    resource: lambda
+    description: >
+      Lambda functions with zero invocations in the past 30 days.
+      These may be orphaned or unused — review for decommission.
+    filters:
+      - type: metrics
+        name: Invocations
+        namespace: AWS/Lambda
+        dimensions:
+          FunctionName: FunctionName
+        statistics: Sum
+        days: 30
+        value: 1
+        op: less-than
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "lambda-unused-review"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Lambda function has 0 invocations in 30 days — review for removal"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

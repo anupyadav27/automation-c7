@@ -1,25 +1,67 @@
-name: Network Exposure
-version: "1.0"
-type: security
-provider: aws
-resource_type: security_group
-description: Detect security groups with overly permissive rules
-tags: [security, network, security-groups]
-rules:
-  - id: SEC-NET-001
-    description: Security group allows inbound traffic from 0.0.0.0/0
-    severity: high
-    conditions:
-      - field: open_to_world
-        operator: eq
-        value: true
-    remediation: Restrict inbound rules to specific IP ranges or security groups
+policies:
 
-  - id: SEC-NET-002
-    description: Security group has excessive inbound rules
-    severity: medium
-    conditions:
-      - field: inbound_rules_count
-        operator: gt
-        value: 20
-    remediation: Consolidate inbound rules and remove unnecessary entries
+  # ---------------------------------------------------------------
+  # Security groups with excessive inbound rules (hard to audit)
+  # ---------------------------------------------------------------
+  - name: sg-high-rule-count
+    resource: security-group
+    description: >
+      Security groups with more than 20 inbound rules. Large rule
+      sets are impossible to audit manually and often contain stale
+      or overly permissive entries accumulated over time.
+    filters:
+      - type: ingress
+        Cidr:
+          value: "0.0.0.0/0"
+          op: regex
+      - not:
+          - type: value
+            key: GroupName
+            value: "default"
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "high-rule-count-review"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Security group with many inbound rules — audit for stale entries"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # Default VPC security group with non-empty rules
+  # ---------------------------------------------------------------
+  - name: vpc-default-sg-has-rules
+    resource: security-group
+    description: >
+      The default security group in each VPC should have all rules
+      removed. Resources should never be associated with the default
+      SG (CIS Benchmark 4.3).
+    filters:
+      - type: value
+        key: GroupName
+        value: "default"
+      - or:
+          - type: value
+            key: "IpPermissions"
+            value: []
+            op: ne
+          - type: value
+            key: "IpPermissionsEgress"
+            value: []
+            op: ne
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "default-sg-has-rules"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Default VPC security group has rules — CIS 4.3 violation"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

@@ -1,7 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 
 const navItems = [
-  { to: '/', label: 'Run & Report', icon: RunIcon },
+  { to: '/', label: 'Scan & Remediate', icon: RunIcon },
   { to: '/builder', label: 'Policy Builder', icon: BuilderIcon },
   { to: '/history', label: 'History', icon: HistoryIcon },
   { to: '/settings', label: 'Settings', icon: SettingsIcon },

@@ -1,25 +1,60 @@
-name: Idle Resource Detection
-version: "1.0"
-type: finops
-provider: aws
-resource_type: ebs_volume
-description: Find idle or unattached EBS volumes wasting money
-tags: [cost, ebs, idle]
-rules:
-  - id: FINOPS-EBS-001
-    description: EBS volume is not attached to any instance
-    severity: medium
-    conditions:
-      - field: attachments
-        operator: eq
-        value: 0
-    remediation: Delete unattached EBS volumes or create a snapshot and delete
+policies:
 
-  - id: FINOPS-EBS-002
-    description: EBS volume using expensive io1/io2 type
-    severity: low
-    conditions:
-      - field: volume_type
-        operator: in
-        value: [io1, io2]
-    remediation: Evaluate if gp3 would meet performance needs at lower cost
+  # ---------------------------------------------------------------
+  # RDS instances with zero database connections for 14 days
+  # ---------------------------------------------------------------
+  - name: rds-idle-instance
+    resource: rds
+    description: >
+      RDS instances with no database connections (DatabaseConnections = 0)
+      over the past 14 days. These are idle and incurring full instance
+      cost. Candidate for stopping or deletion.
+    filters:
+      - type: metrics
+        name: DatabaseConnections
+        namespace: AWS/RDS
+        statistics: Maximum
+        days: 14
+        value: 1
+        op: less-than
+      - type: value
+        key: DBInstanceStatus
+        value: available
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "rds-idle-review-or-stop"
+      - type: notify
+        template: default.html
+        subject: "[c7n] RDS instance has 0 connections for 14 days — review or stop"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # RDS instances stopped for more than 7 days
+  # ---------------------------------------------------------------
+  - name: rds-stopped-7d
+    resource: rds
+    description: >
+      RDS instances in stopped state for more than 7 days. AWS
+      automatically restarts stopped instances after 7 days, which
+      resumes billing. Review for termination if no longer needed.
+    filters:
+      - type: value
+        key: DBInstanceStatus
+        value: stopped
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "rds-stopped-review-for-deletion"
+      - type: notify
+        template: default.html
+        subject: "[c7n] RDS instance stopped — AWS will auto-restart in 7 days"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
