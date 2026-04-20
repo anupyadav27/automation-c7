@@ -1,7 +1,7 @@
 ---
 project_name: 'automation-c7'
-user_name: 'Apple'
-date: '2026-04-09'
+user_name: 'Ajay'
+date: '2026-04-19'
 sections_completed: ['technology_stack', 'architecture', 'implementation_rules', 'api_contracts', 'policy_system', 'ui_patterns', 'docker_deployment', 'anti_patterns']
 ---
 
@@ -37,9 +37,9 @@ Focus on unobvious details that would otherwise be missed._
 
 ---
 
-## Architecture — Dual Execution Modes
+## Architecture — Three Execution Modes
 
-This is the single most important architectural concept. The system runs in TWO modes with the same UI:
+The system runs in THREE modes with the same UI:
 
 ```
 Mode 1: local (access-key / aws-profile)
@@ -47,6 +47,9 @@ Mode 1: local (access-key / aws-profile)
 
 Mode 2: lambda (iam-role)
   Browser → https://vgs6w2yd2d...amazonaws.com → Lambda → handler.py → AWS APIs
+
+Mode 3: mock (offline dev)
+  Browser → http://localhost:8080 → mock-api.py → deterministic fake data
 ```
 
 - `ui/src/api.js` `getEndpoint(authType)` selects the endpoint based on `authType`
@@ -63,7 +66,7 @@ Three files must always use **identical** policy names:
 
 1. **YAML files** in `policies/` (source of truth — these are the actual c7n names)
 2. **`handler.py` `POLICY_META` dict** — metadata keyed by exact YAML policy name
-3. **`ui/src/lib/policyInfo.js` `POLICY_INFO`** — UI metadata keyed by exact YAML policy name
+3. **`ui/src/lib/policyInfo.js` `POLICY_INFO`** — UI metadata for all 94 policies, keyed by exact YAML policy name
 
 If names diverge, the policy silently fails to resolve — no error, just 0 results.
 
@@ -140,6 +143,22 @@ Response: { "status": "success", "resources_affected": 1, "action": "tag", "poli
 - Always default to `"true"` in frontend for scan; `/action` endpoint always runs LIVE
 
 ---
+
+## UI Pages
+
+| Page | Route | Description |
+|---|---|---|
+| RunReport | `/` | Policy selector, filter bar, run trigger, hierarchical scan results with per-resource actions |
+| PolicyBuilder | `/builder` | Visual rule builder — pick resource, filters, actions; saves custom rules to localStorage via `userRules.js` |
+| RunHistory | `/history` | Past scan run list with timeline and per-policy findings breakdown |
+| Settings | `/settings` | Auth type, endpoint URL, region |
+
+### Custom Rules (PolicyBuilder + userRules.js)
+- User-defined rules are stored in `localStorage` under `c7n_user_rules`
+- `userRules.js` provides `listRules()`, `saveRule()`, `deleteRule(id)`
+- Custom rules are run via the `/build` endpoint (not `/run`) using a dynamic policy spec
+- `extraPolicyInfo` prop on `ReportTable` injects metadata for dynamic policy names not in `POLICY_INFO`
+- Account info fallback for user-defined rule results: `res.account || policyData?.account || { account_id: '—', region }`
 
 ## UI Data Flow — ReportTable
 
@@ -283,7 +302,8 @@ Use the standard `logging` module only.
 
 - **Scheduled scans** — EventBridge rule → Lambda trigger on a cron
 - **Email/Slack notifications** — SNS topic or webhook from policy actions
-- **Scan history** — DynamoDB table + `/history` page already scaffolded
+- **Scan history persistence** — RunHistory page UI exists but needs a real DynamoDB backend (`c7n-runs` table) to persist results across sessions
 - **Lambda deployment automation** — `deploy.sh` exists but needs CDK/Terraform
 - **Multi-region scan** — run same policies across multiple regions in parallel
 - **PDF/CSV export** — export scan results from the UI
+- **API authentication** — no auth on `/run` or `/action` endpoints (critical for production)

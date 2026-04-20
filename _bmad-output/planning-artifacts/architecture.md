@@ -1,7 +1,7 @@
 # automation-c7 — Architecture Document
 
 **Project:** automation-c7 — AWS Governance Automation (Cloud Custodian)
-**Date:** 2026-04-09
+**Date:** 2026-04-19
 **Status:** Active development
 
 ---
@@ -57,25 +57,22 @@ Same `handler.py` logic runs in both. `local-server.py` is a ~200-line HTTP wrap
 automation-c7/
 │
 ├── handler.py              Core engine — policy runner, normalizer, action executor
-├── local-server.py         HTTP wrapper for local credential mode
+├── local-server.py         HTTP wrapper for local credential mode (port 8081)
+├── mock-api.py             Offline dev mock server (port 8080) — 94 policies with fake data
 ├── policies/               Cloud Custodian YAML policy files (source of truth)
-│   ├── ec2-security.yml    sg-open-ssh, sg-open-rdp, ec2-no-iam-role …
-│   ├── ec2-instances.yml   ec2-stopped-30d, ec2-underutilised-instances …
-│   ├── s3-security-compliance.yml
-│   ├── s3-cost-optimization.yml
-│   ├── ebs-unattached.yml
-│   ├── ebs-optimization.yml
-│   ├── eni-cleanup.yml
-│   ├── ami-unused-cleanup.yml
-│   └── s3-infrequent-access-lifecycle.yml
+│   ├── finops/             Cost optimization policies (S3, EBS, EC2, RDS…)
+│   └── security/           Security & compliance policies (IAM, SG, CloudTrail, VPC…)
 │
 ├── ui/src/
 │   ├── api.js              Endpoint router + fetch wrappers
-│   ├── lib/policyInfo.js   Static metadata (service/category/severity/label) per policy
+│   ├── lib/
+│   │   ├── policyInfo.js   Static UI metadata for all 94 policies (service/category/severity/label)
+│   │   └── userRules.js    localStorage CRUD for custom user-defined rules
 │   ├── pages/
-│   │   ├── RunReport.jsx   Filter bar · policy selector · run trigger
-│   │   ├── RunHistory.jsx  (scaffolded, not yet implemented)
-│   │   └── Settings.jsx    (scaffolded, endpoint config)
+│   │   ├── RunReport.jsx   Main scan page — filter bar, policy selector, run trigger
+│   │   ├── PolicyBuilder.jsx   Visual policy builder — resource, filters, actions, saved rules list
+│   │   ├── RunHistory.jsx  Run history viewer — past scans with per-policy breakdown
+│   │   └── Settings.jsx    Auth type, endpoint URL, region config
 │   └── components/
 │       ├── ReportTable.jsx  Hierarchical results: service → resourceType → resource
 │       └── Layout.jsx       Nav shell
@@ -155,7 +152,7 @@ Mismatch = silent failure. Policy won't resolve, returns 0 resources, no error.
 ```
 RunReport.jsx
 │  State: region, authType, service, category, selected (Set), report
-│  Loads: POLICY_INFO (47 entries) → visibleRules
+│  Loads: POLICY_INFO (94 entries) + userRules → visibleRules
 │  On run: POST /run { policies: Array.from(selected), dryrun, region }
 │
 └── ReportTable.jsx
@@ -216,33 +213,51 @@ Extracted from the installed c7n 0.9.35 using `extract_c7n_schema.py`.
 
 ---
 
-## 8. Remaining Features (Roadmap)
+## 8. Completed Features
 
-### 8.1 Dynamic Policy Builder (next priority)
-Use `c7n_schema.csv` to power a UI policy builder:
-- Select resource type from all 273 c7n resources
-- Choose filters (from CSV `category=filter` rows for that resource)
-- Choose actions (from CSV `category=action` rows for that resource)
-- Generate YAML on-the-fly and save to `policies/`
+### 8.1 Dynamic Policy Builder ✓
+`PolicyBuilder.jsx` — visual rule builder backed by `c7n_schema.csv`:
+- Select resource type, add filter rows (field / operator / value), add action rows
+- Assign label, category, severity
+- Save to localStorage via `userRules.js`; `SavedRulesList` sub-component shows saved rules with Edit / Delete
+- Custom rules run via `/build` endpoint; results appear in the same ReportTable with `extraPolicyInfo` metadata
 
-### 8.2 Run History
-- DynamoDB table: `c7n-runs` (timestamp, account, region, policy, findings_count, resource_ids)
-- `/history` page (already scaffolded in RunHistory.jsx)
-- Trend charts: findings over time per resource type
+### 8.2 Run History ✓
+`RunHistory.jsx` — past scan runs viewer:
+- Displays run timeline and per-policy findings breakdown
+- Currently backed by mock data; production backend needs DynamoDB `c7n-runs` table
 
-### 8.3 Scheduled Scans
+### 8.3 Mock Server ✓
+`mock-api.py` — offline dev server on port 8080:
+- Returns deterministic fake data for all 94 policies
+- Covers EC2, S3, EBS, RDS, IAM, Lambda, CloudTrail, VPC, Secrets Manager, AMI, ENI
+- `/run`, `/build`, `/action` endpoints all implemented
+
+---
+
+## 9. Remaining Roadmap
+
+### 9.1 Scheduled Scans
 - EventBridge rule → Lambda (cron expression)
 - Results stored in DynamoDB
 - Optional SNS notification on new findings
 
-### 8.4 Multi-region Support
+### 9.2 Run History Backend
+- DynamoDB table `c7n-runs` (timestamp, account, region, policy, findings_count, resource_ids)
+- Wire RunHistory.jsx to real `/history` endpoint
+
+### 9.3 Multi-region Support
 - Run same selected policies across multiple regions in parallel
 - Aggregate results in the same ReportTable
 
-### 8.5 Export (PDF / CSV)
+### 9.4 Export (PDF / CSV)
 - Export current scan results from UI
 - Suitable for audit reports
 
-### 8.6 Lambda Deployment Automation
+### 9.5 Lambda Deployment Automation
 - CDK or Terraform stack
 - ECR image push + Lambda update in `deploy.sh`
+
+### 9.6 API Authentication
+- No auth currently on `/run` or `/action` — critical gap for production
+- Options: API Gateway authorizer, Cognito, or API key header
