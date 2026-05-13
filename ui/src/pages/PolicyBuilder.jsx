@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { runBuild } from '../api'
 import { saveToHistory } from '../lib/history'
-import { getUserRules, saveUserRule, deleteUserRule, getUserCategories } from '../lib/userRules'
+import { getUserRules, saveUserRule, deleteUserRule, getUserCategories, getUserGroups } from '../lib/userRules'
+import { POLICY_DESC, POLICY_INFO } from '../lib/policyInfo'
 import ReportTable from '../components/ReportTable'
 
 // Maps c7n resource type names → { service, resourceType } used by ReportTable
@@ -75,8 +76,7 @@ const KNOWN_VALUES = {
   kind:              ['lambda', 'sns', 'sqs'],
 }
 
-// ── Per-resource attribute keys + enum values (auto-generated from c7n resource_type)
-// Covers all 273 c7n AWS resources: id/name/date fields + known enum values
+// ── Per-resource attribute keys + enum values
 const RESOURCE_ATTRS = {
   'access-analyzer-finding': {keys: ['id','resourceType']},
   'account': {keys: ['account_id','account_name']},
@@ -191,6 +191,16 @@ const SKIP_FIELDS = new Set([
   'whitelist_orgids_from','whitelist_vpce_from','whitelist_vpc_from',
 ])
 
+const SEVERITY_COLORS = {
+  CRITICAL: 'bg-red-100 text-red-700 border-red-200',
+  HIGH:     'bg-orange-100 text-orange-700 border-orange-200',
+  WARNING:  'bg-yellow-100 text-yellow-700 border-yellow-200',
+  MEDIUM:   'bg-yellow-50 text-yellow-600 border-yellow-200',
+  COST:     'bg-violet-100 text-violet-700 border-violet-200',
+  LOW:      'bg-gray-100 text-gray-600 border-gray-200',
+  INFO:     'bg-blue-50 text-blue-600 border-blue-200',
+}
+
 // Wraps matched substring in a highlight span
 function highlightMatch(text, query) {
   const idx = text.toLowerCase().indexOf(query.toLowerCase())
@@ -198,14 +208,14 @@ function highlightMatch(text, query) {
   return (
     <>
       {text.slice(0, idx)}
-      <span className="text-blue-300 font-semibold">{text.slice(idx, idx + query.length)}</span>
+      <span className="text-blue-600 font-semibold">{text.slice(idx, idx + query.length)}</span>
       {text.slice(idx + query.length)}
     </>
   )
 }
 
 export default function PolicyBuilder() {
-  const [schema, setSchema]         = useState([])   // all CSV rows
+  const [schema, setSchema]         = useState([])
   const [loading, setLoading]       = useState(true)
   const [error, setError]           = useState(null)
 
@@ -213,23 +223,22 @@ export default function PolicyBuilder() {
   const [authType, setAuthType]     = useState('access-key')
   const [region, setRegion]         = useState('ap-south-1')
   const [selectedResource, setSelectedResource] = useState('')
-  const [filters, setFilters]       = useState([])   // [{type,params:{}}]
-  const [actions, setActions]       = useState([])   // [{type,params:{}}]
+  const [filters, setFilters]       = useState([])
+  const [actions, setActions]       = useState([])
   const [policyName, setPolicyName] = useState('')
 
   // save / edit state
   const [savedRules,    setSavedRules]    = useState(() => getUserRules())
-  const [editingRuleId, setEditingRuleId] = useState(null)   // null = new rule
+  const [editingRuleId, setEditingRuleId] = useState(null)
   const [showSaveForm,  setShowSaveForm]  = useState(false)
-  const [saveForm,      setSaveForm]      = useState({ label:'', category:'security', customCategory:'', severity:'INFO' })
-  const [saveMsg,       setSaveMsg]       = useState(null)   // { ok, text }
+  const [saveForm,      setSaveForm]      = useState({ label:'', category:'security', customCategory:'', severity:'INFO', group:'', customGroup:'', description:'', recommendation:'' })
+  const [saveMsg,       setSaveMsg]       = useState(null)
 
   // run state
   const [running,         setRunning]         = useState(false)
   const [report,          setReport]          = useState(null)
   const [extraPolicyInfo, setExtraPolicyInfo] = useState(null)
   const [runError,        setRunError]        = useState(null)
-  const [yamlPreview,     setYamlPreview]     = useState('')
 
   // Load CSV once
   useEffect(() => {
@@ -270,7 +279,6 @@ export default function PolicyBuilder() {
     setActions([])
     setReport(null)
     setExtraPolicyInfo(null)
-    setYamlPreview('')
     setPolicyName(`dynamic-${res}`)
   }
 
@@ -328,11 +336,9 @@ export default function PolicyBuilder() {
       const obj = { type: f.type }
       Object.entries(f.params).forEach(([k, v]) => {
         if (v === '' || v === null || v === undefined) return
-        // booleans come back as actual booleans or 'true'/'false' strings
         if (v === true || v === false) { obj[k] = v; return }
         if (v === 'true')  { obj[k] = true;  return }
         if (v === 'false') { obj[k] = false; return }
-        // numeric strings
         const n = Number(v)
         obj[k] = Number.isFinite(n) && v !== '' ? n : v
       })
@@ -349,6 +355,7 @@ export default function PolicyBuilder() {
 
   // Generate YAML preview (client-side approximation)
   function previewYaml() {
+    if (!selectedResource) return '# Select a resource type to begin'
     const spec = buildSpec()
     const filtersYaml = spec.filters.map(f => {
       const lines = Object.entries(f)
@@ -362,17 +369,55 @@ export default function PolicyBuilder() {
     return `policies:\n  - name: ${spec.name}\n    resource: aws.${spec.resource}\n    filters:\n${filtersYaml || '      []'}\n    actions:\n${actionsYaml || '      []'}`
   }
 
+  // Plain-English description
+  function buildDescription() {
+    if (!selectedResource) return ''
+    const parts = [`Find all aws.${selectedResource} resources`]
+    filters.forEach(f => {
+      if (f.params.key && f.params.value) {
+        parts.push(`where ${f.params.key} ${f.params.op || 'eq'} "${f.params.value}"`)
+      } else {
+        parts.push(`matching filter: ${f.type}`)
+      }
+    })
+    if (actions.length > 0) {
+      parts.push(`then: ${actions.map(a => a.type).join(', ')}`)
+    }
+    return parts.join(' · ')
+  }
+
   // ── Save / Edit / Delete handlers ───────────────────────────────
   function openSaveForm() {
     const existingRule = savedRules.find(r => r.id === editingRuleId)
     setSaveForm({
-      label:          existingRule?.label    || policyName || `dynamic-${selectedResource}`,
-      category:       existingRule?.category || 'security',
+      label:          existingRule?.label          || policyName || `dynamic-${selectedResource}`,
+      category:       existingRule?.category       || 'security',
       customCategory: '',
-      severity:       existingRule?.severity || 'INFO',
+      severity:       existingRule?.severity       || 'INFO',
+      group:          existingRule?.group          || '',
+      customGroup:    '',
+      description:    existingRule?.description    || '',
+      recommendation: existingRule?.recommendation || '',
     })
     setShowSaveForm(true)
     setSaveMsg(null)
+  }
+
+  function applyQuickFill() {
+    // Find POLICY_DESC entries that match the selected resource/service
+    const meta = C7N_RESOURCE_META[selectedResource] || {}
+    const svc  = meta.service?.toLowerCase()
+    const candidates = Object.entries(POLICY_DESC).filter(([name]) => {
+      const info = POLICY_INFO[name]
+      return info && info.service?.toLowerCase() === svc
+    })
+    if (candidates.length === 0) return
+    const [, d] = candidates[0]
+    setSaveForm(f => ({
+      ...f,
+      description:    f.description    || d.desc           || '',
+      recommendation: f.recommendation || d.recommendation || '',
+    }))
   }
 
   function handleSaveRule() {
@@ -381,17 +426,23 @@ export default function PolicyBuilder() {
     const category = saveForm.category === '__custom__'
       ? saveForm.customCategory.trim().toLowerCase().replace(/\s+/g, '-')
       : saveForm.category
+    const group = saveForm.group === '__new__'
+      ? saveForm.customGroup.trim()
+      : saveForm.group
 
     if (!category) { setSaveMsg({ ok:false, text:'Category is required' }); return }
 
     const rule = saveUserRule({
-      id:           editingRuleId || undefined,
-      name:         spec.name,
-      label:        saveForm.label || spec.name,
+      id:             editingRuleId || undefined,
+      name:           spec.name,
+      label:          saveForm.label || spec.name,
       category,
-      severity:     saveForm.severity,
-      service:      meta.service,
-      resourceType: meta.resourceType,
+      severity:       saveForm.severity,
+      group:          group || undefined,
+      description:    saveForm.description.trim()    || undefined,
+      recommendation: saveForm.recommendation.trim() || undefined,
+      service:        meta.service,
+      resourceType:   meta.resourceType,
       spec,
     })
     setSavedRules(getUserRules())
@@ -411,10 +462,8 @@ export default function PolicyBuilder() {
   }
 
   function handleLoadForEdit(rule) {
-    // Restore spec back into builder form
     setPolicyName(rule.spec.name || '')
     setSelectedResource(rule.spec.resource)
-    // Convert c7n flat filter objects → UI { type, params, required } format
     const uiFilters = (rule.spec.filters || []).map(f => {
       const { type, ...params } = f
       return { type, params, required: [] }
@@ -439,9 +488,7 @@ export default function PolicyBuilder() {
     setExtraPolicyInfo(null)
     try {
       const res = await runBuild(spec, { dryrun: true, region, authType })
-      if (res.generated_yaml) setYamlPreview(res.generated_yaml)
 
-      // Wrap single result into the format ReportTable expects
       const wrappedReport = {
         results: [res],
         account: { account_id: 'builder', region },
@@ -450,8 +497,6 @@ export default function PolicyBuilder() {
       }
       setReport(wrappedReport)
 
-      // Inject display metadata for this dynamic policy so ReportTable
-      // can group it under the right service + resource type + action list
       const meta = C7N_RESOURCE_META[spec.resource] || { service: 'other', resourceType: spec.resource }
       setExtraPolicyInfo({
         [res.policy]: {
@@ -471,7 +516,7 @@ export default function PolicyBuilder() {
     }
   }
 
-  // ── Search state — must be before early returns (React hooks rule) ──
+  // ── Search state ─────────────────────────────────────────────────
   const [resourceSearch, setResourceSearch] = useState('')
 
   const filteredGroups = useMemo(() => {
@@ -490,24 +535,24 @@ export default function PolicyBuilder() {
 
   // ── Early returns after all hooks ───────────────────────────────
   if (loading) return (
-    <div className="flex items-center justify-center h-64 text-gray-400">
+    <div className="flex items-center justify-center h-64 text-gray-500">
       Loading c7n schema…
     </div>
   )
   if (error) return (
-    <div className="p-6 text-red-400">Schema load error: {error}</div>
+    <div className="p-6 text-red-600">Schema load error: {error}</div>
   )
 
   return (
     <div className="flex h-full">
-      {/* ── Left panel: resource selector ── */}
-      <aside className="w-64 border-r border-gray-800 bg-gray-900 flex-shrink-0 flex flex-col">
+      {/* ── Left panel: resource selector (40% on desktop) ── */}
+      <aside className="w-64 border-r border-gray-200 bg-white flex-shrink-0 flex flex-col">
 
         {/* Header + search */}
-        <div className="p-3 border-b border-gray-800 flex-shrink-0">
-          <h2 className="text-sm font-semibold text-gray-200 mb-2">Resource Type</h2>
+        <div className="p-3 border-b border-gray-200 flex-shrink-0">
+          <h2 className="text-sm font-semibold text-gray-800 mb-2">Resource Type</h2>
           <div className="relative">
-            <svg className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none"
+            <svg className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none"
               fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
@@ -516,16 +561,16 @@ export default function PolicyBuilder() {
               value={resourceSearch}
               onChange={e => setResourceSearch(e.target.value)}
               placeholder="Search resources…"
-              className="w-full pl-7 pr-7 py-1.5 text-xs bg-gray-800 border border-gray-700 rounded-lg text-gray-300 placeholder-gray-600 focus:outline-none focus:border-blue-500"
+              className="w-full pl-7 pr-7 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-500"
             />
             {resourceSearch && (
               <button
                 onClick={() => setResourceSearch('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 text-xs leading-none"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs leading-none"
               >✕</button>
             )}
           </div>
-          <p className="text-[10px] text-gray-600 mt-1.5">
+          <p className="text-[10px] text-gray-400 mt-1.5">
             {resourceSearch
               ? `${filteredCount} of ${resourceCount} resources`
               : `${resourceCount} resources`}
@@ -535,11 +580,11 @@ export default function PolicyBuilder() {
         {/* Scrollable resource list */}
         <div className="overflow-y-auto flex-1">
           {Object.keys(filteredGroups).length === 0 ? (
-            <p className="px-4 py-6 text-xs text-gray-600 text-center">No resources match "{resourceSearch}"</p>
+            <p className="px-4 py-6 text-xs text-gray-400 text-center">No resources match "{resourceSearch}"</p>
           ) : (
             Object.entries(filteredGroups).map(([group, resources]) => (
               <div key={group}>
-                <div className="px-4 py-1.5 text-[10px] font-bold uppercase text-gray-600 tracking-wider bg-gray-900 sticky top-0 z-10">
+                <div className="px-4 py-1.5 text-[10px] font-bold uppercase text-gray-400 tracking-wider bg-gray-50 sticky top-0 z-10 border-b border-gray-100">
                   {group}
                 </div>
                 {resources.map(res => (
@@ -548,8 +593,8 @@ export default function PolicyBuilder() {
                     onClick={() => selectResource(res)}
                     className={`w-full text-left px-4 py-1.5 text-xs transition-colors ${
                       selectedResource === res
-                        ? 'bg-blue-600/20 text-blue-400 font-medium'
-                        : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
+                        ? 'bg-blue-50 text-blue-700 font-medium'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     }`}
                   >
                     {resourceSearch
@@ -563,211 +608,290 @@ export default function PolicyBuilder() {
         </div>
       </aside>
 
-      {/* ── Main panel ── */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        {!selectedResource ? (
-          <div className="flex items-center justify-center h-48 text-gray-500 text-sm">
-            Select a resource type from the left panel
-          </div>
-        ) : (
-          <>
-            {/* Header row */}
-            <div className="flex items-center gap-4 flex-wrap">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-100">
-                  aws.<span className="text-blue-400">{selectedResource}</span>
-                </h2>
-                <p className="text-xs text-gray-500">
-                  {availableFilters.length} filters · {availableActions.length} actions
-                  {editingRuleId && <span className="ml-2 text-blue-400">· editing saved rule</span>}
-                </p>
-              </div>
-              <div className="ml-auto flex items-center gap-2 flex-wrap">
-                <select value={authType} onChange={e => setAuthType(e.target.value)}
-                  className="bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5">
-                  <option value="access-key">Access Key (local)</option>
-                  <option value="iam-role">IAM Role (Lambda)</option>
-                </select>
-                <input value={region} onChange={e => setRegion(e.target.value)}
-                  placeholder="region"
-                  className="bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5 w-36"/>
-                <input value={policyName} onChange={e => setPolicyName(e.target.value)}
-                  placeholder="policy name"
-                  className="bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5 w-44"/>
-                {/* Save Rule button */}
-                <button
-                  onClick={openSaveForm}
-                  disabled={filters.length === 0}
-                  className="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 disabled:opacity-40 text-gray-200 text-xs font-semibold rounded border border-gray-600 transition-colors"
-                >
-                  {editingRuleId ? '💾 Update Rule' : '💾 Save Rule'}
-                </button>
-                <button
-                  onClick={runScan}
-                  disabled={running || filters.length === 0}
-                  className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-xs font-semibold rounded transition-colors"
-                >
-                  {running ? 'Scanning…' : 'Run Scan'}
-                </button>
-              </div>
+      {/* ── Split: builder (60%) + YAML preview (40%) ── */}
+      <div className="flex-1 flex min-w-0">
+
+        {/* Builder panel */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-4 min-w-0">
+          {!selectedResource ? (
+            <div className="flex items-center justify-center h-48 text-gray-400 text-sm">
+              Select a resource type from the left panel
             </div>
-
-            {/* Save feedback message */}
-            {saveMsg && (
-              <div className={`text-xs px-3 py-2 rounded-lg border ${saveMsg.ok
-                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
-                {saveMsg.text}
+          ) : (
+            <>
+              {/* Header row */}
+              <div className="flex items-center gap-3 flex-wrap">
+                <div>
+                  <h2 className="text-base font-semibold text-gray-900">
+                    aws.<span className="text-blue-600">{selectedResource}</span>
+                  </h2>
+                  <p className="text-xs text-gray-500">
+                    {availableFilters.length} filters · {availableActions.length} actions
+                    {editingRuleId && <span className="ml-2 text-blue-600">· editing saved rule</span>}
+                  </p>
+                </div>
+                <div className="ml-auto flex items-center gap-2 flex-wrap">
+                  <select value={authType} onChange={e => setAuthType(e.target.value)}
+                    className="bg-white border border-gray-300 text-gray-700 text-xs rounded px-2 py-1.5 focus:outline-none focus:border-blue-500">
+                    <option value="access-key">Access Key (local)</option>
+                    <option value="iam-role">IAM Role (Lambda)</option>
+                  </select>
+                  <input value={region} onChange={e => setRegion(e.target.value)}
+                    placeholder="region"
+                    className="bg-white border border-gray-300 text-gray-700 text-xs rounded px-2 py-1.5 w-36 focus:outline-none focus:border-blue-500"/>
+                  <input value={policyName} onChange={e => setPolicyName(e.target.value)}
+                    placeholder="policy name"
+                    className="bg-white border border-gray-300 text-gray-700 text-xs rounded px-2 py-1.5 w-44 focus:outline-none focus:border-blue-500"/>
+                </div>
               </div>
-            )}
 
-            {/* ── Save Rule form ── */}
-            {showSaveForm && (
-              <div className="bg-gray-900 border border-blue-500/30 rounded-lg p-4 space-y-3">
-                <h3 className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
-                  {editingRuleId ? 'Update Saved Rule' : 'Save as Custom Rule'}
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Label */}
-                  <div className="col-span-2">
-                    <label className="text-[10px] text-gray-500 block mb-1">Display Label</label>
-                    <input
-                      value={saveForm.label}
-                      onChange={e => setSaveForm(f => ({ ...f, label: e.target.value }))}
-                      placeholder="e.g. Stopped EC2 instances"
-                      className="w-full bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5 focus:outline-none focus:border-blue-500"
-                    />
-                  </div>
-                  {/* Category */}
-                  <div>
-                    <label className="text-[10px] text-gray-500 block mb-1">Category</label>
-                    <select
-                      value={saveForm.category}
-                      onChange={e => setSaveForm(f => ({ ...f, category: e.target.value }))}
-                      className="w-full bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5"
-                    >
-                      <option value="security">Security</option>
-                      <option value="cost">Cost Optimisation</option>
-                      {getUserCategories().map(c => <option key={c} value={c}>{c}</option>)}
-                      <option value="__custom__">+ New category…</option>
-                    </select>
-                    {saveForm.category === '__custom__' && (
+              {/* Save feedback message */}
+              {saveMsg && (
+                <div className={`text-xs px-3 py-2 rounded-lg border ${saveMsg.ok
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  : 'bg-red-50 text-red-600 border-red-200'}`}>
+                  {saveMsg.text}
+                </div>
+              )}
+
+              {/* ── Saved Rules list — compact cards ── */}
+              {savedRules.length > 0 && (
+                <SavedRulesList
+                  rules={savedRules}
+                  editingId={editingRuleId}
+                  onEdit={handleLoadForEdit}
+                  onDelete={handleDeleteRule}
+                />
+              )}
+
+              {/* ── Save Rule form ── */}
+              {showSaveForm && (
+                <div className="card p-4 border-blue-200 space-y-3">
+                  <h3 className="text-xs font-semibold text-blue-700 uppercase tracking-wider">
+                    {editingRuleId ? 'Update Saved Rule' : 'Save as Custom Rule'}
+                  </h3>
+                  <div className="space-y-3">
+                    {/* Label */}
+                    <div>
+                      <label className="text-[10px] text-gray-500 block mb-1">Display Label <span className="text-red-400">*</span></label>
                       <input
-                        value={saveForm.customCategory}
-                        onChange={e => setSaveForm(f => ({ ...f, customCategory: e.target.value }))}
-                        placeholder="e.g. compliance"
-                        className="mt-1 w-full bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5 focus:outline-none focus:border-blue-500"
+                        value={saveForm.label}
+                        onChange={e => setSaveForm(f => ({ ...f, label: e.target.value }))}
+                        placeholder="e.g. Stopped EC2 instances"
+                        className="w-full bg-white border border-gray-300 text-gray-800 text-xs rounded px-2 py-1.5 focus:outline-none focus:border-blue-500"
                       />
-                    )}
-                  </div>
-                  {/* Severity */}
-                  <div>
-                    <label className="text-[10px] text-gray-500 block mb-1">Severity</label>
-                    <select
-                      value={saveForm.severity}
-                      onChange={e => setSaveForm(f => ({ ...f, severity: e.target.value }))}
-                      className="w-full bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5"
-                    >
-                      {['CRITICAL','HIGH','WARNING','MEDIUM','COST','LOW','INFO'].map(s =>
-                        <option key={s} value={s}>{s}</option>
+                    </div>
+
+                    {/* Category + Severity */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-[10px] text-gray-500 block mb-1">Category</label>
+                        <select
+                          value={saveForm.category}
+                          onChange={e => setSaveForm(f => ({ ...f, category: e.target.value }))}
+                          className="w-full bg-white border border-gray-300 text-gray-700 text-xs rounded px-2 py-1.5 focus:outline-none focus:border-blue-500"
+                        >
+                          <option value="security">Security</option>
+                          <option value="cost">Cost Optimisation</option>
+                          {getUserCategories().map(c => <option key={c} value={c}>{c}</option>)}
+                          <option value="__custom__">+ New category…</option>
+                        </select>
+                        {saveForm.category === '__custom__' && (
+                          <input
+                            value={saveForm.customCategory}
+                            onChange={e => setSaveForm(f => ({ ...f, customCategory: e.target.value }))}
+                            placeholder="e.g. compliance"
+                            className="mt-1 w-full bg-white border border-gray-300 text-gray-700 text-xs rounded px-2 py-1.5 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-gray-500 block mb-1">Severity</label>
+                        <select
+                          value={saveForm.severity}
+                          onChange={e => setSaveForm(f => ({ ...f, severity: e.target.value }))}
+                          className="w-full bg-white border border-gray-300 text-gray-700 text-xs rounded px-2 py-1.5 focus:outline-none focus:border-blue-500"
+                        >
+                          {['CRITICAL','HIGH','WARNING','MEDIUM','COST','LOW','INFO'].map(s =>
+                            <option key={s} value={s}>{s}</option>
+                          )}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Group */}
+                    <div>
+                      <label className="text-[10px] text-gray-500 block mb-1">Policy Group <span className="text-gray-400">(optional — organises rules in Policy Library)</span></label>
+                      <select
+                        value={saveForm.group}
+                        onChange={e => setSaveForm(f => ({ ...f, group: e.target.value }))}
+                        className="w-full bg-white border border-gray-300 text-gray-700 text-xs rounded px-2 py-1.5 focus:outline-none focus:border-blue-500"
+                      >
+                        <option value="">— No group —</option>
+                        {getUserGroups().map(g => <option key={g} value={g}>{g}</option>)}
+                        <option value="__new__">+ Create new group…</option>
+                      </select>
+                      {saveForm.group === '__new__' && (
+                        <input
+                          value={saveForm.customGroup}
+                          onChange={e => setSaveForm(f => ({ ...f, customGroup: e.target.value }))}
+                          placeholder="e.g. PCI-DSS, Team-Infra, Q2-Audit"
+                          className="mt-1 w-full bg-white border border-gray-300 text-gray-700 text-xs rounded px-2 py-1.5 focus:outline-none focus:border-blue-500"
+                        />
                       )}
-                    </select>
+                    </div>
+
+                    {/* Description + Recommendation with quick-fill */}
+                    <div className="border-t border-gray-100 pt-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Metadata</span>
+                        <button
+                          type="button"
+                          onClick={applyQuickFill}
+                          className="text-[10px] px-2 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 transition-colors"
+                        >
+                          ✦ Quick-fill from similar rules
+                        </button>
+                      </div>
+                      <div className="space-y-2">
+                        <div>
+                          <label className="text-[10px] text-gray-500 block mb-1">What this rule checks</label>
+                          <textarea
+                            rows={2}
+                            value={saveForm.description}
+                            onChange={e => setSaveForm(f => ({ ...f, description: e.target.value }))}
+                            placeholder="Plain English: what condition does this policy detect?"
+                            className="w-full bg-white border border-gray-300 text-gray-800 text-xs rounded px-2 py-1.5 focus:outline-none focus:border-blue-500 resize-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-500 block mb-1">Recommendation</label>
+                          <textarea
+                            rows={2}
+                            value={saveForm.recommendation}
+                            onChange={e => setSaveForm(f => ({ ...f, recommendation: e.target.value }))}
+                            placeholder="What should an engineer do when this rule triggers?"
+                            className="w-full bg-white border border-gray-300 text-gray-800 text-xs rounded px-2 py-1.5 focus:outline-none focus:border-blue-500 resize-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 pt-1">
+                    <button onClick={handleSaveRule}
+                      className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded transition-colors">
+                      {editingRuleId ? 'Update' : 'Save'}
+                    </button>
+                    <button onClick={() => setShowSaveForm(false)}
+                      className="px-4 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-xs rounded border border-gray-300 transition-colors">
+                      Cancel
+                    </button>
                   </div>
                 </div>
-                <div className="flex gap-2 pt-1">
-                  <button onClick={handleSaveRule}
-                    className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded transition-colors">
-                    {editingRuleId ? 'Update' : 'Save'}
-                  </button>
-                  <button onClick={() => setShowSaveForm(false)}
-                    className="px-4 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs rounded border border-gray-700 transition-colors">
-                    Cancel
-                  </button>
+              )}
+
+              {/* ── Filters ── */}
+              <Section title="Filters" count={filters.length}>
+                <div className="mb-3">
+                  <FilterSearchSelect
+                    options={availableFilters}
+                    onSelect={addFilter}
+                    label="Add filter"
+                  />
                 </div>
-              </div>
-            )}
+                {filters.length === 0 && (
+                  <p className="text-xs text-gray-400 italic">No filters added — add at least one to run a scan.</p>
+                )}
+                {filters.map((f, idx) => (
+                  <FilterRow
+                    key={idx}
+                    filter={f}
+                    resource={selectedResource}
+                    schemaRow={availableFilters.find(r => r.name === f.type)}
+                    onChange={(key, val) => updateFilterParam(idx, key, val)}
+                    onRemove={() => removeFilter(idx)}
+                  />
+                ))}
+              </Section>
 
-            {/* ── Saved Rules list ── */}
-            {savedRules.length > 0 && (
-              <SavedRulesList
-                rules={savedRules}
-                editingId={editingRuleId}
-                onEdit={handleLoadForEdit}
-                onDelete={handleDeleteRule}
-              />
-            )}
+              {/* ── Actions ── */}
+              <Section title="Actions (optional)" count={actions.length}>
+                <div className="mb-3">
+                  <FilterSearchSelect
+                    options={availableActions}
+                    onSelect={addAction}
+                    label="Add action"
+                  />
+                </div>
+                {actions.length === 0 && (
+                  <p className="text-xs text-gray-400 italic">No actions — scan only (dry-run safe).</p>
+                )}
+                {actions.map((a, idx) => (
+                  <ActionRow
+                    key={idx}
+                    action={a}
+                    onRemove={() => removeAction(idx)}
+                  />
+                ))}
+              </Section>
 
-            {/* ── Filters ── */}
-            <Section title="Filters" count={filters.length}>
-              {/* Add filter */}
-              <div className="mb-3">
-                <FilterSearchSelect
-                  options={availableFilters}
-                  onSelect={addFilter}
-                  label="Add filter"
-                />
-              </div>
-              {filters.length === 0 && (
-                <p className="text-xs text-gray-600 italic">No filters added — add at least one to run a scan.</p>
+              {/* ── Error ── */}
+              {runError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600">
+                  {runError}
+                </div>
               )}
-              {filters.map((f, idx) => (
-                <FilterRow
-                  key={idx}
-                  filter={f}
-                  resource={selectedResource}
-                  schemaRow={availableFilters.find(r => r.name === f.type)}
-                  onChange={(key, val) => updateFilterParam(idx, key, val)}
-                  onRemove={() => removeFilter(idx)}
-                />
-              ))}
-            </Section>
 
-            {/* ── Actions ── */}
-            <Section title="Actions (optional)" count={actions.length}>
-              <div className="mb-3">
-                <FilterSearchSelect
-                  options={availableActions}
-                  onSelect={addAction}
-                  label="Add action"
+              {/* ── Results ── */}
+              {report && (
+                <ReportTable
+                  report={report}
+                  region={region}
+                  authType={authType}
+                  extraPolicyInfo={extraPolicyInfo}
                 />
-              </div>
-              {actions.length === 0 && (
-                <p className="text-xs text-gray-600 italic">No actions — scan only (dry-run safe).</p>
               )}
-              {actions.map((a, idx) => (
-                <ActionRow
-                  key={idx}
-                  action={a}
-                  onRemove={() => removeAction(idx)}
-                />
-              ))}
-            </Section>
+            </>
+          )}
+        </div>
 
-            {/* ── YAML Preview ── */}
-            <Section title="YAML Preview">
-              <pre className="bg-gray-900 border border-gray-800 rounded p-3 text-xs text-green-400 overflow-x-auto whitespace-pre">
-                {yamlPreview || previewYaml()}
-              </pre>
-            </Section>
-
-            {/* ── Error ── */}
-            {runError && (
-              <div className="bg-red-900/30 border border-red-700 rounded p-3 text-sm text-red-300">
-                {runError}
-              </div>
+        {/* ── Right YAML preview pane (sticky) ── */}
+        <div className="w-80 border-l border-gray-200 bg-white flex flex-col flex-shrink-0">
+          <div className="p-4 border-b border-gray-200 flex-shrink-0">
+            <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wide">YAML Preview</h3>
+            {selectedResource && (
+              <p className="text-[11px] text-gray-400 mt-1 leading-relaxed">{buildDescription()}</p>
             )}
+          </div>
 
-            {/* ── Results — full ReportTable with remediation actions ── */}
-            {report && (
-              <ReportTable
-                report={report}
-                region={region}
-                authType={authType}
-                extraPolicyInfo={extraPolicyInfo}
-              />
-            )}
-          </>
-        )}
+          <div className="flex-1 overflow-auto p-4">
+            <pre className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-green-700 overflow-x-auto whitespace-pre leading-relaxed font-mono">
+              {previewYaml()}
+            </pre>
+          </div>
+
+          {selectedResource && (
+            <div className="p-4 border-t border-gray-200 space-y-2 flex-shrink-0">
+              <button
+                onClick={openSaveForm}
+                disabled={filters.length === 0}
+                className="w-full px-4 py-2 btn-secondary disabled:opacity-40 disabled:cursor-not-allowed text-center"
+              >
+                {editingRuleId ? 'Update Rule' : 'Save to Library'}
+              </button>
+              <button
+                onClick={runScan}
+                disabled={running || filters.length === 0}
+                className="w-full btn-primary justify-center disabled:opacity-40"
+              >
+                {running
+                  ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Scanning…</>
+                  : '▶ Test Run'}
+              </button>
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   )
@@ -777,8 +901,8 @@ export default function PolicyBuilder() {
 
 function Section({ title, count, children }) {
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+    <div className="card p-4">
+      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
         {title}{count !== undefined && count > 0 ? ` (${count})` : ''}
       </h3>
       {children}
@@ -797,10 +921,9 @@ function Tooltip({ text, children, width = 'w-72' }) {
     >
       {children}
       {visible && (
-        <div className={`absolute bottom-full left-0 mb-2 z-50 ${width} bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 shadow-2xl pointer-events-none`}>
-          <p className="text-[11px] text-gray-300 leading-relaxed">{text}</p>
-          {/* arrow */}
-          <div className="absolute top-full left-4 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-700" />
+        <div className={`absolute bottom-full left-0 mb-2 z-50 ${width} bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-lg pointer-events-none`}>
+          <p className="text-[11px] text-gray-600 leading-relaxed">{text}</p>
+          <div className="absolute top-full left-4 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-200" />
         </div>
       )}
     </div>
@@ -826,17 +949,17 @@ function FilterSearchSelect({ options, onSelect, label }) {
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         placeholder={label}
-        className="w-full bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1.5 placeholder-gray-600 focus:outline-none focus:border-blue-500"
+        className="w-full bg-white border border-gray-300 text-gray-700 text-xs rounded px-2 py-1.5 placeholder-gray-400 focus:outline-none focus:border-blue-500"
       />
       {open && filtered.length > 0 && (
-        <div className="absolute z-20 mt-1 w-full bg-gray-800 border border-gray-700 rounded shadow-xl max-h-64 overflow-y-auto">
+        <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
           {filtered.map(o => (
             <button
               key={o.name}
               onMouseDown={() => { onSelect(o.name); setQuery(''); setOpen(false) }}
-              className="w-full text-left px-3 py-2 hover:bg-gray-700 border-b border-gray-700/50 last:border-0"
+              className="w-full text-left px-3 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-0"
             >
-              <div className="font-mono text-xs text-blue-400 font-semibold">{o.name}</div>
+              <div className="font-mono text-xs text-blue-600 font-semibold">{o.name}</div>
               {o.doc && (
                 <div className="text-[11px] text-gray-500 mt-0.5 leading-relaxed whitespace-normal">
                   {o.doc}
@@ -857,7 +980,6 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
     catch { return null }
   }, [schemaRow])
 
-  // Split fields into required and optional (both exclude 'type' which is auto-set)
   const { requiredFields, optionalFields } = useMemo(() => {
     const props = paramSchema?.properties
     if (!props) return { requiredFields: null, optionalFields: null }
@@ -879,9 +1001,8 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
     if (SKIP_FIELDS.has(k)) return null
 
     const val = filter.params[k] ?? ''
-    const cls = 'bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-1'
+    const cls = 'bg-white border border-gray-300 text-gray-700 text-xs rounded px-2 py-1 focus:outline-none focus:border-blue-500'
 
-    // ── 'key' field: searchable dropdown of resource attribute paths ──
     if (k === 'key') {
       const knownKeys = resAttrs.keys
       if (knownKeys.length > 0) {
@@ -892,7 +1013,6 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
               value={val}
               onChange={e => {
                 onChange('key', e.target.value)
-                // Reset value when key changes
                 onChange('value', '')
               }}
               className={`${cls} w-52`}
@@ -901,7 +1021,6 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
               {knownKeys.map(k2 => <option key={k2} value={k2}>{k2}</option>)}
               <option value="__custom__">custom (type below)…</option>
             </select>
-            {/* show text input when no known key is selected — persists while typing */}
             {(!val || val === '__custom__' || !knownKeys.includes(val)) && (
               <input
                 value={val === '__custom__' ? '' : (knownKeys.includes(val) ? '' : val)}
@@ -913,7 +1032,6 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
           </div>
         )
       }
-      // No known keys — plain text
       return (
         <div key="key" className="flex flex-col gap-0.5">
           <label className="text-[10px] text-gray-500">key</label>
@@ -923,9 +1041,8 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
       )
     }
 
-    // ── 'value' field: enum dropdown if key has known values, else text ──
     if (k === 'value' || (typeof typeSpec === 'string' && typeSpec.includes('/value"'))) {
-      const enumVals = resAttrs.enumValues[filter.params.key]
+      const enumVals = resAttrs.enumValues?.[filter.params.key]
       if (enumVals) {
         return (
           <div key="value" className="flex flex-col gap-0.5">
@@ -946,7 +1063,6 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
       )
     }
 
-    // ── boolean ──
     if (typeSpec === 'boolean' || (Array.isArray(typeSpec) && typeSpec.includes(true))) {
       return (
         <div key={k} className="flex flex-col gap-0.5">
@@ -962,7 +1078,6 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
       )
     }
 
-    // ── op / comparison_operators ──
     if (k === 'op' || (typeof typeSpec === 'string' && typeSpec.includes('comparison_operators'))) {
       return (
         <div key={k} className="flex flex-col gap-0.5">
@@ -974,7 +1089,6 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
       )
     }
 
-    // ── array in schema → enum dropdown ──
     if (Array.isArray(typeSpec)) {
       return (
         <div key={k} className="flex flex-col gap-0.5">
@@ -987,7 +1101,6 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
       )
     }
 
-    // ── number ──
     if (typeSpec === 'number') {
       return (
         <div key={k} className="flex flex-col gap-0.5">
@@ -998,11 +1111,9 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
       )
     }
 
-    // ── skip other $ref, array, object, ? ──
     if (typeof typeSpec === 'string' && typeSpec.startsWith('#/')) return null
     if (typeSpec === 'array' || typeSpec === 'object' || typeSpec === '?') return null
 
-    // ── string with known values ──
     if (KNOWN_VALUES[k]) {
       return (
         <div key={k} className="flex flex-col gap-0.5">
@@ -1015,7 +1126,6 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
       )
     }
 
-    // ── plain string ──
     return (
       <div key={k} className="flex flex-col gap-0.5">
         <label className="text-[10px] text-gray-500">{k}</label>
@@ -1028,26 +1138,23 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
   const hasSchema = requiredFields !== null
 
   return (
-    <div className="mb-2 bg-gray-800/30 border border-gray-800 rounded">
-      {/* Filter name header row */}
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-800">
-        <span className="font-mono text-xs text-blue-400 font-semibold">{filter.type}</span>
+    <div className="mb-2 bg-gray-50 border border-gray-200 rounded-lg">
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-200">
+        <span className="font-mono text-xs text-blue-600 font-semibold">{filter.type}</span>
         {schemaRow?.doc && (
           <Tooltip text={schemaRow.doc}>
-            <span className="w-4 h-4 rounded-full bg-gray-700 text-gray-400 text-[10px] font-bold flex items-center justify-center cursor-default select-none hover:bg-gray-600 hover:text-gray-200 transition-colors">
+            <span className="w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-[10px] font-bold flex items-center justify-center cursor-default select-none hover:bg-gray-300 hover:text-gray-700 transition-colors">
               ?
             </span>
           </Tooltip>
         )}
-        <button onClick={onRemove} className="ml-auto text-gray-600 hover:text-red-400 text-sm leading-none">✕</button>
+        <button onClick={onRemove} className="ml-auto text-gray-400 hover:text-red-500 text-sm leading-none">✕</button>
       </div>
 
-      {/* Params area */}
       <div className="px-3 py-2 space-y-2">
         {!hasSchema ? (
-          // No schema — show generic key / op / value
           <div>
-            <div className="text-[10px] text-red-400 font-semibold uppercase tracking-wider mb-1.5">Required</div>
+            <div className="text-[10px] text-red-600 font-semibold uppercase tracking-wider mb-1.5">Required</div>
             <div className="flex flex-wrap gap-2">
               {renderParam('key', 'string')}
               {renderParam('op', 'op')}
@@ -1056,10 +1163,9 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
           </div>
         ) : (
           <>
-            {/* Required fields */}
             {requiredFields.length > 0 && (
               <div>
-                <div className="text-[10px] text-red-400 font-semibold uppercase tracking-wider mb-1.5">
+                <div className="text-[10px] text-red-600 font-semibold uppercase tracking-wider mb-1.5">
                   Required <span className="text-red-500">*</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -1072,20 +1178,16 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
                 </div>
               </div>
             )}
-
-            {/* Optional fields */}
             {optionalFields.length > 0 && (
               <div>
-                <div className="text-[10px] text-gray-600 font-semibold uppercase tracking-wider mb-1.5">Optional</div>
+                <div className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mb-1.5">Optional</div>
                 <div className="flex flex-wrap gap-2">
                   {optionalFields.map(([k, t]) => renderParam(k, t))}
                 </div>
               </div>
             )}
-
-            {/* No visible params at all */}
             {requiredFields.length === 0 && optionalFields.length === 0 && (
-              <span className="text-[11px] text-gray-600">(no parameters — filter matches by presence)</span>
+              <span className="text-[11px] text-gray-400">(no parameters — filter matches by presence)</span>
             )}
           </>
         )}
@@ -1097,35 +1199,25 @@ function FilterRow({ filter, resource, schemaRow, onChange, onRemove }) {
 function ActionRow({ action, onRemove }) {
   return (
     <div className="flex items-center gap-2 mb-2">
-      <span className="font-mono text-xs text-violet-400 bg-violet-950/40 border border-violet-900 rounded px-2 py-1 min-w-[120px]">
+      <span className="font-mono text-xs text-violet-700 bg-violet-50 border border-violet-200 rounded px-2 py-1 min-w-[120px]">
         {action.type}
       </span>
-      <span className="text-xs text-yellow-600 bg-yellow-900/20 border border-yellow-900/50 rounded px-2 py-0.5">
+      <span className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-0.5">
         LIVE action — will execute without dry-run
       </span>
       <button
         onClick={onRemove}
-        className="ml-auto text-gray-600 hover:text-red-400 text-xs px-1"
+        className="ml-auto text-gray-400 hover:text-red-500 text-xs px-1"
       >✕</button>
     </div>
   )
 }
 
-const SEVERITY_COLORS = {
-  CRITICAL: 'bg-red-500/15 text-red-400 border-red-500/30',
-  HIGH:     'bg-orange-500/15 text-orange-400 border-orange-500/30',
-  WARNING:  'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
-  MEDIUM:   'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-  COST:     'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-  LOW:      'bg-gray-500/15 text-gray-400 border-gray-600',
-  INFO:     'bg-blue-500/10 text-blue-400 border-blue-500/20',
-}
-
 function SavedRulesList({ rules, editingId, onEdit, onDelete }) {
   if (!rules.length) return null
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+    <div className="card p-4">
+      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
         Saved Rules ({rules.length})
       </h3>
       <div className="space-y-2">
@@ -1136,16 +1228,15 @@ function SavedRulesList({ rules, editingId, onEdit, onDelete }) {
               key={rule.id}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg border transition-colors ${
                 isEditing
-                  ? 'bg-blue-600/10 border-blue-500/40'
-                  : 'bg-gray-800/40 border-gray-800 hover:border-gray-700'
+                  ? 'bg-blue-50 border-blue-200'
+                  : 'bg-gray-50 border-gray-200 hover:border-gray-300'
               }`}
             >
-              {/* Label + resource */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs font-medium text-gray-200 truncate">{rule.label || rule.name}</span>
+                  <span className="text-xs font-medium text-gray-800 truncate">{rule.label || rule.name}</span>
                   {isEditing && (
-                    <span className="text-[10px] bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded px-1.5 py-0.5 font-semibold">
+                    <span className="text-[10px] bg-blue-100 text-blue-700 border border-blue-200 rounded px-1.5 py-0.5 font-semibold">
                       editing
                     </span>
                   )}
@@ -1154,26 +1245,24 @@ function SavedRulesList({ rules, editingId, onEdit, onDelete }) {
                   <span className="text-[10px] font-mono text-gray-500">
                     aws.{rule.spec?.resource || rule.resourceType}
                   </span>
-                  <span className="text-[10px] text-gray-700">·</span>
-                  <span className="text-[10px] bg-gray-800 text-gray-500 border border-gray-700 rounded px-1.5 py-0.5">
+                  <span className="text-[10px] text-gray-300">·</span>
+                  <span className="text-[10px] bg-gray-100 text-gray-500 border border-gray-200 rounded px-1.5 py-0.5">
                     {rule.category}
                   </span>
                   <span className={`text-[10px] border rounded px-1.5 py-0.5 ${SEVERITY_COLORS[rule.severity] || SEVERITY_COLORS.INFO}`}>
                     {rule.severity}
                   </span>
                   {rule.spec?.filters?.length > 0 && (
-                    <span className="text-[10px] text-gray-600">
+                    <span className="text-[10px] text-gray-400">
                       {rule.spec.filters.length} filter{rule.spec.filters.length !== 1 ? 's' : ''}
                     </span>
                   )}
                 </div>
               </div>
-
-              {/* Actions */}
               <div className="flex items-center gap-1.5 flex-shrink-0">
                 <button
                   onClick={() => onEdit(rule)}
-                  className="px-2.5 py-1 text-[11px] font-medium rounded border border-gray-700 text-gray-300 hover:bg-gray-700 hover:text-gray-100 transition-colors"
+                  className="px-2.5 py-1 text-[11px] font-medium rounded border border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-colors"
                 >
                   Edit
                 </button>
@@ -1181,7 +1270,7 @@ function SavedRulesList({ rules, editingId, onEdit, onDelete }) {
                   onClick={() => {
                     if (window.confirm(`Delete "${rule.label || rule.name}"?`)) onDelete(rule.id)
                   }}
-                  className="px-2.5 py-1 text-[11px] font-medium rounded border border-red-900/50 text-red-500 hover:bg-red-900/30 hover:text-red-400 transition-colors"
+                  className="px-2.5 py-1 text-[11px] font-medium rounded border border-red-200 text-red-500 hover:bg-red-50 transition-colors"
                 >
                   Delete
                 </button>

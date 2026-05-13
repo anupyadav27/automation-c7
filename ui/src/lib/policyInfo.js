@@ -238,6 +238,56 @@ export const RESOURCE_ACTIONS = {
   ],
 }
 
+// Per-policy descriptions and recommendations shown in Policy Library.
+// desc: what the rule checks for; recommendation: what to do when triggered.
+export const POLICY_DESC = {
+  'sg-open-ssh':            { desc: 'Security groups with unrestricted inbound SSH (port 22) from 0.0.0.0/0 or ::/0.', recommendation: 'Restrict SSH to specific IP ranges or a bastion/VPN CIDR. Never allow 0.0.0.0/0 for SSH.' },
+  'sg-open-rdp':            { desc: 'Security groups with unrestricted inbound RDP (port 3389) from any IP.', recommendation: 'Restrict RDP to specific IPs or use a VPN/bastion host. Remove 0.0.0.0/0 rules.' },
+  'sg-all-ports-open':      { desc: 'Security groups allowing all inbound traffic (ports 0-65535) from any IP.', recommendation: 'Define explicit rules for required ports only. Delete the catch-all rule.' },
+  'sg-open-database-ports': { desc: 'Security groups exposing database ports (MySQL 3306, Postgres 5432, MSSQL 1433, Redis 6379, MongoDB 27017) to the internet.', recommendation: 'Database ports should never be public. Allow only from application security group.' },
+  'sg-unused':              { desc: 'Security groups not associated with any EC2, RDS, Lambda, or load balancer resource.', recommendation: 'Verify the SG is truly unused, then delete to reduce attack surface and clutter.' },
+  'ec2-no-iam-role':        { desc: 'EC2 instances running without an IAM instance profile/role attached.', recommendation: 'Attach a least-privilege IAM role. Never use long-lived access keys on EC2.' },
+  'ec2-has-key-pair':       { desc: 'EC2 instances configured with an SSH key pair, enabling direct SSH access.', recommendation: 'Migrate to SSM Session Manager for shell access. Remove key pairs from production instances.' },
+  'ec2-imdsv1-enabled':     { desc: 'EC2 instances with IMDSv1 enabled — vulnerable to SSRF attacks that steal instance credentials.', recommendation: 'Enforce IMDSv2 by setting HttpTokens=required. IMDSv1 was exploited in the Capital One breach.' },
+  'ec2-public-ip-check':    { desc: 'EC2 instances with a public IP address directly assigned.', recommendation: 'Use a load balancer or NAT gateway. Public IPs should only be on load balancers, not compute.' },
+  'ec2-missing-tags':       { desc: 'EC2 instances missing required governance tags (Owner, Environment, or Project).', recommendation: 'Tag all instances at launch via Service Control Policies or enforce via AWS Config rules.' },
+  'ec2-no-backup-tag':      { desc: 'EC2 instances without a Backup tag, indicating no automated backup policy.', recommendation: 'Add a Backup=daily tag and configure AWS Backup to act on it.' },
+  'ec2-underutilised-instances':    { desc: 'EC2 instances with CPU utilisation below 10% for 14+ consecutive days.', recommendation: 'Downsize to a smaller instance type or switch to Spot/Savings Plans. Consider termination if unused.' },
+  'ec2-stopped-30d':                { desc: 'EC2 instances that have been stopped for 30+ days but still have attached EBS volumes incurring cost.', recommendation: 'Terminate the instance (after snapshotting the EBS) or restart if still needed.' },
+  'ec2-stopped-60d-mark-terminate': { desc: 'EC2 instances stopped for 60+ days, marked for termination.', recommendation: 'Review and terminate. Take a final EBS snapshot before deletion.' },
+  'ec2-old-generation-instance-type':{ desc: 'EC2 instances using old-generation types (m3, m4, c3, c4, t2) that are more expensive and slower than current gen.', recommendation: 'Migrate to m5/m6i, c5/c6i, or t3/t4g equivalents for better price/performance.' },
+  's3-public-access-check':         { desc: 'S3 buckets with public access enabled via ACL or bucket policy, exposing data to the internet.', recommendation: 'Enable Block Public Access settings at the bucket and account level unless serving a public website.' },
+  's3-no-encryption':               { desc: 'S3 buckets without server-side encryption (SSE-S3 or SSE-KMS) configured.', recommendation: 'Enable default SSE-S3 encryption on all buckets. Use SSE-KMS for sensitive data requiring audit trails.' },
+  's3-no-versioning':               { desc: 'S3 buckets with versioning disabled — data deleted or overwritten cannot be recovered.', recommendation: 'Enable versioning on buckets holding important data. Add lifecycle rules to expire old versions to control cost.' },
+  's3-no-access-logging':           { desc: 'S3 buckets without server access logging enabled — no audit trail for object operations.', recommendation: 'Enable access logging to a separate logging bucket for security auditing and incident response.' },
+  's3-no-ssl-enforcement':          { desc: 'S3 buckets without a bucket policy enforcing HTTPS-only access.', recommendation: 'Add a bucket policy with aws:SecureTransport: false → Deny to enforce TLS-only access.' },
+  's3-overly-permissive-policy':    { desc: 'S3 bucket policies with Principal: * granting access to everyone on the internet.', recommendation: 'Restrict principal to specific AWS accounts, IAM roles, or use aws:PrincipalOrgID condition.' },
+  'ebs-unattached-volumes':         { desc: 'EBS volumes not attached to any EC2 instance, still charged at full rate.', recommendation: 'Snapshot the volume for backup then delete it. Unattached volumes cost the same as attached.' },
+  'ebs-unencrypted':                { desc: 'EBS volumes without encryption enabled — data at rest is in plaintext.', recommendation: 'Enable EBS encryption by default in the AWS console. For existing volumes, snapshot and restore with encryption.' },
+  'ebs-gp2-upgrade-to-gp3':        { desc: 'EBS gp2 volumes that could save 20% cost and gain higher IOPS by upgrading to gp3.', recommendation: 'Modify volume type from gp2 to gp3 (no downtime, same performance baseline, lower cost).' },
+  'ebs-old-snapshots':              { desc: 'EBS snapshots older than 90 days with no recent activity.', recommendation: 'Review if the snapshot is still needed. Delete old snapshots to reduce storage cost.' },
+  'eni-unattached':                 { desc: 'Elastic Network Interfaces not attached to any instance or resource.', recommendation: 'Delete orphaned ENIs. They accumulate when instances are terminated without proper cleanup.' },
+  'eip-unattached':                 { desc: 'Elastic IP addresses not associated with any running instance or network interface, charged at ~$3.60/month.', recommendation: 'Release unused Elastic IPs immediately. AWS charges for unassociated EIPs.' },
+  'lambda-public-url-no-auth':      { desc: 'Lambda functions with a public function URL configured without IAM authentication.', recommendation: 'Add IAM auth to the function URL or delete the URL if unused. Unauthenticated URLs are publicly accessible.' },
+  'lambda-public-invoke-policy':    { desc: 'Lambda functions with resource policies allowing cross-account or anonymous invocation.', recommendation: 'Restrict resource policy to specific principals. Remove Principal: * entries.' },
+  'lambda-not-invoked-30d':         { desc: 'Lambda functions with zero invocations in 30 days — likely unused.', recommendation: 'Review the function purpose. Delete if unused to reduce costs and attack surface.' },
+  'rds-public-access':              { desc: 'RDS instances with PubliclyAccessible=true, exposing the database endpoint to the internet.', recommendation: 'Set PubliclyAccessible=false. Database should only be reachable from the application security group.' },
+  'rds-unencrypted':                { desc: 'RDS instances with storage encryption disabled — data at rest is in plaintext.', recommendation: 'Enable encryption. For existing unencrypted instances, snapshot and restore to a new encrypted instance.' },
+  'rds-no-backup':                  { desc: 'RDS instances with backup retention period set to fewer than 7 days.', recommendation: 'Set backup retention to at least 7 days (30 days recommended for production).' },
+  'rds-no-deletion-protection':     { desc: 'RDS instances with deletion protection disabled — can be deleted accidentally.', recommendation: 'Enable deletion protection on all production databases. Require explicit disable before deletion.' },
+  'rds-idle-instance':              { desc: 'RDS instances with zero database connections over 14 days — likely idle.', recommendation: 'Stop the instance if temporarily unneeded or delete if permanently unused.' },
+  'iam-user-no-mfa':                { desc: 'IAM users with console access but without multi-factor authentication enabled.', recommendation: 'Enforce MFA via IAM policy (aws:MultiFactorAuthPresent: false → Deny). Require MFA for all human users.' },
+  'iam-inactive-user':              { desc: 'IAM users with console or API credentials unused for 90+ days.', recommendation: 'Disable or delete the user. Dormant credentials are a common attack vector.' },
+  'iam-unused-access-key':          { desc: 'IAM access keys not used or rotated in 90+ days.', recommendation: 'Rotate or delete the key. Set a key rotation policy and use AWS Secrets Manager for automation.' },
+  'iam-overly-broad-policy':        { desc: 'IAM policies with wildcard Action (*) or Resource (*) granting excessive permissions.', recommendation: 'Scope down to specific actions and resource ARNs. Use IAM Access Analyzer to generate least-privilege policies.' },
+  'iam-unused-role':                { desc: 'IAM roles with no last-used activity in 90+ days.', recommendation: 'Delete unused roles to reduce blast radius. Use IAM Access Analyzer before deletion.' },
+  'cloudtrail-not-logging':         { desc: 'CloudTrail trails with logging disabled — no audit log of API calls.', recommendation: 'Re-enable logging immediately. CloudTrail should always be active in every region.' },
+  'cloudtrail-no-log-validation':   { desc: 'CloudTrail trails without log file integrity validation — logs could be tampered.', recommendation: 'Enable log file validation. CloudTrail will create SHA-256 digest files to detect tampering.' },
+  'vpc-no-flow-logs':               { desc: 'VPCs without VPC Flow Logs enabled — no record of network traffic for forensics.', recommendation: 'Enable Flow Logs for all VPCs, publishing to CloudWatch Logs or S3 for analysis.' },
+  'secret-not-rotated':             { desc: 'Secrets Manager secrets not rotated in 90+ days.', recommendation: 'Enable automatic rotation. Use Lambda rotation functions provided by AWS for common databases.' },
+  'secret-rotation-disabled':       { desc: 'Secrets Manager secrets with automatic rotation disabled.', recommendation: 'Enable rotation with an appropriate schedule (30–90 days). Use AWS-managed rotation Lambdas.' },
+}
+
 // Returns the action list appropriate for a specific set of findings on a resource.
 // If any of the policies have suggestedActions, we filter RESOURCE_ACTIONS to that union.
 // Falls back to the full resource-type action list when no policy overrides exist.

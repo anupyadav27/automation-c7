@@ -1284,7 +1284,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    port = 8080
+    port = int(os.environ.get("MOCK_PORT", 8082))
     print(f"Mock API running on http://localhost:{port}")
     print(f"Loaded {len(POLICY_INDEX)} policies from {POLICY_DIR}")
     HTTPServer(("0.0.0.0", port), Handler).serve_forever()

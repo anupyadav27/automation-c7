@@ -29,6 +29,15 @@ export function deleteUserRule(id) {
   localStorage.setItem(KEY, JSON.stringify(getUserRules().filter(r => r.id !== id)))
 }
 
+// Returns unique user-defined group names (excludes built-in groups)
+export function getUserGroups() {
+  const builtIn = new Set(['security', 'cost'])
+  const seen    = new Set()
+  return getUserRules()
+    .map(r => r.group)
+    .filter(g => g && !builtIn.has(g) && !seen.has(g) && seen.add(g))
+}
+
 // Returns custom category names (excludes built-ins: security, cost)
 export function getUserCategories() {
   const builtIn = new Set(['security', 'cost'])

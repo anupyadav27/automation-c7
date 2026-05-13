@@ -2,7 +2,7 @@ const LAMBDA_EP_KEY = 'c7n_lambda_endpoint'
 const LOCAL_EP_KEY  = 'c7n_local_endpoint'
 
 const DEFAULT_LAMBDA = import.meta.env.VITE_API_ENDPOINT || 'https://vgs6w2yd2d.execute-api.ap-south-1.amazonaws.com'
-const DEFAULT_LOCAL  = 'http://localhost:8081'
+const DEFAULT_LOCAL  = 'http://localhost:8082'
 
 export function getEndpoint(authType) {
   if (authType === 'iam-role') {

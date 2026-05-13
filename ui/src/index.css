@@ -3,26 +3,32 @@
 @tailwind utilities;
 
 @layer base {
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  body {
+    @apply bg-gray-50 text-gray-900;
   }
-  ::-webkit-scrollbar-track {
-    background: #1e1e2e;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #444;
-    border-radius: 3px;
-  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #f1f5f9; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 }
 
-/* filter bar utilities */
-.filter-label {
-  @apply block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5;
-}
-.filter-select {
-  @apply w-full px-3 py-2 text-sm bg-gray-950 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:border-blue-500;
-}
-.filter-display {
-  @apply px-3 py-2 text-sm bg-gray-950 border border-gray-700 rounded-lg min-h-[38px] flex items-center;
+@layer components {
+  .filter-label {
+    @apply block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5;
+  }
+  .filter-select {
+    @apply w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500;
+  }
+  .filter-display {
+    @apply px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded-lg min-h-[38px] flex items-center;
+  }
+  .card {
+    @apply bg-white rounded-xl border border-gray-200 shadow-sm;
+  }
+  .btn-primary {
+    @apply flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply px-4 py-2 text-sm font-medium rounded-lg bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 transition-colors;
+  }
 }
