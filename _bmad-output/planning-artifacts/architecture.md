@@ -45,7 +45,7 @@ automation-c7 is a Cloud Custodian (c7n) governance platform with a React UI. It
 
 The UI selects the mode via the `Auth Type` dropdown:
 - `Access Key` / `AWS Profile` → `http://localhost:8081`
-- `IAM Role` → `https://vgs6w2yd2d.execute-api.ap-south-1.amazonaws.com`
+- `IAM Role` → `https://abcd123456.execute-api.ap-south-1.amazonaws.com`
 
 Same `handler.py` logic runs in both. `local-server.py` is a ~200-line HTTP wrapper.
 

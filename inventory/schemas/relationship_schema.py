@@ -75,7 +75,7 @@ class Relationship(BaseModel):
                 "tenant_id": "tnt_123",
                 "scan_run_id": "scan_01HYYY",
                 "provider": "aws",
-                "account_id": "588989875114",
+                "account_id": "123456789012",
                 "region": "us-east-1",
                 "relation_type": "attached_to",
                 "from_uid": "arn:aws:ec2:us-east-1:5889:instance/i-123",

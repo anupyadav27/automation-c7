@@ -5,7 +5,7 @@ import pytest
 from providers.aws.runtime import collector as col
 from providers.aws.runtime import valuematch as vm
 
-ACCOUNT, REGION = '588989875114', 'ap-southeast-1'
+ACCOUNT, REGION = '123456789012', 'ap-southeast-1'
 
 CATALOG = {
     'ec2.instance': {

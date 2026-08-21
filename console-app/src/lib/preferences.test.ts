@@ -11,7 +11,7 @@ import {
   type Prefs,
 } from "./preferences";
 
-const SCOPE = scopeOf("588989875114", "ap-southeast-1");
+const SCOPE = scopeOf("123456789012", "ap-southeast-1");
 const base = () => emptyPrefs(SCOPE);
 
 const withOrder = (order: Prefs["order"]): Prefs => ({ ...base(), order });

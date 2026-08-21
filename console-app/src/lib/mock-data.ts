@@ -71,7 +71,7 @@ const pick = <T>(a: readonly T[]) => a[Math.floor(rand() * a.length)]!;
 const hex = (n: number) =>
   Array.from({ length: n }, () => "0123456789abcdef"[Math.floor(rand() * 16)]).join("");
 
-export const ACCOUNTS = ["588989875114", "402118845093", "917364552018", "230771449862"];
+export const ACCOUNTS = ["123456789012", "402118845093", "917364552018", "230771449862"];
 export const REGIONS = [
   "ap-south-1",
   "us-east-1",
@@ -888,7 +888,7 @@ const FIXTURE_DRIFT: DriftEvent[] = [
     kind: "ASSET_ADDED",
     at: "17:12:41",
     run_id: "run_01JQ8F3K2A",
-    resource_uid: "arn:aws:ec2:ap-south-1:588989875114:instance/i-0a41c7d9e2b8f0c31",
+    resource_uid: "arn:aws:ec2:ap-south-1:123456789012:instance/i-0a41c7d9e2b8f0c31",
     resource_type: "ec2.instance",
   },
   {
@@ -896,7 +896,7 @@ const FIXTURE_DRIFT: DriftEvent[] = [
     kind: "ASSET_CHANGED",
     at: "17:12:39",
     run_id: "run_01JQ8F3K2A",
-    resource_uid: "arn:aws:ec2:ap-south-1:588989875114:security-group/sg-051b8ad3f74c9e102",
+    resource_uid: "arn:aws:ec2:ap-south-1:123456789012:security-group/sg-051b8ad3f74c9e102",
     resource_type: "ec2.security_group",
     diff: [
       { field: "ingress[0].cidr", before: "10.0.0.0/8", after: "0.0.0.0/0" },
@@ -961,7 +961,7 @@ const FIXTURE_DRIFT: DriftEvent[] = [
     kind: "ASSET_CHANGED",
     at: "05:12:08",
     run_id: "run_01JQ6Z5R7P",
-    resource_uid: "arn:aws:iam::588989875114:role/legacy-batch-07",
+    resource_uid: "arn:aws:iam::123456789012:role/legacy-batch-07",
     resource_type: "iam.role",
     diff: [{ field: "policy.Action", before: "s3:GetObject", after: "s3:*" }],
   },
@@ -970,7 +970,7 @@ const FIXTURE_DRIFT: DriftEvent[] = [
     kind: "ASSET_REMOVED",
     at: "22:44:52",
     run_id: "run_01JQ6H2T3V",
-    resource_uid: "arn:aws:ec2:ap-south-1:588989875114:snapshot/snap-03f7e1b9c8a2d4056",
+    resource_uid: "arn:aws:ec2:ap-south-1:123456789012:snapshot/snap-03f7e1b9c8a2d4056",
     resource_type: "ec2.snapshot",
   },
 ];
@@ -1000,7 +1000,7 @@ export const COST_RULE_ROWS = COST_RULES.map((r) => ({
 /* ------------------------------ architecture ----------------------------- */
 
 export const ARCH = {
-  account_id: "588989875114",
+  account_id: "123456789012",
   region: "ap-south-1",
   vpc: "vpc-0a19b73cd45e6f281",
   azs: [

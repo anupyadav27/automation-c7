@@ -45,7 +45,7 @@ Two properties carry everything else:
 
 ## 2. Current state, measured
 
-652 nodes in `ap-south-1`, account `588989875114`.
+652 nodes in `ap-south-1`, account `123456789012`.
 
 | kind | count | share | what it is |
 |---|---|---|---|

@@ -981,7 +981,7 @@ correctly. That is why `Scene.positions()` runs before serialisation.
 
 ## 12. Current state
 
-Implemented and verified against a live account (588989875114 / ap-southeast-1 —
+Implemented and verified against a live account (123456789012 / ap-southeast-1 —
 513 nodes, 3 VPCs, 2 AZs, 4 subnets):
 
 - 513/513 nodes placed, **zero unplaced**

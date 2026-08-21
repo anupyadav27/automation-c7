@@ -71,7 +71,7 @@ def asset(id_, key, arn):
     return {'asset_id': id_, 'resource_key': key, 'arn': arn}
 
 
-ACCT = 'arn:aws:iam::588989875114'
+ACCT = 'arn:aws:iam::123456789012'
 
 
 def test_keeps_everything_we_made():
@@ -115,7 +115,7 @@ def test_an_attachment_record_is_itself_the_evidence_of_use():
 
 def test_leaves_everything_that_is_not_identity_alone():
     assets = [
-        asset('1', 'ec2.instance', 'arn:aws:ec2:ap-south-1:588989875114:instance/i-1'),
+        asset('1', 'ec2.instance', 'arn:aws:ec2:ap-south-1:123456789012:instance/i-1'),
         asset('2', 's3.bucket', 'arn:aws:s3:::my-bucket'),
         {'asset_id': '3', 'resource_key': 'kms.key'},  # no arn at all
     ]

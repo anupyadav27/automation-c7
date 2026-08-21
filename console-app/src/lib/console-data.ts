@@ -564,7 +564,7 @@ export const REC_ROWS: RecRow[] = RECOMMENDATIONS.map((r) => {
     resource_name: asset?.name ?? r.resource_uid,
     resource_type: asset?.resource_type ?? rule?.resource_key ?? "unknown",
     provider: asset?.provider ?? "aws",
-    account_id: asset?.account_id ?? "588989875114",
+    account_id: asset?.account_id ?? "123456789012",
     region: asset?.region ?? "ap-south-1",
     confidence:
       r.savings_model === "flat_monthly"
@@ -824,7 +824,7 @@ export const DRIFT_ROWS: DriftRow[] = DRIFT.map((d, i) => {
         : isEdge
           ? "relationship no longer observed"
           : "resource absent from inventory",
-    account_id: asset?.account_id ?? "588989875114",
+    account_id: asset?.account_id ?? "123456789012",
     region: asset?.region ?? "ap-south-1",
     from_scan: from.scan_id,
     to_scan: to.scan_id,

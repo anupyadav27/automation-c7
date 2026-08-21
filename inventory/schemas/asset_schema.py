@@ -50,7 +50,7 @@ class Asset(BaseModel):
                 "tenant_id": "tnt_123",
                 "scan_run_id": "scan_01HYYY",
                 "provider": "aws",
-                "account_id": "588989875114",
+                "account_id": "123456789012",
                 "region": "us-east-1",
                 "scope": "regional",
                 "resource_type": "s3.bucket",
@@ -62,7 +62,7 @@ class Asset(BaseModel):
                     "created_at": "2025-10-01T10:12:00Z",
                     "labels": {},
                     "raw_refs": [
-                        "s3://inventory/tnt_123/scan_01HYYY/raw/aws/588989875114/us-east-1/s3.json"
+                        "s3://inventory/tnt_123/scan_01HYYY/raw/aws/123456789012/us-east-1/s3.json"
                     ]
                 },
                 "hash_sha256": "abc123..."

@@ -358,7 +358,7 @@ so a preference must never leak from a fixture session into a live one —
 ```
 {
   version: 1,
-  scope: "588989875114/ap-southeast-1",
+  scope: "123456789012/ap-southeast-1",
   savedAt: "2026-08-19T...",
   order:   { [containerKey]: string[] },      // §3
 

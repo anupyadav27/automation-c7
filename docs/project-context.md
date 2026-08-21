@@ -30,9 +30,9 @@ Focus on unobvious details that would otherwise be missed._
 
 ### Infrastructure
 - **AWS Lambda** — container image (python:3.11-slim), not zip deployment
-- **AWS API Gateway HTTP API** — endpoint: `https://vgs6w2yd2d.execute-api.ap-south-1.amazonaws.com`
-- **AWS account**: 588989875114, **primary region**: ap-south-1
-- **IAM role**: `arn:aws:iam::588989875114:role/c7n-automation-lambda-dev`
+- **AWS API Gateway HTTP API** — endpoint: `https://abcd123456.execute-api.ap-south-1.amazonaws.com`
+- **AWS account**: 123456789012, **primary region**: ap-south-1
+- **IAM role**: `arn:aws:iam::123456789012:role/c7n-automation-lambda-dev`
 - **Docker** — Dockerfile (Lambda), Dockerfile.local (local dev), nginx:alpine (UI)
 
 ---
@@ -108,7 +108,7 @@ Response: {
   "execution_time": "ISO8601",
   "dryrun": true,
   "region": "ap-south-1",
-  "account": { "account_id": "588989875114", "arn": "...", "region": "..." },
+  "account": { "account_id": "123456789012", "arn": "...", "region": "..." },
   "policies_executed": 3,
   "results": [
     {

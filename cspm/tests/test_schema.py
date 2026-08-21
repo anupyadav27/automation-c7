@@ -11,7 +11,7 @@ from cspm import schema, uid as uidlib
 
 
 def a_record(**over):
-    base = dict(provider='aws', account_id='588989875114', region='ap-southeast-1',
+    base = dict(provider='aws', account_id='123456789012', region='ap-southeast-1',
                 resource_type='s3.bucket', resource_id='my-bucket',
                 resource_uid='arn:aws:s3:::my-bucket', name='my-bucket')
     base.update(over)
@@ -52,7 +52,7 @@ def test_regional_asset_must_name_its_region():
 
 def test_global_asset_needs_no_region():
     record = a_record(region='', scope='global',
-                      resource_uid='arn:aws:iam::588989875114:role/app',
+                      resource_uid='arn:aws:iam::123456789012:role/app',
                       resource_type='iam.role', resource_id='app')
     assert schema.validate(record) == []
 
@@ -94,7 +94,7 @@ def test_topology_never_leaks_into_metadata():
 
 @pytest.mark.parametrize('provider,value', [
     ('aws', 'arn:aws:s3:::my-bucket'),
-    ('aws', 'arn:aws:ec2:ap-southeast-1:588989875114:instance/i-0abc'),
+    ('aws', 'arn:aws:ec2:ap-southeast-1:123456789012:instance/i-0abc'),
     ('azure', '/subscriptions/abc-123/resourceGroups/rg1/providers/'
               'Microsoft.Compute/virtualMachines/vm1'),
     ('gcp', '//compute.googleapis.com/projects/p1/zones/us-central1-a/instances/i1'),
