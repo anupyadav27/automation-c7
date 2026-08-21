@@ -1,0 +1,112 @@
+version: '1.0'
+provider: aws
+service: bedrock-data-automation
+services:
+  client: bedrock-data-automation
+  module: boto3.client
+discovery:
+- discovery_id: aws.bedrock-data-automation.list_blueprints
+  calls:
+  - action: list_blueprints
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.blueprints }}'
+    item:
+      blueprint: '{{ item.blueprint }}'
+      blueprintArn: '{{ item.blueprintArn }}'
+      blueprintName: '{{ item.blueprintName }}'
+      blueprintStage: '{{ item.blueprintStage }}'
+      blueprintVersion: '{{ item.blueprintVersion }}'
+      creationTime: '{{ item.creationTime }}'
+      kmsEncryptionContext: '{{ item.kmsEncryptionContext }}'
+      kmsKeyId: '{{ item.kmsKeyId }}'
+      lastModifiedTime: '{{ item.lastModifiedTime }}'
+      schema: '{{ item.schema }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.bedrock-data-automation.list_data_automation_projects
+  calls:
+  - action: list_data_automation_projects
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.projects }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      customOutputConfiguration: '{{ item.customOutputConfiguration }}'
+      overrideConfiguration: '{{ item.overrideConfiguration }}'
+      project: '{{ item.project }}'
+      projectArn: '{{ item.projectArn }}'
+      projectName: '{{ item.projectName }}'
+      projectStage: '{{ item.projectStage }}'
+      projectType: '{{ item.projectType }}'
+      standardOutputConfiguration: '{{ item.standardOutputConfiguration }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.bedrock-data-automation.get_blueprint
+  for_each: aws.bedrock-data-automation.list_blueprints
+  calls:
+  - action: get_blueprint
+    params:
+      blueprintArn: '{{ item.blueprintArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      blueprintArn: '{{ response.blueprint.blueprintArn }}'
+      blueprintName: '{{ response.blueprint.blueprintName }}'
+      blueprintStage: '{{ response.blueprint.blueprintStage }}'
+      blueprintVersion: '{{ response.blueprint.blueprintVersion }}'
+      creationTime: '{{ response.blueprint.creationTime }}'
+      kmsEncryptionContext: '{{ response.blueprint.kmsEncryptionContext }}'
+      kmsKeyId: '{{ response.blueprint.kmsKeyId }}'
+      lastModifiedTime: '{{ response.blueprint.lastModifiedTime }}'
+      schema: '{{ response.blueprint.schema }}'
+      type: '{{ response.blueprint.type }}'
+- discovery_id: aws.bedrock-data-automation.get_data_automation_project
+  for_each: aws.bedrock-data-automation.list_data_automation_projects
+  calls:
+  - action: get_data_automation_project
+    params:
+      projectArn: '{{ item.projectArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.project.status }}'
+      Enabled: '{{ response.project.Enabled }}'
+      creationTime: '{{ response.project.creationTime }}'
+      customOutputConfiguration: '{{ response.project.customOutputConfiguration }}'
+      kmsEncryptionContext: '{{ response.project.kmsEncryptionContext }}'
+      kmsKeyId: '{{ response.project.kmsKeyId }}'
+      lastModifiedTime: '{{ response.project.lastModifiedTime }}'
+      overrideConfiguration: '{{ response.project.overrideConfiguration }}'
+      project: '{{ response.project.projectArn }}'
+      projectArn: '{{ response.project.projectArn }}'
+      projectDescription: '{{ response.project.projectDescription }}'
+      projectName: '{{ response.project.projectName }}'
+      projectStage: '{{ response.project.projectStage }}'
+      projectType: '{{ response.project.projectType }}'
+      standardOutputConfiguration: '{{ response.project.standardOutputConfiguration }}'
+      status: '{{ response.project.status }}'
+      state: '{{ response.project.overrideConfiguration.audio.modalityProcessing.state }}'
+      jpeg: '{{ response.project.overrideConfiguration.modalityRouting.jpeg }}'
+      mov: '{{ response.project.overrideConfiguration.modalityRouting.mov }}'
+      mp4: '{{ response.project.overrideConfiguration.modalityRouting.mp4 }}'
+      png: '{{ response.project.overrideConfiguration.modalityRouting.png }}'
+- discovery_id: aws.bedrock-data-automation.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'

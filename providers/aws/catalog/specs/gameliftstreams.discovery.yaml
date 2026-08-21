@@ -1,0 +1,158 @@
+version: '1.0'
+provider: aws
+service: gameliftstreams
+services:
+  client: gameliftstreams
+  module: boto3.client
+discovery:
+- discovery_id: aws.gameliftstreams.list_applications
+  calls:
+  - action: list_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Description: '{{ item.Description }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      RuntimeEnvironment: '{{ item.RuntimeEnvironment }}'
+- discovery_id: aws.gameliftstreams.list_stream_groups
+  calls:
+  - action: list_stream_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DefaultApplication: '{{ item.DefaultApplication }}'
+      Description: '{{ item.Description }}'
+      ExpiresAt: '{{ item.ExpiresAt }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      StreamClass: '{{ item.StreamClass }}'
+- discovery_id: aws.gameliftstreams.list_stream_sessions_by_account
+  calls:
+  - action: list_stream_sessions_by_account
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Location: '{{ item.Location }}'
+      Status: '{{ item.Status }}'
+      ApplicationArn: '{{ item.ApplicationArn }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      ExportFilesMetadata: '{{ item.ExportFilesMetadata }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      Protocol: '{{ item.Protocol }}'
+      UserId: '{{ item.UserId }}'
+- discovery_id: aws.gameliftstreams.get_application
+  calls:
+  - action: get_application
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ApplicationLogPaths }}'
+    item:
+      ApplicationLogOutputUri: '{{ response.ApplicationLogOutputUri }}'
+      ApplicationSourceUri: '{{ response.ApplicationSourceUri }}'
+      Arn: '{{ response.Arn }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      Description: '{{ response.Description }}'
+      ExecutablePath: '{{ response.ExecutablePath }}'
+      Id: '{{ response.Id }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      Type: '{{ response.RuntimeEnvironment.Type }}'
+      Version: '{{ response.RuntimeEnvironment.Version }}'
+      Status: '{{ response.Status }}'
+      StatusReason: '{{ response.StatusReason }}'
+- discovery_id: aws.gameliftstreams.get_stream_group
+  calls:
+  - action: get_stream_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LocationStates }}'
+    item:
+      Status: '{{ item.Status }}'
+      AllocatedCapacity: '{{ item.AllocatedCapacity }}'
+      AlwaysOnCapacity: '{{ item.AlwaysOnCapacity }}'
+      IdleCapacity: '{{ item.IdleCapacity }}'
+      LocationName: '{{ item.LocationName }}'
+      OnDemandCapacity: '{{ item.OnDemandCapacity }}'
+      RequestedCapacity: '{{ item.RequestedCapacity }}'
+      Arn: '{{ response.Arn }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      Id: '{{ response.DefaultApplication.Id }}'
+      Description: '{{ response.Description }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      StatusReason: '{{ response.StatusReason }}'
+      StreamClass: '{{ response.StreamClass }}'
+- discovery_id: aws.gameliftstreams.get_stream_session
+  calls:
+  - action: get_stream_session
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AdditionalLaunchArgs }}'
+    item:
+      AdditionalEnvironmentVariables: '{{ response.AdditionalEnvironmentVariables }}'
+      ApplicationArn: '{{ response.ApplicationArn }}'
+      Arn: '{{ response.Arn }}'
+      ConnectionTimeoutSeconds: '{{ response.ConnectionTimeoutSeconds }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      Description: '{{ response.Description }}'
+      OutputUri: '{{ response.ExportFilesMetadata.OutputUri }}'
+      Status: '{{ response.ExportFilesMetadata.Status }}'
+      StatusReason: '{{ response.ExportFilesMetadata.StatusReason }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      Location: '{{ response.Location }}'
+      LogFileLocationUri: '{{ response.LogFileLocationUri }}'
+      Protocol: '{{ response.Protocol }}'
+      SessionLengthSeconds: '{{ response.SessionLengthSeconds }}'
+      SignalRequest: '{{ response.SignalRequest }}'
+      SignalResponse: '{{ response.SignalResponse }}'
+      StreamGroupId: '{{ response.StreamGroupId }}'
+      UserId: '{{ response.UserId }}'
+      WebSdkProtocolUrl: '{{ response.WebSdkProtocolUrl }}'
+- discovery_id: aws.gameliftstreams.list_stream_sessions
+  calls:
+  - action: list_stream_sessions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Location: '{{ item.Location }}'
+      Status: '{{ item.Status }}'
+      ApplicationArn: '{{ item.ApplicationArn }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      ExportFilesMetadata: '{{ item.ExportFilesMetadata }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      Protocol: '{{ item.Protocol }}'
+      UserId: '{{ item.UserId }}'
+- discovery_id: aws.gameliftstreams.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

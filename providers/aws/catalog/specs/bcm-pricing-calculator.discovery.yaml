@@ -1,0 +1,270 @@
+version: '1.0'
+provider: aws
+service: bcm-pricing-calculator
+services:
+  client: bcm-pricing-calculator
+  module: boto3.client
+discovery:
+- discovery_id: aws.bcm-pricing-calculator.get_preferences
+  calls:
+  - action: get_preferences
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.managementAccountRateTypeSelections }}'
+    item:
+      managementAccountRateTypeSelections: '{{ item.managementAccountRateTypeSelections }}'
+      memberAccountRateTypeSelections: '{{ item.memberAccountRateTypeSelections }}'
+      standaloneAccountRateTypeSelections: '{{ item.standaloneAccountRateTypeSelections }}'
+- discovery_id: aws.bcm-pricing-calculator.list_bill_estimates
+  calls:
+  - action: list_bill_estimates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      billInterval: '{{ item.billInterval }}'
+      createdAt: '{{ item.createdAt }}'
+      expiresAt: '{{ item.expiresAt }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.bcm-pricing-calculator.list_bill_scenarios
+  calls:
+  - action: list_bill_scenarios
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      billInterval: '{{ item.billInterval }}'
+      costCategoryGroupSharingPreferenceArn: '{{ item.costCategoryGroupSharingPreferenceArn }}'
+      createdAt: '{{ item.createdAt }}'
+      expiresAt: '{{ item.expiresAt }}'
+      failureMessage: '{{ item.failureMessage }}'
+      groupSharingPreference: '{{ item.groupSharingPreference }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.bcm-pricing-calculator.list_workload_estimates
+  calls:
+  - action: list_workload_estimates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      costCurrency: '{{ item.costCurrency }}'
+      createdAt: '{{ item.createdAt }}'
+      expiresAt: '{{ item.expiresAt }}'
+      failureMessage: '{{ item.failureMessage }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      rateTimestamp: '{{ item.rateTimestamp }}'
+      rateType: '{{ item.rateType }}'
+      status: '{{ item.status }}'
+      totalCost: '{{ item.totalCost }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.bcm-pricing-calculator.get_bill_estimate
+  calls:
+  - action: get_bill_estimate
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      end: '{{ response.billInterval.end }}'
+      start: '{{ response.billInterval.start }}'
+      serviceCostDifferences: '{{ response.costSummary.serviceCostDifferences }}'
+      amount: '{{ response.costSummary.totalCostDifference.estimatedCost.amount }}'
+      currency: '{{ response.costSummary.totalCostDifference.estimatedCost.currency }}'
+      createdAt: '{{ response.createdAt }}'
+      expiresAt: '{{ response.expiresAt }}'
+      failureMessage: '{{ response.failureMessage }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.bcm-pricing-calculator.get_bill_scenario
+  calls:
+  - action: get_bill_scenario
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      end: '{{ response.billInterval.end }}'
+      start: '{{ response.billInterval.start }}'
+      createdAt: '{{ response.createdAt }}'
+      expiresAt: '{{ response.expiresAt }}'
+      failureMessage: '{{ response.failureMessage }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.bcm-pricing-calculator.get_workload_estimate
+  calls:
+  - action: get_workload_estimate
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      costCurrency: '{{ response.costCurrency }}'
+      createdAt: '{{ response.createdAt }}'
+      expiresAt: '{{ response.expiresAt }}'
+      failureMessage: '{{ response.failureMessage }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      rateTimestamp: '{{ response.rateTimestamp }}'
+      rateType: '{{ response.rateType }}'
+      status: '{{ response.status }}'
+      totalCost: '{{ response.totalCost }}'
+- discovery_id: aws.bcm-pricing-calculator.list_bill_estimate_commitments
+  calls:
+  - action: list_bill_estimate_commitments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      id: '{{ item.id }}'
+      monthlyPayment: '{{ item.monthlyPayment }}'
+      offeringId: '{{ item.offeringId }}'
+      paymentOption: '{{ item.paymentOption }}'
+      purchaseAgreementType: '{{ item.purchaseAgreementType }}'
+      region: '{{ item.region }}'
+      termLength: '{{ item.termLength }}'
+      upfrontPayment: '{{ item.upfrontPayment }}'
+      usageAccountId: '{{ item.usageAccountId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.bcm-pricing-calculator.list_bill_estimate_input_commitment_modifications
+  calls:
+  - action: list_bill_estimate_input_commitment_modifications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      commitmentAction: '{{ item.commitmentAction }}'
+      group: '{{ item.group }}'
+      id: '{{ item.id }}'
+      usageAccountId: '{{ item.usageAccountId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.bcm-pricing-calculator.list_bill_estimate_input_usage_modifications
+  calls:
+  - action: list_bill_estimate_input_usage_modifications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      availabilityZone: '{{ item.availabilityZone }}'
+      group: '{{ item.group }}'
+      historicalUsage: '{{ item.historicalUsage }}'
+      id: '{{ item.id }}'
+      location: '{{ item.location }}'
+      operation: '{{ item.operation }}'
+      quantities: '{{ item.quantities }}'
+      serviceCode: '{{ item.serviceCode }}'
+      usageAccountId: '{{ item.usageAccountId }}'
+      usageType: '{{ item.usageType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.bcm-pricing-calculator.list_bill_estimate_line_items
+  calls:
+  - action: list_bill_estimate_line_items
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      availabilityZone: '{{ item.availabilityZone }}'
+      estimatedCost: '{{ item.estimatedCost }}'
+      estimatedUsageQuantity: '{{ item.estimatedUsageQuantity }}'
+      historicalCost: '{{ item.historicalCost }}'
+      historicalUsageQuantity: '{{ item.historicalUsageQuantity }}'
+      id: '{{ item.id }}'
+      lineItemId: '{{ item.lineItemId }}'
+      lineItemType: '{{ item.lineItemType }}'
+      location: '{{ item.location }}'
+      operation: '{{ item.operation }}'
+      payerAccountId: '{{ item.payerAccountId }}'
+      savingsPlanArns: '{{ item.savingsPlanArns }}'
+      serviceCode: '{{ item.serviceCode }}'
+      usageAccountId: '{{ item.usageAccountId }}'
+      usageType: '{{ item.usageType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.bcm-pricing-calculator.list_bill_scenario_commitment_modifications
+  calls:
+  - action: list_bill_scenario_commitment_modifications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      commitmentAction: '{{ item.commitmentAction }}'
+      group: '{{ item.group }}'
+      id: '{{ item.id }}'
+      usageAccountId: '{{ item.usageAccountId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.bcm-pricing-calculator.list_bill_scenario_usage_modifications
+  calls:
+  - action: list_bill_scenario_usage_modifications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      availabilityZone: '{{ item.availabilityZone }}'
+      group: '{{ item.group }}'
+      historicalUsage: '{{ item.historicalUsage }}'
+      id: '{{ item.id }}'
+      location: '{{ item.location }}'
+      operation: '{{ item.operation }}'
+      quantities: '{{ item.quantities }}'
+      serviceCode: '{{ item.serviceCode }}'
+      usageAccountId: '{{ item.usageAccountId }}'
+      usageType: '{{ item.usageType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.bcm-pricing-calculator.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.bcm-pricing-calculator.list_workload_estimate_usage
+  calls:
+  - action: list_workload_estimate_usage
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      cost: '{{ item.cost }}'
+      currency: '{{ item.currency }}'
+      group: '{{ item.group }}'
+      historicalUsage: '{{ item.historicalUsage }}'
+      id: '{{ item.id }}'
+      location: '{{ item.location }}'
+      operation: '{{ item.operation }}'
+      quantity: '{{ item.quantity }}'
+      serviceCode: '{{ item.serviceCode }}'
+      status: '{{ item.status }}'
+      usageAccountId: '{{ item.usageAccountId }}'
+      usageType: '{{ item.usageType }}'
+      nextToken: '{{ response.nextToken }}'

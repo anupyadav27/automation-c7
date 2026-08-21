@@ -1,0 +1,59 @@
+# =============================================================================
+# IEDS Tier 2 — AWS EC2 Instances (direct public IP / EIP)
+# Tier 2 = single emitted-field condition.
+# Tier 3 rule (SG + IGW + NACL chain) is in tier3_ec2_chain.yaml.
+# =============================================================================
+
+rules:
+
+  # resource_type = di_table_inventory.resource_type exact values
+  - rule_id: IEDS-T2-AWS-004
+    tier: 2
+    csp: aws
+    resource_type: ec2_instance
+    origin_type: internet
+    title: "AWS EC2 instance has a public IP address"
+    description: >
+      EC2 instances with a public IP (auto-assigned or EIP) are directly reachable
+      from the internet if the attached security groups permit inbound traffic.
+      This Tier 2 rule flags the presence of a public IP; the Tier 3 rule
+      validates the full SG+NACL+IGW chain.
+    severity: medium
+    required_emitted_fields:
+      - public_ip_address
+    exposure_conditions:
+      - field: public_ip_address
+        operator: not_null
+
+  - rule_id: IEDS-T2-AWS-005
+    tier: 2
+    csp: aws
+    resource_type: ec2_address
+    origin_type: internet
+    title: "AWS Elastic IP is associated to a resource"
+    description: >
+      An Elastic IP associated to an EC2 instance or network interface makes that
+      resource directly reachable from the internet.
+    severity: high
+    required_emitted_fields:
+      - association_id
+    exposure_conditions:
+      - field: association_id
+        operator: not_null
+
+  - rule_id: IEDS-T2-AWS-015
+    tier: 2
+    csp: aws
+    resource_type: ec2_network_interface
+    origin_type: internet
+    title: "AWS EC2 network interface has a public IP"
+    description: >
+      Network interfaces with a public IPv4 address association are directly
+      reachable from the internet. This covers ENIs attached to EC2, ECS tasks,
+      Lambda VPC, and other services.
+    severity: high
+    required_emitted_fields:
+      - association
+    exposure_conditions:
+      - field: association.public_ip
+        operator: not_null

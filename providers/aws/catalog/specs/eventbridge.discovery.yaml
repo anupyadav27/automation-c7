@@ -1,0 +1,38 @@
+version: '1.0'
+provider: aws
+service: eventbridge
+discovery:
+- calls:
+  - action: describe_event_bus
+    on_error: continue
+    save_as: response
+  discovery_id: aws.eventbridge.describe_event_bus
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Policy: '{{ response.Policy }}'
+      KmsKeyIdentifier: '{{ response.KmsKeyIdentifier }}'
+      LogConfig: '{{ response.LogConfig }}'
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+  resource_type: eventbridge_event_bus
+- calls:
+  - action: list_replays
+    on_error: continue
+    save_as: response
+  discovery_id: aws.eventbridge.list_replays
+  emit:
+    as: item
+    item:
+      Destination: '{{ response.Destination }}'
+      EventEndTime: '{{ response.EventEndTime }}'
+      EventLastReplayedTime: '{{ response.EventLastReplayedTime }}'
+      EventSourceArn: '{{ response.EventSourceArn }}'
+      EventStartTime: '{{ response.EventStartTime }}'
+      ReplayEndTime: '{{ response.ReplayEndTime }}'
+      ReplayName: '{{ response.ReplayName }}'
+      ReplayStartTime: '{{ response.ReplayStartTime }}'
+      State: '{{ response.State }}'
+      StateReason: '{{ response.StateReason }}'
+  resource_type: eventbridge_replay

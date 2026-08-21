@@ -1,0 +1,947 @@
+version: '1.0'
+provider: aws
+service: customer-profiles
+services:
+  client: customer-profiles
+  module: boto3.client
+discovery:
+- discovery_id: aws.customer-profiles.list_domains
+  calls:
+  - action: list_domains
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      EncryptionKey: '{{ item.EncryptionKey }}'
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      AllowProfileCreation: '{{ item.AllowProfileCreation }}'
+      AppflowIntegration: '{{ item.AppflowIntegration }}'
+      AttributeDetails: '{{ item.AttributeDetails }}'
+      ClientToken: '{{ item.ClientToken }}'
+      CompletedAt: '{{ item.CompletedAt }}'
+      Conditions: '{{ item.Conditions }}'
+      ConfidenceScore: '{{ item.ConfidenceScore }}'
+      ConflictResolution: '{{ item.ConflictResolution }}'
+      Consolidation: '{{ item.Consolidation }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DataExpiry: '{{ item.DataExpiry }}'
+      DeadLetterQueueUrl: '{{ item.DeadLetterQueueUrl }}'
+      DefaultEncryptionKey: '{{ item.DefaultEncryptionKey }}'
+      DefaultExpirationDays: '{{ item.DefaultExpirationDays }}'
+      Description: '{{ item.Description }}'
+      DestinationDetails: '{{ item.DestinationDetails }}'
+      DestinationSummary: '{{ item.DestinationSummary }}'
+      DestinationUri: '{{ item.DestinationUri }}'
+      DomainName: '{{ item.DomainName }}'
+      Enabled: '{{ item.Enabled }}'
+      ErrorDescription: '{{ item.ErrorDescription }}'
+      EventStreamName: '{{ item.EventStreamName }}'
+      EventTriggerConditions: '{{ item.EventTriggerConditions }}'
+      EventTriggerDimensions: '{{ item.EventTriggerDimensions }}'
+      EventTriggerLimits: '{{ item.EventTriggerLimits }}'
+      EventTriggerNames: '{{ item.EventTriggerNames }}'
+      ExpirationDays: '{{ item.ExpirationDays }}'
+      Filter: '{{ item.Filter }}'
+      Groups: '{{ item.Groups }}'
+      Include: '{{ item.Include }}'
+      IsDefault: '{{ item.IsDefault }}'
+      IsUnstructured: '{{ item.IsUnstructured }}'
+      Items: '{{ item.Items }}'
+      JobExpirationTime: '{{ item.JobExpirationTime }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      Layout: '{{ item.Layout }}'
+      LayoutType: '{{ item.LayoutType }}'
+      LogicalOperator: '{{ item.LogicalOperator }}'
+      MatchGenerationDate: '{{ item.MatchGenerationDate }}'
+      MaxAvailableProfileObjectCount: '{{ item.MaxAvailableProfileObjectCount }}'
+      MaxProfileObjectCount: '{{ item.MaxProfileObjectCount }}'
+      MeteringProfileCount: '{{ item.MeteringProfileCount }}'
+      Metrics: '{{ item.Metrics }}'
+      MinAllowedConfidenceScoreForMerging: '{{ item.MinAllowedConfidenceScoreForMerging }}'
+      NumberOfMatchesInSample: '{{ item.NumberOfMatchesInSample }}'
+      NumberOfProfilesInSample: '{{ item.NumberOfProfilesInSample }}'
+      NumberOfProfilesWillBeMerged: '{{ item.NumberOfProfilesWillBeMerged }}'
+      ObjectCount: '{{ item.ObjectCount }}'
+      ObjectTypeNames: '{{ item.ObjectTypeNames }}'
+      PotentialMatches: '{{ item.PotentialMatches }}'
+      ProfileCount: '{{ item.ProfileCount }}'
+      ProfileIds: '{{ item.ProfileIds }}'
+      Readiness: '{{ item.Readiness }}'
+      ResultsSummary: '{{ item.ResultsSummary }}'
+      RuleBasedMatching: '{{ item.RuleBasedMatching }}'
+      SegmentFilter: '{{ item.SegmentFilter }}'
+      SegmentGroups: '{{ item.SegmentGroups }}'
+      StartDate: '{{ item.StartDate }}'
+      Statistic: '{{ item.Statistic }}'
+      Stats: '{{ item.Stats }}'
+      StatusCode: '{{ item.StatusCode }}'
+      StatusDescription: '{{ item.StatusDescription }}'
+      StatusReason: '{{ item.StatusReason }}'
+      StoppedSince: '{{ item.StoppedSince }}'
+      TotalSize: '{{ item.TotalSize }}'
+      UniqueKey: '{{ item.UniqueKey }}'
+      UseHistoricalData: '{{ item.UseHistoricalData }}'
+      ValidUntil: '{{ item.ValidUntil }}'
+      Value: '{{ item.Value }}'
+      Version: '{{ item.Version }}'
+      WorkflowType: '{{ item.WorkflowType }}'
+- discovery_id: aws.customer-profiles.list_profile_object_type_templates
+  calls:
+  - action: list_profile_object_type_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      EncryptionKey: '{{ item.EncryptionKey }}'
+      AllowProfileCreation: '{{ item.AllowProfileCreation }}'
+      ExpirationDays: '{{ item.ExpirationDays }}'
+      SourceName: '{{ item.SourceName }}'
+      SourceObject: '{{ item.SourceObject }}'
+      TemplateId: '{{ item.TemplateId }}'
+- discovery_id: aws.customer-profiles.get_auto_merging_preview
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_auto_merging_preview
+    params:
+      DomainName: '{{ item.DomainName }}'
+      Consolidation: '{{ item.Consolidation }}'
+      ConflictResolution: '{{ item.ConflictResolution }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      NumberOfMatchesInSample: '{{ response.NumberOfMatchesInSample }}'
+      NumberOfProfilesInSample: '{{ response.NumberOfProfilesInSample }}'
+      NumberOfProfilesWillBeMerged: '{{ response.NumberOfProfilesWillBeMerged }}'
+      DomainName: '{{ response.DomainName }}'
+- discovery_id: aws.customer-profiles.get_calculated_attribute_definition
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_calculated_attribute_definition
+    params:
+      DomainName: '{{ item.DomainName }}'
+      CalculatedAttributeName: '{{ item.CalculatedAttributeName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AttributeDetails: '{{ response.Filter.AttributeDetails }}'
+      Conditions: '{{ response.Filter.Conditions }}'
+      Filter: '{{ response.Filter.Filter }}'
+      Groups: '{{ response.Filter.Groups }}'
+      Include: '{{ response.Filter.Include }}'
+      Metrics: '{{ response.Filter.Metrics }}'
+      Readiness: '{{ response.Filter.Readiness }}'
+      Statistic: '{{ response.Filter.Statistic }}'
+      Expression: '{{ response.AttributeDetails.Expression }}'
+      CalculatedAttributeName: '{{ response.CalculatedAttributeName }}'
+      ObjectCount: '{{ response.Conditions.ObjectCount }}'
+      Unit: '{{ response.Conditions.Range.Unit }}'
+      Value: '{{ response.Conditions.Range.Value }}'
+      Operator: '{{ response.Conditions.Threshold.Operator }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      Description: '{{ response.Description }}'
+      DisplayName: '{{ response.DisplayName }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.customer-profiles.get_calculated_attribute_for_profile
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_calculated_attribute_for_profile
+    params:
+      DomainName: '{{ item.DomainName }}'
+      ProfileId: '{{ item.ProfileId }}'
+      CalculatedAttributeName: '{{ item.CalculatedAttributeName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CalculatedAttributeName: '{{ response.CalculatedAttributeName }}'
+      DisplayName: '{{ response.DisplayName }}'
+      IsDataPartial: '{{ response.IsDataPartial }}'
+      LastObjectTimestamp: '{{ response.LastObjectTimestamp }}'
+      Value: '{{ response.Value }}'
+- discovery_id: aws.customer-profiles.get_domain
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_domain
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      EncryptionKey: '{{ response.Stats.EncryptionKey }}'
+      AppflowIntegration: '{{ response.Stats.AppflowIntegration }}'
+      DeadLetterQueueUrl: '{{ response.DeadLetterQueueUrl }}'
+      DefaultEncryptionKey: '{{ response.DefaultEncryptionKey }}'
+      DefaultExpirationDays: '{{ response.DefaultExpirationDays }}'
+      ErrorDescription: '{{ response.Stats.ErrorDescription }}'
+      ExpirationDays: '{{ response.Stats.ExpirationDays }}'
+      MeteringProfileCount: '{{ response.Stats.MeteringProfileCount }}'
+      ObjectCount: '{{ response.Stats.ObjectCount }}'
+      ProfileCount: '{{ response.Stats.ProfileCount }}'
+      RuleBasedMatching: '{{ response.Stats.RuleBasedMatching }}'
+      StartDate: '{{ response.Stats.StartDate }}'
+      Stats: '{{ response.Stats.Stats }}'
+      TotalSize: '{{ response.Stats.TotalSize }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      DomainName: '{{ response.DomainName }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      ConflictResolvingModel: '{{ response.Matching.AutoMerging.ConflictResolution.ConflictResolvingModel }}'
+      SourceName: '{{ response.Matching.AutoMerging.ConflictResolution.SourceName }}'
+      Enabled: '{{ response.Matching.AutoMerging.Enabled }}'
+      MinAllowedConfidenceScoreForMerging: '{{ response.Matching.AutoMerging.MinAllowedConfidenceScoreForMerging }}'
+      S3BucketName: '{{ response.Matching.ExportingConfig.S3Exporting.S3BucketName }}'
+      S3KeyName: '{{ response.Matching.ExportingConfig.S3Exporting.S3KeyName }}'
+      DayOfTheWeek: '{{ response.Matching.JobSchedule.DayOfTheWeek }}'
+      Time: '{{ response.Matching.JobSchedule.Time }}'
+      AttributeMatchingModel: '{{ response.RuleBasedMatching.AttributeTypesSelector.AttributeMatchingModel }}'
+      MaxAllowedRuleLevelForMatching: '{{ response.RuleBasedMatching.MaxAllowedRuleLevelForMatching }}'
+      MaxAllowedRuleLevelForMerging: '{{ response.RuleBasedMatching.MaxAllowedRuleLevelForMerging }}'
+      Status: '{{ response.RuleBasedMatching.Status }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.customer-profiles.get_domain_layout
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_domain_layout
+    params:
+      DomainName: '{{ item.DomainName }}'
+      LayoutDefinitionName: '{{ item.LayoutDefinitionName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      Description: '{{ response.Description }}'
+      DisplayName: '{{ response.DisplayName }}'
+      IsDefault: '{{ response.IsDefault }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      Layout: '{{ response.Layout }}'
+      LayoutDefinitionName: '{{ response.LayoutDefinitionName }}'
+      LayoutType: '{{ response.LayoutType }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.customer-profiles.get_event_stream
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_event_stream
+    params:
+      DomainName: '{{ item.DomainName }}'
+      EventStreamName: '{{ item.EventStreamName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.DestinationDetails.Status }}'
+      DestinationDetails: '{{ response.DestinationDetails.DestinationDetails }}'
+      DestinationUri: '{{ response.DestinationDetails.DestinationUri }}'
+      Message: '{{ response.DestinationDetails.Message }}'
+      UnhealthySince: '{{ response.DestinationDetails.UnhealthySince }}'
+      Uri: '{{ response.DestinationDetails.Uri }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      DomainName: '{{ response.DomainName }}'
+      EventStreamArn: '{{ response.EventStreamArn }}'
+      State: '{{ response.State }}'
+      StoppedSince: '{{ response.StoppedSince }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.customer-profiles.get_event_trigger
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_event_trigger
+    params:
+      DomainName: '{{ item.DomainName }}'
+      EventTriggerName: '{{ item.EventTriggerName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EventTriggerConditions }}'
+    item:
+      EventTriggerConditions: '{{ item.EventTriggerConditions }}'
+      EventTriggerDimensions: '{{ item.EventTriggerDimensions }}'
+      EventTriggerLimits: '{{ item.EventTriggerLimits }}'
+      LogicalOperator: '{{ item.LogicalOperator }}'
+      SegmentFilter: '{{ item.SegmentFilter }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      Description: '{{ response.Description }}'
+      EventExpiration: '{{ response.EventTriggerLimits.EventExpiration }}'
+      EventTriggerName: '{{ response.EventTriggerName }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      ObjectTypeName: '{{ response.ObjectTypeName }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.customer-profiles.get_identity_resolution_job
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_identity_resolution_job
+    params:
+      DomainName: '{{ item.DomainName }}'
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ConflictResolution: '{{ response.AutoMerging.ConflictResolution }}'
+      Consolidation: '{{ response.AutoMerging.Consolidation }}'
+      Enabled: '{{ response.AutoMerging.Enabled }}'
+      JobExpirationTime: '{{ response.AutoMerging.JobExpirationTime }}'
+      MinAllowedConfidenceScoreForMerging: '{{ response.AutoMerging.MinAllowedConfidenceScoreForMerging }}'
+      ConflictResolvingModel: '{{ response.AutoMerging.ConflictResolution.ConflictResolvingModel }}'
+      SourceName: '{{ response.AutoMerging.ConflictResolution.SourceName }}'
+      DomainName: '{{ response.DomainName }}'
+      S3BucketName: '{{ response.ExportingLocation.S3Exporting.S3BucketName }}'
+      S3KeyName: '{{ response.ExportingLocation.S3Exporting.S3KeyName }}'
+      JobEndTime: '{{ response.JobEndTime }}'
+      JobId: '{{ response.JobId }}'
+      JobStartTime: '{{ response.JobStartTime }}'
+      NumberOfMatchesFound: '{{ response.JobStats.NumberOfMatchesFound }}'
+      NumberOfMergesDone: '{{ response.JobStats.NumberOfMergesDone }}'
+      NumberOfProfilesReviewed: '{{ response.JobStats.NumberOfProfilesReviewed }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      Message: '{{ response.Message }}'
+      Status: '{{ response.Status }}'
+- discovery_id: aws.customer-profiles.get_integration
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_integration
+    params:
+      DomainName: '{{ item.DomainName }}'
+      Uri: '{{ item.Uri }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EventTriggerNames }}'
+    item:
+      CreatedAt: '{{ response.CreatedAt }}'
+      DomainName: '{{ response.DomainName }}'
+      IsUnstructured: '{{ response.IsUnstructured }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      ObjectTypeName: '{{ response.ObjectTypeName }}'
+      ObjectTypeNames: '{{ response.ObjectTypeNames }}'
+      RoleArn: '{{ response.RoleArn }}'
+      Tags: '{{ response.Tags }}'
+      Uri: '{{ response.Uri }}'
+      WorkflowId: '{{ response.WorkflowId }}'
+- discovery_id: aws.customer-profiles.get_matches
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_matches
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Matches }}'
+    item:
+      ConfidenceScore: '{{ item.ConfidenceScore }}'
+      MatchGenerationDate: '{{ item.MatchGenerationDate }}'
+      MatchId: '{{ item.MatchId }}'
+      Matches: '{{ item.Matches }}'
+      PotentialMatches: '{{ item.PotentialMatches }}'
+      ProfileIds: '{{ item.ProfileIds }}'
+- discovery_id: aws.customer-profiles.get_profile_history_record
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_profile_history_record
+    params:
+      DomainName: '{{ item.DomainName }}'
+      ProfileId: '{{ item.ProfileId }}'
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.Id }}'
+      ActionType: '{{ response.ActionType }}'
+      Content: '{{ response.Content }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      ObjectTypeName: '{{ response.ObjectTypeName }}'
+      PerformedBy: '{{ response.PerformedBy }}'
+      ProfileObjectUniqueKey: '{{ response.ProfileObjectUniqueKey }}'
+- discovery_id: aws.customer-profiles.get_profile_object_type
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_profile_object_type
+    params:
+      DomainName: '{{ item.DomainName }}'
+      ObjectTypeName: '{{ item.ObjectTypeName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      EncryptionKey: '{{ response.EncryptionKey }}'
+      AllowProfileCreation: '{{ response.AllowProfileCreation }}'
+      ExpirationDays: '{{ response.ExpirationDays }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      Description: '{{ response.Description }}'
+      Fields: '{{ response.Fields }}'
+      Keys: '{{ response.Keys }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      MaxAvailableProfileObjectCount: '{{ response.MaxAvailableProfileObjectCount }}'
+      MaxProfileObjectCount: '{{ response.MaxProfileObjectCount }}'
+      ObjectTypeName: '{{ response.ObjectTypeName }}'
+      SourceLastUpdatedTimestampFormat: '{{ response.SourceLastUpdatedTimestampFormat }}'
+      Tags: '{{ response.Tags }}'
+      TemplateId: '{{ response.TemplateId }}'
+- discovery_id: aws.customer-profiles.get_profile_object_type_template
+  for_each: aws.customer-profiles.list_profile_object_type_templates
+  calls:
+  - action: get_profile_object_type_template
+    params:
+      TemplateId: '{{ item.TemplateId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AllowProfileCreation: '{{ response.AllowProfileCreation }}'
+      Fields: '{{ response.Fields }}'
+      Keys: '{{ response.Keys }}'
+      SourceLastUpdatedTimestampFormat: '{{ response.SourceLastUpdatedTimestampFormat }}'
+      SourceName: '{{ response.SourceName }}'
+      SourceObject: '{{ response.SourceObject }}'
+      TemplateId: '{{ response.TemplateId }}'
+- discovery_id: aws.customer-profiles.get_segment_definition
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_segment_definition
+    params:
+      DomainName: '{{ item.DomainName }}'
+      SegmentDefinitionName: '{{ item.SegmentDefinitionName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Groups: '{{ response.SegmentGroups.Groups[].Type }}'
+      Include: '{{ response.SegmentGroups.Include }}'
+      SegmentGroups: '{{ response.SegmentGroups.SegmentGroups }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      Description: '{{ response.Description }}'
+      DisplayName: '{{ response.DisplayName }}'
+      SegmentDefinitionArn: '{{ response.SegmentDefinitionArn }}'
+      SegmentDefinitionName: '{{ response.SegmentDefinitionName }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.customer-profiles.get_segment_estimate
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_segment_estimate
+    params:
+      DomainName: '{{ item.DomainName }}'
+      EstimateId: '{{ item.EstimateId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Estimate: '{{ response.Estimate }}'
+      DomainName: '{{ response.DomainName }}'
+      EstimateId: '{{ response.EstimateId }}'
+      Message: '{{ response.Message }}'
+      Status: '{{ response.Status }}'
+      StatusCode: '{{ response.StatusCode }}'
+- discovery_id: aws.customer-profiles.get_segment_membership
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_segment_membership
+    params:
+      DomainName: '{{ item.DomainName }}'
+      SegmentDefinitionName: '{{ item.SegmentDefinitionName }}'
+      ProfileIds: '{{ item.ProfileIds }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Profiles }}'
+    item:
+      Failures: '{{ item.Failures }}'
+      Profile: '{{ item.Profile }}'
+      QueryResult: '{{ item.QueryResult }}'
+      SegmentDefinitionName: '{{ response.SegmentDefinitionName }}'
+- discovery_id: aws.customer-profiles.get_segment_snapshot
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_segment_snapshot
+    params:
+      DomainName: '{{ item.DomainName }}'
+      SegmentDefinitionName: '{{ item.SegmentDefinitionName }}'
+      SnapshotId: '{{ item.SnapshotId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DestinationUri: '{{ response.DestinationUri }}'
+      DataFormat: '{{ response.DataFormat }}'
+      EncryptionKey: '{{ response.EncryptionKey }}'
+      RoleArn: '{{ response.RoleArn }}'
+      SnapshotId: '{{ response.SnapshotId }}'
+      Status: '{{ response.Status }}'
+      StatusMessage: '{{ response.StatusMessage }}'
+- discovery_id: aws.customer-profiles.get_similar_profiles
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_similar_profiles
+    params:
+      DomainName: '{{ item.DomainName }}'
+      MatchType: '{{ item.MatchType }}'
+      SearchKey: '{{ item.SearchKey }}'
+      SearchValue: '{{ item.SearchValue }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ProfileIds }}'
+    item:
+      ConfidenceScore: '{{ response.ConfidenceScore }}'
+      MatchId: '{{ response.MatchId }}'
+      MatchType: '{{ response.MatchType }}'
+      RuleLevel: '{{ response.RuleLevel }}'
+- discovery_id: aws.customer-profiles.get_upload_job
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_upload_job
+    params:
+      DomainName: '{{ item.DomainName }}'
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedRecords: '{{ response.ResultsSummary.CreatedRecords }}'
+      FailedRecords: '{{ response.ResultsSummary.FailedRecords }}'
+      ResultsSummary: '{{ response.ResultsSummary.ResultsSummary }}'
+      UniqueKey: '{{ response.ResultsSummary.UniqueKey }}'
+      UpdatedRecords: '{{ response.ResultsSummary.UpdatedRecords }}'
+- discovery_id: aws.customer-profiles.get_upload_job_path
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_upload_job_path
+    params:
+      DomainName: '{{ item.DomainName }}'
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ClientToken: '{{ response.ClientToken }}'
+      Url: '{{ response.Url }}'
+      ValidUntil: '{{ response.ValidUntil }}'
+- discovery_id: aws.customer-profiles.get_workflow
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_workflow
+    params:
+      DomainName: '{{ item.DomainName }}'
+      WorkflowId: '{{ item.WorkflowId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AppflowIntegration: '{{ response.Attributes.AppflowIntegration.RoleArn }}'
+      ErrorDescription: '{{ response.Attributes.ErrorDescription }}'
+      Metrics: '{{ response.Attributes.Metrics }}'
+      StartDate: '{{ response.Attributes.StartDate }}'
+      ConnectorProfileName: '{{ response.Attributes.AppflowIntegration.ConnectorProfileName }}'
+      RoleArn: '{{ response.Attributes.AppflowIntegration.RoleArn }}'
+      SourceConnectorType: '{{ response.Attributes.AppflowIntegration.SourceConnectorType }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      RecordsProcessed: '{{ response.Metrics.AppflowIntegration.RecordsProcessed }}'
+      StepsCompleted: '{{ response.Metrics.AppflowIntegration.StepsCompleted }}'
+      TotalSteps: '{{ response.Metrics.AppflowIntegration.TotalSteps }}'
+      Status: '{{ response.Status }}'
+      WorkflowId: '{{ response.WorkflowId }}'
+      WorkflowType: '{{ response.WorkflowType }}'
+- discovery_id: aws.customer-profiles.get_workflow_steps
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: get_workflow_steps
+    params:
+      DomainName: '{{ item.DomainName }}'
+      WorkflowId: '{{ item.WorkflowId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      AppflowIntegration: '{{ item.AppflowIntegration }}'
+      WorkflowId: '{{ response.WorkflowId }}'
+      WorkflowType: '{{ response.WorkflowType }}'
+- discovery_id: aws.customer-profiles.list_account_integrations
+  calls:
+  - action: list_account_integrations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      RoleArn: '{{ item.RoleArn }}'
+      Tags: '{{ item.Tags }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DomainName: '{{ item.DomainName }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      ObjectTypeName: '{{ item.ObjectTypeName }}'
+      Uri: '{{ item.Uri }}'
+      WorkflowId: '{{ item.WorkflowId }}'
+- discovery_id: aws.customer-profiles.list_calculated_attribute_definitions
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_calculated_attribute_definitions
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      CalculatedAttributeName: '{{ item.Items[].CalculatedAttributeName }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Description: '{{ item.Description }}'
+      DisplayName: '{{ item.DisplayName }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      StatusCode: '{{ item.StatusCode }}'
+      UseHistoricalData: '{{ item.UseHistoricalData }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.customer-profiles.list_calculated_attributes_for_profile
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_calculated_attributes_for_profile
+    params:
+      DomainName: '{{ item.DomainName }}'
+      ProfileId: '{{ item.ProfileId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      CalculatedAttributeName: '{{ item.Items[].CalculatedAttributeName }}'
+      DisplayName: '{{ item.DisplayName }}'
+      IsDataPartial: '{{ item.IsDataPartial }}'
+      LastObjectTimestamp: '{{ item.LastObjectTimestamp }}'
+- discovery_id: aws.customer-profiles.list_domain_layouts
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_domain_layouts
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Description: '{{ item.Description }}'
+      DisplayName: '{{ item.DisplayName }}'
+      IsDefault: '{{ item.IsDefault }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      Layout: '{{ item.Layout }}'
+      LayoutDefinitionName: '{{ item.LayoutDefinitionName }}'
+      LayoutType: '{{ item.LayoutType }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.customer-profiles.list_event_streams
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_event_streams
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      DestinationDetails: '{{ item.DestinationDetails }}'
+      DestinationSummary: '{{ item.DestinationSummary }}'
+      DomainName: '{{ item.DomainName }}'
+      EventStreamArn: '{{ item.EventStreamArn }}'
+      EventStreamName: '{{ item.EventStreamName }}'
+      StoppedSince: '{{ item.StoppedSince }}'
+- discovery_id: aws.customer-profiles.list_event_triggers
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_event_triggers
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Description: '{{ item.Description }}'
+      EventTriggerName: '{{ item.EventTriggerName }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      ObjectTypeName: '{{ item.ObjectTypeName }}'
+- discovery_id: aws.customer-profiles.list_identity_resolution_jobs
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_identity_resolution_jobs
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.IdentityResolutionJobsList }}'
+    item:
+      Status: '{{ item.Status }}'
+      ClientToken: '{{ item.ClientToken }}'
+      ConflictResolution: '{{ item.ConflictResolution }}'
+      Consolidation: '{{ item.Consolidation }}'
+      DomainName: '{{ item.DomainName }}'
+      Enabled: '{{ item.Enabled }}'
+      ExportingLocation: '{{ item.ExportingLocation }}'
+      JobEndTime: '{{ item.JobEndTime }}'
+      JobExpirationTime: '{{ item.JobExpirationTime }}'
+      JobId: '{{ item.JobId }}'
+      JobStartTime: '{{ item.JobStartTime }}'
+      JobStats: '{{ item.JobStats }}'
+      Message: '{{ item.Message }}'
+      MinAllowedConfidenceScoreForMerging: '{{ item.MinAllowedConfidenceScoreForMerging }}'
+      ResultsSummary: '{{ item.ResultsSummary }}'
+      UniqueKey: '{{ item.UniqueKey }}'
+      ValidUntil: '{{ item.ValidUntil }}'
+- discovery_id: aws.customer-profiles.list_integrations
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_integrations
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      RoleArn: '{{ item.RoleArn }}'
+      Tags: '{{ item.Tags }}'
+      AppflowIntegration: '{{ item.AppflowIntegration }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DomainName: '{{ item.DomainName }}'
+      ErrorDescription: '{{ item.ErrorDescription }}'
+      EventTriggerNames: '{{ item.EventTriggerNames }}'
+      IsUnstructured: '{{ item.IsUnstructured }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      ObjectTypeName: '{{ item.ObjectTypeName }}'
+      ObjectTypeNames: '{{ item.ObjectTypeNames }}'
+      StartDate: '{{ item.StartDate }}'
+      Uri: '{{ item.Uri }}'
+      WorkflowId: '{{ item.WorkflowId }}'
+- discovery_id: aws.customer-profiles.list_object_type_attributes
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_object_type_attributes
+    params:
+      DomainName: '{{ item.DomainName }}'
+      ObjectTypeName: '{{ item.ObjectTypeName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      AttributeName: '{{ item.AttributeName }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+- discovery_id: aws.customer-profiles.list_profile_attribute_values
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_profile_attribute_values
+    params:
+      DomainName: '{{ item.DomainName }}'
+      AttributeName: '{{ item.AttributeName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      StatusCode: '{{ item.StatusCode }}'
+      Value: '{{ item.Value }}'
+      AttributeName: '{{ response.AttributeName }}'
+      DomainName: '{{ response.DomainName }}'
+- discovery_id: aws.customer-profiles.list_profile_history_records
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_profile_history_records
+    params:
+      DomainName: '{{ item.DomainName }}'
+      ProfileId: '{{ item.ProfileId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ProfileHistoryRecords }}'
+    item:
+      Id: '{{ item.Id }}'
+      ActionType: '{{ item.ActionType }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      ObjectTypeName: '{{ item.ObjectTypeName }}'
+      PerformedBy: '{{ item.PerformedBy }}'
+      ProfileObjectUniqueKey: '{{ item.ProfileObjectUniqueKey }}'
+- discovery_id: aws.customer-profiles.list_profile_object_types
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_profile_object_types
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Description: '{{ item.Description }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      MaxAvailableProfileObjectCount: '{{ item.Items[].MaxAvailableProfileObjectCount }}'
+      MaxProfileObjectCount: '{{ item.MaxProfileObjectCount }}'
+      ObjectTypeName: '{{ item.ObjectTypeName }}'
+- discovery_id: aws.customer-profiles.list_profile_objects
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_profile_objects
+    params:
+      DomainName: '{{ item.DomainName }}'
+      ObjectTypeName: '{{ item.ObjectTypeName }}'
+      ProfileId: '{{ item.ProfileId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Object: '{{ item.Object }}'
+      ObjectTypeName: '{{ item.ObjectTypeName }}'
+      ProfileObjectUniqueKey: '{{ item.ProfileObjectUniqueKey }}'
+- discovery_id: aws.customer-profiles.list_rule_based_matches
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_rule_based_matches
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MatchIds }}'
+    item:
+      MatchGenerationDate: '{{ item.MatchGenerationDate }}'
+      Matches: '{{ item.Matches }}'
+      PotentialMatches: '{{ item.PotentialMatches }}'
+- discovery_id: aws.customer-profiles.list_segment_definitions
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_segment_definitions
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Description: '{{ item.Description }}'
+      DisplayName: '{{ item.DisplayName }}'
+      SegmentDefinitionArn: '{{ item.SegmentDefinitionArn }}'
+      SegmentDefinitionName: '{{ item.SegmentDefinitionName }}'
+      SegmentGroups: '{{ item.SegmentGroups }}'
+- discovery_id: aws.customer-profiles.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.customer-profiles.list_upload_jobs
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_upload_jobs
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Status: '{{ item.Status }}'
+      CompletedAt: '{{ item.CompletedAt }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DataExpiry: '{{ item.DataExpiry }}'
+      DisplayName: '{{ item.DisplayName }}'
+      JobId: '{{ item.JobId }}'
+      ResultsSummary: '{{ item.ResultsSummary }}'
+      StatusReason: '{{ item.StatusReason }}'
+      UniqueKey: '{{ item.UniqueKey }}'
+- discovery_id: aws.customer-profiles.list_workflows
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: list_workflows
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      ErrorDescription: '{{ item.ErrorDescription }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      Metrics: '{{ item.Metrics }}'
+      StartDate: '{{ item.StartDate }}'
+      StatusDescription: '{{ item.StatusDescription }}'
+      WorkflowId: '{{ item.WorkflowId }}'
+      WorkflowType: '{{ item.WorkflowType }}'
+- discovery_id: aws.customer-profiles.search_profiles
+  for_each: aws.customer-profiles.list_domains
+  calls:
+  - action: search_profiles
+    params:
+      DomainName: '{{ item.DomainName }}'
+      KeyName: '{{ item.KeyName }}'
+      Values: '{{ item.Values }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'

@@ -1,0 +1,40 @@
+# ============================================================
+# Discovery YAML — sms-voice (AWS)
+# Generated: 2026-02-21T04:56:59Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: sms-voice
+services:
+  client: sms-voice
+  module: boto3.client
+discovery:
+  # ── ListConfigurationSets ──
+  - discovery_id: aws.sms-voice.list_configuration_sets
+    calls:
+      - action: list_configuration_sets
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.ConfigurationSets }}'
+      item:
+        Status: '{{ item.Status }}'
+  # ── Dependent read operations (require identifiers) ──
+  # ── GetConfigurationSetEventDestinations ──
+  - discovery_id: aws.sms-voice.get_configuration_set_event_destinations
+    calls:
+      - action: get_configuration_set_event_destinations
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.EventDestinations }}'
+      item:
+        Name: '{{ item.Name }}'
+        CloudWatchLogsDestination: '{{ item.CloudWatchLogsDestination }}'
+        Enabled: '{{ item.Enabled }}'
+        KinesisFirehoseDestination: '{{ item.KinesisFirehoseDestination }}'
+        MatchingEventTypes: '{{ item.MatchingEventTypes }}'
+        SnsDestination: '{{ item.SnsDestination }}'

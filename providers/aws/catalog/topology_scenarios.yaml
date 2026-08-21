@@ -1,0 +1,385 @@
+# Topology scenarios — the connectivity patterns a real estate is built from.
+#
+# A scenario is not a path we found; it is a pattern we know exists in AWS,
+# written down with the conditions that make it true. Discovery then asks, per
+# account: does this pattern hold here, and with what evidence?
+#
+# Why this file exists at all
+# ---------------------------
+# An edge list says "these two things reference each other". It cannot say
+# "traffic can flow" - that needs several edges to hold AT ONCE, each with the
+# right attribute values. `route_table -> nat_gateway` is meaningless without
+# `DestinationCidrBlock = 0.0.0.0/0`, and useless if the NAT's own subnet has no
+# route to an internet gateway. Scenarios encode those conjunctions.
+#
+# The schema
+# ----------
+#   exposure        who can reach whom. Drives how hard we check - see below.
+#   hops            ordered pattern; each hop names an edge type and its ends.
+#   assertions      every condition that must ALSO hold. A scenario with all
+#                   hops present but a failed assertion is NOT a match.
+#   evidence        the catalog rows that supply the data.
+#   data_required   what the collector must fetch for this to be decidable.
+#   blocked_by      why it cannot be evaluated yet, when that applies.
+#
+# Check depth by exposure — the asymmetry that matters
+# ----------------------------------------------------
+#   private -> public    EVERY assertion must pass. A single missed condition
+#                        turns "internal only" into "reachable from the
+#                        internet", so these are checked conjunctively and a
+#                        missing input is treated as unknown, never as safe.
+#   external -> private   same. Ingress is the other direction of the same risk.
+#   private -> private    routing correctness matters, exposure does not.
+#   public  -> public     informational. Two internet-facing things talking over
+#                         the internet changes no exposure, so a partial match
+#                         here is not worth reporting as a finding.
+#
+# Nothing here is evaluated yet. Path traversal is deliberately last - see
+# ROADMAP.md - because a path assembled from unverified hops reads as
+# authoritative while being wrong.
+
+version: 1
+
+scenarios:
+
+  # ══════════════════════════════════════════════════════════════════
+  # EGRESS — something inside reaching out
+  # ══════════════════════════════════════════════════════════════════
+
+  - id: egress-nat
+    name: Private subnet to internet via NAT gateway
+    category: egress
+    exposure: private-to-public
+    hops:
+      - {from: ec2.instance, edge: contained-in, to: ec2.subnet}
+      - {from: ec2.route_table, edge: contained-in, to: ec2.subnet, note: association}
+      - {from: ec2.route_table, edge: routes-through, to: ec2.nat_gateway}
+      - {from: ec2.nat_gateway, edge: contained-in, to: ec2.subnet, as: public_subnet}
+      - {from: public_subnet_route_table, edge: routes-through, to: ec2.internet_gateway}
+    assertions:
+      - {field: "Routes[].DestinationCidrBlock", op: equals, value: "0.0.0.0/0",
+         why: a route to a specific CIDR is not internet egress}
+      - {field: "Routes[].State", op: equals, value: active,
+         why: blackhole routes look identical in the topology and carry nothing}
+      - {field: "security_group.IpPermissionsEgress", op: allows_outbound,
+         why: egress rules can block what routing permits}
+      - {field: "network_acl.Entries", op: allows_outbound,
+         why: NACLs are stateless and deny independently of security groups}
+    evidence: [ec2.route_table, ec2.nat_gateway, ec2.internet_gateway, ec2.security_group]
+    data_required: [edge_attributes]
+    blocked_by: edges do not yet carry DestinationCidrBlock or State
+
+  - id: egress-igw-direct
+    name: Public subnet instance straight to the internet
+    category: egress
+    exposure: private-to-public
+    hops:
+      - {from: ec2.instance, edge: contained-in, to: ec2.subnet}
+      - {from: ec2.route_table, edge: routes-through, to: ec2.internet_gateway}
+    assertions:
+      - {field: "Routes[].DestinationCidrBlock", op: equals, value: "0.0.0.0/0"}
+      - {field: "instance.PublicIpAddress", op: present,
+         why: an IGW route without a public IP still cannot reach the internet}
+    evidence: [ec2.route_table, ec2.internet_gateway]
+    data_required: [edge_attributes]
+
+  - id: egress-gateway-endpoint
+    name: Private subnet to S3 or DynamoDB without leaving AWS
+    category: egress
+    exposure: private-to-private
+    hops:
+      - {from: ec2.instance, edge: contained-in, to: ec2.subnet}
+      - {from: ec2.vpc_endpoint, edge: routes-through, to: ec2.route_table}
+      - {from: ec2.vpc_endpoint, edge: fronts, to: service, via: ServiceName}
+    assertions:
+      - {field: "vpc_endpoint.VpcEndpointType", op: equals, value: Gateway}
+      - {field: "vpc_endpoint.PolicyDocument", op: allows_resource,
+         why: the endpoint policy can permit the service but deny the bucket}
+      - {field: "s3.bucket.Policy", op: allows_principal,
+         why: both sides must agree - endpoint policy and bucket policy}
+    evidence: [ec2.vpc_endpoint, ec2.route_table, s3.bucket]
+    data_required: [C/value-match ServiceName, B/policy-document]
+
+  - id: egress-interface-endpoint
+    name: Private subnet to an AWS service over PrivateLink
+    category: egress
+    exposure: private-to-private
+    hops:
+      - {from: ec2.instance, edge: contained-in, to: ec2.subnet}
+      - {from: ec2.vpc_endpoint, edge: contained-in, to: ec2.subnet}
+      - {from: ec2.vpc_endpoint, edge: attached-to, to: ec2.network_interface}
+      - {from: ec2.vpc_endpoint, edge: fronts, to: service, via: ServiceName}
+    assertions:
+      - {field: "vpc_endpoint.VpcEndpointType", op: equals, value: Interface}
+      - {field: "vpc_endpoint.Groups", op: allows_inbound,
+         why: the endpoint's own security group gates who may use it}
+      - {field: "vpc_endpoint.PrivateDnsEnabled", op: note,
+         why: without private DNS, clients must use the endpoint-specific name}
+    evidence: [ec2.vpc_endpoint, ec2.network_interface]
+    data_required: [C/value-match ServiceName]
+
+  # ══════════════════════════════════════════════════════════════════
+  # INGRESS — something outside reaching in
+  # ══════════════════════════════════════════════════════════════════
+
+  - id: ingress-alb
+    name: Internet to private instances through a load balancer
+    category: ingress
+    exposure: external-to-private
+    hops:
+      - {from: elbv2.load_balancer, edge: contained-in, to: ec2.subnet}
+      - {from: elbv2.target_group, edge: attached-to, to: elbv2.load_balancer}
+      - {from: elbv2.target_group, edge: routes-to, to: ec2.instance, via: target-health}
+    assertions:
+      - {field: "load_balancer.Scheme", op: equals, value: internet-facing,
+         why: an internal ALB is not an ingress path at all}
+      - {field: "load_balancer.SecurityGroups", op: allows_inbound}
+      - {field: "target_group.TargetHealthDescriptions[].TargetHealth.State",
+         op: equals, value: healthy,
+         why: an unhealthy target receives nothing}
+      - {field: "instance.security_group", op: allows_from_lb_sg,
+         why: the instance SG must admit the load balancer's SG specifically}
+    evidence: [elbv2.load_balancer, elbv2.target_group, ec2.instance]
+    data_required: [elbv2.target_health]
+
+  - id: ingress-cloudfront
+    name: Internet to an origin through CloudFront
+    category: ingress
+    exposure: external-to-private
+    hops:
+      - {from: cloudfront.distribution, edge: routes-to, to: origin, via: DomainName}
+    assertions:
+      - {field: "distribution.Enabled", op: equals, value: true}
+      - {field: "origin.S3OriginConfig.OriginAccessIdentity", op: present_or_oac,
+         why: without OAI/OAC the bucket must be public, which is a different finding}
+      - {field: "distribution.WebACLId", op: note, why: WAF presence changes exposure}
+    evidence: [cloudfront.distribution, s3.bucket, elbv2.load_balancer]
+    data_required: [C/value-match DomainName]
+
+  - id: ingress-api-gateway-vpclink
+    name: API Gateway to a private NLB over a VPC link
+    category: ingress
+    exposure: external-to-private
+    hops:
+      - {from: apigatewayv2.api, edge: routes-to, to: apigatewayv2.vpc_link}
+      - {from: apigatewayv2.vpc_link, edge: contained-in, to: ec2.subnet}
+      - {from: apigatewayv2.vpc_link, edge: routes-to, to: elbv2.load_balancer}
+    assertions:
+      - {field: "api.ProtocolType", op: note}
+      - {field: "route.AuthorizationType", op: not_equals, value: NONE,
+         why: an unauthenticated route is public reach into a private subnet}
+    evidence: [apigatewayv2.api, apigatewayv2.vpc_link, elbv2.load_balancer]
+    data_required: [apigatewayv2 vpc link + integration collection]
+
+  # ══════════════════════════════════════════════════════════════════
+  # HYBRID — on-premises connectivity
+  # ══════════════════════════════════════════════════════════════════
+
+  - id: hybrid-dx-private-vif
+    name: Direct Connect to one VPC via a private VIF
+    category: hybrid
+    exposure: external-to-private
+    hops:
+      - {from: directconnect.connection, edge: attached-to, to: directconnect.virtual_interface}
+      - {from: directconnect.virtual_interface, edge: routes-to, to: ec2.vpn_gateway}
+      - {from: ec2.vpn_gateway, edge: attached-to, to: ec2.vpc}
+    assertions:
+      - {field: "virtual_interface.virtualInterfaceType", op: equals, value: private}
+      - {field: "virtual_interface.virtualInterfaceState", op: equals, value: available}
+      - {field: "route_table.PropagatingVgws", op: present,
+         why: without propagation or a static route the VPC cannot reach on-prem}
+    evidence: [directconnect.connection, directconnect.virtual_interface]
+    data_required: [directconnect collection]
+
+  - id: hybrid-dx-transit-vif-tgw
+    name: Direct Connect to many accounts via DX gateway and Transit Gateway
+    category: hybrid
+    exposure: external-to-private
+    note: >
+      The pattern behind most hub-and-spoke estates: one DX circuit, a transit
+      VIF into a DX gateway, the DX gateway associated with a Transit Gateway,
+      and every spoke VPC attached to that TGW. On-prem reach is therefore a
+      property of TGW route-table membership, not of any VPC's own config -
+      which is exactly why reading a VPC in isolation gives the wrong answer.
+    hops:
+      - {from: directconnect.connection, edge: attached-to, to: directconnect.virtual_interface}
+      - {from: directconnect.virtual_interface, edge: routes-to, to: directconnect.direct_connect_gateway}
+      - {from: directconnect.direct_connect_gateway, edge: routes-to, to: ec2.transit_gateway}
+      - {from: ec2.transit_gateway_attachment, edge: attached-to, to: ec2.transit_gateway}
+      - {from: ec2.transit_gateway_attachment, edge: attached-to, to: ec2.vpc}
+    assertions:
+      - {field: "transit_gateway_route_table.Routes", op: reaches_prefix,
+         why: attachment alone grants nothing; the TGW route table decides}
+      - {field: "transit_gateway_attachment.State", op: equals, value: available}
+      - {field: "vpc.route_table.Routes[].TransitGatewayId", op: present,
+         why: the VPC also needs its own route back to the TGW}
+    evidence: [directconnect.direct_connect_gateway, ec2.transit_gateway, ec2.transit_gateway_attachment]
+    data_required: [ec2.transit_gateway_route_table]
+
+  - id: hybrid-site-to-site-vpn
+    name: On-premises to VPC over IPsec VPN
+    category: hybrid
+    exposure: external-to-private
+    hops:
+      - {from: ec2.customer_gateway, edge: attached-to, to: ec2.vpn_connection}
+      - {from: ec2.vpn_connection, edge: attached-to, to: ec2.vpn_gateway}
+      - {from: ec2.vpn_gateway, edge: attached-to, to: ec2.vpc}
+    assertions:
+      - {field: "vpn_connection.VgwTelemetry[].Status", op: equals, value: UP,
+         why: a configured tunnel that is DOWN carries nothing}
+      - {field: "vpn_connection.Routes", op: present}
+    evidence: [ec2.vpn_connection, ec2.customer_gateway]
+    data_required: [ec2 vpn collection]
+
+  # ══════════════════════════════════════════════════════════════════
+  # EAST-WEST — VPC to VPC
+  # ══════════════════════════════════════════════════════════════════
+
+  - id: eastwest-peering
+    name: VPC peering, same or cross account
+    category: east-west
+    exposure: private-to-private
+    hops:
+      - {from: ec2.vpc_peering_connection, edge: routes-to, to: ec2.vpc, as: accepter}
+      - {from: ec2.vpc_peering_connection, edge: routes-to, to: ec2.vpc, as: requester}
+    assertions:
+      - {field: "peering.Status.Code", op: equals, value: active}
+      - {field: "route_table.Routes[].VpcPeeringConnectionId", op: present_both_sides,
+         why: peering is not transitive and needs a route on BOTH sides}
+      - {field: "accepter.OwnerId", op: compare_to_scan_account,
+         why: a different owner id means the far side is another account}
+    evidence: [ec2.vpc_peering_connection, ec2.route_table]
+    data_required: [edge_attributes]
+
+  - id: eastwest-tgw
+    name: VPC to VPC through a Transit Gateway
+    category: east-west
+    exposure: private-to-private
+    hops:
+      - {from: ec2.transit_gateway_attachment, edge: attached-to, to: ec2.vpc, as: source}
+      - {from: ec2.transit_gateway_attachment, edge: attached-to, to: ec2.transit_gateway}
+      - {from: ec2.transit_gateway_attachment, edge: attached-to, to: ec2.vpc, as: destination}
+    assertions:
+      - {field: "transit_gateway_route_table.Associations", op: same_or_routed,
+         why: two attachments on one TGW cannot reach each other unless their
+              route tables say so - this is the most common wrong assumption}
+      - {field: "vpc.route_table.Routes[].TransitGatewayId", op: present_both_sides}
+    evidence: [ec2.transit_gateway, ec2.transit_gateway_attachment,
+               ec2.transit_gateway_route_table]
+
+  - id: eastwest-privatelink-shared-service
+    name: Consumer VPC to a shared appliance in another account
+    category: east-west
+    exposure: private-to-private
+    note: >
+      This is the shared-F5 case, and the general shape of any shared appliance
+      or SaaS-in-VPC: the provider account runs an NLB fronted by an endpoint
+      service, consumers create interface endpoints against it. The consumer
+      sees an endpoint and an ENI; the instances actually serving traffic live
+      in an account we may not be collecting. Without the provider's target
+      group registrations the far end is a named service, not a resource -
+      which is a correct and useful answer, not a failure.
+    hops:
+      - {from: ec2.vpc_endpoint, edge: contained-in, to: ec2.subnet, as: consumer}
+      - {from: ec2.vpc_endpoint, edge: fronts, to: ec2.vpc_endpoint_service, via: ServiceName}
+      - {from: ec2.vpc_endpoint_service, edge: attached-to, to: elbv2.load_balancer,
+         as: provider, cross_account: true}
+      - {from: elbv2.target_group, edge: routes-to, to: ec2.instance, as: appliance}
+    assertions:
+      - {field: "vpc_endpoint_service.AcceptanceRequired", op: note}
+      - {field: "vpc_endpoint_service.AllowedPrincipals", op: includes_consumer_account}
+      - {field: "vpc_endpoint.State", op: equals, value: available}
+    evidence: [ec2.vpc_endpoint, ec2.vpc_endpoint_service, elbv2.target_group]
+    data_required: [provider-account collection, elbv2.target_health]
+    blocked_by: >
+      the provider side is another account; without it the chain terminates at
+      the endpoint service and must be shown as terminating there, not guessed
+
+  - id: eastwest-shared-subnets-ram
+    name: Central network account sharing subnets to workload accounts
+    category: cross-account
+    exposure: private-to-private
+    note: >
+      The centralised-networking model. One account owns the VPC and subnets and
+      shares them via RAM; workloads in other accounts launch INTO those subnets.
+      Reading a workload account alone shows instances in subnets that account
+      does not own, and the VPC appears to be missing - so the diagram must
+      express ownership separately from placement.
+    hops:
+      - {from: ram.resource_share, edge: routes-to, to: ec2.subnet}
+      - {from: ec2.instance, edge: contained-in, to: ec2.subnet, cross_account: true}
+    assertions:
+      - {field: "subnet.OwnerId", op: compare_to_scan_account,
+         why: an owner id different from the scanned account means a shared subnet}
+      - {field: "resource_share.Principals", op: includes_workload_account}
+    evidence: [ram.resource_share, ec2.subnet]
+    data_required: [ram collection, subnet OwnerId as an asset field]
+
+  # ══════════════════════════════════════════════════════════════════
+  # IDENTITY AND DATA PLANE
+  # ══════════════════════════════════════════════════════════════════
+
+  - id: identity-instance-to-bucket
+    name: Instance reaching a bucket through its role
+    category: identity
+    exposure: private-to-private
+    hops:
+      - {from: ec2.instance, edge: assumes, to: iam.instance_profile}
+      - {from: iam.instance_profile, edge: assumes, to: iam.role}
+      - {from: iam.role, edge: can-access, to: s3.bucket, via: policy-document}
+    assertions:
+      - {field: "policy.Statement[].Effect", op: equals, value: Allow}
+      - {field: "policy.Statement[].Resource", op: matches_target_arn,
+         why: wildcards must be expanded before a grant can be called specific}
+      - {field: "bucket.Policy", op: not_explicit_deny,
+         why: a resource-policy Deny overrides an identity-policy Allow}
+    evidence: [iam.role, s3.bucket, policy_sources]
+    data_required: [B/policy-document]
+
+  - id: identity-cross-account-assume
+    name: A principal in another account assuming a role here
+    category: cross-account
+    exposure: external-to-private
+    hops:
+      - {from: external_principal, edge: assumes, to: iam.role, via: trust-policy}
+    assertions:
+      - {field: "trust.Statement[].Principal", op: is_external_account,
+         why: the whole point is distinguishing our account from a third party}
+      - {field: "trust.Statement[].Condition", op: has_external_id,
+         why: a third-party trust without ExternalId is the confused-deputy shape}
+      - {field: "role.attached_policies", op: summarise_reach,
+         why: what the role can do decides what the trust is worth}
+    evidence: [iam.role, policy_sources]
+    data_required: [B/policy-document, is_external flag]
+
+  - id: exposure-public-resource-policy
+    name: A resource made public by its own policy
+    category: exposure
+    exposure: private-to-public
+    hops:
+      - {from: resource, edge: accessible-by, to: wildcard_principal, via: resource-policy}
+    assertions:
+      - {field: "policy.Statement[].Principal", op: equals, value: "*"}
+      - {field: "policy.Statement[].Effect", op: equals, value: Allow}
+      - {field: "policy.Statement[].Condition", op: absent_or_ineffective,
+         why: a wildcard principal narrowed by aws:SourceVpce is not public}
+      - {field: "s3.PublicAccessBlockConfiguration", op: not_blocking,
+         why: account or bucket level public-access block overrides the policy}
+    evidence: [policy_sources, s3.bucket]
+    data_required: [B/policy-document, s3 public access block]
+
+  # ══════════════════════════════════════════════════════════════════
+  # INFORMATIONAL — recorded so they are not mistaken for findings
+  # ══════════════════════════════════════════════════════════════════
+
+  - id: public-to-public
+    name: Internet-facing resource talking to another internet-facing resource
+    category: informational
+    exposure: public-to-public
+    note: >
+      Both ends are already reachable from the internet, so the connection
+      changes no exposure. Recorded to keep the topology complete and to stop
+      this shape being surfaced as a finding.
+    hops: []
+    assertions: []
+    evidence: []

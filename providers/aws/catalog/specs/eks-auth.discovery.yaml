@@ -1,0 +1,8 @@
+version: '1.0'
+provider: aws
+service: eks-auth
+services:
+  client: eks-auth
+  module: boto3.client
+discovery:
+checks: []

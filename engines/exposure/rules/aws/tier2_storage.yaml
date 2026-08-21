@@ -1,0 +1,53 @@
+# =============================================================================
+# IEDS Tier 2 — AWS Storage (S3, OpenSearch, Elasticsearch, Redshift)
+# =============================================================================
+
+rules:
+
+  # resource_type = di_table_inventory.resource_type exact values
+  - rule_id: IEDS-T2-AWS-010
+    tier: 2
+    csp: aws
+    resource_type: s3_bucket
+    origin_type: internet
+    title: "AWS S3 bucket has public access enabled"
+    description: >
+      S3 buckets with BlockPublicAcls=false can be made public via ACLs.
+      The discovery YAML emits BlockPublicAcls / BlockPublicPolicy as top-level fields.
+    severity: high
+    required_emitted_fields:
+      - block_public_acls
+    exposure_conditions:
+      - field: block_public_acls
+        operator: eq
+        value: false
+
+  - rule_id: IEDS-T2-AWS-011
+    tier: 2
+    csp: aws
+    resource_type: opensearch_domain
+    origin_type: internet
+    title: "AWS OpenSearch domain is internet-accessible"
+    description: >
+      OpenSearch domains with VPC=false and an internet endpoint are directly
+      reachable from the public internet.
+    severity: critical
+    required_emitted_fields:
+      - endpoint
+    exposure_conditions:
+      - field: endpoint
+        operator: not_null
+
+  - rule_id: IEDS-T2-AWS-012
+    tier: 2
+    csp: aws
+    resource_type: redshift_cluster
+    origin_type: internet
+    title: "AWS Redshift cluster is publicly accessible"
+    severity: critical
+    required_emitted_fields:
+      - publicly_accessible
+    exposure_conditions:
+      - field: publicly_accessible
+        operator: eq
+        value: true

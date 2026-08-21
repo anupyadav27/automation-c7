@@ -1,0 +1,8 @@
+version: '1.0'
+provider: aws
+service: kinesis-video-webrtc-storage
+services:
+  client: kinesis-video-webrtc-storage
+  module: boto3.client
+discovery:
+checks: []

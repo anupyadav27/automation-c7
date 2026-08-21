@@ -1,0 +1,26 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: s3express (backed by s3)
+# 1 ops (from checks)
+# Generated: 2026-04-14
+version: '1.0'
+provider: aws
+service: s3express
+services:
+  client: s3
+  module: boto3.client
+discovery:
+  - discovery_id: aws.s3express.list_directory_buckets
+    calls:
+    - action: list_directory_buckets
+      save_as: response
+      on_error: continue
+      params:
+        MaxDirectoryBuckets: 100
+    emit:
+      as: item
+      items_for: '{{ response.Buckets }}'
+      item:
+        CreationDate: '{{ item.CreationDate }}'
+        Name: '{{ item.Name }}'
+        BucketArn: '{{ item.BucketArn }}'
+        BucketRegion: '{{ item.BucketRegion }}'

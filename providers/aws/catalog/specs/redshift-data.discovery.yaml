@@ -1,0 +1,144 @@
+version: '1.0'
+provider: aws
+service: redshift-data
+services:
+  client: redshift-data
+  module: boto3.client
+discovery:
+- discovery_id: aws.redshift-data.list_statements
+  calls:
+  - action: list_statements
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Statements }}'
+    item:
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Duration: '{{ item.Duration }}'
+      Error: '{{ item.Error }}'
+      IsBatchStatement: '{{ item.IsBatchStatement }}'
+      QueryParameters: '{{ item.QueryParameters }}'
+      QueryString: '{{ item.QueryString }}'
+      QueryStrings: '{{ item.QueryStrings }}'
+      ResultFormat: '{{ item.ResultFormat }}'
+      SecretArn: '{{ item.SecretArn }}'
+      SessionId: '{{ item.SessionId }}'
+      StatementName: '{{ item.StatementName }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.redshift-data.describe_statement
+  for_each: aws.redshift-data.list_statements
+  calls:
+  - action: describe_statement
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.QueryParameters }}'
+    item:
+      Duration: '{{ item.Duration }}'
+      Error: '{{ item.Error }}'
+      name: '{{ item.name }}'
+      value: '{{ item.value }}'
+      ClusterIdentifier: '{{ response.ClusterIdentifier }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      Database: '{{ response.Database }}'
+      DbUser: '{{ response.DbUser }}'
+      HasResultSet: '{{ response.HasResultSet }}'
+      Id: '{{ response.Id }}'
+      QueryString: '{{ response.QueryString }}'
+      RedshiftPid: '{{ response.RedshiftPid }}'
+      RedshiftQueryId: '{{ response.RedshiftQueryId }}'
+      ResultFormat: '{{ response.ResultFormat }}'
+      ResultRows: '{{ response.ResultRows }}'
+      ResultSize: '{{ response.ResultSize }}'
+      SecretArn: '{{ response.SecretArn }}'
+      SessionId: '{{ response.SessionId }}'
+      Status: '{{ response.Status }}'
+      UpdatedAt: '{{ response.UpdatedAt }}'
+      WorkgroupName: '{{ response.WorkgroupName }}'
+- discovery_id: aws.redshift-data.describe_table
+  calls:
+  - action: describe_table
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ColumnList }}'
+    item:
+      columnDefault: '{{ item.columnDefault }}'
+      isCaseSensitive: '{{ item.isCaseSensitive }}'
+      isCurrency: '{{ item.isCurrency }}'
+      isSigned: '{{ item.isSigned }}'
+      label: '{{ item.label }}'
+      length: '{{ item.length }}'
+      name: '{{ item.name }}'
+      nullable: '{{ item.nullable }}'
+      precision: '{{ item.precision }}'
+      scale: '{{ item.scale }}'
+      schemaName: '{{ item.schemaName }}'
+      tableName: '{{ item.TableName }}'
+      typeName: '{{ item.typeName }}'
+      TableName: '{{ response.TableName }}'
+- discovery_id: aws.redshift-data.get_statement_result
+  for_each: aws.redshift-data.list_statements
+  calls:
+  - action: get_statement_result
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Records }}'
+    item:
+      Records: '{{ item.Records }}'
+      TotalNumRows: '{{ response.TotalNumRows }}'
+- discovery_id: aws.redshift-data.get_statement_result_v2
+  for_each: aws.redshift-data.list_statements
+  calls:
+  - action: get_statement_result_v2
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Records }}'
+    item:
+      CSVRecords: '{{ item.CSVRecords }}'
+      Records: '{{ item.Records }}'
+      ResultFormat: '{{ response.ResultFormat }}'
+      TotalNumRows: '{{ response.TotalNumRows }}'
+- discovery_id: aws.redshift-data.list_databases
+  calls:
+  - action: list_databases
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Databases }}'
+- discovery_id: aws.redshift-data.list_schemas
+  calls:
+  - action: list_schemas
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Schemas }}'
+- discovery_id: aws.redshift-data.list_tables
+  calls:
+  - action: list_tables
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tables }}'
+    item:
+      name: '{{ item.name }}'
+      schema: '{{ item.schema }}'
+      type: '{{ item.type }}'

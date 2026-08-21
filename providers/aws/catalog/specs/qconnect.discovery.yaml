@@ -1,0 +1,765 @@
+version: '1.0'
+provider: aws
+service: qconnect
+services:
+  client: qconnect
+  module: boto3.client
+discovery:
+- discovery_id: aws.qconnect.list_assistants
+  calls:
+  - action: list_assistants
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assistantSummaries }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      aiAgent: '{{ item.aiAgent }}'
+      aiAgentConfiguration: '{{ item.aiAgentConfiguration }}'
+      aiGuardrail: '{{ item.aiGuardrail }}'
+      aiPrompt: '{{ item.aiPrompt }}'
+      apiFormat: '{{ item.apiFormat }}'
+      assistant: '{{ item.assistant }}'
+      assistantAssociation: '{{ item.assistantAssociation }}'
+      associationData: '{{ item.associationData }}'
+      associationType: '{{ item.associationType }}'
+      blockedInputMessaging: '{{ item.blockedInputMessaging }}'
+      blockedOutputsMessaging: '{{ item.blockedOutputsMessaging }}'
+      capabilityConfiguration: '{{ item.capabilityConfiguration }}'
+      configuration: '{{ item.configuration }}'
+      contentPolicyConfig: '{{ item.contentPolicyConfig }}'
+      contextualGroundingPolicyConfig: '{{ item.contextualGroundingPolicyConfig }}'
+      integrationConfiguration: '{{ item.integrationConfiguration }}'
+      modifiedTime: '{{ item.modifiedTime }}'
+      origin: '{{ item.origin }}'
+      sensitiveInformationPolicyConfig: '{{ item.sensitiveInformationPolicyConfig
+        }}'
+      serverSideEncryptionConfiguration: '{{ item.serverSideEncryptionConfiguration
+        }}'
+      templateConfiguration: '{{ item.templateConfiguration }}'
+      templateType: '{{ item.templateType }}'
+      topicPolicyConfig: '{{ item.topicPolicyConfig }}'
+      type: '{{ item.type }}'
+      visibilityStatus: '{{ item.visibilityStatus }}'
+      wordPolicyConfig: '{{ item.wordPolicyConfig }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qconnect.list_knowledge_bases
+  calls:
+  - action: list_knowledge_bases
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.knowledgeBaseSummaries }}'
+    item:
+      knowledgeBaseType: '{{ item.knowledgeBaseType }}'
+      renderingConfiguration: '{{ item.renderingConfiguration }}'
+      serverSideEncryptionConfiguration: '{{ item.serverSideEncryptionConfiguration
+        }}'
+      sourceConfiguration: '{{ item.sourceConfiguration }}'
+      vectorIngestionConfiguration: '{{ item.vectorIngestionConfiguration }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qconnect.get_ai_agent
+  calls:
+  - action: get_ai_agent
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      aiAgent: '{{ response.aiAgent.aiAgent }}'
+      aiAgentArn: '{{ response.aiAgent.aiAgentArn }}'
+      aiAgentId: '{{ response.aiAgent.aiAgentId }}'
+      type: '{{ response.aiAgent.type }}'
+- discovery_id: aws.qconnect.get_ai_guardrail
+  calls:
+  - action: get_ai_guardrail
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      aiGuardrail: '{{ response.aiGuardrail.aiGuardrail }}'
+      aiGuardrailArn: '{{ response.aiGuardrail.aiGuardrailArn }}'
+      aiGuardrailId: '{{ response.aiGuardrail.aiGuardrailId }}'
+      blockedInputMessaging: '{{ response.aiGuardrail.blockedInputMessaging }}'
+      blockedOutputsMessaging: '{{ response.aiGuardrail.blockedOutputsMessaging }}'
+      contentPolicyConfig: '{{ response.aiGuardrail.contentPolicyConfig }}'
+      contextualGroundingPolicyConfig: '{{ response.aiGuardrail.contextualGroundingPolicyConfig
+        }}'
+      modifiedTime: '{{ response.aiGuardrail.modifiedTime }}'
+      sensitiveInformationPolicyConfig: '{{ response.aiGuardrail.sensitiveInformationPolicyConfig
+        }}'
+      topicPolicyConfig: '{{ response.aiGuardrail.topicPolicyConfig }}'
+      visibilityStatus: '{{ response.aiGuardrail.visibilityStatus }}'
+      wordPolicyConfig: '{{ response.aiGuardrail.wordPolicyConfig }}'
+- discovery_id: aws.qconnect.get_ai_prompt
+  calls:
+  - action: get_ai_prompt
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      aiPrompt: '{{ response.aiPrompt.aiPrompt }}'
+      aiPromptArn: '{{ response.aiPrompt.aiPromptArn }}'
+      aiPromptId: '{{ response.aiPrompt.aiPromptId }}'
+      modelId: '{{ response.aiPrompt.modelId }}'
+      modifiedTime: '{{ response.aiPrompt.modifiedTime }}'
+      origin: '{{ response.aiPrompt.origin }}'
+      templateConfiguration: '{{ response.aiPrompt.templateConfiguration }}'
+      type: '{{ response.aiPrompt.type }}'
+      visibilityStatus: '{{ response.aiPrompt.visibilityStatus }}'
+- discovery_id: aws.qconnect.get_assistant
+  calls:
+  - action: get_assistant
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      aiAgentConfiguration: '{{ response.assistant.aiAgentConfiguration }}'
+      capabilityConfiguration: '{{ response.assistant.capabilityConfiguration.type
+        }}'
+      integrationConfiguration: '{{ response.assistant.integrationConfiguration }}'
+      serverSideEncryptionConfiguration: '{{ response.assistant.serverSideEncryptionConfiguration.kmsKeyId
+        }}'
+      type: '{{ response.assistant.type }}'
+      assistantArn: '{{ response.assistant.assistantArn }}'
+      assistantId: '{{ response.assistant.assistantId }}'
+      description: '{{ response.assistant.description }}'
+      topicIntegrationArn: '{{ response.assistant.integrationConfiguration.topicIntegrationArn
+        }}'
+      name: '{{ response.assistant.name }}'
+      kmsKeyId: '{{ response.assistant.serverSideEncryptionConfiguration.kmsKeyId
+        }}'
+      status: '{{ response.assistant.status }}'
+      tags: '{{ response.assistant.tags }}'
+- discovery_id: aws.qconnect.get_assistant_association
+  calls:
+  - action: get_assistant_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      assistant: '{{ response.assistantAssociation.assistantId }}'
+      assistantAssociation: '{{ response.assistantAssociation.assistantAssociationId
+        }}'
+      assistantAssociationArn: '{{ response.assistantAssociation.assistantAssociationArn
+        }}'
+      assistantAssociationId: '{{ response.assistantAssociation.assistantAssociationId
+        }}'
+      assistantArn: '{{ response.assistantAssociation.assistantArn }}'
+      assistantId: '{{ response.assistantAssociation.assistantId }}'
+      knowledgeBaseArn: '{{ response.assistantAssociation.associationData.knowledgeBaseAssociation.knowledgeBaseArn
+        }}'
+      knowledgeBaseId: '{{ response.assistantAssociation.associationData.knowledgeBaseAssociation.knowledgeBaseId
+        }}'
+      associationType: '{{ response.assistantAssociation.associationType }}'
+      tags: '{{ response.assistantAssociation.tags }}'
+- discovery_id: aws.qconnect.get_content
+  calls:
+  - action: get_content
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      linkOutUri: '{{ response.content.linkOutUri }}'
+      url: '{{ response.content.url }}'
+      urlExpiry: '{{ response.content.urlExpiry }}'
+      contentArn: '{{ response.content.contentArn }}'
+      contentId: '{{ response.content.contentId }}'
+      contentType: '{{ response.content.contentType }}'
+      knowledgeBaseArn: '{{ response.content.knowledgeBaseArn }}'
+      knowledgeBaseId: '{{ response.content.knowledgeBaseId }}'
+      metadata: '{{ response.content.metadata }}'
+      name: '{{ response.content.name }}'
+      revisionId: '{{ response.content.revisionId }}'
+      status: '{{ response.content.status }}'
+      tags: '{{ response.content.tags }}'
+      title: '{{ response.content.title }}'
+- discovery_id: aws.qconnect.get_content_association
+  calls:
+  - action: get_content_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      associationData: '{{ response.contentAssociation.associationType }}'
+      associationType: '{{ response.contentAssociation.associationType }}'
+      contentAssociationArn: '{{ response.contentAssociation.contentAssociationArn
+        }}'
+      contentAssociationId: '{{ response.contentAssociation.contentAssociationId }}'
+      flowId: '{{ response.contentAssociation.associationData.amazonConnectGuideAssociation.flowId
+        }}'
+      contentArn: '{{ response.contentAssociation.contentArn }}'
+      contentId: '{{ response.contentAssociation.contentId }}'
+      knowledgeBaseArn: '{{ response.contentAssociation.knowledgeBaseArn }}'
+      knowledgeBaseId: '{{ response.contentAssociation.knowledgeBaseId }}'
+      tags: '{{ response.contentAssociation.tags }}'
+- discovery_id: aws.qconnect.get_content_summary
+  calls:
+  - action: get_content_summary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      contentSummary: '{{ response.contentSummary.contentArn }}'
+      contentArn: '{{ response.contentSummary.contentArn }}'
+      contentId: '{{ response.contentSummary.contentId }}'
+      contentType: '{{ response.contentSummary.contentType }}'
+      knowledgeBaseArn: '{{ response.contentSummary.knowledgeBaseArn }}'
+      knowledgeBaseId: '{{ response.contentSummary.knowledgeBaseId }}'
+      metadata: '{{ response.contentSummary.metadata }}'
+      name: '{{ response.contentSummary.name }}'
+      revisionId: '{{ response.contentSummary.revisionId }}'
+      status: '{{ response.contentSummary.status }}'
+      tags: '{{ response.contentSummary.tags }}'
+      title: '{{ response.contentSummary.title }}'
+- discovery_id: aws.qconnect.get_import_job
+  calls:
+  - action: get_import_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      externalSourceConfiguration: '{{ response.importJob.externalSourceConfiguration.source
+        }}'
+      failedRecordReport: '{{ response.importJob.failedRecordReport }}'
+      importJobId: '{{ response.importJob.importJobId }}'
+      importJobType: '{{ response.importJob.importJobType }}'
+      uploadId: '{{ response.importJob.uploadId }}'
+      url: '{{ response.importJob.url }}'
+      urlExpiry: '{{ response.importJob.urlExpiry }}'
+      createdTime: '{{ response.importJob.createdTime }}'
+      instanceId: '{{ response.importJob.externalSourceConfiguration.configuration.connectConfiguration.instanceId
+        }}'
+      source: '{{ response.importJob.externalSourceConfiguration.source }}'
+      knowledgeBaseArn: '{{ response.importJob.knowledgeBaseArn }}'
+      knowledgeBaseId: '{{ response.importJob.knowledgeBaseId }}'
+      lastModifiedTime: '{{ response.importJob.lastModifiedTime }}'
+      metadata: '{{ response.importJob.metadata }}'
+      status: '{{ response.importJob.status }}'
+- discovery_id: aws.qconnect.get_knowledge_base
+  calls:
+  - action: get_knowledge_base
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ingestionFailureReasons: '{{ response.knowledgeBase.ingestionFailureReasons
+        }}'
+      ingestionStatus: '{{ response.knowledgeBase.ingestionStatus }}'
+      knowledgeBaseType: '{{ response.knowledgeBase.knowledgeBaseType }}'
+      lastContentModificationTime: '{{ response.knowledgeBase.lastContentModificationTime
+        }}'
+      renderingConfiguration: '{{ response.knowledgeBase.renderingConfiguration.templateUri
+        }}'
+      serverSideEncryptionConfiguration: '{{ response.knowledgeBase.serverSideEncryptionConfiguration.kmsKeyId
+        }}'
+      sourceConfiguration: '{{ response.knowledgeBase.sourceConfiguration }}'
+      vectorIngestionConfiguration: '{{ response.knowledgeBase.vectorIngestionConfiguration
+        }}'
+      description: '{{ response.knowledgeBase.description }}'
+      knowledgeBaseArn: '{{ response.knowledgeBase.knowledgeBaseArn }}'
+      knowledgeBaseId: '{{ response.knowledgeBase.knowledgeBaseId }}'
+      name: '{{ response.knowledgeBase.name }}'
+      templateUri: '{{ response.knowledgeBase.renderingConfiguration.templateUri }}'
+      kmsKeyId: '{{ response.knowledgeBase.serverSideEncryptionConfiguration.kmsKeyId
+        }}'
+      appIntegrationArn: '{{ response.knowledgeBase.sourceConfiguration.appIntegrations.appIntegrationArn
+        }}'
+      scope: '{{ response.knowledgeBase.sourceConfiguration.managedSourceConfiguration.webCrawlerConfiguration.scope
+        }}'
+      status: '{{ response.knowledgeBase.status }}'
+      tags: '{{ response.knowledgeBase.tags }}'
+      chunkingStrategy: '{{ response.knowledgeBase.vectorIngestionConfiguration.chunkingConfiguration.chunkingStrategy
+        }}'
+      maxTokens: '{{ response.knowledgeBase.vectorIngestionConfiguration.chunkingConfiguration.fixedSizeChunkingConfiguration.maxTokens
+        }}'
+      overlapPercentage: '{{ response.knowledgeBase.vectorIngestionConfiguration.chunkingConfiguration.fixedSizeChunkingConfiguration.overlapPercentage
+        }}'
+      overlapTokens: '{{ response.knowledgeBase.vectorIngestionConfiguration.chunkingConfiguration.hierarchicalChunkingConfiguration.overlapTokens
+        }}'
+      breakpointPercentileThreshold: '{{ response.knowledgeBase.vectorIngestionConfiguration.chunkingConfiguration.semanticChunkingConfiguration.breakpointPercentileThreshold
+        }}'
+      bufferSize: '{{ response.knowledgeBase.vectorIngestionConfiguration.chunkingConfiguration.semanticChunkingConfiguration.bufferSize
+        }}'
+      modelArn: '{{ response.knowledgeBase.vectorIngestionConfiguration.parsingConfiguration.bedrockFoundationModelConfiguration.modelArn
+        }}'
+      parsingStrategy: '{{ response.knowledgeBase.vectorIngestionConfiguration.parsingConfiguration.parsingStrategy
+        }}'
+- discovery_id: aws.qconnect.get_message_template
+  calls:
+  - action: get_message_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      attachments: '{{ response.messageTemplate.attachments[].url }}'
+      attributeTypes: '{{ response.messageTemplate.attributeTypes }}'
+      content: '{{ response.messageTemplate.content }}'
+      defaultAttributes: '{{ response.messageTemplate.defaultAttributes }}'
+      messageTemplateContentSha256: '{{ response.messageTemplate.messageTemplateContentSha256
+        }}'
+      channelSubtype: '{{ response.messageTemplate.channelSubtype }}'
+      subject: '{{ response.messageTemplate.content.email.subject }}'
+      createdTime: '{{ response.messageTemplate.createdTime }}'
+      firstName: '{{ response.messageTemplate.defaultAttributes.agentAttributes.firstName
+        }}'
+      lastName: '{{ response.messageTemplate.defaultAttributes.agentAttributes.lastName
+        }}'
+      customAttributes: '{{ response.messageTemplate.defaultAttributes.customAttributes
+        }}'
+      accountNumber: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.accountNumber
+        }}'
+      additionalInformation: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.additionalInformation
+        }}'
+      address1: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.address1
+        }}'
+      address2: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.address2
+        }}'
+      address3: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.address3
+        }}'
+      address4: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.address4
+        }}'
+      billingAddress1: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.billingAddress1
+        }}'
+      billingAddress2: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.billingAddress2
+        }}'
+      billingAddress3: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.billingAddress3
+        }}'
+      billingAddress4: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.billingAddress4
+        }}'
+      billingCity: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.billingCity
+        }}'
+      billingCountry: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.billingCountry
+        }}'
+      billingCounty: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.billingCounty
+        }}'
+      billingPostalCode: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.billingPostalCode
+        }}'
+      billingProvince: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.billingProvince
+        }}'
+      billingState: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.billingState
+        }}'
+      birthDate: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.birthDate
+        }}'
+      businessEmailAddress: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.businessEmailAddress
+        }}'
+      businessName: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.businessName
+        }}'
+      businessPhoneNumber: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.businessPhoneNumber
+        }}'
+      city: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.city
+        }}'
+      country: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.country
+        }}'
+      county: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.county
+        }}'
+      custom: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.custom
+        }}'
+      emailAddress: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.emailAddress
+        }}'
+      gender: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.gender
+        }}'
+      homePhoneNumber: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.homePhoneNumber
+        }}'
+      mailingAddress1: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.mailingAddress1
+        }}'
+      mailingAddress2: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.mailingAddress2
+        }}'
+      mailingAddress3: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.mailingAddress3
+        }}'
+      mailingAddress4: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.mailingAddress4
+        }}'
+      mailingCity: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.mailingCity
+        }}'
+      mailingCountry: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.mailingCountry
+        }}'
+      mailingCounty: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.mailingCounty
+        }}'
+      mailingPostalCode: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.mailingPostalCode
+        }}'
+      mailingProvince: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.mailingProvince
+        }}'
+      mailingState: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.mailingState
+        }}'
+      middleName: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.middleName
+        }}'
+      mobilePhoneNumber: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.mobilePhoneNumber
+        }}'
+      partyType: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.partyType
+        }}'
+      phoneNumber: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.phoneNumber
+        }}'
+      postalCode: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.postalCode
+        }}'
+      profileARN: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.profileARN
+        }}'
+      profileId: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.profileId
+        }}'
+      province: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.province
+        }}'
+      shippingAddress1: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.shippingAddress1
+        }}'
+      shippingAddress2: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.shippingAddress2
+        }}'
+      shippingAddress3: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.shippingAddress3
+        }}'
+      shippingAddress4: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.shippingAddress4
+        }}'
+      shippingCity: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.shippingCity
+        }}'
+      shippingCountry: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.shippingCountry
+        }}'
+      shippingCounty: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.shippingCounty
+        }}'
+      shippingPostalCode: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.shippingPostalCode
+        }}'
+      shippingProvince: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.shippingProvince
+        }}'
+      shippingState: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.shippingState
+        }}'
+      state: '{{ response.messageTemplate.defaultAttributes.customerProfileAttributes.state
+        }}'
+      address: '{{ response.messageTemplate.defaultAttributes.systemAttributes.customerEndpoint.address
+        }}'
+      name: '{{ response.messageTemplate.defaultAttributes.systemAttributes.name }}'
+      description: '{{ response.messageTemplate.description }}'
+      criteria: '{{ response.messageTemplate.groupingConfiguration.criteria }}'
+      isActive: '{{ response.messageTemplate.isActive }}'
+      knowledgeBaseArn: '{{ response.messageTemplate.knowledgeBaseArn }}'
+      knowledgeBaseId: '{{ response.messageTemplate.knowledgeBaseId }}'
+      language: '{{ response.messageTemplate.language }}'
+      lastModifiedBy: '{{ response.messageTemplate.lastModifiedBy }}'
+      lastModifiedTime: '{{ response.messageTemplate.lastModifiedTime }}'
+      messageTemplateArn: '{{ response.messageTemplate.messageTemplateArn }}'
+      messageTemplateId: '{{ response.messageTemplate.messageTemplateId }}'
+      tags: '{{ response.messageTemplate.tags }}'
+      versionNumber: '{{ response.messageTemplate.versionNumber }}'
+- discovery_id: aws.qconnect.get_next_message
+  calls:
+  - action: get_next_message
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.conversationSessionData }}'
+    item:
+      key: '{{ item.key }}'
+      response: '{{ item.response }}'
+      value: '{{ item.value }}'
+      reason: '{{ response.conversationState.reason }}'
+      status: '{{ response.conversationState.status }}'
+      nextMessageToken: '{{ response.nextMessageToken }}'
+      requestMessageId: '{{ response.requestMessageId }}'
+      messageId: '{{ response.response.messageId }}'
+      participant: '{{ response.response.participant }}'
+      timestamp: '{{ response.response.timestamp }}'
+      type: '{{ response.type }}'
+- discovery_id: aws.qconnect.get_quick_response
+  calls:
+  - action: get_quick_response
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      contentType: '{{ response.quickResponse.contentType }}'
+      content: '{{ response.quickResponse.contents.markdown.content }}'
+      createdTime: '{{ response.quickResponse.createdTime }}'
+      description: '{{ response.quickResponse.description }}'
+      criteria: '{{ response.quickResponse.groupingConfiguration.criteria }}'
+      isActive: '{{ response.quickResponse.isActive }}'
+      knowledgeBaseArn: '{{ response.quickResponse.knowledgeBaseArn }}'
+      knowledgeBaseId: '{{ response.quickResponse.knowledgeBaseId }}'
+      language: '{{ response.quickResponse.language }}'
+      lastModifiedBy: '{{ response.quickResponse.lastModifiedBy }}'
+      lastModifiedTime: '{{ response.quickResponse.lastModifiedTime }}'
+      name: '{{ response.quickResponse.name }}'
+      quickResponseArn: '{{ response.quickResponse.quickResponseArn }}'
+      quickResponseId: '{{ response.quickResponse.quickResponseId }}'
+      shortcutKey: '{{ response.quickResponse.shortcutKey }}'
+      status: '{{ response.quickResponse.status }}'
+      tags: '{{ response.quickResponse.tags }}'
+- discovery_id: aws.qconnect.get_recommendations
+  calls:
+  - action: get_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recommendations }}'
+    item:
+      data: '{{ item.data }}'
+      document: '{{ item.document }}'
+      recommendationId: '{{ item.recommendationId }}'
+      recommendations: '{{ item.recommendations }}'
+      relevanceLevel: '{{ item.relevanceLevel }}'
+      relevanceScore: '{{ item.relevanceScore }}'
+      type: '{{ item.type }}'
+- discovery_id: aws.qconnect.get_session
+  calls:
+  - action: get_session
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      aiAgentConfiguration: '{{ response.session.aiAgentConfiguration }}'
+      integrationConfiguration: '{{ response.session.integrationConfiguration }}'
+      origin: '{{ response.session.origin }}'
+      tagFilter: '{{ response.session.tagFilter }}'
+      description: '{{ response.session.description }}'
+      topicIntegrationArn: '{{ response.session.integrationConfiguration.topicIntegrationArn
+        }}'
+      name: '{{ response.session.name }}'
+      sessionArn: '{{ response.session.sessionArn }}'
+      sessionId: '{{ response.session.sessionId }}'
+      key: '{{ response.session.tagFilter.tagCondition.key }}'
+      value: '{{ response.session.tagFilter.tagCondition.value }}'
+      tags: '{{ response.session.tags }}'
+- discovery_id: aws.qconnect.list_ai_agent_versions
+  calls:
+  - action: list_ai_agent_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.aiAgentVersionSummaries }}'
+    item:
+      aiAgentSummary: '{{ item.aiAgentSummary }}'
+- discovery_id: aws.qconnect.list_ai_agents
+  calls:
+  - action: list_ai_agents
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.aiAgentSummaries }}'
+    item:
+      aiAgentArn: '{{ item.aiAgentArn }}'
+      aiAgentId: '{{ item.aiAgentId }}'
+      configuration: '{{ item.configuration }}'
+      modifiedTime: '{{ item.modifiedTime }}'
+      origin: '{{ item.origin }}'
+      type: '{{ item.type }}'
+      visibilityStatus: '{{ item.visibilityStatus }}'
+- discovery_id: aws.qconnect.list_ai_guardrail_versions
+  calls:
+  - action: list_ai_guardrail_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.aiGuardrailVersionSummaries }}'
+    item:
+      aiGuardrailSummary: '{{ item.aiGuardrailSummary }}'
+- discovery_id: aws.qconnect.list_ai_guardrails
+  calls:
+  - action: list_ai_guardrails
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.aiGuardrailSummaries }}'
+    item:
+      aiGuardrailArn: '{{ item.aiGuardrailArn }}'
+      aiGuardrailId: '{{ item.aiGuardrailId }}'
+      modifiedTime: '{{ item.modifiedTime }}'
+      visibilityStatus: '{{ item.visibilityStatus }}'
+- discovery_id: aws.qconnect.list_ai_prompt_versions
+  calls:
+  - action: list_ai_prompt_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.aiPromptVersionSummaries }}'
+    item:
+      aiPromptSummary: '{{ item.aiPromptSummary }}'
+- discovery_id: aws.qconnect.list_ai_prompts
+  calls:
+  - action: list_ai_prompts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.aiPromptSummaries }}'
+    item:
+      aiPromptArn: '{{ item.aiPromptArn }}'
+      aiPromptId: '{{ item.aiPromptId }}'
+      apiFormat: '{{ item.apiFormat }}'
+      modelId: '{{ item.modelId }}'
+      modifiedTime: '{{ item.modifiedTime }}'
+      origin: '{{ item.origin }}'
+      templateType: '{{ item.templateType }}'
+      type: '{{ item.type }}'
+      visibilityStatus: '{{ item.visibilityStatus }}'
+- discovery_id: aws.qconnect.list_assistant_associations
+  calls:
+  - action: list_assistant_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assistantAssociationSummaries }}'
+    item:
+      assistantAssociationArn: '{{ item.assistantAssociationArn }}'
+      assistantAssociationId: '{{ item.assistantAssociationId }}'
+      associationData: '{{ item.associationData }}'
+      associationType: '{{ item.associationType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qconnect.list_content_associations
+  calls:
+  - action: list_content_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.contentAssociationSummaries }}'
+    item:
+      associationData: '{{ item.associationData }}'
+      associationType: '{{ item.associationType }}'
+      contentAssociationArn: '{{ item.contentAssociationArn }}'
+      contentAssociationId: '{{ item.contentAssociationId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qconnect.list_contents
+  calls:
+  - action: list_contents
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.contentSummaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qconnect.list_import_jobs
+  calls:
+  - action: list_import_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.importJobSummaries }}'
+    item:
+      externalSourceConfiguration: '{{ item.externalSourceConfiguration }}'
+      importJobId: '{{ item.importJobId }}'
+      importJobType: '{{ item.importJobType }}'
+      uploadId: '{{ item.uploadId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qconnect.list_message_template_versions
+  calls:
+  - action: list_message_template_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.messageTemplateVersionSummaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qconnect.list_message_templates
+  calls:
+  - action: list_message_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.messageTemplateSummaries }}'
+    item:
+      activeVersionNumber: '{{ item.activeVersionNumber }}'
+      sourceConfiguration: '{{ item.sourceConfiguration }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qconnect.list_messages
+  calls:
+  - action: list_messages
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.messages }}'
+    item:
+      messageId: '{{ item.messageId }}'
+      participant: '{{ item.participant }}'
+      timestamp: '{{ item.timestamp }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qconnect.list_quick_responses
+  calls:
+  - action: list_quick_responses
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.quickResponseSummaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qconnect.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.qconnect.query_assistant
+  calls:
+  - action: query_assistant
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.results }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qconnect.search_content
+  calls:
+  - action: search_content
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.contentSummaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qconnect.search_message_templates
+  calls:
+  - action: search_message_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.results }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qconnect.search_quick_responses
+  calls:
+  - action: search_quick_responses
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.results }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qconnect.search_sessions
+  calls:
+  - action: search_sessions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.sessionSummaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'

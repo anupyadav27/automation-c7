@@ -1,0 +1,61 @@
+version: '1.0'
+provider: aws
+service: lakeformation
+discovery:
+- calls:
+  - action: list_resources
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lakeformation.list_resources
+  emit:
+    as: item
+    item:
+      HybridAccessEnabled: '{{ item.HybridAccessEnabled }}'
+      LastModified: '{{ item.LastModified }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      ResourceInfo: '{{ item.ResourceInfo }}'
+      RoleArn: '{{ item.RoleArn }}'
+      WithFederation: '{{ item.WithFederation }}'
+      WithPrivilegedAccess: '{{ item.WithPrivilegedAccess }}'
+    items_for: '{{ response.ResourceInfoList }}'
+- calls:
+  - action: get_data_lake_settings
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lakeformation.get_data_lake_settings
+  emit:
+    as: item
+    item:
+      AllowExternalDataFiltering: '{{ response.DataLakeSettings.AllowExternalDataFiltering }}'
+      AllowFullTableExternalDataAccess: '{{ response.DataLakeSettings.AllowFullTableExternalDataAccess }}'
+      AuthorizedSessionTagValueList: '{{ response.DataLakeSettings.AuthorizedSessionTagValueList }}'
+      CreateDatabaseDefaultPermissions: '{{ response.DataLakeSettings.CreateDatabaseDefaultPermissions }}'
+      CreateTableDefaultPermissions: '{{ response.DataLakeSettings.CreateTableDefaultPermissions }}'
+      DataLakeAdmins: '{{ response.DataLakeSettings.DataLakeAdmins }}'
+      DataLakeSettings: '{{ response.DataLakeSettings.DataLakeSettings }}'
+      DestinationArn: '{{ response.DataLakeSettings.DestinationArn }}'
+      Enabled: '{{ response.DataLakeSettings.Enabled }}'
+      ExternalDataFilteringAllowList: '{{ response.DataLakeSettings.ExternalDataFilteringAllowList }}'
+      Format: '{{ response.DataLakeSettings.Format }}'
+      Level: '{{ response.DataLakeSettings.Level }}'
+      Parameters: '{{ response.DataLakeSettings.Parameters }}'
+      ReadOnlyAdmins: '{{ response.DataLakeSettings.ReadOnlyAdmins }}'
+      TrustedResourceOwners: '{{ response.DataLakeSettings.TrustedResourceOwners }}'
+- calls:
+  - action: describe_lake_formation_identity_center_configuration
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lakeformation.describe_lake_formation_identity_center_configuration
+  emit:
+    as: item
+    item:
+      ApplicationArn: '{{ item.ApplicationArn }}'
+      DataLakePrincipalIdentifier: '{{ item.DataLakePrincipalIdentifier }}'
+      ExternalFiltering: '{{ item.ExternalFiltering }}'
+      InstanceArn: '{{ item.InstanceArn }}'
+      ResourceShare: '{{ item.ResourceShare }}'
+      ServiceIntegrations: '{{ item.ServiceIntegrations }}'
+      ShareRecipients: '{{ item.ShareRecipients }}'
+      CatalogId: '{{ response.CatalogId }}'
+      Status: '{{ response.ExternalFiltering.Status }}'
+    items_for: '{{ response.ShareRecipients }}'

@@ -1,0 +1,73 @@
+version: '1.0'
+provider: aws
+service: kinesis-video-archived-media
+services:
+  client: kinesis-video-archived-media
+  module: boto3.client
+discovery:
+- discovery_id: aws.kinesis-video-archived-media.get_dash_streaming_session_url
+  calls:
+  - action: get_dash_streaming_session_url
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DASHStreamingSessionURL: '{{ response.DASHStreamingSessionURL }}'
+- discovery_id: aws.kinesis-video-archived-media.get_hls_streaming_session_url
+  calls:
+  - action: get_hls_streaming_session_url
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DASHStreamingSessionURL: '{{ response.DASHStreamingSessionURL }}'
+      HLSStreamingSessionURL: '{{ response.HLSStreamingSessionURL }}'
+- discovery_id: aws.kinesis-video-archived-media.list_fragments
+  calls:
+  - action: list_fragments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Fragments }}'
+    item:
+      FragmentLengthInMilliseconds: '{{ item.FragmentLengthInMilliseconds }}'
+      FragmentNumber: '{{ item.FragmentNumber }}'
+      FragmentSizeInBytes: '{{ item.FragmentSizeInBytes }}'
+      ProducerTimestamp: '{{ item.ProducerTimestamp }}'
+      ServerTimestamp: '{{ item.ServerTimestamp }}'
+- discovery_id: aws.kinesis-video-archived-media.get_clip
+  calls:
+  - action: get_clip
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ContentType: '{{ response.ContentType }}'
+      Payload: '{{ response.Payload }}'
+- discovery_id: aws.kinesis-video-archived-media.get_images
+  calls:
+  - action: get_images
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Images }}'
+    item:
+      Error: '{{ item.Error }}'
+      ImageContent: '{{ item.ImageContent }}'
+      Images: '{{ item.Images }}'
+      TimeStamp: '{{ item.TimeStamp }}'
+- discovery_id: aws.kinesis-video-archived-media.get_media_for_fragment_list
+  calls:
+  - action: get_media_for_fragment_list
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ContentType: '{{ response.ContentType }}'
+      Payload: '{{ response.Payload }}'

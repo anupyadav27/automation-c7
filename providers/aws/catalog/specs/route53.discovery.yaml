@@ -1,0 +1,82 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: route53
+# 5 ops (4 from checks, +1 for inventory)
+version: '1.0'
+provider: aws
+service: route53
+discovery:
+  - calls:
+    - action: list_cidr_collections
+      on_error: continue
+      save_as: response
+    discovery_id: aws.route53.list_cidr_collections
+    emit:
+      as: item
+      item:
+        Arn: '{{ item.Arn }}'
+        Id: '{{ item.Id }}'
+        Name: '{{ item.Name }}'
+        Version: '{{ item.Version }}'
+      items_for: '{{ response.CidrCollections }}'
+  - calls:
+    - action: list_traffic_policy_instances
+      on_error: continue
+      save_as: response
+    discovery_id: aws.route53.list_traffic_policy_instances
+    emit:
+      as: item
+      item:
+        HostedZoneId: '{{ item.HostedZoneId }}'
+        Id: '{{ item.Id }}'
+        Message: '{{ item.Message }}'
+        Name: '{{ item.Name }}'
+        State: '{{ item.State }}'
+        TTL: '{{ item.TTL }}'
+        TrafficPolicyId: '{{ item.TrafficPolicyId }}'
+        TrafficPolicyType: '{{ item.TrafficPolicyType }}'
+        TrafficPolicyVersion: '{{ item.TrafficPolicyVersion }}'
+      items_for: '{{ response.TrafficPolicyInstances }}'
+  - calls:
+    - action: list_health_checks
+      on_error: continue
+      save_as: response
+    discovery_id: aws.route53.list_health_checks
+    emit:
+      as: item
+      item:
+        CallerReference: '{{ item.CallerReference }}'
+        CloudWatchAlarmConfiguration: '{{ item.CloudWatchAlarmConfiguration }}'
+        Enabled: '{{ item.Enabled }}'
+        HealthCheckConfig: '{{ item.HealthCheckConfig }}'
+        HealthCheckVersion: '{{ item.HealthCheckVersion }}'
+        Id: '{{ item.Id }}'
+        LinkedService: '{{ item.LinkedService }}'
+      items_for: '{{ response.HealthChecks }}'
+  - calls:
+    - action: list_hosted_zones
+      on_error: continue
+      save_as: response
+    discovery_id: aws.route53.list_hosted_zones
+    emit:
+      as: item
+      item:
+        CallerReference: '{{ item.CallerReference }}'
+        Config: '{{ item.Config }}'
+        Features: '{{ item.Features }}'
+        Id: '{{ item.Id }}'
+        LinkedService: '{{ item.LinkedService }}'
+        Name: '{{ item.Name }}'
+        ResourceRecordSetCount: '{{ item.ResourceRecordSetCount }}'
+      items_for: '{{ response.HostedZones }}'
+  - calls:
+    - action: list_query_logging_configs
+      on_error: continue
+      save_as: response
+    discovery_id: aws.route53.list_query_logging_configs
+    emit:
+      as: item
+      item:
+        CloudWatchLogsLogGroupArn: '{{ item.CloudWatchLogsLogGroupArn }}'
+        HostedZoneId: '{{ item.HostedZoneId }}'
+        Id: '{{ item.Id }}'
+      items_for: '{{ response.QueryLoggingConfigs }}'

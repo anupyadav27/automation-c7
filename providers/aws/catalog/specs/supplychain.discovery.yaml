@@ -1,0 +1,315 @@
+version: '1.0'
+provider: aws
+service: supplychain
+services:
+  client: supplychain
+  module: boto3.client
+discovery:
+- discovery_id: aws.supplychain.list_instances
+  calls:
+  - action: list_instances
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.instances }}'
+    item:
+      awsAccountId: '{{ item.awsAccountId }}'
+      createdTime: '{{ item.createdTime }}'
+      datasetTargetDetails: '{{ item.datasetTargetDetails }}'
+      endTime: '{{ item.endTime }}'
+      errorMessage: '{{ item.errorMessage }}'
+      flowExecution: '{{ item.flowExecution }}'
+      instance: '{{ item.instance }}'
+      instanceDescription: '{{ item.instanceDescription }}'
+      instanceId: '{{ item.instanceId }}'
+      instanceName: '{{ item.instanceName }}'
+      kmsKeyArn: '{{ item.kmsKeyArn }}'
+      lastModifiedTime: '{{ item.lastModifiedTime }}'
+      name: '{{ item.name }}'
+      outputMetadata: '{{ item.outputMetadata }}'
+      sourceInfo: '{{ item.sourceInfo }}'
+      sources: '{{ item.sources }}'
+      startTime: '{{ item.startTime }}'
+      state: '{{ item.state }}'
+      target: '{{ item.target }}'
+      transformation: '{{ item.transformation }}'
+      versionNumber: '{{ item.versionNumber }}'
+      webAppDnsDomain: '{{ item.webAppDnsDomain }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.supplychain.get_bill_of_materials_import_job
+  for_each: aws.supplychain.list_instances
+  calls:
+  - action: get_bill_of_materials_import_job
+    params:
+      instanceId: '{{ item.instanceId }}'
+      jobId: '{{ item.jobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      instanceId: '{{ response.job.instanceId }}'
+      job: '{{ response.job.jobId }}'
+      jobId: '{{ response.job.jobId }}'
+      message: '{{ response.job.message }}'
+      s3uri: '{{ response.job.s3uri }}'
+      status: '{{ response.job.status }}'
+- discovery_id: aws.supplychain.get_data_integration_event
+  for_each: aws.supplychain.list_instances
+  calls:
+  - action: get_data_integration_event
+    params:
+      instanceId: '{{ item.instanceId }}'
+      eventId: '{{ item.eventId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      event: '{{ response.event.eventId }}'
+      eventGroupId: '{{ response.event.eventGroupId }}'
+      eventId: '{{ response.event.eventId }}'
+      eventTimestamp: '{{ response.event.eventTimestamp }}'
+      eventType: '{{ response.event.eventType }}'
+      instanceId: '{{ response.event.instanceId }}'
+      datasetIdentifier: '{{ response.event.datasetTargetDetails.datasetIdentifier }}'
+      message: '{{ response.event.datasetTargetDetails.datasetLoadExecution.message }}'
+      status: '{{ response.event.datasetTargetDetails.datasetLoadExecution.status }}'
+      operationType: '{{ response.event.datasetTargetDetails.operationType }}'
+- discovery_id: aws.supplychain.get_data_integration_flow
+  for_each: aws.supplychain.list_instances
+  calls:
+  - action: get_data_integration_flow
+    params:
+      instanceId: '{{ item.instanceId }}'
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdTime: '{{ response.flow.createdTime }}'
+      flow: '{{ response.flow.flow }}'
+      instanceId: '{{ response.flow.instanceId }}'
+      lastModifiedTime: '{{ response.flow.lastModifiedTime }}'
+      name: '{{ response.flow.name }}'
+      datasetIdentifier: '{{ response.flow.target.datasetTarget.datasetIdentifier }}'
+      dedupeRecords: '{{ response.flow.target.datasetTarget.options.dedupeRecords }}'
+      loadType: '{{ response.flow.target.datasetTarget.options.loadType }}'
+      bucketName: '{{ response.flow.target.s3Target.bucketName }}'
+      fileType: '{{ response.flow.target.s3Target.options.fileType }}'
+      prefix: '{{ response.flow.target.s3Target.prefix }}'
+      targetType: '{{ response.flow.target.targetType }}'
+      query: '{{ response.flow.transformation.sqlTransformation.query }}'
+      transformationType: '{{ response.flow.transformation.transformationType }}'
+- discovery_id: aws.supplychain.get_data_integration_flow_execution
+  for_each: aws.supplychain.list_instances
+  calls:
+  - action: get_data_integration_flow_execution
+    params:
+      instanceId: '{{ item.instanceId }}'
+      flowName: '{{ item.flowName }}'
+      executionId: '{{ item.executionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      executionId: '{{ response.flowExecution.executionId }}'
+      flowExecution: '{{ response.flowExecution.flowExecution }}'
+      flowName: '{{ response.flowExecution.flowName }}'
+      instanceId: '{{ response.flowExecution.instanceId }}'
+      message: '{{ response.flowExecution.message }}'
+      status: '{{ response.flowExecution.status }}'
+      endTime: '{{ response.flowExecution.endTime }}'
+      diagnosticReportsRootS3URI: '{{ response.flowExecution.outputMetadata.diagnosticReportsRootS3URI }}'
+      datasetIdentifier: '{{ response.flowExecution.sourceInfo.datasetSource.datasetIdentifier }}'
+      bucketName: '{{ response.flowExecution.sourceInfo.s3Source.bucketName }}'
+      key: '{{ response.flowExecution.sourceInfo.s3Source.key }}'
+      sourceType: '{{ response.flowExecution.sourceInfo.sourceType }}'
+      startTime: '{{ response.flowExecution.startTime }}'
+- discovery_id: aws.supplychain.get_data_lake_dataset
+  for_each: aws.supplychain.list_instances
+  calls:
+  - action: get_data_lake_dataset
+    params:
+      instanceId: '{{ item.instanceId }}'
+      namespace: '{{ item.namespace }}'
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.dataset.arn }}'
+      createdTime: '{{ response.dataset.createdTime }}'
+      description: '{{ response.dataset.description }}'
+      instanceId: '{{ response.dataset.instanceId }}'
+      lastModifiedTime: '{{ response.dataset.lastModifiedTime }}'
+      name: '{{ response.dataset.name }}'
+      namespace: '{{ response.dataset.namespace }}'
+      partitionSpec: '{{ response.dataset.partitionSpec }}'
+      schema: '{{ response.dataset.schema }}'
+- discovery_id: aws.supplychain.get_data_lake_namespace
+  for_each: aws.supplychain.list_instances
+  calls:
+  - action: get_data_lake_namespace
+    params:
+      instanceId: '{{ item.instanceId }}'
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.namespace.arn }}'
+      createdTime: '{{ response.namespace.createdTime }}'
+      description: '{{ response.namespace.description }}'
+      instanceId: '{{ response.namespace.instanceId }}'
+      lastModifiedTime: '{{ response.namespace.lastModifiedTime }}'
+      name: '{{ response.namespace.name }}'
+- discovery_id: aws.supplychain.get_instance
+  for_each: aws.supplychain.list_instances
+  calls:
+  - action: get_instance
+    params:
+      instanceId: '{{ item.instanceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      awsAccountId: '{{ response.instance.awsAccountId }}'
+      createdTime: '{{ response.instance.createdTime }}'
+      errorMessage: '{{ response.instance.errorMessage }}'
+      instance: '{{ response.instance.instanceId }}'
+      instanceDescription: '{{ response.instance.instanceDescription }}'
+      instanceId: '{{ response.instance.instanceId }}'
+      instanceName: '{{ response.instance.instanceName }}'
+      kmsKeyArn: '{{ response.instance.kmsKeyArn }}'
+      lastModifiedTime: '{{ response.instance.lastModifiedTime }}'
+      state: '{{ response.instance.state }}'
+      versionNumber: '{{ response.instance.versionNumber }}'
+      webAppDnsDomain: '{{ response.instance.webAppDnsDomain }}'
+- discovery_id: aws.supplychain.list_data_integration_events
+  for_each: aws.supplychain.list_instances
+  calls:
+  - action: list_data_integration_events
+    params:
+      instanceId: '{{ item.instanceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.events }}'
+    item:
+      datasetTargetDetails: '{{ item.datasetTargetDetails }}'
+      event: '{{ item.event }}'
+      eventGroupId: '{{ item.eventGroupId }}'
+      eventId: '{{ item.eventId }}'
+      eventTimestamp: '{{ item.eventTimestamp }}'
+      eventType: '{{ item.eventType }}'
+      instanceId: '{{ item.instanceId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.supplychain.list_data_integration_flow_executions
+  for_each: aws.supplychain.list_instances
+  calls:
+  - action: list_data_integration_flow_executions
+    params:
+      instanceId: '{{ item.instanceId }}'
+      flowName: '{{ item.flowName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.flowExecutions }}'
+    item:
+      endTime: '{{ item.endTime }}'
+      executionId: '{{ item.executionId }}'
+      flow: '{{ item.flow }}'
+      flowExecution: '{{ item.flowExecution }}'
+      flowName: '{{ item.flowName }}'
+      instanceId: '{{ item.instanceId }}'
+      message: '{{ item.message }}'
+      outputMetadata: '{{ item.outputMetadata }}'
+      sourceInfo: '{{ item.sourceInfo }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.supplychain.list_data_integration_flows
+  for_each: aws.supplychain.list_instances
+  calls:
+  - action: list_data_integration_flows
+    params:
+      instanceId: '{{ item.instanceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.flows }}'
+    item:
+      createdTime: '{{ item.createdTime }}'
+      endTime: '{{ item.endTime }}'
+      flowExecution: '{{ item.flowExecution }}'
+      instanceId: '{{ item.instanceId }}'
+      lastModifiedTime: '{{ item.lastModifiedTime }}'
+      name: '{{ item.name }}'
+      outputMetadata: '{{ item.outputMetadata }}'
+      sourceInfo: '{{ item.sourceInfo }}'
+      sources: '{{ item.sources }}'
+      startTime: '{{ item.startTime }}'
+      target: '{{ item.target }}'
+      transformation: '{{ item.transformation }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.supplychain.list_data_lake_datasets
+  for_each: aws.supplychain.list_instances
+  calls:
+  - action: list_data_lake_datasets
+    params:
+      instanceId: '{{ item.instanceId }}'
+      namespace: '{{ item.namespace }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.datasets }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      instanceId: '{{ item.instanceId }}'
+      lastModifiedTime: '{{ item.lastModifiedTime }}'
+      name: '{{ item.name }}'
+      namespace: '{{ item.namespace }}'
+      partitionSpec: '{{ item.partitionSpec }}'
+      schema: '{{ item.schema }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.supplychain.list_data_lake_namespaces
+  for_each: aws.supplychain.list_instances
+  calls:
+  - action: list_data_lake_namespaces
+    params:
+      instanceId: '{{ item.instanceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.namespaces }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      instanceId: '{{ item.instanceId }}'
+      lastModifiedTime: '{{ item.lastModifiedTime }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.supplychain.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

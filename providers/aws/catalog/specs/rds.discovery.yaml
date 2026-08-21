@@ -1,0 +1,907 @@
+version: '1.0'
+provider: aws
+service: rds
+discovery:
+- calls:
+  - action: describe_db_instances
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_instances
+  emit:
+    as: item
+    item:
+      resource_type: rds_db_instance
+      ActivityStreamEngineNativeAuditFieldsIncluded: '{{ item.ActivityStreamEngineNativeAuditFieldsIncluded }}'
+      ActivityStreamKinesisStreamName: '{{ item.ActivityStreamKinesisStreamName }}'
+      ActivityStreamKmsKeyId: '{{ item.ActivityStreamKmsKeyId }}'
+      ActivityStreamMode: '{{ item.ActivityStreamMode }}'
+      ActivityStreamPolicyStatus: '{{ item.ActivityStreamPolicyStatus }}'
+      ActivityStreamStatus: '{{ item.ActivityStreamStatus }}'
+      AllocatedStorage: '{{ item.AllocatedStorage }}'
+      AssociatedRoles: '{{ item.AssociatedRoles }}'
+      AutoMinorVersionUpgrade: '{{ item.AutoMinorVersionUpgrade }}'
+      AutomaticRestartTime: '{{ item.AutomaticRestartTime }}'
+      AutomationMode: '{{ item.AutomationMode }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      AwsBackupRecoveryPointArn: '{{ item.AwsBackupRecoveryPointArn }}'
+      BackupRetentionPeriod: '{{ item.BackupRetentionPeriod }}'
+      BackupTarget: '{{ item.BackupTarget }}'
+      CACertificateIdentifier: '{{ item.CACertificateIdentifier }}'
+      CertificateDetails: '{{ item.CertificateDetails }}'
+      CharacterSetName: '{{ item.CharacterSetName }}'
+      CopyTagsToSnapshot: '{{ item.CopyTagsToSnapshot }}'
+      CustomIamInstanceProfile: '{{ item.CustomIamInstanceProfile }}'
+      CustomerOwnedIpEnabled: '{{ item.CustomerOwnedIpEnabled }}'
+      DBClusterIdentifier: '{{ item.DBClusterIdentifier }}'
+      DBInstanceArn: '{{ item.DBInstanceArn }}'
+      DBInstanceAutomatedBackupsReplications: '{{ item.DBInstanceAutomatedBackupsReplications }}'
+      DBInstanceClass: '{{ item.DBInstanceClass }}'
+      DBInstanceIdentifier: '{{ item.DBInstanceIdentifier }}'
+      DBInstanceStatus: '{{ item.DBInstanceStatus }}'
+      DBInstances: '{{ item.DBInstances }}'
+      DBName: '{{ item.DBName }}'
+      DBParameterGroups: '{{ item.DBParameterGroups }}'
+      DBSecurityGroups: '{{ item.DBSecurityGroups }}'
+      DBSubnetGroup: '{{ item.DBSubnetGroup }}'
+      DBSystemId: '{{ item.DBSystemId }}'
+      DatabaseInsightsMode: '{{ item.DatabaseInsightsMode }}'
+      DbInstancePort: '{{ item.DbInstancePort }}'
+      DbiResourceId: '{{ item.DbiResourceId }}'
+      DedicatedLogVolume: '{{ item.DedicatedLogVolume }}'
+      DeletionProtection: '{{ item.DeletionProtection }}'
+      DomainMemberships: '{{ item.DomainMemberships }}'
+      EnabledCloudwatchLogsExports: '{{ item.EnabledCloudwatchLogsExports }}'
+      Endpoint: '{{ item.Endpoint }}'
+      Engine: '{{ item.Engine }}'
+      EngineLifecycleSupport: '{{ item.EngineLifecycleSupport }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      EnhancedMonitoringResourceArn: '{{ item.EnhancedMonitoringResourceArn }}'
+      IAMDatabaseAuthenticationEnabled: '{{ item.IAMDatabaseAuthenticationEnabled }}'
+      InstanceCreateTime: '{{ item.InstanceCreateTime }}'
+      Iops: '{{ item.Iops }}'
+      IsStorageConfigUpgradeAvailable: '{{ item.IsStorageConfigUpgradeAvailable }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      LatestRestorableTime: '{{ item.LatestRestorableTime }}'
+      LicenseModel: '{{ item.LicenseModel }}'
+      ListenerEndpoint: '{{ item.ListenerEndpoint }}'
+      MasterUserSecret: '{{ item.MasterUserSecret }}'
+      MasterUsername: '{{ item.MasterUsername }}'
+      MaxAllocatedStorage: '{{ item.MaxAllocatedStorage }}'
+      MonitoringInterval: '{{ item.MonitoringInterval }}'
+      MonitoringRoleArn: '{{ item.MonitoringRoleArn }}'
+      MultiAZ: '{{ item.MultiAZ }}'
+      MultiTenant: '{{ item.MultiTenant }}'
+      NcharCharacterSetName: '{{ item.NcharCharacterSetName }}'
+      NetworkType: '{{ item.NetworkType }}'
+      OptionGroupMemberships: '{{ item.OptionGroupMemberships }}'
+      PendingModifiedValues: '{{ item.PendingModifiedValues }}'
+      PercentProgress: '{{ item.PercentProgress }}'
+      PerformanceInsightsEnabled: '{{ item.PerformanceInsightsEnabled }}'
+      PerformanceInsightsKMSKeyId: '{{ item.PerformanceInsightsKMSKeyId }}'
+      PerformanceInsightsRetentionPeriod: '{{ item.PerformanceInsightsRetentionPeriod }}'
+      PreferredBackupWindow: '{{ item.PreferredBackupWindow }}'
+      PreferredMaintenanceWindow: '{{ item.PreferredMaintenanceWindow }}'
+      ProcessorFeatures: '{{ item.ProcessorFeatures }}'
+      PromotionTier: '{{ item.PromotionTier }}'
+      PubliclyAccessible: '{{ item.PubliclyAccessible }}'
+      ReadReplicaDBClusterIdentifiers: '{{ item.ReadReplicaDBClusterIdentifiers }}'
+      ReadReplicaDBInstanceIdentifiers: '{{ item.ReadReplicaDBInstanceIdentifiers }}'
+      ReadReplicaSourceDBClusterIdentifier: '{{ item.ReadReplicaSourceDBClusterIdentifier }}'
+      ReadReplicaSourceDBInstanceIdentifier: '{{ item.ReadReplicaSourceDBInstanceIdentifier }}'
+      ReplicaMode: '{{ item.ReplicaMode }}'
+      ResumeFullAutomationModeTime: '{{ item.ResumeFullAutomationModeTime }}'
+      SecondaryAvailabilityZone: '{{ item.SecondaryAvailabilityZone }}'
+      Statement: '{{ item.Statement }}'
+      StatusInfos: '{{ item.StatusInfos }}'
+      StorageEncrypted: '{{ item.StorageEncrypted }}'
+      StorageThroughput: '{{ item.StorageThroughput }}'
+      StorageType: '{{ item.StorageType }}'
+      TagList: '{{ item.TagList }}'
+      TdeCredentialArn: '{{ item.TdeCredentialArn }}'
+      Timezone: '{{ item.Timezone }}'
+      UpgradeRolloutOrder: '{{ item.UpgradeRolloutOrder }}'
+      Version: '{{ item.Version }}'
+      VpcSecurityGroups: '{{ item.VpcSecurityGroups }}'
+    items_for: '{{ response.DBInstances }}'
+  resource_type: rds_db_instance
+- calls:
+  - action: describe_db_proxy_endpoints
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_proxy_endpoints
+  emit:
+    as: item
+    item:
+      CreatedDate: '{{ item.CreatedDate }}'
+      DBProxyEndpointArn: '{{ item.DBProxyEndpointArn }}'
+      DBProxyEndpointName: '{{ item.DBProxyEndpointName }}'
+      DBProxyEndpoints: '{{ item.DBProxyEndpoints }}'
+      DBProxyName: '{{ item.DBProxyName }}'
+      Endpoint: '{{ item.Endpoint }}'
+      EndpointNetworkType: '{{ item.EndpointNetworkType }}'
+      IsDefault: '{{ item.IsDefault }}'
+      Status: '{{ item.Status }}'
+      TargetRole: '{{ item.TargetRole }}'
+      VpcId: '{{ item.VpcId }}'
+      VpcSecurityGroupIds: '{{ item.VpcSecurityGroupIds }}'
+      VpcSubnetIds: '{{ item.VpcSubnetIds }}'
+    items_for: '{{ response.DBProxyEndpoints }}'
+  resource_type: rds_db_proxy_endpoint
+- calls:
+  - action: describe_db_cluster_parameter_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_cluster_parameter_groups
+  emit:
+    as: item
+    item:
+      DBClusterParameterGroupArn: '{{ item.DBClusterParameterGroupArn }}'
+      DBClusterParameterGroupName: '{{ item.DBClusterParameterGroupName }}'
+      DBClusterParameterGroups: '{{ item.DBClusterParameterGroups }}'
+      DBParameterGroupFamily: '{{ item.DBParameterGroupFamily }}'
+      Description: '{{ item.Description }}'
+    items_for: '{{ response.DBClusterParameterGroups }}'
+  resource_type: rds_db_cluster_parameter_group
+- calls:
+  - action: describe_db_cluster_parameters
+    on_error: continue
+    params:
+      DBClusterParameterGroupName: '{{ item.DBClusterParameterGroupName }}'
+    save_as: response
+  discovery_id: aws.rds.describe_db_cluster_parameters
+  emit:
+    as: item
+    item:
+      AllowedValues: '{{ item.AllowedValues }}'
+      ApplyMethod: '{{ item.ApplyMethod }}'
+      ApplyType: '{{ item.ApplyType }}'
+      DataType: '{{ item.DataType }}'
+      Description: '{{ item.Description }}'
+      IsModifiable: '{{ item.IsModifiable }}'
+      MinimumEngineVersion: '{{ item.MinimumEngineVersion }}'
+      ParameterName: '{{ item.ParameterName }}'
+      ParameterValue: '{{ item.ParameterValue }}'
+      Source: '{{ item.Source }}'
+      SupportedEngineModes: '{{ item.SupportedEngineModes }}'
+    items_for: '{{ response.Parameters }}'
+  for_each: aws.rds.describe_db_cluster_parameter_groups
+  resource_type: rds_db_cluster_parameter
+- calls:
+  - action: describe_blue_green_deployments
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_blue_green_deployments
+  emit:
+    as: item
+    item:
+      BlueGreenDeploymentIdentifier: '{{ item.BlueGreenDeploymentIdentifier }}'
+      BlueGreenDeploymentName: '{{ item.BlueGreenDeploymentName }}'
+      BlueGreenDeployments: '{{ item.BlueGreenDeployments }}'
+      CreateTime: '{{ item.CreateTime }}'
+      DeleteTime: '{{ item.DeleteTime }}'
+      Source: '{{ item.Source }}'
+      Status: '{{ item.Status }}'
+      StatusDetails: '{{ item.StatusDetails }}'
+      SwitchoverDetails: '{{ item.SwitchoverDetails }}'
+      TagList: '{{ item.TagList }}'
+      Target: '{{ item.Target }}'
+      Tasks: '{{ item.Tasks }}'
+    items_for: '{{ response.BlueGreenDeployments }}'
+  resource_type: rds_blue_green_deployment
+- calls:
+  - action: describe_certificates
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_certificates
+  emit:
+    as: item
+    item:
+      CertificateArn: '{{ item.CertificateArn }}'
+      CertificateIdentifier: '{{ item.CertificateIdentifier }}'
+      CertificateType: '{{ item.CertificateType }}'
+      Certificates: '{{ item.Certificates }}'
+      CustomerOverride: '{{ item.CustomerOverride }}'
+      CustomerOverrideValidTill: '{{ item.CustomerOverrideValidTill }}'
+      DefaultCertificateForNewLaunches: '{{ item.DefaultCertificateForNewLaunches }}'
+      Thumbprint: '{{ item.Thumbprint }}'
+      ValidFrom: '{{ item.ValidFrom }}'
+      ValidTill: '{{ item.ValidTill }}'
+    items_for: '{{ response.Certificates }}'
+  resource_type: rds_certificate
+- calls:
+  - action: describe_integrations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_integrations
+  emit:
+    as: item
+    item:
+      AdditionalEncryptionContext: '{{ item.AdditionalEncryptionContext }}'
+      CreateTime: '{{ item.CreateTime }}'
+      DataFilter: '{{ item.DataFilter }}'
+      Description: '{{ item.Description }}'
+      Errors: '{{ item.Errors }}'
+      IntegrationArn: '{{ item.IntegrationArn }}'
+      IntegrationName: '{{ item.IntegrationName }}'
+      Integrations: '{{ item.Integrations }}'
+      KMSKeyId: '{{ item.KMSKeyId }}'
+      SourceArn: '{{ item.SourceArn }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      TargetArn: '{{ item.TargetArn }}'
+      Targets: '{{ item.Targets }}'
+    items_for: '{{ response.Integrations }}'
+  resource_type: rds_integration
+- calls:
+  - action: describe_event_subscriptions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_event_subscriptions
+  emit:
+    as: item
+    item:
+      CustSubscriptionId: '{{ item.CustSubscriptionId }}'
+      CustomerAwsId: '{{ item.CustomerAwsId }}'
+      Enabled: '{{ item.Enabled }}'
+      EventCategoriesList: '{{ item.EventCategoriesList }}'
+      EventSubscriptionArn: '{{ item.EventSubscriptionArn }}'
+      EventSubscriptionsList: '{{ item.EventSubscriptionsList }}'
+      SnsTopicArn: '{{ item.SnsTopicArn }}'
+      SourceIdsList: '{{ item.SourceIdsList }}'
+      SourceType: '{{ item.SourceType }}'
+      Status: '{{ item.Status }}'
+      SubscriptionCreationTime: '{{ item.SubscriptionCreationTime }}'
+    items_for: '{{ response.EventSubscriptionsList }}'
+  resource_type: rds_event_subscription
+- calls:
+  - action: describe_db_cluster_automated_backups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_cluster_automated_backups
+  emit:
+    as: item
+    item:
+      AllocatedStorage: '{{ item.AllocatedStorage }}'
+      AvailabilityZones: '{{ item.AvailabilityZones }}'
+      AwsBackupRecoveryPointArn: '{{ item.AwsBackupRecoveryPointArn }}'
+      BackupRetentionPeriod: '{{ item.BackupRetentionPeriod }}'
+      ClusterCreateTime: '{{ item.ClusterCreateTime }}'
+      DBClusterArn: '{{ item.DBClusterArn }}'
+      DBClusterAutomatedBackups: '{{ item.DBClusterAutomatedBackups }}'
+      DBClusterAutomatedBackupsArn: '{{ item.DBClusterAutomatedBackupsArn }}'
+      DBClusterIdentifier: '{{ item.DBClusterIdentifier }}'
+      DbClusterResourceId: '{{ item.DbClusterResourceId }}'
+      Engine: '{{ item.Engine }}'
+      EngineMode: '{{ item.EngineMode }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      IAMDatabaseAuthenticationEnabled: '{{ item.IAMDatabaseAuthenticationEnabled }}'
+      Iops: '{{ item.Iops }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      LicenseModel: '{{ item.LicenseModel }}'
+      MasterUsername: '{{ item.MasterUsername }}'
+      Port: '{{ item.Port }}'
+      Region: '{{ item.Region }}'
+      RestoreWindow: '{{ item.RestoreWindow }}'
+      Status: '{{ item.Status }}'
+      StorageEncrypted: '{{ item.StorageEncrypted }}'
+      StorageThroughput: '{{ item.StorageThroughput }}'
+      StorageType: '{{ item.StorageType }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.DBClusterAutomatedBackups }}'
+  resource_type: rds_db_cluster_automated_backup
+- calls:
+  - action: describe_db_shard_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_shard_groups
+  emit:
+    as: item
+    item:
+      ComputeRedundancy: '{{ item.ComputeRedundancy }}'
+      DBClusterIdentifier: '{{ item.DBClusterIdentifier }}'
+      DBShardGroupArn: '{{ item.DBShardGroupArn }}'
+      DBShardGroupIdentifier: '{{ item.DBShardGroupIdentifier }}'
+      DBShardGroupResourceId: '{{ item.DBShardGroupResourceId }}'
+      DBShardGroups: '{{ item.DBShardGroups }}'
+      Endpoint: '{{ item.Endpoint }}'
+      MaxACU: '{{ item.MaxACU }}'
+      MinACU: '{{ item.MinACU }}'
+      PubliclyAccessible: '{{ item.PubliclyAccessible }}'
+      Status: '{{ item.Status }}'
+      TagList: '{{ item.TagList }}'
+    items_for: '{{ response.DBShardGroups }}'
+  resource_type: rds_db_shard_group
+- calls:
+  - action: describe_db_subnet_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_subnet_groups
+  emit:
+    as: item
+    item:
+      DBSubnetGroupArn: '{{ item.DBSubnetGroupArn }}'
+      DBSubnetGroupDescription: '{{ item.DBSubnetGroupDescription }}'
+      DBSubnetGroupName: '{{ item.DBSubnetGroupName }}'
+      DBSubnetGroups: '{{ item.DBSubnetGroups }}'
+      SubnetGroupStatus: '{{ item.SubnetGroupStatus }}'
+      Subnets: '{{ item.Subnets }}'
+      SupportedNetworkTypes: '{{ item.SupportedNetworkTypes }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.DBSubnetGroups }}'
+  resource_type: rds_db_subnet_group
+- calls:
+  - action: describe_db_proxies
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_proxies
+  emit:
+    as: item
+    item:
+      Auth: '{{ item.Auth }}'
+      CreatedDate: '{{ item.CreatedDate }}'
+      DBProxies: '{{ item.DBProxies }}'
+      DBProxyArn: '{{ item.DBProxyArn }}'
+      DBProxyName: '{{ item.DBProxyName }}'
+      DebugLogging: '{{ item.DebugLogging }}'
+      DefaultAuthScheme: '{{ item.DefaultAuthScheme }}'
+      Endpoint: '{{ item.Endpoint }}'
+      EndpointNetworkType: '{{ item.EndpointNetworkType }}'
+      EngineFamily: '{{ item.EngineFamily }}'
+      IdleClientTimeout: '{{ item.IdleClientTimeout }}'
+      RequireTLS: '{{ item.RequireTLS }}'
+      RoleArn: '{{ item.RoleArn }}'
+      Status: '{{ item.Status }}'
+      TargetConnectionNetworkType: '{{ item.TargetConnectionNetworkType }}'
+      UpdatedDate: '{{ item.UpdatedDate }}'
+      VpcId: '{{ item.VpcId }}'
+      VpcSecurityGroupIds: '{{ item.VpcSecurityGroupIds }}'
+      VpcSubnetIds: '{{ item.VpcSubnetIds }}'
+    items_for: '{{ response.DBProxies }}'
+  resource_type: rds_db_proxy
+- calls:
+  - action: describe_db_recommendations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_recommendations
+  emit:
+    as: item
+    item:
+      AdditionalInfo: '{{ item.AdditionalInfo }}'
+      Category: '{{ item.Category }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      DBRecommendations: '{{ item.DBRecommendations }}'
+      Description: '{{ item.Description }}'
+      Detection: '{{ item.Detection }}'
+      Impact: '{{ item.Impact }}'
+      IssueDetails: '{{ item.IssueDetails }}'
+      Links: '{{ item.Links }}'
+      Reason: '{{ item.Reason }}'
+      Recommendation: '{{ item.Recommendation }}'
+      RecommendationId: '{{ item.RecommendationId }}'
+      RecommendedActions: '{{ item.RecommendedActions }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      Severity: '{{ item.Severity }}'
+      Source: '{{ item.Source }}'
+      Status: '{{ item.Status }}'
+      TypeDetection: '{{ item.TypeDetection }}'
+      TypeId: '{{ item.TypeId }}'
+      TypeRecommendation: '{{ item.TypeRecommendation }}'
+      UpdatedTime: '{{ item.UpdatedTime }}'
+    items_for: '{{ response.DBRecommendations }}'
+  resource_type: rds_db_recommendation
+- calls:
+  - action: describe_db_cluster_snapshots
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_cluster_snapshots
+  emit:
+    as: item
+    item:
+      AllocatedStorage: '{{ item.AllocatedStorage }}'
+      AvailabilityZones: '{{ item.AvailabilityZones }}'
+      ClusterCreateTime: '{{ item.ClusterCreateTime }}'
+      DBClusterIdentifier: '{{ item.DBClusterIdentifier }}'
+      DBClusterSnapshotArn: '{{ item.DBClusterSnapshotArn }}'
+      DBClusterSnapshotIdentifier: '{{ item.DBClusterSnapshotIdentifier }}'
+      DBClusterSnapshots: '{{ item.DBClusterSnapshots }}'
+      DBSystemId: '{{ item.DBSystemId }}'
+      DbClusterResourceId: '{{ item.DbClusterResourceId }}'
+      Engine: '{{ item.Engine }}'
+      EngineMode: '{{ item.EngineMode }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      IAMDatabaseAuthenticationEnabled: '{{ item.IAMDatabaseAuthenticationEnabled }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      LicenseModel: '{{ item.LicenseModel }}'
+      MasterUsername: '{{ item.MasterUsername }}'
+      PercentProgress: '{{ item.PercentProgress }}'
+      Port: '{{ item.Port }}'
+      SnapshotCreateTime: '{{ item.SnapshotCreateTime }}'
+      SnapshotType: '{{ item.SnapshotType }}'
+      SourceDBClusterSnapshotArn: '{{ item.SourceDBClusterSnapshotArn }}'
+      Status: '{{ item.Status }}'
+      StorageEncrypted: '{{ item.StorageEncrypted }}'
+      StorageThroughput: '{{ item.StorageThroughput }}'
+      StorageType: '{{ item.StorageType }}'
+      TagList: '{{ item.TagList }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.DBClusterSnapshots }}'
+  resource_type: rds_db_cluster_snapshot
+- calls:
+  - action: describe_db_clusters
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_clusters
+  emit:
+    as: item
+    item:
+      ActivityStreamKinesisStreamName: '{{ item.ActivityStreamKinesisStreamName }}'
+      ActivityStreamKmsKeyId: '{{ item.ActivityStreamKmsKeyId }}'
+      ActivityStreamMode: '{{ item.ActivityStreamMode }}'
+      ActivityStreamStatus: '{{ item.ActivityStreamStatus }}'
+      AllocatedStorage: '{{ item.AllocatedStorage }}'
+      AssociatedRoles: '{{ item.AssociatedRoles }}'
+      AutoMinorVersionUpgrade: '{{ item.AutoMinorVersionUpgrade }}'
+      AutomaticRestartTime: '{{ item.AutomaticRestartTime }}'
+      AvailabilityZones: '{{ item.AvailabilityZones }}'
+      AwsBackupRecoveryPointArn: '{{ item.AwsBackupRecoveryPointArn }}'
+      BacktrackConsumedChangeRecords: '{{ item.BacktrackConsumedChangeRecords }}'
+      BacktrackWindow: '{{ item.BacktrackWindow }}'
+      BackupRetentionPeriod: '{{ item.BackupRetentionPeriod }}'
+      Capacity: '{{ item.Capacity }}'
+      CertificateDetails: '{{ item.CertificateDetails }}'
+      CharacterSetName: '{{ item.CharacterSetName }}'
+      CloneGroupId: '{{ item.CloneGroupId }}'
+      ClusterCreateTime: '{{ item.ClusterCreateTime }}'
+      ClusterScalabilityType: '{{ item.ClusterScalabilityType }}'
+      CopyTagsToSnapshot: '{{ item.CopyTagsToSnapshot }}'
+      CrossAccountClone: '{{ item.CrossAccountClone }}'
+      CustomEndpoints: '{{ item.CustomEndpoints }}'
+      DBClusterArn: '{{ item.DBClusterArn }}'
+      DBClusterIdentifier: '{{ item.DBClusterIdentifier }}'
+      DBClusterInstanceClass: '{{ item.DBClusterInstanceClass }}'
+      DBClusterMembers: '{{ item.DBClusterMembers }}'
+      DBClusterOptionGroupMemberships: '{{ item.DBClusterOptionGroupMemberships }}'
+      DBClusterParameterGroup: '{{ item.DBClusterParameterGroup }}'
+      DBClusters: '{{ item.DBClusters }}'
+      DBSubnetGroup: '{{ item.DBSubnetGroup }}'
+      DBSystemId: '{{ item.DBSystemId }}'
+      DatabaseInsightsMode: '{{ item.DatabaseInsightsMode }}'
+      DatabaseName: '{{ item.DatabaseName }}'
+      DbClusterResourceId: '{{ item.DbClusterResourceId }}'
+      DeletionProtection: '{{ item.DeletionProtection }}'
+      DomainMemberships: '{{ item.DomainMemberships }}'
+      EarliestBacktrackTime: '{{ item.EarliestBacktrackTime }}'
+      EarliestRestorableTime: '{{ item.EarliestRestorableTime }}'
+      EnabledCloudwatchLogsExports: '{{ item.EnabledCloudwatchLogsExports }}'
+      Endpoint: '{{ item.Endpoint }}'
+      Engine: '{{ item.Engine }}'
+      EngineLifecycleSupport: '{{ item.EngineLifecycleSupport }}'
+      EngineMode: '{{ item.EngineMode }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      GlobalClusterIdentifier: '{{ item.GlobalClusterIdentifier }}'
+      GlobalWriteForwardingRequested: '{{ item.GlobalWriteForwardingRequested }}'
+      GlobalWriteForwardingStatus: '{{ item.GlobalWriteForwardingStatus }}'
+      HostedZoneId: '{{ item.HostedZoneId }}'
+      HttpEndpointEnabled: '{{ item.HttpEndpointEnabled }}'
+      IAMDatabaseAuthenticationEnabled: '{{ item.IAMDatabaseAuthenticationEnabled }}'
+      IOOptimizedNextAllowedModificationTime: '{{ item.IOOptimizedNextAllowedModificationTime }}'
+      Iops: '{{ item.Iops }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      LatestRestorableTime: '{{ item.LatestRestorableTime }}'
+      LimitlessDatabase: '{{ item.LimitlessDatabase }}'
+      LocalWriteForwardingStatus: '{{ item.LocalWriteForwardingStatus }}'
+      MasterUserSecret: '{{ item.MasterUserSecret }}'
+      MasterUsername: '{{ item.MasterUsername }}'
+      MonitoringInterval: '{{ item.MonitoringInterval }}'
+      MonitoringRoleArn: '{{ item.MonitoringRoleArn }}'
+      MultiAZ: '{{ item.MultiAZ }}'
+      NetworkType: '{{ item.NetworkType }}'
+      PendingModifiedValues: '{{ item.PendingModifiedValues }}'
+      PercentProgress: '{{ item.PercentProgress }}'
+      PerformanceInsightsEnabled: '{{ item.PerformanceInsightsEnabled }}'
+      PerformanceInsightsKMSKeyId: '{{ item.PerformanceInsightsKMSKeyId }}'
+      PerformanceInsightsRetentionPeriod: '{{ item.PerformanceInsightsRetentionPeriod }}'
+      Port: '{{ item.Port }}'
+      PreferredBackupWindow: '{{ item.PreferredBackupWindow }}'
+      PreferredMaintenanceWindow: '{{ item.PreferredMaintenanceWindow }}'
+      PubliclyAccessible: '{{ item.PubliclyAccessible }}'
+      RdsCustomClusterConfiguration: '{{ item.RdsCustomClusterConfiguration }}'
+      ReadReplicaIdentifiers: '{{ item.ReadReplicaIdentifiers }}'
+      ReaderEndpoint: '{{ item.ReaderEndpoint }}'
+      ReplicationSourceIdentifier: '{{ item.ReplicationSourceIdentifier }}'
+      ScalingConfigurationInfo: '{{ item.ScalingConfigurationInfo }}'
+      ServerlessV2PlatformVersion: '{{ item.ServerlessV2PlatformVersion }}'
+      ServerlessV2ScalingConfiguration: '{{ item.ServerlessV2ScalingConfiguration }}'
+      Status: '{{ item.Status }}'
+      StatusInfos: '{{ item.StatusInfos }}'
+      StorageEncrypted: '{{ item.StorageEncrypted }}'
+      StorageThroughput: '{{ item.StorageThroughput }}'
+      StorageType: '{{ item.StorageType }}'
+      TagList: '{{ item.TagList }}'
+      UpgradeRolloutOrder: '{{ item.UpgradeRolloutOrder }}'
+      VpcSecurityGroups: '{{ item.VpcSecurityGroups }}'
+    items_for: '{{ response.DBClusters }}'
+  resource_type: rds_db_cluster
+- calls:
+  - action: describe_db_engine_versions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_engine_versions
+  emit:
+    as: item
+    item:
+      CreateTime: '{{ item.CreateTime }}'
+      CustomDBEngineVersionManifest: '{{ item.CustomDBEngineVersionManifest }}'
+      DBEngineDescription: '{{ item.DBEngineDescription }}'
+      DBEngineMediaType: '{{ item.DBEngineMediaType }}'
+      DBEngineVersionArn: '{{ item.DBEngineVersionArn }}'
+      DBEngineVersionDescription: '{{ item.DBEngineVersionDescription }}'
+      DBEngineVersions: '{{ item.DBEngineVersions }}'
+      DBParameterGroupFamily: '{{ item.DBParameterGroupFamily }}'
+      DatabaseInstallationFilesS3BucketName: '{{ item.DatabaseInstallationFilesS3BucketName }}'
+      DatabaseInstallationFilesS3Prefix: '{{ item.DatabaseInstallationFilesS3Prefix }}'
+      DefaultCharacterSet: '{{ item.DefaultCharacterSet }}'
+      Engine: '{{ item.Engine }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      ExportableLogTypes: '{{ item.ExportableLogTypes }}'
+      Image: '{{ item.Image }}'
+      KMSKeyId: '{{ item.KMSKeyId }}'
+      MajorEngineVersion: '{{ item.MajorEngineVersion }}'
+      ServerlessV2FeaturesSupport: '{{ item.ServerlessV2FeaturesSupport }}'
+      Status: '{{ item.Status }}'
+      SupportedCACertificateIdentifiers: '{{ item.SupportedCACertificateIdentifiers }}'
+      SupportedCharacterSets: '{{ item.SupportedCharacterSets }}'
+      SupportedEngineModes: '{{ item.SupportedEngineModes }}'
+      SupportedFeatureNames: '{{ item.SupportedFeatureNames }}'
+      SupportedNcharCharacterSets: '{{ item.SupportedNcharCharacterSets }}'
+      SupportedTimezones: '{{ item.SupportedTimezones }}'
+      SupportsBabelfish: '{{ item.SupportsBabelfish }}'
+      SupportsCertificateRotationWithoutRestart: '{{ item.SupportsCertificateRotationWithoutRestart }}'
+      SupportsGlobalDatabases: '{{ item.SupportsGlobalDatabases }}'
+      SupportsIntegrations: '{{ item.SupportsIntegrations }}'
+      SupportsLimitlessDatabase: '{{ item.SupportsLimitlessDatabase }}'
+      SupportsLocalWriteForwarding: '{{ item.SupportsLocalWriteForwarding }}'
+      SupportsLogExportsToCloudwatchLogs: '{{ item.SupportsLogExportsToCloudwatchLogs }}'
+      SupportsParallelQuery: '{{ item.SupportsParallelQuery }}'
+      SupportsReadReplica: '{{ item.SupportsReadReplica }}'
+      TagList: '{{ item.TagList }}'
+      ValidUpgradeTarget: '{{ item.ValidUpgradeTarget }}'
+    items_for: '{{ response.DBEngineVersions }}'
+  resource_type: rds_db_engine_version
+- calls:
+  - action: describe_option_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_option_groups
+  emit:
+    as: item
+    item:
+      AllowsVpcAndNonVpcInstanceMemberships: '{{ item.AllowsVpcAndNonVpcInstanceMemberships }}'
+      CopyTimestamp: '{{ item.CopyTimestamp }}'
+      EngineName: '{{ item.EngineName }}'
+      MajorEngineVersion: '{{ item.MajorEngineVersion }}'
+      OptionGroupArn: '{{ item.OptionGroupArn }}'
+      OptionGroupDescription: '{{ item.OptionGroupDescription }}'
+      OptionGroupName: '{{ item.OptionGroupName }}'
+      OptionGroupsList: '{{ item.OptionGroupsList }}'
+      Options: '{{ item.Options }}'
+      SourceAccountId: '{{ item.SourceAccountId }}'
+      SourceOptionGroup: '{{ item.SourceOptionGroup }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.OptionGroupsList }}'
+  resource_type: rds_option_group
+- calls:
+  - action: describe_db_cluster_snapshot_attributes
+    on_error: continue
+    params:
+      DBClusterSnapshotIdentifier: '{{ item.DBClusterSnapshotIdentifier }}'
+    save_as: response
+  discovery_id: aws.rds.describe_db_cluster_snapshot_attributes
+  emit:
+    as: item
+    item:
+      DBClusterSnapshotAttributes: '{{ response.DBClusterSnapshotAttributesResult.DBClusterSnapshotAttributes }}'
+      DBClusterSnapshotIdentifier: '{{ response.DBClusterSnapshotAttributesResult.DBClusterSnapshotIdentifier }}'
+  for_each: aws.rds.describe_db_cluster_snapshots
+  resource_type: rds_db_cluster_snapshot_attribute
+- calls:
+  - action: describe_export_tasks
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_export_tasks
+  emit:
+    as: item
+    item:
+      ExportOnly: '{{ item.ExportOnly }}'
+      ExportTaskIdentifier: '{{ item.ExportTaskIdentifier }}'
+      ExportTasks: '{{ item.ExportTasks }}'
+      FailureCause: '{{ item.FailureCause }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      PercentProgress: '{{ item.PercentProgress }}'
+      S3Bucket: '{{ item.S3Bucket }}'
+      S3Prefix: '{{ item.S3Prefix }}'
+      SnapshotTime: '{{ item.SnapshotTime }}'
+      SourceArn: '{{ item.SourceArn }}'
+      SourceType: '{{ item.SourceType }}'
+      Status: '{{ item.Status }}'
+      TaskEndTime: '{{ item.TaskEndTime }}'
+      TaskStartTime: '{{ item.TaskStartTime }}'
+      TotalExtractedDataInGB: '{{ item.TotalExtractedDataInGB }}'
+      WarningMessage: '{{ item.WarningMessage }}'
+    items_for: '{{ response.ExportTasks }}'
+  resource_type: rds_export_task
+- calls:
+  - action: describe_db_instance_automated_backups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_instance_automated_backups
+  emit:
+    as: item
+    item:
+      AllocatedStorage: '{{ item.AllocatedStorage }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      AwsBackupRecoveryPointArn: '{{ item.AwsBackupRecoveryPointArn }}'
+      BackupRetentionPeriod: '{{ item.BackupRetentionPeriod }}'
+      BackupTarget: '{{ item.BackupTarget }}'
+      DBInstanceArn: '{{ item.DBInstanceArn }}'
+      DBInstanceAutomatedBackups: '{{ item.DBInstanceAutomatedBackups }}'
+      DBInstanceAutomatedBackupsArn: '{{ item.DBInstanceAutomatedBackupsArn }}'
+      DBInstanceAutomatedBackupsReplications: '{{ item.DBInstanceAutomatedBackupsReplications }}'
+      DBInstanceIdentifier: '{{ item.DBInstanceIdentifier }}'
+      DbiResourceId: '{{ item.DbiResourceId }}'
+      DedicatedLogVolume: '{{ item.DedicatedLogVolume }}'
+      Encrypted: '{{ item.Encrypted }}'
+      Engine: '{{ item.Engine }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      IAMDatabaseAuthenticationEnabled: '{{ item.IAMDatabaseAuthenticationEnabled }}'
+      InstanceCreateTime: '{{ item.InstanceCreateTime }}'
+      Iops: '{{ item.Iops }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      LicenseModel: '{{ item.LicenseModel }}'
+      MasterUsername: '{{ item.MasterUsername }}'
+      MultiTenant: '{{ item.MultiTenant }}'
+      OptionGroupName: '{{ item.OptionGroupName }}'
+      Port: '{{ item.Port }}'
+      Region: '{{ item.Region }}'
+      RestoreWindow: '{{ item.RestoreWindow }}'
+      Status: '{{ item.Status }}'
+      StorageThroughput: '{{ item.StorageThroughput }}'
+      StorageType: '{{ item.StorageType }}'
+      TdeCredentialArn: '{{ item.TdeCredentialArn }}'
+      Timezone: '{{ item.Timezone }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.DBInstanceAutomatedBackups }}'
+  resource_type: rds_db_instance_automated_backup
+- calls:
+  - action: describe_db_snapshots
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_snapshots
+  emit:
+    as: item
+    item:
+      AllocatedStorage: '{{ item.AllocatedStorage }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      DBInstanceIdentifier: '{{ item.DBInstanceIdentifier }}'
+      DBSnapshotArn: '{{ item.DBSnapshotArn }}'
+      DBSnapshotAttributes: '{{ item.DBSnapshotAttributes }}'
+      DBSnapshotAttributesResult: '{{ item.DBSnapshotAttributesResult }}'
+      DBSnapshotIdentifier: '{{ item.DBSnapshotIdentifier }}'
+      DBSnapshots: '{{ item.DBSnapshots }}'
+      DBSystemId: '{{ item.DBSystemId }}'
+      DbiResourceId: '{{ item.DbiResourceId }}'
+      DedicatedLogVolume: '{{ item.DedicatedLogVolume }}'
+      Encrypted: '{{ item.Encrypted }}'
+      Engine: '{{ item.Engine }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      IAMDatabaseAuthenticationEnabled: '{{ item.IAMDatabaseAuthenticationEnabled }}'
+      InstanceCreateTime: '{{ item.InstanceCreateTime }}'
+      Iops: '{{ item.Iops }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      LicenseModel: '{{ item.LicenseModel }}'
+      MasterUsername: '{{ item.MasterUsername }}'
+      MultiTenant: '{{ item.MultiTenant }}'
+      OptionGroupName: '{{ item.OptionGroupName }}'
+      OriginalSnapshotCreateTime: '{{ item.OriginalSnapshotCreateTime }}'
+      PercentProgress: '{{ item.PercentProgress }}'
+      Port: '{{ item.Port }}'
+      ProcessorFeatures: '{{ item.ProcessorFeatures }}'
+      SnapshotAvailabilityZone: '{{ item.SnapshotAvailabilityZone }}'
+      SnapshotCreateTime: '{{ item.SnapshotCreateTime }}'
+      SnapshotDatabaseTime: '{{ item.SnapshotDatabaseTime }}'
+      SnapshotTarget: '{{ item.SnapshotTarget }}'
+      SnapshotType: '{{ item.SnapshotType }}'
+      SourceDBSnapshotIdentifier: '{{ item.SourceDBSnapshotIdentifier }}'
+      SourceRegion: '{{ item.SourceRegion }}'
+      Status: '{{ item.Status }}'
+      StorageThroughput: '{{ item.StorageThroughput }}'
+      StorageType: '{{ item.StorageType }}'
+      TagList: '{{ item.TagList }}'
+      TdeCredentialArn: '{{ item.TdeCredentialArn }}'
+      Timezone: '{{ item.Timezone }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.DBSnapshots }}'
+  resource_type: rds_db_snapshot
+- calls:
+  - action: describe_db_cluster_endpoints
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_cluster_endpoints
+  emit:
+    as: item
+    item:
+      CustomEndpointType: '{{ item.CustomEndpointType }}'
+      DBClusterEndpointArn: '{{ item.DBClusterEndpointArn }}'
+      DBClusterEndpointIdentifier: '{{ item.DBClusterEndpointIdentifier }}'
+      DBClusterEndpointResourceIdentifier: '{{ item.DBClusterEndpointResourceIdentifier }}'
+      DBClusterEndpoints: '{{ item.DBClusterEndpoints }}'
+      DBClusterIdentifier: '{{ item.DBClusterIdentifier }}'
+      Endpoint: '{{ item.Endpoint }}'
+      EndpointType: '{{ item.EndpointType }}'
+      ExcludedMembers: '{{ item.ExcludedMembers }}'
+      StaticMembers: '{{ item.StaticMembers }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.DBClusterEndpoints }}'
+  resource_type: rds_db_cluster_endpoint
+- calls:
+  - action: describe_reserved_db_instances
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_reserved_db_instances
+  emit:
+    as: item
+    item:
+      CurrencyCode: '{{ item.CurrencyCode }}'
+      DBInstanceClass: '{{ item.DBInstanceClass }}'
+      DBInstanceCount: '{{ item.DBInstanceCount }}'
+      Duration: '{{ item.Duration }}'
+      FixedPrice: '{{ item.FixedPrice }}'
+      LeaseId: '{{ item.LeaseId }}'
+      MultiAZ: '{{ item.MultiAZ }}'
+      OfferingType: '{{ item.OfferingType }}'
+      ProductDescription: '{{ item.ProductDescription }}'
+      RecurringCharges: '{{ item.RecurringCharges }}'
+      ReservedDBInstanceArn: '{{ item.ReservedDBInstanceArn }}'
+      ReservedDBInstanceId: '{{ item.ReservedDBInstanceId }}'
+      ReservedDBInstances: '{{ item.ReservedDBInstances }}'
+      ReservedDBInstancesOfferingId: '{{ item.ReservedDBInstancesOfferingId }}'
+      StartTime: '{{ item.StartTime }}'
+      State: '{{ item.State }}'
+      UsagePrice: '{{ item.UsagePrice }}'
+    items_for: '{{ response.ReservedDBInstances }}'
+  resource_type: rds_reserved_db_instance
+- calls:
+  - action: describe_db_parameter_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_parameter_groups
+  emit:
+    as: item
+    item:
+      DBParameterGroupArn: '{{ item.DBParameterGroupArn }}'
+      DBParameterGroupFamily: '{{ item.DBParameterGroupFamily }}'
+      DBParameterGroupName: '{{ item.DBParameterGroupName }}'
+      Description: '{{ item.Description }}'
+      EngineDefaults: '{{ item.EngineDefaults }}'
+      Parameters: '{{ item.Parameters }}'
+    items_for: '{{ response.DBParameterGroups }}'
+  resource_type: rds_db_parameter_group
+- calls:
+  - action: describe_db_security_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_security_groups
+  emit:
+    as: item
+    item:
+      DBSecurityGroupArn: '{{ item.DBSecurityGroupArn }}'
+      DBSecurityGroupDescription: '{{ item.DBSecurityGroupDescription }}'
+      DBSecurityGroupName: '{{ item.DBSecurityGroupName }}'
+      EC2SecurityGroups: '{{ item.EC2SecurityGroups }}'
+      IPRanges: '{{ item.IPRanges }}'
+      OwnerId: '{{ item.OwnerId }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.DBSecurityGroups }}'
+  resource_type: rds_db_security_group
+- calls:
+  - action: describe_tenant_databases
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_tenant_databases
+  emit:
+    as: item
+    item:
+      CharacterSetName: '{{ item.CharacterSetName }}'
+      DBInstanceIdentifier: '{{ item.DBInstanceIdentifier }}'
+      DbiResourceId: '{{ item.DbiResourceId }}'
+      DeletionProtection: '{{ item.DeletionProtection }}'
+      MasterUserSecret: '{{ item.MasterUserSecret }}'
+      MasterUsername: '{{ item.MasterUsername }}'
+      NcharCharacterSetName: '{{ item.NcharCharacterSetName }}'
+      PendingModifiedValues: '{{ item.PendingModifiedValues }}'
+      Status: '{{ item.Status }}'
+      TagList: '{{ item.TagList }}'
+      TenantDBName: '{{ item.TenantDBName }}'
+      TenantDatabaseARN: '{{ item.TenantDatabaseARN }}'
+      TenantDatabaseCreateTime: '{{ item.TenantDatabaseCreateTime }}'
+      TenantDatabaseResourceId: '{{ item.TenantDatabases[].DbiResourceId }}'
+      TenantDatabases: '{{ item.TenantDatabases }}'
+    items_for: '{{ response.TenantDatabases }}'
+  resource_type: rds_tenant_databas
+- calls:
+  - action: describe_global_clusters
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_global_clusters
+  emit:
+    as: item
+    item:
+      DatabaseName: '{{ item.DatabaseName }}'
+      DeletionProtection: '{{ item.DeletionProtection }}'
+      Endpoint: '{{ item.Endpoint }}'
+      Engine: '{{ item.Engine }}'
+      EngineLifecycleSupport: '{{ item.EngineLifecycleSupport }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      FailoverState: '{{ item.FailoverState }}'
+      GlobalClusterArn: '{{ item.GlobalClusterArn }}'
+      GlobalClusterIdentifier: '{{ item.GlobalClusterIdentifier }}'
+      GlobalClusterMembers: '{{ item.GlobalClusterMembers }}'
+      GlobalClusterResourceId: '{{ item.GlobalClusterResourceId }}'
+      GlobalClusters: '{{ item.GlobalClusters }}'
+      Status: '{{ item.Status }}'
+      StorageEncrypted: '{{ item.StorageEncrypted }}'
+      TagList: '{{ item.TagList }}'
+    items_for: '{{ response.GlobalClusters }}'
+  resource_type: rds_global_cluster
+- calls:
+  - action: describe_db_snapshot_tenant_databases
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rds.describe_db_snapshot_tenant_databases
+  emit:
+    as: item
+    item:
+      CharacterSetName: '{{ item.CharacterSetName }}'
+      CopyableCrossAccount: '{{ item.CopyableCrossAccount }}'
+      DBInstanceIdentifier: '{{ item.DBInstanceIdentifier }}'
+      DBSnapshotIdentifier: '{{ item.DBSnapshotIdentifier }}'
+      DBSnapshotTenantDatabaseARN: '{{ item.DBSnapshotTenantDatabaseARN }}'
+      DBSnapshotTenantDatabases: '{{ item.DBSnapshotTenantDatabases }}'
+      DbiResourceId: '{{ item.DbiResourceId }}'
+      DefaultPort: '{{ item.DefaultPort }}'
+      EngineName: '{{ item.EngineName }}'
+      MasterUsername: '{{ item.MasterUsername }}'
+      MinimumRequiredMinorEngineVersion: '{{ item.MinimumRequiredMinorEngineVersion }}'
+      Name: '{{ item.Name }}'
+      NcharCharacterSetName: '{{ item.NcharCharacterSetName }}'
+      OptionGroupOptions: '{{ item.OptionGroupOptions }}'
+      OptionsConflictsWith: '{{ item.OptionsConflictsWith }}'
+      OptionsDependedOn: '{{ item.OptionsDependedOn }}'
+      Permanent: '{{ item.Permanent }}'
+      Persistent: '{{ item.Persistent }}'
+      PortRequired: '{{ item.PortRequired }}'
+      RequiresAutoMinorEngineVersionUpgrade: '{{ item.RequiresAutoMinorEngineVersionUpgrade }}'
+      SnapshotType: '{{ item.SnapshotType }}'
+      SupportsOptionVersionDowngrade: '{{ item.SupportsOptionVersionDowngrade }}'
+      TagList: '{{ item.TagList }}'
+      TenantDBName: '{{ item.TenantDBName }}'
+      TenantDatabaseCreateTime: '{{ item.TenantDatabaseCreateTime }}'
+      TenantDatabaseResourceId: '{{ item.TenantDatabaseResourceId }}'
+      VpcOnly: '{{ item.VpcOnly }}'
+    items_for: '{{ response.DBSnapshotTenantDatabases }}'
+  resource_type: rds_db_snapshot_tenant_databas
+- calls:
+  - action: describe_db_snapshot_attributes
+    on_error: continue
+    params:
+      DBSnapshotIdentifier: '{{ item.DBSnapshotIdentifier }}'
+    save_as: response
+  discovery_id: aws.rds.describe_db_snapshot_attributes
+  resource_type: rds_db_snapshot
+  emit:
+    as: item
+    item:
+      DBSnapshotAttributes: '{{ response.DBSnapshotAttributesResult.DBSnapshotAttributes }}'
+      DBSnapshotIdentifier: '{{ response.DBSnapshotAttributesResult.DBSnapshotIdentifier }}'
+  for_each: aws.rds.describe_db_snapshots

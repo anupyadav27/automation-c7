@@ -1,0 +1,337 @@
+version: '1.0'
+provider: aws
+service: codecatalyst
+services:
+  client: codecatalyst
+  module: boto3.client
+discovery:
+- discovery_id: aws.codecatalyst.get_user_details
+  calls:
+  - action: get_user_details
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      email: '{{ response.primaryEmail.email }}'
+      primaryEmail: '{{ response.primaryEmail.primaryEmail }}'
+      userId: '{{ response.primaryEmail.userId }}'
+      userName: '{{ response.primaryEmail.userName }}'
+      verified: '{{ response.primaryEmail.verified }}'
+      version: '{{ response.primaryEmail.version }}'
+      displayName: '{{ response.displayName }}'
+- discovery_id: aws.codecatalyst.list_access_tokens
+  calls:
+  - action: list_access_tokens
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      expiresTime: '{{ item.expiresTime }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codecatalyst.list_spaces
+  calls:
+  - action: list_spaces
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      description: '{{ item.description }}'
+      displayName: '{{ item.displayName }}'
+      name: '{{ item.name }}'
+      regionName: '{{ item.regionName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codecatalyst.get_dev_environment
+  for_each: aws.codecatalyst.list_access_tokens
+  calls:
+  - action: get_dev_environment
+    params:
+      spaceName: '{{ item.spaceName }}'
+      projectName: '{{ item.projectName }}'
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.repositories }}'
+    item:
+      branchName: '{{ item.branchName }}'
+      repositoryName: '{{ item.repositoryName }}'
+      alias: '{{ response.alias }}'
+      creatorId: '{{ response.creatorId }}'
+      id: '{{ response.id }}'
+      inactivityTimeoutMinutes: '{{ response.inactivityTimeoutMinutes }}'
+      instanceType: '{{ response.instanceType }}'
+      lastUpdatedTime: '{{ response.lastUpdatedTime }}'
+      sizeInGiB: '{{ response.persistentStorage.sizeInGiB }}'
+      projectName: '{{ response.projectName }}'
+      spaceName: '{{ response.spaceName }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+      vpcConnectionName: '{{ response.vpcConnectionName }}'
+- discovery_id: aws.codecatalyst.get_project
+  for_each: aws.codecatalyst.list_access_tokens
+  calls:
+  - action: get_project
+    params:
+      spaceName: '{{ item.spaceName }}'
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      description: '{{ response.description }}'
+      displayName: '{{ response.displayName }}'
+      name: '{{ response.name }}'
+      spaceName: '{{ response.spaceName }}'
+- discovery_id: aws.codecatalyst.get_source_repository
+  for_each: aws.codecatalyst.list_access_tokens
+  calls:
+  - action: get_source_repository
+    params:
+      spaceName: '{{ item.spaceName }}'
+      projectName: '{{ item.projectName }}'
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdTime: '{{ response.createdTime }}'
+      description: '{{ response.description }}'
+      lastUpdatedTime: '{{ response.lastUpdatedTime }}'
+      name: '{{ response.name }}'
+      projectName: '{{ response.projectName }}'
+      spaceName: '{{ response.spaceName }}'
+- discovery_id: aws.codecatalyst.get_source_repository_clone_urls
+  calls:
+  - action: get_source_repository_clone_urls
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      https: '{{ response.https }}'
+- discovery_id: aws.codecatalyst.get_space
+  for_each: aws.codecatalyst.list_access_tokens
+  calls:
+  - action: get_space
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      description: '{{ response.description }}'
+      displayName: '{{ response.displayName }}'
+      name: '{{ response.name }}'
+      regionName: '{{ response.regionName }}'
+- discovery_id: aws.codecatalyst.get_subscription
+  calls:
+  - action: get_subscription
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      awsAccountName: '{{ response.awsAccountName }}'
+      pendingSubscriptionStartTime: '{{ response.pendingSubscriptionStartTime }}'
+      pendingSubscriptionType: '{{ response.pendingSubscriptionType }}'
+      subscriptionType: '{{ response.subscriptionType }}'
+- discovery_id: aws.codecatalyst.get_workflow
+  for_each: aws.codecatalyst.list_access_tokens
+  calls:
+  - action: get_workflow
+    params:
+      spaceName: '{{ item.spaceName }}'
+      id: '{{ item.id }}'
+      projectName: '{{ item.projectName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      path: '{{ response.definition.path }}'
+      createdTime: '{{ response.createdTime }}'
+      id: '{{ response.id }}'
+      lastUpdatedTime: '{{ response.lastUpdatedTime }}'
+      name: '{{ response.name }}'
+      projectName: '{{ response.projectName }}'
+      runMode: '{{ response.runMode }}'
+      sourceBranchName: '{{ response.sourceBranchName }}'
+      sourceRepositoryName: '{{ response.sourceRepositoryName }}'
+      spaceName: '{{ response.spaceName }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.codecatalyst.get_workflow_run
+  for_each: aws.codecatalyst.list_access_tokens
+  calls:
+  - action: get_workflow_run
+    params:
+      spaceName: '{{ item.spaceName }}'
+      id: '{{ item.id }}'
+      projectName: '{{ item.projectName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.statusReasons }}'
+    item:
+      endTime: '{{ response.endTime }}'
+      id: '{{ response.id }}'
+      lastUpdatedTime: '{{ response.lastUpdatedTime }}'
+      projectName: '{{ response.projectName }}'
+      spaceName: '{{ response.spaceName }}'
+      startTime: '{{ response.startTime }}'
+      status: '{{ response.status }}'
+      workflowId: '{{ response.workflowId }}'
+- discovery_id: aws.codecatalyst.list_dev_environment_sessions
+  calls:
+  - action: list_dev_environment_sessions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      devEnvironmentId: '{{ item.devEnvironmentId }}'
+      id: '{{ item.id }}'
+      projectName: '{{ item.projectName }}'
+      spaceName: '{{ item.spaceName }}'
+      startedTime: '{{ item.startedTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codecatalyst.list_dev_environments
+  calls:
+  - action: list_dev_environments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      alias: '{{ item.alias }}'
+      creatorId: '{{ item.creatorId }}'
+      id: '{{ item.id }}'
+      ides: '{{ item.ides }}'
+      inactivityTimeoutMinutes: '{{ item.items[].inactivityTimeoutMinutes }}'
+      instanceType: '{{ item.instanceType }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      persistentStorage: '{{ item.persistentStorage }}'
+      projectName: '{{ item.projectName }}'
+      repositories: '{{ item.repositories }}'
+      spaceName: '{{ item.spaceName }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      vpcConnectionName: '{{ item.vpcConnectionName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codecatalyst.list_event_logs
+  calls:
+  - action: list_event_logs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      errorCode: '{{ item.errorCode }}'
+      eventCategory: '{{ item.eventCategory }}'
+      eventName: '{{ item.eventName }}'
+      eventSource: '{{ item.eventSource }}'
+      eventTime: '{{ item.eventTime }}'
+      eventType: '{{ item.eventType }}'
+      id: '{{ item.id }}'
+      operationType: '{{ item.operationType }}'
+      projectInformation: '{{ item.projectInformation }}'
+      requestId: '{{ item.requestId }}'
+      requestPayload: '{{ item.requestPayload }}'
+      responsePayload: '{{ item.responsePayload }}'
+      sourceIpAddress: '{{ item.sourceIpAddress }}'
+      userAgent: '{{ item.userAgent }}'
+      userIdentity: '{{ item.userIdentity }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codecatalyst.list_projects
+  calls:
+  - action: list_projects
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      description: '{{ item.description }}'
+      displayName: '{{ item.displayName }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codecatalyst.list_source_repositories
+  calls:
+  - action: list_source_repositories
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codecatalyst.list_source_repository_branches
+  calls:
+  - action: list_source_repository_branches
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      headCommitId: '{{ item.headCommitId }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      name: '{{ item.name }}'
+      ref: '{{ item.ref }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codecatalyst.list_workflow_runs
+  calls:
+  - action: list_workflow_runs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      endTime: '{{ item.endTime }}'
+      id: '{{ item.id }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      statusReasons: '{{ item.statusReasons }}'
+      workflowId: '{{ item.workflowId }}'
+      workflowName: '{{ item.workflowName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codecatalyst.list_workflows
+  calls:
+  - action: list_workflows
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdTime: '{{ item.createdTime }}'
+      definition: '{{ item.definition }}'
+      id: '{{ item.id }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      name: '{{ item.name }}'
+      runMode: '{{ item.runMode }}'
+      sourceBranchName: '{{ item.sourceBranchName }}'
+      sourceRepositoryName: '{{ item.sourceRepositoryName }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'

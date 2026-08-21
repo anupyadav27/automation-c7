@@ -1,0 +1,97 @@
+version: '1.0'
+provider: aws
+service: appsync
+discovery:
+- calls:
+  - action: list_domain_names
+    on_error: continue
+    save_as: response
+  discovery_id: aws.appsync.list_domain_names
+  emit:
+    as: item
+    item:
+      apiAssociation: '{{ item.apiAssociation }}'
+      appsyncDomainName: '{{ item.appsyncDomainName }}'
+      associationStatus: '{{ item.associationStatus }}'
+      certificateArn: '{{ item.certificateArn }}'
+      deploymentDetail: '{{ item.deploymentDetail }}'
+      description: '{{ item.description }}'
+      domainName: '{{ item.domainName }}'
+      domainNameArn: '{{ item.domainNameArn }}'
+      domainNameConfig: '{{ item.domainNameConfig }}'
+      hostedZoneId: '{{ item.hostedZoneId }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.domainNameConfigs }}'
+- calls:
+  - action: list_graphql_apis
+    on_error: continue
+    save_as: response
+  discovery_id: aws.appsync.list_graphql_apis
+  emit:
+    as: item
+    item:
+      additionalAuthenticationProviders: '{{ item.additionalAuthenticationProviders }}'
+      apiId: '{{ item.apiId }}'
+      apiType: '{{ item.apiType }}'
+      arn: '{{ item.arn }}'
+      authenticationType: '{{ item.authenticationType }}'
+      dns: '{{ item.dns }}'
+      enhancedMetricsConfig: '{{ item.enhancedMetricsConfig }}'
+      introspectionConfig: '{{ item.introspectionConfig }}'
+      lambdaAuthorizerConfig: '{{ item.lambdaAuthorizerConfig }}'
+      logConfig: '{{ item.logConfig }}'
+      mergedApiExecutionRoleArn: '{{ item.mergedApiExecutionRoleArn }}'
+      name: '{{ item.name }}'
+      openIDConnectConfig: '{{ item.openIDConnectConfig }}'
+      owner: '{{ item.owner }}'
+      ownerContact: '{{ item.ownerContact }}'
+      queryDepthLimit: '{{ item.queryDepthLimit }}'
+      resolverCountLimit: '{{ item.resolverCountLimit }}'
+      tags: '{{ item.tags }}'
+      uris: '{{ item.uris }}'
+      userPoolConfig: '{{ item.userPoolConfig }}'
+      visibility: '{{ item.visibility }}'
+      wafWebAclArn: '{{ item.wafWebAclArn }}'
+      xrayEnabled: '{{ item.xrayEnabled }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.graphqlApis }}'
+- calls:
+  - action: list_apis
+    on_error: continue
+    save_as: response
+  discovery_id: aws.appsync.list_apis
+  emit:
+    as: item
+    item:
+      api: '{{ item.api }}'
+      apiArn: '{{ item.apiArn }}'
+      apiCache: '{{ item.apiCache }}'
+      apiCachingBehavior: '{{ item.apiCachingBehavior }}'
+      apiId: '{{ item.apiId }}'
+      associationArn: '{{ item.associationArn }}'
+      atRestEncryptionEnabled: '{{ item.atRestEncryptionEnabled }}'
+      created: '{{ item.created }}'
+      deletes: '{{ item.deletes }}'
+      details: '{{ item.details }}'
+      dns: '{{ item.dns }}'
+      environmentVariables: '{{ item.environmentVariables }}'
+      eventConfig: '{{ item.eventConfig }}'
+      expires: '{{ item.expires }}'
+      graphqlApi: '{{ item.graphqlApi }}'
+      healthMetricsConfig: '{{ item.healthMetricsConfig }}'
+      id: '{{ item.id }}'
+      mergedApiArn: '{{ item.mergedApiArn }}'
+      name: '{{ item.name }}'
+      ownerContact: '{{ item.ownerContact }}'
+      schema: '{{ item.schema }}'
+      sourceApiArn: '{{ item.sourceApiArn }}'
+      status: '{{ item.status }}'
+      tags: '{{ item.tags }}'
+      transitEncryptionEnabled: '{{ item.transitEncryptionEnabled }}'
+      ttl: '{{ item.ttl }}'
+      type: '{{ item.type }}'
+      wafWebAclArn: '{{ item.wafWebAclArn }}'
+      xrayEnabled: '{{ item.xrayEnabled }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.apis }}'

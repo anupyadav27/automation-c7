@@ -1,0 +1,129 @@
+version: '1.0'
+provider: aws
+service: pi
+services:
+  client: pi
+  module: boto3.client
+discovery:
+- discovery_id: aws.pi.describe_dimension_keys
+  calls:
+  - action: describe_dimension_keys
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PartitionKeys }}'
+    item:
+      AdditionalMetrics: '{{ item.AdditionalMetrics }}'
+      AlignedEndTime: '{{ item.AlignedEndTime }}'
+      AlignedStartTime: '{{ item.AlignedStartTime }}'
+      Dimensions: '{{ item.Dimensions }}'
+      Keys: '{{ item.Keys }}'
+      Partitions: '{{ item.Partitions }}'
+- discovery_id: aws.pi.get_dimension_key_details
+  calls:
+  - action: get_dimension_key_details
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Dimensions }}'
+    item:
+      Status: '{{ item.Status }}'
+      Dimension: '{{ item.Dimension }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.pi.get_performance_analysis_report
+  calls:
+  - action: get_performance_analysis_report
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreateTime: '{{ response.AnalysisReport.CreateTime }}'
+      Status: '{{ response.AnalysisReport.Status }}'
+      AlignedEndTime: '{{ response.AnalysisReport.EndTime }}'
+      AlignedStartTime: '{{ response.AnalysisReport.StartTime }}'
+      AnalysisReportId: '{{ response.AnalysisReport.AnalysisReportId }}'
+      EndTime: '{{ response.AnalysisReport.EndTime }}'
+      Identifier: '{{ response.AnalysisReport.Identifier }}'
+      Insights: '{{ response.AnalysisReport.Insights }}'
+      ServiceType: '{{ response.AnalysisReport.ServiceType }}'
+      StartTime: '{{ response.AnalysisReport.StartTime }}'
+- discovery_id: aws.pi.get_resource_metadata
+  calls:
+  - action: get_resource_metadata
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Features: '{{ response.Features }}'
+      Identifier: '{{ response.Identifier }}'
+- discovery_id: aws.pi.get_resource_metrics
+  calls:
+  - action: get_resource_metrics
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MetricList }}'
+    item:
+      DataPoints: '{{ item.DataPoints }}'
+      Key: '{{ item.Key }}'
+      MetricList: '{{ item.MetricList }}'
+      AlignedEndTime: '{{ response.AlignedEndTime }}'
+      AlignedStartTime: '{{ response.AlignedStartTime }}'
+      Identifier: '{{ response.Identifier }}'
+- discovery_id: aws.pi.list_available_resource_dimensions
+  calls:
+  - action: list_available_resource_dimensions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MetricDimensions }}'
+    item:
+      Groups: '{{ item.Groups }}'
+      Metric: '{{ item.Metric }}'
+- discovery_id: aws.pi.list_available_resource_metrics
+  calls:
+  - action: list_available_resource_metrics
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Metrics }}'
+    item:
+      Description: '{{ item.Description }}'
+      Metric: '{{ item.Metric }}'
+      MetricList: '{{ item.MetricList }}'
+      Unit: '{{ item.Unit }}'
+- discovery_id: aws.pi.list_performance_analysis_reports
+  calls:
+  - action: list_performance_analysis_reports
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AnalysisReports }}'
+    item:
+      CreateTime: '{{ item.CreateTime }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      AlignedEndTime: '{{ item.AlignedEndTime }}'
+      AlignedStartTime: '{{ item.AlignedStartTime }}'
+      AnalysisReportId: '{{ item.AnalysisReportId }}'
+      EndTime: '{{ item.EndTime }}'
+      StartTime: '{{ item.StartTime }}'
+- discovery_id: aws.pi.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

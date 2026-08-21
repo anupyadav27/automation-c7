@@ -1,0 +1,110 @@
+version: '1.0'
+provider: aws
+service: keyspacesstreams
+services:
+  client: keyspacesstreams
+  module: boto3.client
+discovery:
+- discovery_id: aws.keyspacesstreams.list_streams
+  calls:
+  - action: list_streams
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.streams }}'
+    item:
+      changeRecords: '{{ item.changeRecords }}'
+      clusteringKeys: '{{ item.clusteringKeys }}'
+      createdAt: '{{ item.createdAt }}'
+      creationRequestDateTime: '{{ item.creationRequestDateTime }}'
+      eventVersion: '{{ item.eventVersion }}'
+      keyspaceName: '{{ item.keyspaceName }}'
+      newImage: '{{ item.newImage }}'
+      nextShardIterator: '{{ item.nextShardIterator }}'
+      oldImage: '{{ item.oldImage }}'
+      origin: '{{ item.origin }}'
+      parentShardIds: '{{ item.parentShardIds }}'
+      partitionKeys: '{{ item.partitionKeys }}'
+      sequenceNumber: '{{ item.sequenceNumber }}'
+      sequenceNumberRange: '{{ item.sequenceNumberRange }}'
+      shardIterator: '{{ item.shardIterator }}'
+      shards: '{{ item.shards }}'
+      streamArn: '{{ item.streamArn }}'
+      streamLabel: '{{ item.streamLabel }}'
+      streamStatus: '{{ item.streamStatus }}'
+      streamViewType: '{{ item.streamViewType }}'
+      tableName: '{{ item.tableName }}'
+- discovery_id: aws.keyspacesstreams.get_records
+  calls:
+  - action: get_records
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.changeRecords }}'
+    item:
+      changeRecords: '{{ item.changeRecords }}'
+      clusteringKeys: '{{ item.clusteringKeys }}'
+      createdAt: '{{ item.createdAt }}'
+      eventVersion: '{{ item.eventVersion }}'
+      newImage: '{{ item.newImage }}'
+      nextShardIterator: '{{ item.nextShardIterator }}'
+      oldImage: '{{ item.oldImage }}'
+      origin: '{{ item.origin }}'
+      partitionKeys: '{{ item.partitionKeys }}'
+      sequenceNumber: '{{ item.sequenceNumber }}'
+- discovery_id: aws.keyspacesstreams.get_shard_iterator
+  for_each: aws.keyspacesstreams.list_streams
+  calls:
+  - action: get_shard_iterator
+    params:
+      streamArn: '{{ item.streamArn }}'
+      shardId: '{{ item.shardId }}'
+      shardIteratorType: '{{ item.shardIteratorType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      changeRecords: '{{ response.changeRecords }}'
+      clusteringKeys: '{{ response.clusteringKeys }}'
+      createdAt: '{{ response.createdAt }}'
+      eventVersion: '{{ response.eventVersion }}'
+      newImage: '{{ response.newImage }}'
+      nextShardIterator: '{{ response.nextShardIterator }}'
+      oldImage: '{{ response.oldImage }}'
+      origin: '{{ response.origin }}'
+      partitionKeys: '{{ response.partitionKeys }}'
+      sequenceNumber: '{{ response.sequenceNumber }}'
+      shardIterator: '{{ response.shardIterator }}'
+- discovery_id: aws.keyspacesstreams.get_stream
+  for_each: aws.keyspacesstreams.list_streams
+  calls:
+  - action: get_stream
+    params:
+      streamArn: '{{ item.streamArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.shards }}'
+    item:
+      changeRecords: '{{ item.changeRecords }}'
+      clusteringKeys: '{{ item.clusteringKeys }}'
+      createdAt: '{{ item.createdAt }}'
+      creationRequestDateTime: '{{ item.creationRequestDateTime }}'
+      eventVersion: '{{ item.eventVersion }}'
+      newImage: '{{ item.newImage }}'
+      nextShardIterator: '{{ item.nextShardIterator }}'
+      oldImage: '{{ item.oldImage }}'
+      origin: '{{ item.origin }}'
+      parentShardIds: '{{ item.parentShardIds }}'
+      partitionKeys: '{{ item.partitionKeys }}'
+      sequenceNumber: '{{ item.sequenceNumber }}'
+      sequenceNumberRange: '{{ item.sequenceNumberRange }}'
+      shardId: '{{ item.shardId }}'
+      shardIterator: '{{ item.shardIterator }}'
+      shards: '{{ item.shards }}'
+      streamStatus: '{{ item.streamStatus }}'
+      streamViewType: '{{ item.streamViewType }}'

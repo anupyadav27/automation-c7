@@ -1,0 +1,135 @@
+# Auto-generated: minimum discoveries for check rules + inventory + engine requirements
+# Sources: wafv2
+# 8 ops total
+version: '1.0'
+provider: aws
+service: wafv2
+discovery:
+  - calls:
+    - action: get_web_acl
+      on_error: continue
+      save_as: response
+    discovery_id: aws.wafv2.get_web_acl
+    emit:
+      as: item
+      item:
+        ARN: '{{ response.WebACL.ARN }}'
+        ApplicationConfig: '{{ response.WebACL.ApplicationConfig }}'
+        ApplicationIntegrationURL: '{{ response.WebACL.ApplicationIntegrationURL }}'
+        AssociationConfig: '{{ response.WebACL.AssociationConfig }}'
+        Capacity: '{{ response.WebACL.Capacity }}'
+        CaptchaConfig: '{{ response.WebACL.CaptchaConfig }}'
+        ChallengeConfig: '{{ response.WebACL.ChallengeConfig }}'
+        CustomResponseBodies: '{{ response.WebACL.CustomResponseBodies }}'
+        DataProtectionConfig: '{{ response.WebACL.DataProtectionConfig }}'
+        DefaultAction: '{{ response.WebACL.DefaultAction }}'
+        Description: '{{ response.WebACL.Description }}'
+        Id: '{{ response.WebACL.Id }}'
+        LabelNamespace: '{{ response.WebACL.LabelNamespace }}'
+        ManagedByFirewallManager: '{{ response.WebACL.ManagedByFirewallManager }}'
+        Name: '{{ response.WebACL.Name }}'
+        OnSourceDDoSProtectionConfig: '{{ response.WebACL.OnSourceDDoSProtectionConfig
+          }}'
+        PostProcessFirewallManagerRuleGroups: '{{ response.WebACL.PostProcessFirewallManagerRuleGroups
+          }}'
+        PreProcessFirewallManagerRuleGroups: '{{ response.WebACL.PreProcessFirewallManagerRuleGroups
+          }}'
+        RetrofittedByFirewallManager: '{{ response.WebACL.RetrofittedByFirewallManager
+          }}'
+        Rules: '{{ response.WebACL.Rules }}'
+        TokenDomains: '{{ response.WebACL.TokenDomains }}'
+        VisibilityConfig: '{{ response.WebACL.VisibilityConfig }}'
+        WebACL: '{{ response.WebACL.WebACL }}'
+  - calls:
+    - action: list_regex_pattern_sets
+      on_error: continue
+      save_as: response
+    discovery_id: aws.wafv2.list_regex_pattern_sets
+    emit:
+      as: item
+      item:
+        ARN: '{{ item.ARN }}'
+        Description: '{{ item.Description }}'
+        Id: '{{ item.Id }}'
+        LockToken: '{{ item.LockToken }}'
+        Name: '{{ item.Name }}'
+      items_for: '{{ response.RegexPatternSets }}'
+  - calls:
+    - action: list_web_ac_ls
+      on_error: continue
+      save_as: response
+    discovery_id: aws.wafv2.list_web_ac_ls
+    emit:
+      as: item
+      item:
+        ARN: '{{ item.ARN }}'
+        Description: '{{ item.Description }}'
+        Id: '{{ item.Id }}'
+        LockToken: '{{ item.LockToken }}'
+        Name: '{{ item.Name }}'
+      items_for: '{{ response.WebACLs }}'
+  - calls:
+    - action: list_rule_groups
+      on_error: continue
+      save_as: response
+    discovery_id: aws.wafv2.list_rule_groups
+    emit:
+      as: item
+      item:
+        ARN: '{{ item.ARN }}'
+        Description: '{{ item.Description }}'
+        Id: '{{ item.Id }}'
+        LockToken: '{{ item.LockToken }}'
+        Name: '{{ item.Name }}'
+      items_for: '{{ response.RuleGroups }}'
+  - calls:
+    - action: list_ip_sets
+      on_error: continue
+      save_as: response
+    discovery_id: aws.wafv2.list_ip_sets
+    emit:
+      as: item
+      item:
+        ARN: '{{ item.ARN }}'
+        Description: '{{ item.Description }}'
+        Id: '{{ item.Id }}'
+        LockToken: '{{ item.LockToken }}'
+        Name: '{{ item.Name }}'
+      items_for: '{{ response.IPSets }}'
+  - calls:
+    - action: list_logging_configurations
+      on_error: continue
+      save_as: response
+    discovery_id: aws.wafv2.list_logging_configurations
+    emit:
+      as: item
+      item:
+        LogDestinationConfigs: '{{ item.LogDestinationConfigs }}'
+        LogScope: '{{ item.LogScope }}'
+        LogType: '{{ item.LogType }}'
+        LoggingFilter: '{{ item.LoggingFilter }}'
+        ManagedByFirewallManager: '{{ item.ManagedByFirewallManager }}'
+        RedactedFields: '{{ item.RedactedFields }}'
+        ResourceArn: '{{ item.ResourceArn }}'
+      items_for: '{{ response.LoggingConfigurations }}'
+  - calls:
+    - action: list_resources_for_web_acl
+      on_error: continue
+      save_as: response
+    discovery_id: aws.wafv2.list_resources_for_web_acl
+    emit:
+      as: item
+      items_for: '{{ response.ResourceArns }}'
+  - calls:
+    - action: list_available_managed_rule_groups
+      on_error: continue
+      save_as: response
+    discovery_id: aws.wafv2.list_available_managed_rule_groups
+    emit:
+      as: item
+      item:
+        Description: '{{ item.Description }}'
+        Name: '{{ item.Name }}'
+        VendorName: '{{ item.VendorName }}'
+        VersioningSupported: '{{ item.VersioningSupported }}'
+      items_for: '{{ response.ManagedRuleGroups }}'

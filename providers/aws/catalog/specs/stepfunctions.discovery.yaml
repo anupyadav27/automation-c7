@@ -1,0 +1,97 @@
+version: '1.0'
+provider: aws
+service: stepfunctions
+discovery:
+- calls:
+  - action: list_state_machines
+    on_error: continue
+    save_as: response
+  discovery_id: aws.stepfunctions.list_state_machines
+  emit:
+    as: item
+    item:
+      creationDate: '{{ item.creationDate }}'
+      definition: '{{ item.definition }}'
+      description: '{{ item.description }}'
+      label: '{{ item.label }}'
+      name: '{{ item.name }}'
+      stateMachineArn: '{{ item.stateMachineArn }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.stateMachines }}'
+- calls:
+  - action: list_executions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.stepfunctions.list_executions
+  emit:
+    as: item
+    item:
+      cause: '{{ item.cause }}'
+      error: '{{ item.error }}'
+      executionArn: '{{ item.executionArn }}'
+      inputDetails: '{{ item.inputDetails }}'
+      itemCount: '{{ item.itemCount }}'
+      mapRunArn: '{{ item.mapRunArn }}'
+      name: '{{ item.name }}'
+      output: '{{ item.output }}'
+      outputDetails: '{{ item.outputDetails }}'
+      redriveCount: '{{ item.redriveCount }}'
+      redriveDate: '{{ item.redriveDate }}'
+      startDate: '{{ item.startDate }}'
+      stateMachineAliasArn: '{{ item.stateMachineAliasArn }}'
+      stateMachineArn: '{{ item.stateMachineArn }}'
+      stateMachineVersionArn: '{{ item.stateMachineVersionArn }}'
+      status: '{{ item.status }}'
+      stopDate: '{{ item.stopDate }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.executions }}'
+- calls:
+  - action: describe_state_machine
+    on_error: continue
+    params:
+      stateMachineArn: '{{ item.stateMachineArn }}'
+    save_as: response
+  discovery_id: aws.stepfunctions.describe_state_machine
+  emit:
+    as: item
+    item:
+      creationDate: '{{ response.creationDate }}'
+      definition: '{{ response.loggingConfiguration.definition }}'
+      description: '{{ response.loggingConfiguration.description }}'
+      destinations: '{{ response.loggingConfiguration.destinations }}'
+      encryptionConfiguration: '{{ response.encryptionConfiguration.type }}'
+      includeExecutionData: '{{ response.loggingConfiguration.includeExecutionData }}'
+      label: '{{ response.loggingConfiguration.level }}'
+      level: '{{ response.loggingConfiguration.level }}'
+      loggingConfiguration: '{{ response.loggingConfiguration.loggingConfiguration }}'
+      name: '{{ response.name }}'
+      revisionId: '{{ response.revisionId }}'
+      roleArn: '{{ response.roleArn }}'
+      stateMachineArn: '{{ response.stateMachineArn }}'
+      status: '{{ response.status }}'
+      tracingConfiguration: '{{ response.loggingConfiguration.tracingConfiguration }}'
+      type: '{{ response.type }}'
+      variableReferences: '{{ response.variableReferences }}'
+      kmsDataKeyReusePeriodSeconds: '{{ response.encryptionConfiguration.kmsDataKeyReusePeriodSeconds }}'
+      kmsKeyId: '{{ response.encryptionConfiguration.kmsKeyId }}'
+      enabled: '{{ response.tracingConfiguration.enabled }}'
+  for_each: aws.stepfunctions.list_state_machines
+- calls:
+  - action: list_activities
+    on_error: continue
+    save_as: response
+  discovery_id: aws.stepfunctions.list_activities
+  emit:
+    as: item
+    item:
+      activityArn: '{{ item.activityArn }}'
+      creationDate: '{{ item.creationDate }}'
+      encryptionConfiguration: '{{ item.encryptionConfiguration }}'
+      input: '{{ item.input }}'
+      kmsDataKeyReusePeriodSeconds: '{{ item.kmsDataKeyReusePeriodSeconds }}'
+      kmsKeyId: '{{ item.kmsKeyId }}'
+      name: '{{ item.name }}'
+      taskToken: '{{ item.taskToken }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.activities }}'

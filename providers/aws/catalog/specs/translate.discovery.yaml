@@ -1,0 +1,106 @@
+version: '1.0'
+provider: aws
+service: translate
+discovery:
+- calls:
+  - action: list_languages
+    on_error: continue
+    save_as: response
+  discovery_id: aws.translate.list_languages
+  emit:
+    as: item
+    item:
+      LanguageCode: '{{ item.LanguageCode }}'
+      LanguageName: '{{ item.LanguageName }}'
+      DisplayLanguageCode: '{{ response.DisplayLanguageCode }}'
+    items_for: '{{ response.Languages }}'
+- calls:
+  - action: list_parallel_data
+    on_error: continue
+    save_as: response
+  discovery_id: aws.translate.list_parallel_data
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Description: '{{ item.Description }}'
+      EncryptionKey: '{{ item.EncryptionKey }}'
+      FailedRecordCount: '{{ item.FailedRecordCount }}'
+      ImportedDataSize: '{{ item.ImportedDataSize }}'
+      ImportedRecordCount: '{{ item.ImportedRecordCount }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      LatestUpdateAttemptAt: '{{ item.LatestUpdateAttemptAt }}'
+      LatestUpdateAttemptStatus: '{{ item.LatestUpdateAttemptStatus }}'
+      Message: '{{ item.Message }}'
+      Name: '{{ item.Name }}'
+      ParallelDataConfig: '{{ item.ParallelDataConfig }}'
+      ParallelDataProperties: '{{ item.ParallelDataProperties }}'
+      SkippedRecordCount: '{{ item.SkippedRecordCount }}'
+      SourceLanguageCode: '{{ item.SourceLanguageCode }}'
+      Status: '{{ item.Status }}'
+      TargetLanguageCodes: '{{ item.TargetLanguageCodes }}'
+    items_for: '{{ response.ParallelDataPropertiesList }}'
+- calls:
+  - action: list_terminologies
+    on_error: continue
+    save_as: response
+  discovery_id: aws.translate.list_terminologies
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Description: '{{ item.Description }}'
+      Directionality: '{{ item.Directionality }}'
+      EncryptionKey: '{{ item.EncryptionKey }}'
+      Format: '{{ item.Format }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      Message: '{{ item.Message }}'
+      Name: '{{ item.Name }}'
+      SizeBytes: '{{ item.SizeBytes }}'
+      SkippedTermCount: '{{ item.SkippedTermCount }}'
+      SourceLanguageCode: '{{ item.SourceLanguageCode }}'
+      TargetLanguageCodes: '{{ item.TargetLanguageCodes }}'
+      TermCount: '{{ item.TermCount }}'
+      TerminologyProperties: '{{ item.TerminologyProperties }}'
+    items_for: '{{ response.TerminologyPropertiesList }}'
+- calls:
+  - action: list_text_translation_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.translate.list_text_translation_jobs
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      DestinationArn: '{{ item.DestinationArn }}'
+      Enabled: '{{ item.Enabled }}'
+      EndTime: '{{ item.EndTime }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobDetails: '{{ item.JobDetails }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      Level: '{{ item.Level }}'
+      Message: '{{ item.Message }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      ParallelDataNames: '{{ item.ParallelDataNames }}'
+      Settings: '{{ item.Settings }}'
+      SourceLanguageCode: '{{ item.SourceLanguageCode }}'
+      SubmittedTime: '{{ item.SubmittedTime }}'
+      TargetLanguageCodes: '{{ item.TargetLanguageCodes }}'
+      TerminologyNames: '{{ item.TerminologyNames }}'
+      TextTranslationJobProperties: '{{ item.TextTranslationJobProperties }}'
+    items_for: '{{ response.TextTranslationJobPropertiesList }}'
+- calls:
+  - action: list_tags_for_resource
+    on_error: continue
+    save_as: response
+  discovery_id: aws.translate.list_tags_for_resource
+  emit:
+    as: item
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+    items_for: '{{ response.Tags }}'

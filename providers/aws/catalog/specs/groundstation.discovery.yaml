@@ -1,0 +1,331 @@
+version: '1.0'
+provider: aws
+service: groundstation
+services:
+  client: groundstation
+  module: boto3.client
+discovery:
+- discovery_id: aws.groundstation.list_configs
+  calls:
+  - action: list_configs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.configList }}'
+    item:
+      antennaDownlinkConfig: '{{ item.antennaDownlinkConfig }}'
+      antennaDownlinkDemodDecodeConfig: '{{ item.antennaDownlinkDemodDecodeConfig }}'
+      antennaUplinkConfig: '{{ item.antennaUplinkConfig }}'
+      configArn: '{{ item.configArn }}'
+      configData: '{{ item.configData }}'
+      configId: '{{ item.configId }}'
+      configType: '{{ item.configType }}'
+      dataflowEndpointConfig: '{{ item.dataflowEndpointConfig }}'
+      name: '{{ item.name }}'
+      s3RecordingConfig: '{{ item.s3RecordingConfig }}'
+      trackingConfig: '{{ item.trackingConfig }}'
+      trackingConfigArn: '{{ item.trackingConfigArn }}'
+      uplinkEchoConfig: '{{ item.uplinkEchoConfig }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.groundstation.list_dataflow_endpoint_groups
+  calls:
+  - action: list_dataflow_endpoint_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dataflowEndpointGroupList }}'
+    item:
+      dataflowEndpointGroupArn: '{{ item.dataflowEndpointGroupArn }}'
+      dataflowEndpointGroupId: '{{ item.dataflowEndpointGroupId }}'
+      endpointsDetails: '{{ item.endpointsDetails }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.groundstation.list_ground_stations
+  calls:
+  - action: list_ground_stations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.groundStationList }}'
+    item:
+      groundStationId: '{{ item.groundStationId }}'
+      groundStationName: '{{ item.groundStationName }}'
+      region: '{{ item.region }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.groundstation.list_mission_profiles
+  calls:
+  - action: list_mission_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.missionProfileList }}'
+    item:
+      missionProfileArn: '{{ item.missionProfileArn }}'
+      missionProfileId: '{{ item.missionProfileId }}'
+      name: '{{ item.name }}'
+      region: '{{ item.region }}'
+      trackingConfigArn: '{{ item.trackingConfigArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.groundstation.list_satellites
+  calls:
+  - action: list_satellites
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.satellites }}'
+    item:
+      currentEphemeris: '{{ item.currentEphemeris }}'
+      groundStations: '{{ item.groundStations }}'
+      noradSatelliteID: '{{ item.noradSatelliteID }}'
+      satelliteArn: '{{ item.satelliteArn }}'
+      satelliteId: '{{ item.satelliteId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.groundstation.describe_contact
+  calls:
+  - action: describe_contact
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dataflowList }}'
+    item:
+      destination: '{{ item.destination }}'
+      errorMessage: '{{ item.errorMessage }}'
+      source: '{{ item.source }}'
+      contactId: '{{ response.contactId }}'
+      contactStatus: '{{ response.contactStatus }}'
+      endTime: '{{ response.endTime }}'
+      groundStation: '{{ response.groundStation }}'
+      unit: '{{ response.maximumElevation.unit }}'
+      value: '{{ response.maximumElevation.value }}'
+      missionProfileArn: '{{ response.missionProfileArn }}'
+      postPassEndTime: '{{ response.postPassEndTime }}'
+      prePassStartTime: '{{ response.prePassStartTime }}'
+      region: '{{ response.region }}'
+      satelliteArn: '{{ response.satelliteArn }}'
+      startTime: '{{ response.startTime }}'
+      tags: '{{ response.tags }}'
+      visibilityEndTime: '{{ response.visibilityEndTime }}'
+      visibilityStartTime: '{{ response.visibilityStartTime }}'
+- discovery_id: aws.groundstation.describe_ephemeris
+  calls:
+  - action: describe_ephemeris
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.errorReasons }}'
+    item:
+      errorCode: '{{ item.errorCode }}'
+      errorMessage: '{{ item.errorMessage }}'
+      creationTime: '{{ response.creationTime }}'
+      enabled: '{{ response.enabled }}'
+      ephemerisId: '{{ response.ephemerisId }}'
+      invalidReason: '{{ response.invalidReason }}'
+      name: '{{ response.name }}'
+      priority: '{{ response.priority }}'
+      satelliteId: '{{ response.satelliteId }}'
+      status: '{{ response.status }}'
+      ephemerisData: '{{ response.suppliedData.oem.ephemerisData }}'
+      bucket: '{{ response.suppliedData.oem.sourceS3Object.bucket }}'
+      key: '{{ response.suppliedData.oem.sourceS3Object.key }}'
+      version: '{{ response.suppliedData.oem.sourceS3Object.version }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.groundstation.get_agent_configuration
+  calls:
+  - action: get_agent_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      agentId: '{{ response.agentId }}'
+      taskingDocument: '{{ response.taskingDocument }}'
+- discovery_id: aws.groundstation.get_agent_task_response_url
+  calls:
+  - action: get_agent_task_response_url
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      agentId: '{{ response.agentId }}'
+      presignedLogUrl: '{{ response.presignedLogUrl }}'
+      taskId: '{{ response.taskId }}'
+- discovery_id: aws.groundstation.get_config
+  for_each: aws.groundstation.list_configs
+  calls:
+  - action: get_config
+    params:
+      configId: '{{ item.configId }}'
+      configType: '{{ item.configType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      antennaDownlinkConfig: '{{ response.configData.antennaDownlinkConfig }}'
+      antennaDownlinkDemodDecodeConfig: '{{ response.configData.antennaDownlinkDemodDecodeConfig }}'
+      antennaUplinkConfig: '{{ response.configData.antennaUplinkConfig }}'
+      configData: '{{ response.configData.configData }}'
+      dataflowEndpointConfig: '{{ response.configData.dataflowEndpointConfig }}'
+      s3RecordingConfig: '{{ response.configData.s3RecordingConfig.prefix }}'
+      trackingConfig: '{{ response.configData.trackingConfig }}'
+      uplinkEchoConfig: '{{ response.configData.uplinkEchoConfig.enabled }}'
+      configArn: '{{ response.configArn }}'
+      units: '{{ response.configData.antennaDownlinkConfig.spectrumConfig.bandwidth.units }}'
+      value: '{{ response.configData.antennaDownlinkConfig.spectrumConfig.bandwidth.value }}'
+      polarization: '{{ response.configData.antennaDownlinkConfig.spectrumConfig.polarization }}'
+      unvalidatedJSON: '{{ response.configData.antennaDownlinkDemodDecodeConfig.decodeConfig.unvalidatedJSON }}'
+      transmitDisabled: '{{ response.configData.antennaUplinkConfig.transmitDisabled }}'
+      dataflowEndpointName: '{{ response.configData.dataflowEndpointConfig.dataflowEndpointName }}'
+      dataflowEndpointRegion: '{{ response.configData.dataflowEndpointConfig.dataflowEndpointRegion }}'
+      bucketArn: '{{ response.configData.s3RecordingConfig.bucketArn }}'
+      prefix: '{{ response.configData.s3RecordingConfig.prefix }}'
+      roleArn: '{{ response.configData.s3RecordingConfig.roleArn }}'
+      autotrack: '{{ response.configData.trackingConfig.autotrack }}'
+      antennaUplinkConfigArn: '{{ response.configData.uplinkEchoConfig.antennaUplinkConfigArn }}'
+      enabled: '{{ response.configData.uplinkEchoConfig.enabled }}'
+      configId: '{{ response.configId }}'
+      configType: '{{ response.configType }}'
+      name: '{{ response.name }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.groundstation.get_dataflow_endpoint_group
+  for_each: aws.groundstation.list_dataflow_endpoint_groups
+  calls:
+  - action: get_dataflow_endpoint_group
+    params:
+      dataflowEndpointGroupId: '{{ item.dataflowEndpointGroupId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.endpointsDetails }}'
+    item:
+      awsGroundStationAgentEndpoint: '{{ item.awsGroundStationAgentEndpoint }}'
+      downlinkAwsGroundStationAgentEndpoint: '{{ item.downlinkAwsGroundStationAgentEndpoint }}'
+      endpoint: '{{ item.endpoint }}'
+      endpointsDetails: '{{ item.endpointsDetails }}'
+      healthReasons: '{{ item.healthReasons }}'
+      healthStatus: '{{ item.healthStatus }}'
+      securityDetails: '{{ item.securityDetails }}'
+      uplinkAwsGroundStationAgentEndpoint: '{{ item.uplinkAwsGroundStationAgentEndpoint }}'
+      contactPostPassDurationSeconds: '{{ response.contactPostPassDurationSeconds }}'
+      contactPrePassDurationSeconds: '{{ response.contactPrePassDurationSeconds }}'
+      dataflowEndpointGroupArn: '{{ response.dataflowEndpointGroupArn }}'
+      dataflowEndpointGroupId: '{{ response.dataflowEndpointGroupId }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.groundstation.get_minute_usage
+  calls:
+  - action: get_minute_usage
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      estimatedMinutesRemaining: '{{ response.estimatedMinutesRemaining }}'
+      isReservedMinutesCustomer: '{{ response.isReservedMinutesCustomer }}'
+      totalReservedMinuteAllocation: '{{ response.totalReservedMinuteAllocation }}'
+      totalScheduledMinutes: '{{ response.totalScheduledMinutes }}'
+      upcomingMinutesScheduled: '{{ response.upcomingMinutesScheduled }}'
+- discovery_id: aws.groundstation.get_mission_profile
+  for_each: aws.groundstation.list_mission_profiles
+  calls:
+  - action: get_mission_profile
+    params:
+      missionProfileId: '{{ item.missionProfileId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dataflowEdges }}'
+    item:
+      trackingConfigArn: '{{ item.trackingConfigArn }}'
+      contactPostPassDurationSeconds: '{{ response.contactPostPassDurationSeconds }}'
+      contactPrePassDurationSeconds: '{{ response.contactPrePassDurationSeconds }}'
+      minimumViableContactDurationSeconds: '{{ response.minimumViableContactDurationSeconds }}'
+      missionProfileArn: '{{ response.missionProfileArn }}'
+      missionProfileId: '{{ response.missionProfileId }}'
+      name: '{{ response.name }}'
+      region: '{{ response.region }}'
+      kmsAliasArn: '{{ response.streamsKmsKey.kmsAliasArn }}'
+      kmsAliasName: '{{ response.streamsKmsKey.kmsAliasName }}'
+      kmsKeyArn: '{{ response.streamsKmsKey.kmsKeyArn }}'
+      streamsKmsRole: '{{ response.streamsKmsRole }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.groundstation.get_satellite
+  for_each: aws.groundstation.list_satellites
+  calls:
+  - action: get_satellite
+    params:
+      satelliteId: '{{ item.satelliteId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.groundStations }}'
+    item:
+      ephemerisId: '{{ response.currentEphemeris.ephemerisId }}'
+      epoch: '{{ response.currentEphemeris.epoch }}'
+      name: '{{ response.currentEphemeris.name }}'
+      source: '{{ response.currentEphemeris.source }}'
+      noradSatelliteID: '{{ response.noradSatelliteID }}'
+      satelliteArn: '{{ response.satelliteArn }}'
+      satelliteId: '{{ response.satelliteId }}'
+- discovery_id: aws.groundstation.list_contacts
+  calls:
+  - action: list_contacts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.contactList }}'
+    item:
+      contactId: '{{ item.contactId }}'
+      contactStatus: '{{ item.contactStatus }}'
+      endTime: '{{ item.endTime }}'
+      ephemeris: '{{ item.ephemeris }}'
+      errorMessage: '{{ item.errorMessage }}'
+      groundStation: '{{ item.groundStation }}'
+      maximumElevation: '{{ item.maximumElevation }}'
+      missionProfileArn: '{{ item.missionProfileArn }}'
+      postPassEndTime: '{{ item.postPassEndTime }}'
+      prePassStartTime: '{{ item.prePassStartTime }}'
+      region: '{{ item.region }}'
+      satelliteArn: '{{ item.satelliteArn }}'
+      startTime: '{{ item.startTime }}'
+      tags: '{{ item.tags }}'
+      visibilityEndTime: '{{ item.visibilityEndTime }}'
+      visibilityStartTime: '{{ item.visibilityStartTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.groundstation.list_ephemerides
+  calls:
+  - action: list_ephemerides
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ephemerides }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      enabled: '{{ item.enabled }}'
+      ephemerisId: '{{ item.ephemerisId }}'
+      ephemerisType: '{{ item.ephemerisType }}'
+      name: '{{ item.name }}'
+      priority: '{{ item.priority }}'
+      sourceS3Object: '{{ item.sourceS3Object }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.groundstation.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

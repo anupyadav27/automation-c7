@@ -1,0 +1,774 @@
+version: '1.0'
+provider: aws
+service: sesv2
+services:
+  client: sesv2
+  module: boto3.client
+discovery:
+- discovery_id: aws.sesv2.get_account
+  calls:
+  - action: get_account
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DedicatedIpAutoWarmupEnabled: '{{ response.DedicatedIpAutoWarmupEnabled }}'
+      EnforcementStatus: '{{ response.EnforcementStatus }}'
+      Max24HourSend: '{{ response.Max24HourSend }}'
+      MaxSendRate: '{{ response.MaxSendRate }}'
+      ProductionAccessEnabled: '{{ response.ProductionAccessEnabled }}'
+      SendQuota: '{{ response.SendQuota }}'
+      SentLast24Hours: '{{ response.SentLast24Hours }}'
+      SuppressionAttributes: '{{ response.SuppressionAttributes }}'
+      ContactLanguage: '{{ response.Details.ContactLanguage }}'
+      MailType: '{{ response.Details.MailType }}'
+      CaseId: '{{ response.Details.ReviewDetails.CaseId }}'
+      Status: '{{ response.Details.ReviewDetails.Status }}'
+      UseCaseDescription: '{{ response.Details.UseCaseDescription }}'
+      WebsiteURL: '{{ response.Details.WebsiteURL }}'
+      SendingEnabled: '{{ response.SendingEnabled }}'
+      EngagementMetrics: '{{ response.VdmAttributes.DashboardAttributes.EngagementMetrics
+        }}'
+      OptimizedSharedDelivery: '{{ response.VdmAttributes.GuardianAttributes.OptimizedSharedDelivery
+        }}'
+      VdmEnabled: '{{ response.VdmAttributes.VdmEnabled }}'
+- discovery_id: aws.sesv2.get_dedicated_ips
+  calls:
+  - action: get_dedicated_ips
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DedicatedIps }}'
+    item:
+      DedicatedIpPool: '{{ item.DedicatedIpPool }}'
+      DedicatedIps: '{{ item.DedicatedIps }}'
+      Ip: '{{ item.Ip }}'
+      PoolName: '{{ item.PoolName }}'
+      ScalingMode: '{{ item.ScalingMode }}'
+      WarmupPercentage: '{{ item.WarmupPercentage }}'
+      WarmupStatus: '{{ item.WarmupStatus }}'
+- discovery_id: aws.sesv2.get_deliverability_dashboard_options
+  calls:
+  - action: get_deliverability_dashboard_options
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ActiveSubscribedDomains }}'
+    item:
+      AccountStatus: '{{ item.AccountStatus }}'
+      ActiveSubscribedDomains: '{{ item.ActiveSubscribedDomains }}'
+      DashboardEnabled: '{{ item.DashboardEnabled }}'
+      Domain: '{{ item.Domain }}'
+      InboxPlacementTrackingOption: '{{ item.InboxPlacementTrackingOption }}'
+      PendingExpirationSubscribedDomains: '{{ item.PendingExpirationSubscribedDomains[].Domain
+        }}'
+      SubscriptionExpiryDate: '{{ item.SubscriptionExpiryDate }}'
+      SubscriptionStartDate: '{{ item.SubscriptionStartDate }}'
+- discovery_id: aws.sesv2.list_configuration_sets
+  calls:
+  - action: list_configuration_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ConfigurationSets }}'
+- discovery_id: aws.sesv2.list_contact_lists
+  calls:
+  - action: list_contact_lists
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ContactLists }}'
+    item:
+      ContactListName: '{{ item.ContactListName }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+      Topics: '{{ item.Topics }}'
+- discovery_id: aws.sesv2.list_custom_verification_email_templates
+  calls:
+  - action: list_custom_verification_email_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CustomVerificationEmailTemplates }}'
+    item:
+      FailureRedirectionURL: '{{ item.FailureRedirectionURL }}'
+      FromEmailAddress: '{{ item.FromEmailAddress }}'
+      SuccessRedirectionURL: '{{ item.SuccessRedirectionURL }}'
+      TemplateName: '{{ item.TemplateName }}'
+      TemplateSubject: '{{ item.TemplateSubject }}'
+- discovery_id: aws.sesv2.list_dedicated_ip_pools
+  calls:
+  - action: list_dedicated_ip_pools
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DedicatedIpPools }}'
+    item:
+      DedicatedIpPool: '{{ item.DedicatedIpPool }}'
+- discovery_id: aws.sesv2.list_deliverability_test_reports
+  calls:
+  - action: list_deliverability_test_reports
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DeliverabilityTestReports }}'
+    item:
+      CreateDate: '{{ item.CreateDate }}'
+      DeliverabilityTestStatus: '{{ item.DeliverabilityTestStatus }}'
+      FromEmailAddress: '{{ item.FromEmailAddress }}'
+      IspPlacements: '{{ item.IspPlacements }}'
+      ReportId: '{{ item.ReportId }}'
+      ReportName: '{{ item.ReportName }}'
+      Subject: '{{ item.Subject }}'
+- discovery_id: aws.sesv2.list_email_identities
+  calls:
+  - action: list_email_identities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EmailIdentities }}'
+    item:
+      IdentityName: '{{ item.IdentityName }}'
+      IdentityType: '{{ item.IdentityType }}'
+      SendingEnabled: '{{ item.SendingEnabled }}'
+      VerificationStatus: '{{ item.VerificationStatus }}'
+- discovery_id: aws.sesv2.list_email_templates
+  calls:
+  - action: list_email_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TemplatesMetadata }}'
+    item:
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      TemplateName: '{{ item.TemplateName }}'
+- discovery_id: aws.sesv2.list_export_jobs
+  calls:
+  - action: list_export_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ExportJobs }}'
+    item:
+      CompletedTimestamp: '{{ item.CompletedTimestamp }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      ExportSourceType: '{{ item.ExportSourceType }}'
+      JobId: '{{ item.JobId }}'
+      JobStatus: '{{ item.JobStatus }}'
+- discovery_id: aws.sesv2.list_import_jobs
+  calls:
+  - action: list_import_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ImportJobs }}'
+    item:
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      FailedRecordsCount: '{{ item.FailedRecordsCount }}'
+      ImportDestination: '{{ item.ImportDestination }}'
+      JobId: '{{ item.JobId }}'
+      JobStatus: '{{ item.JobStatus }}'
+      ProcessedRecordsCount: '{{ item.ProcessedRecordsCount }}'
+- discovery_id: aws.sesv2.list_multi_region_endpoints
+  calls:
+  - action: list_multi_region_endpoints
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MultiRegionEndpoints }}'
+    item:
+      Region: '{{ item.Region }}'
+      Status: '{{ item.Status }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      EndpointId: '{{ item.EndpointId }}'
+      EndpointName: '{{ item.EndpointName }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+      Regions: '{{ item.Regions }}'
+      Routes: '{{ item.Routes }}'
+- discovery_id: aws.sesv2.list_recommendations
+  calls:
+  - action: list_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Recommendations }}'
+    item:
+      ResourceArn: '{{ item.ResourceArn }}'
+      Status: '{{ item.Status }}'
+      AssociatedTimestamp: '{{ item.AssociatedTimestamp }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      Description: '{{ item.Description }}'
+      Impact: '{{ item.Impact }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.sesv2.list_reputation_entities
+  calls:
+  - action: list_reputation_entities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ReputationEntities }}'
+    item:
+      AwsSesManagedStatus: '{{ item.AwsSesManagedStatus }}'
+      CustomerManagedStatus: '{{ item.CustomerManagedStatus }}'
+      ReputationEntity: '{{ item.ReputationEntity }}'
+      ReputationEntityReference: '{{ item.ReputationEntityReference }}'
+      ReputationEntityType: '{{ item.ReputationEntityType }}'
+      ReputationImpact: '{{ item.ReputationImpact }}'
+      ReputationManagementPolicy: '{{ item.ReputationManagementPolicy }}'
+      SendingStatusAggregate: '{{ item.SendingStatusAggregate }}'
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.sesv2.list_suppressed_destinations
+  calls:
+  - action: list_suppressed_destinations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SuppressedDestinationSummaries }}'
+    item:
+      EmailAddress: '{{ item.EmailAddress }}'
+      LastUpdateTime: '{{ item.LastUpdateTime }}'
+      Reason: '{{ item.Reason }}'
+- discovery_id: aws.sesv2.list_tenants
+  calls:
+  - action: list_tenants
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tenants }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      ResourceType: '{{ item.ResourceType }}'
+      SendingStatus: '{{ item.SendingStatus }}'
+      Tenant: '{{ item.Tenant }}'
+      TenantArn: '{{ item.TenantArn }}'
+      TenantId: '{{ item.TenantId }}'
+      TenantName: '{{ item.TenantName }}'
+- discovery_id: aws.sesv2.get_blacklist_reports
+  calls:
+  - action: get_blacklist_reports
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      BlacklistReport: '{{ response.BlacklistReport }}'
+- discovery_id: aws.sesv2.get_configuration_set
+  calls:
+  - action: get_configuration_set
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+      ArchiveArn: '{{ response.ArchivingOptions.ArchiveArn }}'
+      ConfigurationSetName: '{{ response.ConfigurationSetName }}'
+      MaxDeliverySeconds: '{{ response.DeliveryOptions.MaxDeliverySeconds }}'
+      SendingPoolName: '{{ response.DeliveryOptions.SendingPoolName }}'
+      TlsPolicy: '{{ response.DeliveryOptions.TlsPolicy }}'
+      LastFreshStart: '{{ response.ReputationOptions.LastFreshStart }}'
+      ReputationMetricsEnabled: '{{ response.ReputationOptions.ReputationMetricsEnabled
+        }}'
+      SendingEnabled: '{{ response.SendingOptions.SendingEnabled }}'
+      CustomRedirectDomain: '{{ response.TrackingOptions.CustomRedirectDomain }}'
+      HttpsPolicy: '{{ response.TrackingOptions.HttpsPolicy }}'
+      EngagementMetrics: '{{ response.VdmOptions.DashboardOptions.EngagementMetrics
+        }}'
+      OptimizedSharedDelivery: '{{ response.VdmOptions.GuardianOptions.OptimizedSharedDelivery
+        }}'
+- discovery_id: aws.sesv2.get_configuration_set_event_destinations
+  calls:
+  - action: get_configuration_set_event_destinations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EventDestinations }}'
+    item:
+      Name: '{{ item.Name }}'
+      CloudWatchDestination: '{{ item.CloudWatchDestination }}'
+      Enabled: '{{ item.Enabled }}'
+      EventBridgeDestination: '{{ item.EventBridgeDestination }}'
+      KinesisFirehoseDestination: '{{ item.KinesisFirehoseDestination }}'
+      MatchingEventTypes: '{{ item.MatchingEventTypes }}'
+      PinpointDestination: '{{ item.PinpointDestination }}'
+      SnsDestination: '{{ item.SnsDestination }}'
+- discovery_id: aws.sesv2.get_contact
+  for_each: aws.sesv2.list_contact_lists
+  calls:
+  - action: get_contact
+    params:
+      ContactListName: '{{ item.ContactListName }}'
+      EmailAddress: '{{ item.EmailAddress }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TopicPreferences }}'
+    item:
+      SubscriptionStatus: '{{ item.SubscriptionStatus }}'
+      TopicName: '{{ item.TopicName }}'
+      AttributesData: '{{ response.AttributesData }}'
+      ContactListName: '{{ response.ContactListName }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+      EmailAddress: '{{ response.EmailAddress }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+      UnsubscribeAll: '{{ response.UnsubscribeAll }}'
+- discovery_id: aws.sesv2.get_contact_list
+  for_each: aws.sesv2.list_contact_lists
+  calls:
+  - action: get_contact_list
+    params:
+      ContactListName: '{{ item.ContactListName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Topics }}'
+    item:
+      DefaultSubscriptionStatus: '{{ item.DefaultSubscriptionStatus }}'
+      Description: '{{ item.Description }}'
+      DisplayName: '{{ item.DisplayName }}'
+      TopicName: '{{ item.TopicName }}'
+      Topics: '{{ item.Topics }}'
+      ContactListName: '{{ response.ContactListName }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+- discovery_id: aws.sesv2.get_custom_verification_email_template
+  for_each: aws.sesv2.list_custom_verification_email_templates
+  calls:
+  - action: get_custom_verification_email_template
+    params:
+      TemplateName: '{{ item.TemplateName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      FailureRedirectionURL: '{{ response.FailureRedirectionURL }}'
+      FromEmailAddress: '{{ response.FromEmailAddress }}'
+      SuccessRedirectionURL: '{{ response.SuccessRedirectionURL }}'
+      TemplateContent: '{{ response.TemplateContent }}'
+      TemplateName: '{{ response.TemplateName }}'
+      TemplateSubject: '{{ response.TemplateSubject }}'
+- discovery_id: aws.sesv2.get_dedicated_ip
+  for_each: aws.sesv2.get_dedicated_ips
+  calls:
+  - action: get_dedicated_ip
+    params:
+      Ip: '{{ item.Ip }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Ip: '{{ response.DedicatedIp.Ip }}'
+      PoolName: '{{ response.DedicatedIp.PoolName }}'
+      WarmupPercentage: '{{ response.DedicatedIp.WarmupPercentage }}'
+      WarmupStatus: '{{ response.DedicatedIp.WarmupStatus }}'
+- discovery_id: aws.sesv2.get_dedicated_ip_pool
+  for_each: aws.sesv2.get_dedicated_ips
+  calls:
+  - action: get_dedicated_ip_pool
+    params:
+      PoolName: '{{ item.PoolName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DedicatedIpPool: '{{ response.DedicatedIpPool.DedicatedIpPool }}'
+      PoolName: '{{ response.DedicatedIpPool.PoolName }}'
+      ScalingMode: '{{ response.DedicatedIpPool.ScalingMode }}'
+- discovery_id: aws.sesv2.get_deliverability_test_report
+  for_each: aws.sesv2.list_deliverability_test_reports
+  calls:
+  - action: get_deliverability_test_report
+    params:
+      ReportId: '{{ item.ReportId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.IspPlacements }}'
+    item:
+      IspName: '{{ item.IspName }}'
+      IspPlacements: '{{ item.IspPlacements }}'
+      PlacementStatistics: '{{ item.PlacementStatistics }}'
+      CreateDate: '{{ response.DeliverabilityTestReport.CreateDate }}'
+      DeliverabilityTestStatus: '{{ response.DeliverabilityTestReport.DeliverabilityTestStatus
+        }}'
+      FromEmailAddress: '{{ response.DeliverabilityTestReport.FromEmailAddress }}'
+      ReportId: '{{ response.DeliverabilityTestReport.ReportId }}'
+      ReportName: '{{ response.DeliverabilityTestReport.ReportName }}'
+      Subject: '{{ response.DeliverabilityTestReport.Subject }}'
+      Message: '{{ response.Message }}'
+      DkimPercentage: '{{ response.OverallPlacement.DkimPercentage }}'
+      InboxPercentage: '{{ response.OverallPlacement.InboxPercentage }}'
+      MissingPercentage: '{{ response.OverallPlacement.MissingPercentage }}'
+      SpamPercentage: '{{ response.OverallPlacement.SpamPercentage }}'
+      SpfPercentage: '{{ response.OverallPlacement.SpfPercentage }}'
+- discovery_id: aws.sesv2.get_domain_deliverability_campaign
+  calls:
+  - action: get_domain_deliverability_campaign
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CampaignId: '{{ response.DomainDeliverabilityCampaign.CampaignId }}'
+      DeleteRate: '{{ response.DomainDeliverabilityCampaign.DeleteRate }}'
+      Esps: '{{ response.DomainDeliverabilityCampaign.Esps }}'
+      FirstSeenDateTime: '{{ response.DomainDeliverabilityCampaign.FirstSeenDateTime
+        }}'
+      FromAddress: '{{ response.DomainDeliverabilityCampaign.FromAddress }}'
+      ImageUrl: '{{ response.DomainDeliverabilityCampaign.ImageUrl }}'
+      InboxCount: '{{ response.DomainDeliverabilityCampaign.InboxCount }}'
+      LastSeenDateTime: '{{ response.DomainDeliverabilityCampaign.LastSeenDateTime
+        }}'
+      ProjectedVolume: '{{ response.DomainDeliverabilityCampaign.ProjectedVolume }}'
+      ReadDeleteRate: '{{ response.DomainDeliverabilityCampaign.ReadDeleteRate }}'
+      ReadRate: '{{ response.DomainDeliverabilityCampaign.ReadRate }}'
+      SendingIps: '{{ response.DomainDeliverabilityCampaign.SendingIps }}'
+      SpamCount: '{{ response.DomainDeliverabilityCampaign.SpamCount }}'
+      Subject: '{{ response.DomainDeliverabilityCampaign.Subject }}'
+- discovery_id: aws.sesv2.get_domain_statistics_report
+  for_each: aws.sesv2.get_deliverability_dashboard_options
+  calls:
+  - action: get_domain_statistics_report
+    params:
+      Domain: '{{ item.Domain }}'
+      StartDate: '{{ item.StartDate }}'
+      EndDate: '{{ item.EndDate }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DailyVolumes }}'
+    item:
+      DomainIspPlacements: '{{ item.DomainIspPlacements }}'
+      IspPlacements: '{{ item.IspPlacements }}'
+      StartDate: '{{ item.StartDate }}'
+      VolumeStatistics: '{{ item.VolumeStatistics }}'
+      ReadRatePercent: '{{ response.OverallVolume.ReadRatePercent }}'
+      InboxRawCount: '{{ response.OverallVolume.VolumeStatistics.InboxRawCount }}'
+      ProjectedInbox: '{{ response.OverallVolume.VolumeStatistics.ProjectedInbox }}'
+      ProjectedSpam: '{{ response.OverallVolume.VolumeStatistics.ProjectedSpam }}'
+      SpamRawCount: '{{ response.OverallVolume.VolumeStatistics.SpamRawCount }}'
+- discovery_id: aws.sesv2.get_email_identity
+  calls:
+  - action: get_email_identity
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+      ConfigurationSetName: '{{ response.ConfigurationSetName }}'
+      CurrentSigningKeyLength: '{{ response.DkimAttributes.CurrentSigningKeyLength
+        }}'
+      LastKeyGenerationTimestamp: '{{ response.DkimAttributes.LastKeyGenerationTimestamp
+        }}'
+      NextSigningKeyLength: '{{ response.DkimAttributes.NextSigningKeyLength }}'
+      SigningAttributesOrigin: '{{ response.DkimAttributes.SigningAttributesOrigin
+        }}'
+      SigningEnabled: '{{ response.DkimAttributes.SigningEnabled }}'
+      Status: '{{ response.DkimAttributes.Status }}'
+      FeedbackForwardingStatus: '{{ response.FeedbackForwardingStatus }}'
+      IdentityType: '{{ response.IdentityType }}'
+      BehaviorOnMxFailure: '{{ response.MailFromAttributes.BehaviorOnMxFailure }}'
+      MailFromDomain: '{{ response.MailFromAttributes.MailFromDomain }}'
+      MailFromDomainStatus: '{{ response.MailFromAttributes.MailFromDomainStatus }}'
+      Policies: '{{ response.Policies }}'
+      ErrorType: '{{ response.VerificationInfo.ErrorType }}'
+      LastCheckedTimestamp: '{{ response.VerificationInfo.LastCheckedTimestamp }}'
+      LastSuccessTimestamp: '{{ response.VerificationInfo.LastSuccessTimestamp }}'
+      AdminEmail: '{{ response.VerificationInfo.SOARecord.AdminEmail }}'
+      PrimaryNameServer: '{{ response.VerificationInfo.SOARecord.PrimaryNameServer
+        }}'
+      SerialNumber: '{{ response.VerificationInfo.SOARecord.SerialNumber }}'
+      VerificationStatus: '{{ response.VerificationStatus }}'
+      VerifiedForSendingStatus: '{{ response.VerifiedForSendingStatus }}'
+- discovery_id: aws.sesv2.get_email_identity_policies
+  calls:
+  - action: get_email_identity_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policies: '{{ response.Policies }}'
+- discovery_id: aws.sesv2.get_email_template
+  for_each: aws.sesv2.list_custom_verification_email_templates
+  calls:
+  - action: get_email_template
+    params:
+      TemplateName: '{{ item.TemplateName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Html: '{{ response.TemplateContent.Html }}'
+      Subject: '{{ response.TemplateContent.Subject }}'
+      Text: '{{ response.TemplateContent.Text }}'
+      TemplateName: '{{ response.TemplateName }}'
+- discovery_id: aws.sesv2.get_export_job
+  for_each: aws.sesv2.list_export_jobs
+  calls:
+  - action: get_export_job
+    params:
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DataFormat: '{{ response.ExportDestination.DataFormat }}'
+      S3Url: '{{ response.ExportDestination.S3Url }}'
+      CompletedTimestamp: '{{ response.CompletedTimestamp }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+      EndDate: '{{ response.ExportDataSource.MessageInsightsDataSource.EndDate }}'
+      MaxResults: '{{ response.ExportDataSource.MessageInsightsDataSource.MaxResults
+        }}'
+      StartDate: '{{ response.ExportDataSource.MessageInsightsDataSource.StartDate
+        }}'
+      Dimensions: '{{ response.ExportDataSource.MetricsDataSource.Dimensions }}'
+      Namespace: '{{ response.ExportDataSource.MetricsDataSource.Namespace }}'
+      ExportSourceType: '{{ response.ExportSourceType }}'
+      ErrorMessage: '{{ response.FailureInfo.ErrorMessage }}'
+      FailedRecordsS3Url: '{{ response.FailureInfo.FailedRecordsS3Url }}'
+      JobId: '{{ response.JobId }}'
+      JobStatus: '{{ response.JobStatus }}'
+      ExportedRecordsCount: '{{ response.Statistics.ExportedRecordsCount }}'
+      ProcessedRecordsCount: '{{ response.Statistics.ProcessedRecordsCount }}'
+- discovery_id: aws.sesv2.get_import_job
+  for_each: aws.sesv2.list_export_jobs
+  calls:
+  - action: get_import_job
+    params:
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ContactListDestination: '{{ response.ImportDestination.ContactListDestination
+        }}'
+      SuppressionListDestination: '{{ response.ImportDestination.SuppressionListDestination
+        }}'
+      CompletedTimestamp: '{{ response.CompletedTimestamp }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+      FailedRecordsCount: '{{ response.FailedRecordsCount }}'
+      ErrorMessage: '{{ response.FailureInfo.ErrorMessage }}'
+      FailedRecordsS3Url: '{{ response.FailureInfo.FailedRecordsS3Url }}'
+      DataFormat: '{{ response.ImportDataSource.DataFormat }}'
+      S3Url: '{{ response.ImportDataSource.S3Url }}'
+      ContactListImportAction: '{{ response.ImportDestination.ContactListDestination.ContactListImportAction
+        }}'
+      ContactListName: '{{ response.ImportDestination.ContactListDestination.ContactListName
+        }}'
+      SuppressionListImportAction: '{{ response.ImportDestination.SuppressionListDestination.SuppressionListImportAction
+        }}'
+      JobId: '{{ response.JobId }}'
+      JobStatus: '{{ response.JobStatus }}'
+      ProcessedRecordsCount: '{{ response.ProcessedRecordsCount }}'
+- discovery_id: aws.sesv2.get_message_insights
+  calls:
+  - action: get_message_insights
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EmailTags }}'
+    item:
+      Name: '{{ item.Name }}'
+      Insights: '{{ item.Insights }}'
+      Value: '{{ item.Value }}'
+      FromEmailAddress: '{{ response.FromEmailAddress }}'
+      MessageId: '{{ response.MessageId }}'
+      Subject: '{{ response.Subject }}'
+- discovery_id: aws.sesv2.get_multi_region_endpoint
+  for_each: aws.sesv2.list_multi_region_endpoints
+  calls:
+  - action: get_multi_region_endpoint
+    params:
+      EndpointName: '{{ item.EndpointName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Routes }}'
+    item:
+      Region: '{{ item.Region }}'
+      Routes: '{{ item.Routes }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+      EndpointId: '{{ response.EndpointId }}'
+      EndpointName: '{{ response.EndpointName }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+      Status: '{{ response.Status }}'
+- discovery_id: aws.sesv2.get_reputation_entity
+  for_each: aws.sesv2.list_reputation_entities
+  calls:
+  - action: get_reputation_entity
+    params:
+      ReputationEntityReference: '{{ item.ReputationEntityReference }}'
+      ReputationEntityType: '{{ item.ReputationEntityType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AwsSesManagedStatus: '{{ response.ReputationEntity.AwsSesManagedStatus }}'
+      CustomerManagedStatus: '{{ response.ReputationEntity.CustomerManagedStatus }}'
+      ReputationEntity: '{{ response.ReputationEntity.ReputationEntity }}'
+      ReputationEntityReference: '{{ response.ReputationEntity.ReputationEntityReference
+        }}'
+      ReputationEntityType: '{{ response.ReputationEntity.ReputationEntityType }}'
+      ReputationImpact: '{{ response.ReputationEntity.ReputationImpact }}'
+      ReputationManagementPolicy: '{{ response.ReputationEntity.ReputationManagementPolicy
+        }}'
+      SendingStatusAggregate: '{{ response.ReputationEntity.SendingStatusAggregate
+        }}'
+- discovery_id: aws.sesv2.get_suppressed_destination
+  for_each: aws.sesv2.list_suppressed_destinations
+  calls:
+  - action: get_suppressed_destination
+    params:
+      EmailAddress: '{{ item.EmailAddress }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Attributes: '{{ response.SuppressedDestination.Attributes.MessageId }}'
+      EmailAddress: '{{ response.SuppressedDestination.EmailAddress }}'
+      LastUpdateTime: '{{ response.SuppressedDestination.LastUpdateTime }}'
+      Reason: '{{ response.SuppressedDestination.Reason }}'
+      FeedbackId: '{{ response.SuppressedDestination.Attributes.FeedbackId }}'
+      MessageId: '{{ response.SuppressedDestination.Attributes.MessageId }}'
+- discovery_id: aws.sesv2.get_tenant
+  for_each: aws.sesv2.list_tenants
+  calls:
+  - action: get_tenant
+    params:
+      TenantName: '{{ item.TenantName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tenant.Tags }}'
+      CreatedTimestamp: '{{ response.Tenant.CreatedTimestamp }}'
+      SendingStatus: '{{ response.Tenant.SendingStatus }}'
+      Tenant: '{{ response.Tenant.Tenant }}'
+      TenantArn: '{{ response.Tenant.TenantArn }}'
+      TenantId: '{{ response.Tenant.TenantId }}'
+      TenantName: '{{ response.Tenant.TenantName }}'
+- discovery_id: aws.sesv2.list_contacts
+  for_each: aws.sesv2.list_contact_lists
+  calls:
+  - action: list_contacts
+    params:
+      ContactListName: '{{ item.ContactListName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Contacts }}'
+    item:
+      EmailAddress: '{{ item.EmailAddress }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+      TopicDefaultPreferences: '{{ item.TopicDefaultPreferences }}'
+      TopicPreferences: '{{ item.TopicPreferences }}'
+      UnsubscribeAll: '{{ item.UnsubscribeAll }}'
+- discovery_id: aws.sesv2.list_domain_deliverability_campaigns
+  calls:
+  - action: list_domain_deliverability_campaigns
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DomainDeliverabilityCampaigns }}'
+    item:
+      CampaignId: '{{ item.CampaignId }}'
+      DeleteRate: '{{ item.DeleteRate }}'
+      Esps: '{{ item.Esps }}'
+      FirstSeenDateTime: '{{ item.FirstSeenDateTime }}'
+      FromAddress: '{{ item.FromAddress }}'
+      ImageUrl: '{{ item.ImageUrl }}'
+      InboxCount: '{{ item.InboxCount }}'
+      LastSeenDateTime: '{{ item.LastSeenDateTime }}'
+      ProjectedVolume: '{{ item.ProjectedVolume }}'
+      ReadDeleteRate: '{{ item.ReadDeleteRate }}'
+      ReadRate: '{{ item.ReadRate }}'
+      SendingIps: '{{ item.SendingIps }}'
+      SpamCount: '{{ item.SpamCount }}'
+      Subject: '{{ item.Subject }}'
+- discovery_id: aws.sesv2.list_resource_tenants
+  for_each: aws.sesv2.list_recommendations
+  calls:
+  - action: list_resource_tenants
+    params:
+      ResourceArn: '{{ item.ResourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceTenants }}'
+    item:
+      ResourceArn: '{{ item.ResourceArn }}'
+      AssociatedTimestamp: '{{ item.AssociatedTimestamp }}'
+      TenantId: '{{ item.TenantId }}'
+      TenantName: '{{ item.TenantName }}'
+- discovery_id: aws.sesv2.list_tags_for_resource
+  for_each: aws.sesv2.list_recommendations
+  calls:
+  - action: list_tags_for_resource
+    params:
+      ResourceArn: '{{ item.ResourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.sesv2.list_tenant_resources
+  for_each: aws.sesv2.list_tenants
+  calls:
+  - action: list_tenant_resources
+    params:
+      TenantName: '{{ item.TenantName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TenantResources }}'
+    item:
+      ResourceArn: '{{ item.ResourceArn }}'
+      ResourceType: '{{ item.ResourceType }}'

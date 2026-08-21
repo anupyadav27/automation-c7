@@ -1,0 +1,224 @@
+version: '1.0'
+provider: aws
+service: iotevents
+services:
+  client: iotevents
+  module: boto3.client
+discovery:
+- discovery_id: aws.iotevents.describe_logging_options
+  calls:
+  - action: describe_logging_options
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      detectorDebugOptions: '{{ response.loggingOptions.detectorDebugOptions[].keyValue }}'
+      enabled: '{{ response.loggingOptions.enabled }}'
+      level: '{{ response.loggingOptions.level }}'
+      loggingOptions: '{{ response.loggingOptions.loggingOptions }}'
+      roleArn: '{{ response.loggingOptions.roleArn }}'
+- discovery_id: aws.iotevents.list_alarm_models
+  calls:
+  - action: list_alarm_models
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.alarmModelSummaries }}'
+    item:
+      alarmModelDescription: '{{ item.alarmModelDescription }}'
+      alarmModelName: '{{ item.alarmModelName }}'
+      creationTime: '{{ item.creationTime }}'
+      severity: '{{ item.severity }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotevents.list_detector_models
+  calls:
+  - action: list_detector_models
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.detectorModelSummaries }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      detectorModelDescription: '{{ item.detectorModelDescription }}'
+      detectorModelName: '{{ item.detectorModelName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotevents.list_inputs
+  calls:
+  - action: list_inputs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.inputSummaries }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      input: '{{ item.input }}'
+      inputArn: '{{ item.inputArn }}'
+      inputDescription: '{{ item.inputDescription }}'
+      inputName: '{{ item.inputName }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotevents.describe_alarm_model
+  for_each: aws.iotevents.list_alarm_models
+  calls:
+  - action: describe_alarm_model
+    params:
+      alarmModelName: '{{ item.alarmModelName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      severity: '{{ response.alarmRule.severity }}'
+      simpleRule: '{{ response.alarmRule.simpleRule }}'
+      enabled: '{{ response.alarmCapabilities.acknowledgeFlow.enabled }}'
+      disabledOnInitialization: '{{ response.alarmCapabilities.initializationConfiguration.disabledOnInitialization }}'
+      alarmModelArn: '{{ response.alarmModelArn }}'
+      alarmModelDescription: '{{ response.alarmModelDescription }}'
+      alarmModelName: '{{ response.alarmModelName }}'
+      alarmModelVersion: '{{ response.alarmModelVersion }}'
+      comparisonOperator: '{{ response.alarmRule.simpleRule.comparisonOperator }}'
+      inputProperty: '{{ response.alarmRule.simpleRule.inputProperty }}'
+      threshold: '{{ response.alarmRule.simpleRule.threshold }}'
+      creationTime: '{{ response.creationTime }}'
+      key: '{{ response.key }}'
+      lastUpdateTime: '{{ response.lastUpdateTime }}'
+      roleArn: '{{ response.roleArn }}'
+      status: '{{ response.status }}'
+      statusMessage: '{{ response.statusMessage }}'
+- discovery_id: aws.iotevents.describe_detector_model
+  for_each: aws.iotevents.list_detector_models
+  calls:
+  - action: describe_detector_model
+    params:
+      detectorModelName: '{{ item.detectorModelName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      detectorModelConfiguration: '{{ response.detectorModel.detectorModelConfiguration.key }}'
+      detectorModelDefinition: '{{ response.detectorModel.detectorModelDefinition }}'
+      creationTime: '{{ response.detectorModel.detectorModelConfiguration.creationTime }}'
+      detectorModelArn: '{{ response.detectorModel.detectorModelConfiguration.detectorModelArn }}'
+      detectorModelDescription: '{{ response.detectorModel.detectorModelConfiguration.detectorModelDescription }}'
+      detectorModelName: '{{ response.detectorModel.detectorModelConfiguration.detectorModelName }}'
+      detectorModelVersion: '{{ response.detectorModel.detectorModelConfiguration.detectorModelVersion }}'
+      evaluationMethod: '{{ response.detectorModel.detectorModelConfiguration.evaluationMethod }}'
+      key: '{{ response.detectorModel.detectorModelConfiguration.key }}'
+      lastUpdateTime: '{{ response.detectorModel.detectorModelConfiguration.lastUpdateTime }}'
+      roleArn: '{{ response.detectorModel.detectorModelConfiguration.roleArn }}'
+      status: '{{ response.detectorModel.detectorModelConfiguration.status }}'
+      initialStateName: '{{ response.detectorModel.detectorModelDefinition.initialStateName }}'
+- discovery_id: aws.iotevents.describe_detector_model_analysis
+  calls:
+  - action: describe_detector_model_analysis
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      status: '{{ response.status }}'
+- discovery_id: aws.iotevents.describe_input
+  for_each: aws.iotevents.list_inputs
+  calls:
+  - action: describe_input
+    params:
+      inputName: '{{ item.inputName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      input: '{{ response.input.input }}'
+      inputConfiguration: '{{ response.input.inputConfiguration.status }}'
+      inputDefinition: '{{ response.input.inputDefinition }}'
+      creationTime: '{{ response.input.inputConfiguration.creationTime }}'
+      inputArn: '{{ response.input.inputConfiguration.inputArn }}'
+      inputDescription: '{{ response.input.inputConfiguration.inputDescription }}'
+      inputName: '{{ response.input.inputConfiguration.inputName }}'
+      lastUpdateTime: '{{ response.input.inputConfiguration.lastUpdateTime }}'
+      status: '{{ response.input.inputConfiguration.status }}'
+- discovery_id: aws.iotevents.get_detector_model_analysis_results
+  calls:
+  - action: get_detector_model_analysis_results
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.analysisResults }}'
+    item:
+      level: '{{ item.level }}'
+      locations: '{{ item.locations }}'
+      message: '{{ item.message }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotevents.list_alarm_model_versions
+  for_each: aws.iotevents.list_alarm_models
+  calls:
+  - action: list_alarm_model_versions
+    params:
+      alarmModelName: '{{ item.alarmModelName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.alarmModelVersionSummaries }}'
+    item:
+      alarmModelArn: '{{ item.alarmModelArn }}'
+      alarmModelName: '{{ item.alarmModelName }}'
+      alarmModelVersion: '{{ item.alarmModelVersion }}'
+      creationTime: '{{ item.creationTime }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      roleArn: '{{ item.roleArn }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotevents.list_detector_model_versions
+  for_each: aws.iotevents.list_detector_models
+  calls:
+  - action: list_detector_model_versions
+    params:
+      detectorModelName: '{{ item.detectorModelName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.detectorModelVersionSummaries }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      detectorModelArn: '{{ item.detectorModelArn }}'
+      detectorModelName: '{{ item.detectorModelName }}'
+      detectorModelVersion: '{{ item.detectorModelVersion }}'
+      evaluationMethod: '{{ item.evaluationMethod }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      roleArn: '{{ item.roleArn }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotevents.list_input_routings
+  calls:
+  - action: list_input_routings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.routedResources }}'
+    item:
+      arn: '{{ item.arn }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotevents.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'

@@ -1,0 +1,43 @@
+version: '1.0'
+provider: aws
+service: iot-jobs-data
+services:
+  client: iot-jobs-data
+  module: boto3.client
+discovery:
+- discovery_id: aws.iot-jobs-data.describe_job_execution
+  calls:
+  - action: describe_job_execution
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      approximateSecondsBeforeTimedOut: '{{ response.execution.approximateSecondsBeforeTimedOut
+        }}'
+      execution: '{{ response.execution.execution }}'
+      executionNumber: '{{ response.execution.executionNumber }}'
+      jobDocument: '{{ response.execution.jobDocument }}'
+      jobId: '{{ response.execution.jobId }}'
+      lastUpdatedAt: '{{ response.execution.lastUpdatedAt }}'
+      queuedAt: '{{ response.execution.queuedAt }}'
+      startedAt: '{{ response.execution.startedAt }}'
+      status: '{{ response.execution.status }}'
+      statusDetails: '{{ response.execution.statusDetails }}'
+      thingName: '{{ response.execution.thingName }}'
+      versionNumber: '{{ response.execution.versionNumber }}'
+- discovery_id: aws.iot-jobs-data.get_pending_job_executions
+  calls:
+  - action: get_pending_job_executions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.inProgressJobs }}'
+    item:
+      executionNumber: '{{ item.executionNumber }}'
+      jobId: '{{ item.jobId }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      queuedAt: '{{ item.queuedAt }}'
+      startedAt: '{{ item.startedAt }}'
+      versionNumber: '{{ item.versionNumber }}'

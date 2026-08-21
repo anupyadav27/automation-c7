@@ -1,0 +1,164 @@
+version: '1.0'
+provider: aws
+service: cognito-sync
+services:
+  client: cognito-sync
+  module: boto3.client
+discovery:
+- discovery_id: aws.cognito-sync.list_identity_pool_usage
+  calls:
+  - action: list_identity_pool_usage
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.IdentityPoolUsages }}'
+    item:
+      DataStorage: '{{ item.DataStorage }}'
+      IdentityPoolId: '{{ item.IdentityPoolId }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      SyncSessionsCount: '{{ item.SyncSessionsCount }}'
+      Count: '{{ response.Count }}'
+      MaxResults: '{{ response.MaxResults }}'
+- discovery_id: aws.cognito-sync.describe_dataset
+  for_each: aws.cognito-sync.list_identity_pool_usage
+  calls:
+  - action: describe_dataset
+    params:
+      IdentityPoolId: '{{ item.IdentityPoolId }}'
+      IdentityId: '{{ item.IdentityId }}'
+      DatasetName: '{{ item.DatasetName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ response.Dataset.CreationDate }}'
+      DataStorage: '{{ response.Dataset.DataStorage }}'
+      DatasetName: '{{ response.Dataset.DatasetName }}'
+      IdentityId: '{{ response.Dataset.IdentityId }}'
+      LastModifiedBy: '{{ response.Dataset.LastModifiedBy }}'
+      LastModifiedDate: '{{ response.Dataset.LastModifiedDate }}'
+      NumRecords: '{{ response.Dataset.NumRecords }}'
+- discovery_id: aws.cognito-sync.describe_identity_pool_usage
+  for_each: aws.cognito-sync.list_identity_pool_usage
+  calls:
+  - action: describe_identity_pool_usage
+    params:
+      IdentityPoolId: '{{ item.IdentityPoolId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DataStorage: '{{ response.IdentityPoolUsage.DataStorage }}'
+      IdentityPoolId: '{{ response.IdentityPoolUsage.IdentityPoolId }}'
+      LastModifiedDate: '{{ response.IdentityPoolUsage.LastModifiedDate }}'
+      SyncSessionsCount: '{{ response.IdentityPoolUsage.SyncSessionsCount }}'
+- discovery_id: aws.cognito-sync.describe_identity_usage
+  for_each: aws.cognito-sync.list_identity_pool_usage
+  calls:
+  - action: describe_identity_usage
+    params:
+      IdentityPoolId: '{{ item.IdentityPoolId }}'
+      IdentityId: '{{ item.IdentityId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DataStorage: '{{ response.IdentityUsage.DataStorage }}'
+      DatasetCount: '{{ response.IdentityUsage.DatasetCount }}'
+      IdentityId: '{{ response.IdentityUsage.IdentityId }}'
+      IdentityPoolId: '{{ response.IdentityUsage.IdentityPoolId }}'
+      LastModifiedDate: '{{ response.IdentityUsage.LastModifiedDate }}'
+- discovery_id: aws.cognito-sync.get_bulk_publish_details
+  for_each: aws.cognito-sync.list_identity_pool_usage
+  calls:
+  - action: get_bulk_publish_details
+    params:
+      IdentityPoolId: '{{ item.IdentityPoolId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      BulkPublishCompleteTime: '{{ response.BulkPublishCompleteTime }}'
+      BulkPublishStartTime: '{{ response.BulkPublishStartTime }}'
+      BulkPublishStatus: '{{ response.BulkPublishStatus }}'
+      FailureMessage: '{{ response.FailureMessage }}'
+      IdentityPoolId: '{{ response.IdentityPoolId }}'
+- discovery_id: aws.cognito-sync.get_cognito_events
+  for_each: aws.cognito-sync.list_identity_pool_usage
+  calls:
+  - action: get_cognito_events
+    params:
+      IdentityPoolId: '{{ item.IdentityPoolId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Events: '{{ response.Events }}'
+- discovery_id: aws.cognito-sync.get_identity_pool_configuration
+  for_each: aws.cognito-sync.list_identity_pool_usage
+  calls:
+  - action: get_identity_pool_configuration
+    params:
+      IdentityPoolId: '{{ item.IdentityPoolId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      RoleArn: '{{ response.PushSync.RoleArn }}'
+      ApplicationArns: '{{ response.PushSync.ApplicationArns }}'
+      StreamName: '{{ response.CognitoStreams.StreamName }}'
+      StreamingStatus: '{{ response.CognitoStreams.StreamingStatus }}'
+      IdentityPoolId: '{{ response.IdentityPoolId }}'
+- discovery_id: aws.cognito-sync.list_datasets
+  for_each: aws.cognito-sync.list_identity_pool_usage
+  calls:
+  - action: list_datasets
+    params:
+      IdentityId: '{{ item.IdentityId }}'
+      IdentityPoolId: '{{ item.IdentityPoolId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Datasets }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      DataStorage: '{{ item.DataStorage }}'
+      DatasetName: '{{ item.DatasetName }}'
+      IdentityId: '{{ item.IdentityId }}'
+      LastModifiedBy: '{{ item.LastModifiedBy }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      NumRecords: '{{ item.NumRecords }}'
+      Count: '{{ response.Count }}'
+- discovery_id: aws.cognito-sync.list_records
+  for_each: aws.cognito-sync.list_identity_pool_usage
+  calls:
+  - action: list_records
+    params:
+      IdentityPoolId: '{{ item.IdentityPoolId }}'
+      IdentityId: '{{ item.IdentityId }}'
+      DatasetName: '{{ item.DatasetName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Records }}'
+    item:
+      DeviceLastModifiedDate: '{{ item.DeviceLastModifiedDate }}'
+      Key: '{{ item.Key }}'
+      LastModifiedBy: '{{ item.LastModifiedBy }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      SyncCount: '{{ item.SyncCount }}'
+      Value: '{{ item.Value }}'
+      Count: '{{ response.Count }}'
+      DatasetDeletedAfterRequestedSyncCount: '{{ response.DatasetDeletedAfterRequestedSyncCount }}'
+      DatasetExists: '{{ response.DatasetExists }}'
+      DatasetSyncCount: '{{ response.DatasetSyncCount }}'
+      SyncSessionToken: '{{ response.SyncSessionToken }}'

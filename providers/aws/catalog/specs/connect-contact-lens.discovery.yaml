@@ -1,0 +1,26 @@
+# ============================================================
+# Discovery YAML — connect-contact-lens (AWS)
+# Generated: 2026-02-21T04:56:57Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: connect-contact-lens
+services:
+  client: connect-contact-lens
+  module: boto3.client
+discovery:
+  # ── Dependent read operations (require identifiers) ──
+  # ── ListRealtimeContactAnalysisSegments ──
+  - discovery_id: aws.connect-contact-lens.list_realtime_contact_analysis_segments
+    calls:
+      - action: list_realtime_contact_analysis_segments
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Segments }}'
+      item:
+        Categories: '{{ item.Categories }}'
+        PostContactSummary: '{{ item.PostContactSummary }}'
+        Transcript: '{{ item.Transcript }}'

@@ -1,0 +1,8 @@
+version: '1.0'
+provider: aws
+service: rds-data
+services:
+  client: rds-data
+  module: boto3.client
+discovery:
+checks: []

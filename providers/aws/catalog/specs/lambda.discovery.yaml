@@ -1,0 +1,394 @@
+version: '1.0'
+provider: aws
+service: lambda
+discovery:
+- calls:
+  - action: list_functions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lambda.list_functions
+  emit:
+    as: item
+    item:
+      Architectures: '{{ item.Architectures }}'
+      CodeSha256: '{{ item.CodeSha256 }}'
+      CodeSize: '{{ item.CodeSize }}'
+      Concurrency: '{{ item.Concurrency }}'
+      DeadLetterConfig: '{{ item.DeadLetterConfig }}'
+      Description: '{{ item.Description }}'
+      Environment: '{{ item.Environment }}'
+      EphemeralStorage: '{{ item.EphemeralStorage }}'
+      FileSystemConfigs: '{{ item.FileSystemConfigs }}'
+      FunctionArn: '{{ item.FunctionArn }}'
+      FunctionName: '{{ item.FunctionName }}'
+      Handler: '{{ item.Handler }}'
+      ImageConfigResponse: '{{ item.ImageConfigResponse }}'
+      KMSKeyArn: '{{ item.KMSKeyArn }}'
+      LastModified: '{{ item.LastModified }}'
+      LastUpdateStatus: '{{ item.LastUpdateStatus }}'
+      LastUpdateStatusReason: '{{ item.LastUpdateStatusReason }}'
+      LastUpdateStatusReasonCode: '{{ item.LastUpdateStatusReasonCode }}'
+      Layers: '{{ item.Layers }}'
+      LoggingConfig: '{{ item.LoggingConfig }}'
+      MasterArn: '{{ item.MasterArn }}'
+      MemorySize: '{{ item.MemorySize }}'
+      PackageType: '{{ item.PackageType }}'
+      RevisionId: '{{ item.RevisionId }}'
+      Role: '{{ item.Role }}'
+      Runtime: '{{ item.Runtime }}'
+      RuntimeVersionConfig: '{{ item.RuntimeVersionConfig }}'
+      SecurityGroupIds: '{{ item.SecurityGroupIds }}'
+      SigningJobArn: '{{ item.SigningJobArn }}'
+      SigningProfileVersionArn: '{{ item.SigningProfileVersionArn }}'
+      SnapStart: '{{ item.SnapStart }}'
+      State: '{{ item.State }}'
+      StateReason: '{{ item.StateReason }}'
+      StateReasonCode: '{{ item.StateReasonCode }}'
+      SubnetIds: '{{ item.SubnetIds }}'
+      TenancyConfig: '{{ item.TenancyConfig }}'
+      Timeout: '{{ item.Timeout }}'
+      TracingConfig: '{{ item.TracingConfig }}'
+      Version: '{{ item.Version }}'
+      VpcConfig: '{{ item.VpcConfig }}'
+    items_for: '{{ response.Functions }}'
+- calls:
+  - action: list_function_url_configs
+    on_error: continue
+    params:
+      FunctionName: '{{ item.FunctionName }}'
+    save_as: response
+  discovery_id: aws.lambda.list_function_url_configs
+  emit:
+    as: item
+    item:
+      AuthType: '{{ item.AuthType }}'
+      Cors: '{{ item.Cors }}'
+      CreationTime: '{{ item.CreationTime }}'
+      FunctionArn: '{{ item.FunctionArn }}'
+      FunctionUrl: '{{ item.FunctionUrl }}'
+      InvokeMode: '{{ item.InvokeMode }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+    items_for: '{{ response.FunctionUrlConfigs }}'
+  for_each: aws.lambda.list_functions
+- calls:
+  - action: get_function
+    on_error: continue
+    params:
+      FunctionName: '{{ item.FunctionName }}'
+    save_as: response
+  discovery_id: aws.lambda.get_function
+  emit:
+    as: item
+    item:
+      Architectures: '{{ response.Configuration.Architectures }}'
+      CodeSha256: '{{ response.Configuration.CodeSha256 }}'
+      CodeSize: '{{ response.Configuration.CodeSize }}'
+      Concurrency: '{{ response.Configuration.Concurrency }}'
+      DeadLetterConfig: '{{ response.Configuration.DeadLetterConfig.TargetArn }}'
+      Description: '{{ response.Configuration.Description }}'
+      Environment: '{{ response.Configuration.Environment }}'
+      EphemeralStorage: '{{ response.Configuration.EphemeralStorage.Size }}'
+      FileSystemConfigs: '{{ response.Configuration.FileSystemConfigs[].Arn }}'
+      FunctionArn: '{{ response.Configuration.FunctionArn }}'
+      FunctionName: '{{ response.Configuration.FunctionName }}'
+      Handler: '{{ response.Configuration.Handler }}'
+      ImageConfigResponse: '{{ response.Configuration.ImageConfigResponse }}'
+      KMSKeyArn: '{{ response.Configuration.KMSKeyArn }}'
+      LastModified: '{{ response.Configuration.LastModified }}'
+      LastUpdateStatus: '{{ response.Configuration.LastUpdateStatus }}'
+      LastUpdateStatusReason: '{{ response.Configuration.LastUpdateStatusReason }}'
+      LastUpdateStatusReasonCode: '{{ response.Configuration.LastUpdateStatusReasonCode
+        }}'
+      Layers: '{{ response.Configuration.Layers[].Arn }}'
+      LoggingConfig: '{{ response.Configuration.LoggingConfig.LogGroup }}'
+      MasterArn: '{{ response.Configuration.MasterArn }}'
+      MemorySize: '{{ response.Configuration.MemorySize }}'
+      PackageType: '{{ response.Configuration.PackageType }}'
+      RevisionId: '{{ response.Configuration.RevisionId }}'
+      Role: '{{ response.Configuration.Role }}'
+      Runtime: '{{ response.Configuration.Runtime }}'
+      RuntimeVersionConfig: '{{ response.Configuration.RuntimeVersionConfig }}'
+      SigningJobArn: '{{ response.Configuration.SigningJobArn }}'
+      SigningProfileVersionArn: '{{ response.Configuration.SigningProfileVersionArn
+        }}'
+      SnapStart: '{{ response.Configuration.State }}'
+      State: '{{ response.Configuration.State }}'
+      StateReason: '{{ response.Configuration.StateReason }}'
+      StateReasonCode: '{{ response.Configuration.StateReasonCode }}'
+      TenancyConfig: '{{ response.Configuration.TenancyConfig }}'
+      Timeout: '{{ response.Configuration.Timeout }}'
+      TracingConfig: '{{ response.Configuration.TracingConfig.Mode }}'
+      Version: '{{ response.Configuration.Version }}'
+      VpcConfig: '{{ response.Configuration.VpcConfig.VpcId }}'
+      ImageUri: '{{ response.Code.ImageUri }}'
+      Location: '{{ response.Code.Location }}'
+      RepositoryType: '{{ response.Code.RepositoryType }}'
+      ResolvedImageUri: '{{ response.Code.ResolvedImageUri }}'
+      SourceKMSKeyArn: '{{ response.Code.SourceKMSKeyArn }}'
+      ReservedConcurrentExecutions: '{{ response.Concurrency.ReservedConcurrentExecutions
+        }}'
+      TargetArn: '{{ response.Configuration.DeadLetterConfig.TargetArn }}'
+      ErrorCode: '{{ response.Configuration.Environment.Error.ErrorCode }}'
+      Message: '{{ response.Configuration.Environment.Error.Message }}'
+      Variables: '{{ response.Configuration.Environment.Variables }}'
+      Size: '{{ response.Configuration.EphemeralStorage.Size }}'
+      WorkingDirectory: '{{ response.Configuration.ImageConfigResponse.ImageConfig.WorkingDirectory
+        }}'
+      ApplicationLogLevel: '{{ response.Configuration.LoggingConfig.ApplicationLogLevel
+        }}'
+      LogFormat: '{{ response.Configuration.LoggingConfig.LogFormat }}'
+      LogGroup: '{{ response.Configuration.LoggingConfig.LogGroup }}'
+      SystemLogLevel: '{{ response.Configuration.LoggingConfig.SystemLogLevel }}'
+      RuntimeVersionArn: '{{ response.Configuration.RuntimeVersionConfig.RuntimeVersionArn
+        }}'
+      ApplyOn: '{{ response.Configuration.SnapStart.ApplyOn }}'
+      OptimizationStatus: '{{ response.Configuration.SnapStart.OptimizationStatus
+        }}'
+      Mode: '{{ response.Configuration.TracingConfig.Mode }}'
+      Ipv6AllowedForDualStack: '{{ response.Configuration.VpcConfig.Ipv6AllowedForDualStack
+        }}'
+      VpcId: '{{ response.Configuration.VpcConfig.VpcId }}'
+      Tags: '{{ response.Tags }}'
+      TenantIsolationMode: '{{ response.Configuration.TenancyConfig.TenantIsolationMode
+        }}'
+  for_each: aws.lambda.list_functions
+- calls:
+  - action: list_versions_by_function
+    on_error: continue
+    params:
+      FunctionName: '{{ item.FunctionName }}'
+    save_as: response
+  discovery_id: aws.lambda.list_versions_by_function
+  emit:
+    as: item
+    item:
+      Architectures: '{{ item.Architectures }}'
+      CodeSha256: '{{ item.CodeSha256 }}'
+      CodeSize: '{{ item.CodeSize }}'
+      DeadLetterConfig: '{{ item.DeadLetterConfig }}'
+      Description: '{{ item.Description }}'
+      Environment: '{{ item.Environment }}'
+      EphemeralStorage: '{{ item.EphemeralStorage }}'
+      FileSystemConfigs: '{{ item.FileSystemConfigs }}'
+      FunctionArn: '{{ item.FunctionArn }}'
+      FunctionName: '{{ item.FunctionName }}'
+      Handler: '{{ item.Handler }}'
+      ImageConfigResponse: '{{ item.ImageConfigResponse }}'
+      KMSKeyArn: '{{ item.KMSKeyArn }}'
+      LastModified: '{{ item.LastModified }}'
+      LastUpdateStatus: '{{ item.LastUpdateStatus }}'
+      LastUpdateStatusReason: '{{ item.LastUpdateStatusReason }}'
+      LastUpdateStatusReasonCode: '{{ item.LastUpdateStatusReasonCode }}'
+      Layers: '{{ item.Layers }}'
+      LoggingConfig: '{{ item.LoggingConfig }}'
+      MasterArn: '{{ item.MasterArn }}'
+      MemorySize: '{{ item.MemorySize }}'
+      PackageType: '{{ item.PackageType }}'
+      RevisionId: '{{ item.RevisionId }}'
+      Role: '{{ item.Role }}'
+      Runtime: '{{ item.Runtime }}'
+      RuntimeVersionConfig: '{{ item.RuntimeVersionConfig }}'
+      SigningJobArn: '{{ item.SigningJobArn }}'
+      SigningProfileVersionArn: '{{ item.SigningProfileVersionArn }}'
+      SnapStart: '{{ item.SnapStart }}'
+      State: '{{ item.State }}'
+      StateReason: '{{ item.StateReason }}'
+      StateReasonCode: '{{ item.StateReasonCode }}'
+      TenancyConfig: '{{ item.TenancyConfig }}'
+      Timeout: '{{ item.Timeout }}'
+      TracingConfig: '{{ item.TracingConfig }}'
+      Version: '{{ item.Version }}'
+      VpcConfig: '{{ item.VpcConfig }}'
+    items_for: '{{ response.Versions }}'
+  for_each: aws.lambda.list_functions
+- calls:
+  - action: list_layers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lambda.list_layers
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      LatestMatchingVersion: '{{ item.LatestMatchingVersion }}'
+      LayerArn: '{{ item.LayerArn }}'
+      LayerName: '{{ item.LayerName }}'
+    items_for: '{{ response.Layers }}'
+- calls:
+  - action: get_layer_version_policy
+    on_error: continue
+    params:
+      LayerName: '{{ item.LayerName }}'
+      VersionNumber: '{{ item.VersionNumber }}'
+    save_as: response
+  discovery_id: aws.lambda.get_layer_version_policy
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      Statement: '{{ response.Statement }}'
+      RevisionId: '{{ response.RevisionId }}'
+  for_each: aws.lambda.list_layers
+- calls:
+  - action: get_function_configuration
+    on_error: continue
+    params:
+      FunctionName: '{{ item.FunctionName }}'
+    save_as: response
+  discovery_id: aws.lambda.get_function_configuration
+  emit:
+    as: item
+    item:
+      Architectures: '{{ response.Architectures }}'
+      CodeSize: '{{ response.CodeSize }}'
+      Description: '{{ response.Description }}'
+      FunctionArn: '{{ response.FunctionArn }}'
+      FunctionName: '{{ response.FunctionName }}'
+      Handler: '{{ response.Handler }}'
+      KMSKeyArn: '{{ response.KMSKeyArn }}'
+      LastModified: '{{ response.LastModified }}'
+      Layers: '{{ response.Layers }}'
+      LogConfig: '{{ response.LoggingConfig }}'
+      MemorySize: '{{ response.MemorySize }}'
+      PackageType: '{{ response.PackageType }}'
+      Role: '{{ response.Role }}'
+      Runtime: '{{ response.Runtime }}'
+      SigningJobArn: '{{ response.SigningJobArn }}'
+      SigningProfileVersionArn: '{{ response.SigningProfileVersionArn }}'
+      State: '{{ response.State }}'
+      StateReason: '{{ response.StateReason }}'
+      Timeout: '{{ response.Timeout }}'
+      Variables: '{{ response.Environment.Variables }}'
+      CodeSha256: '{{ response.CodeSha256 }}'
+      TargetArn: '{{ response.DeadLetterConfig.TargetArn }}'
+      ErrorCode: '{{ response.Environment.Error.ErrorCode }}'
+      Message: '{{ response.Environment.Error.Message }}'
+      Size: '{{ response.EphemeralStorage.Size }}'
+      WorkingDirectory: '{{ response.ImageConfigResponse.ImageConfig.WorkingDirectory
+        }}'
+      LastUpdateStatus: '{{ response.LastUpdateStatus }}'
+      LastUpdateStatusReason: '{{ response.LastUpdateStatusReason }}'
+      LastUpdateStatusReasonCode: '{{ response.LastUpdateStatusReasonCode }}'
+      ApplicationLogLevel: '{{ response.LoggingConfig.ApplicationLogLevel }}'
+      LogFormat: '{{ response.LoggingConfig.LogFormat }}'
+      LogGroup: '{{ response.LoggingConfig.LogGroup }}'
+      SystemLogLevel: '{{ response.LoggingConfig.SystemLogLevel }}'
+      MasterArn: '{{ response.MasterArn }}'
+      RevisionId: '{{ response.RevisionId }}'
+      RuntimeVersionArn: '{{ response.RuntimeVersionConfig.RuntimeVersionArn }}'
+      ApplyOn: '{{ response.SnapStart.ApplyOn }}'
+      OptimizationStatus: '{{ response.SnapStart.OptimizationStatus }}'
+      StateReasonCode: '{{ response.StateReasonCode }}'
+      Mode: '{{ response.TracingConfig.Mode }}'
+      Version: '{{ response.Version }}'
+      Ipv6AllowedForDualStack: '{{ response.VpcConfig.Ipv6AllowedForDualStack }}'
+      VpcId: '{{ response.VpcConfig.VpcId }}'
+      TenantIsolationMode: '{{ response.TenancyConfig.TenantIsolationMode }}'
+  for_each: aws.lambda.list_functions
+- calls:
+  - action: get_policy
+    on_error: continue
+    params:
+      FunctionName: '{{ item.FunctionName }}'
+    save_as: response
+  discovery_id: aws.lambda.get_policy
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      RevisionId: '{{ response.RevisionId }}'
+  for_each: aws.lambda.list_functions
+- calls:
+  - action: get_function_concurrency
+    on_error: continue
+    params:
+      FunctionName: '{{ item.FunctionName }}'
+    save_as: response
+  discovery_id: aws.lambda.get_function_concurrency
+  emit:
+    as: item
+    item:
+      ReservedConcurrentExecutions: '{{ response.ReservedConcurrentExecutions }}'
+  for_each: aws.lambda.list_functions
+- calls:
+  - action: get_function_url_config
+    on_error: continue
+    params:
+      FunctionName: '{{ item.FunctionName }}'
+    save_as: response
+  discovery_id: aws.lambda.get_function_url_config
+  emit:
+    as: item
+    item:
+      AllowCredentials: '{{ response.Cors.AllowCredentials }}'
+      AllowHeaders: '{{ response.Cors.AllowHeaders }}'
+      AllowMethods: '{{ response.Cors.AllowMethods }}'
+      AllowOrigins: '{{ response.Cors.AllowOrigins }}'
+      AuthType: '{{ response.AuthType }}'
+      ExposeHeaders: '{{ response.Cors.ExposeHeaders }}'
+      FunctionArn: '{{ response.FunctionArn }}'
+      FunctionUrl: '{{ response.FunctionUrl }}'
+      InvokeMode: '{{ response.InvokeMode }}'
+      MaxAge: '{{ response.Cors.MaxAge }}'
+      CreationTime: '{{ response.CreationTime }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+  for_each: aws.lambda.list_functions
+- calls:
+  - action: list_code_signing_configs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lambda.list_code_signing_configs
+  emit:
+    as: item
+    item:
+      AllowedPublishers: '{{ item.AllowedPublishers }}'
+      CodeSigningConfigArn: '{{ item.CodeSigningConfigArn }}'
+      CodeSigningConfigId: '{{ item.CodeSigningConfigId }}'
+      CodeSigningPolicies: '{{ item.CodeSigningPolicies }}'
+      Description: '{{ item.Description }}'
+      LastModified: '{{ item.LastModified }}'
+    items_for: '{{ response.CodeSigningConfigs }}'
+- calls:
+  - action: list_event_source_mappings
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lambda.list_event_source_mappings
+  emit:
+    as: item
+    item:
+      AmazonManagedKafkaEventSourceConfig: '{{ item.AmazonManagedKafkaEventSourceConfig
+        }}'
+      BatchSize: '{{ item.BatchSize }}'
+      BisectBatchOnFunctionError: '{{ item.BisectBatchOnFunctionError }}'
+      DestinationConfig: '{{ item.DestinationConfig }}'
+      DocumentDBEventSourceConfig: '{{ item.DocumentDBEventSourceConfig }}'
+      Enabled: '{{ item.Enabled }}'
+      EventSourceArn: '{{ item.EventSourceArn }}'
+      EventSourceMappingArn: '{{ item.EventSourceMappingArn }}'
+      FilterCriteria: '{{ item.FilterCriteria }}'
+      FilterCriteriaError: '{{ item.FilterCriteriaError }}'
+      FunctionArn: '{{ item.FunctionArn }}'
+      FunctionResponseTypes: '{{ item.FunctionResponseTypes }}'
+      KMSKeyArn: '{{ item.KMSKeyArn }}'
+      LastModified: '{{ item.LastModified }}'
+      LastProcessingResult: '{{ item.LastProcessingResult }}'
+      MaximumBatchingWindowInSeconds: '{{ item.MaximumBatchingWindowInSeconds }}'
+      MaximumRecordAgeInSeconds: '{{ item.MaximumRecordAgeInSeconds }}'
+      MaximumRetryAttempts: '{{ item.MaximumRetryAttempts }}'
+      MetricsConfig: '{{ item.MetricsConfig }}'
+      ParallelizationFactor: '{{ item.ParallelizationFactor }}'
+      ProvisionedPollerConfig: '{{ item.ProvisionedPollerConfig }}'
+      Queues: '{{ item.Queues }}'
+      ScalingConfig: '{{ item.ScalingConfig }}'
+      SelfManagedEventSource: '{{ item.SelfManagedEventSource }}'
+      SelfManagedKafkaEventSourceConfig: '{{ item.SelfManagedKafkaEventSourceConfig
+        }}'
+      SourceAccessConfigurations: '{{ item.SourceAccessConfigurations }}'
+      StartingPosition: '{{ item.StartingPosition }}'
+      StartingPositionTimestamp: '{{ item.StartingPositionTimestamp }}'
+      State: '{{ item.State }}'
+      StateTransitionReason: '{{ item.StateTransitionReason }}'
+      Topics: '{{ item.Topics }}'
+      TumblingWindowInSeconds: '{{ item.TumblingWindowInSeconds }}'
+      UUID: '{{ item.UUID }}'
+    items_for: '{{ response.EventSourceMappings }}'

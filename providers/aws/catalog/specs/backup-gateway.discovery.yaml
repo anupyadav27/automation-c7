@@ -1,0 +1,176 @@
+enabled: false
+version: '1.0'
+provider: aws
+service: backup-gateway
+services:
+  client: backup-gateway
+  module: boto3.client
+discovery:
+- discovery_id: aws.backup-gateway.list_gateways
+  calls:
+  - action: list_gateways
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Gateways }}'
+    item:
+      AverageUploadRateLimitInBitsPerSec: '{{ item.AverageUploadRateLimitInBitsPerSec
+        }}'
+      BandwidthRateLimitIntervals: '{{ item.BandwidthRateLimitIntervals }}'
+      DaysOfWeek: '{{ item.DaysOfWeek }}'
+      EndHourOfDay: '{{ item.EndHourOfDay }}'
+      EndMinuteOfHour: '{{ item.EndMinuteOfHour }}'
+      Gateway: '{{ item.Gateway }}'
+      GatewayArn: '{{ item.GatewayArn }}'
+      GatewayDisplayName: '{{ item.GatewayDisplayName }}'
+      GatewayType: '{{ item.GatewayType }}'
+      HypervisorId: '{{ item.HypervisorId }}'
+      LastSeenTime: '{{ item.LastSeenTime }}'
+      MaintenanceStartTime: '{{ item.MaintenanceStartTime }}'
+      NextUpdateAvailabilityTime: '{{ item.NextUpdateAvailabilityTime }}'
+      StartHourOfDay: '{{ item.StartHourOfDay }}'
+      StartMinuteOfHour: '{{ item.StartMinuteOfHour }}'
+      VpcEndpoint: '{{ item.VpcEndpoint }}'
+- discovery_id: aws.backup-gateway.list_hypervisors
+  calls:
+  - action: list_hypervisors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Hypervisors }}'
+    item:
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      Host: '{{ item.Host }}'
+      Hypervisor: '{{ item.Hypervisor }}'
+      HypervisorArn: '{{ item.HypervisorArn }}'
+      KmsKeyArn: '{{ item.KmsKeyArn }}'
+- discovery_id: aws.backup-gateway.list_virtual_machines
+  calls:
+  - action: list_virtual_machines
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VirtualMachines }}'
+    item:
+      Name: '{{ item.Name }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      HostName: '{{ item.HostName }}'
+      HypervisorId: '{{ item.HypervisorId }}'
+      LastBackupDate: '{{ item.LastBackupDate }}'
+      Path: '{{ item.Path }}'
+- discovery_id: aws.backup-gateway.get_bandwidth_rate_limit_schedule
+  for_each: aws.backup-gateway.list_gateways
+  calls:
+  - action: get_bandwidth_rate_limit_schedule
+    params:
+      GatewayArn: '{{ item.GatewayArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.BandwidthRateLimitIntervals }}'
+    item:
+      AverageUploadRateLimitInBitsPerSec: '{{ item.AverageUploadRateLimitInBitsPerSec
+        }}'
+      BandwidthRateLimitIntervals: '{{ item.BandwidthRateLimitIntervals }}'
+      DaysOfWeek: '{{ item.DaysOfWeek }}'
+      EndHourOfDay: '{{ item.EndHourOfDay }}'
+      EndMinuteOfHour: '{{ item.EndMinuteOfHour }}'
+      StartHourOfDay: '{{ item.StartHourOfDay }}'
+      StartMinuteOfHour: '{{ item.StartMinuteOfHour }}'
+- discovery_id: aws.backup-gateway.get_gateway
+  for_each: aws.backup-gateway.list_gateways
+  calls:
+  - action: get_gateway
+    params:
+      GatewayArn: '{{ item.GatewayArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Gateway: '{{ response.Gateway.Gateway }}'
+      GatewayArn: '{{ response.Gateway.GatewayArn }}'
+      GatewayDisplayName: '{{ response.Gateway.GatewayDisplayName }}'
+      GatewayType: '{{ response.Gateway.GatewayType }}'
+      HypervisorId: '{{ response.Gateway.HypervisorId }}'
+      LastSeenTime: '{{ response.Gateway.LastSeenTime }}'
+      MaintenanceStartTime: '{{ response.Gateway.MaintenanceStartTime }}'
+      NextUpdateAvailabilityTime: '{{ response.Gateway.NextUpdateAvailabilityTime
+        }}'
+      VpcEndpoint: '{{ response.Gateway.VpcEndpoint }}'
+- discovery_id: aws.backup-gateway.get_hypervisor
+  for_each: aws.backup-gateway.list_hypervisors
+  calls:
+  - action: get_hypervisor
+    params:
+      HypervisorArn: '{{ item.HypervisorArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.Hypervisor.Name }}'
+      State: '{{ response.Hypervisor.State }}'
+      Host: '{{ response.Hypervisor.Host }}'
+      Hypervisor: '{{ response.Hypervisor.Hypervisor }}'
+      HypervisorArn: '{{ response.Hypervisor.HypervisorArn }}'
+      KmsKeyArn: '{{ response.Hypervisor.KmsKeyArn }}'
+      LastSuccessfulMetadataSyncTime: '{{ response.Hypervisor.LastSuccessfulMetadataSyncTime
+        }}'
+      LatestMetadataSyncStatus: '{{ response.Hypervisor.LatestMetadataSyncStatus }}'
+      LatestMetadataSyncStatusMessage: '{{ response.Hypervisor.LatestMetadataSyncStatusMessage
+        }}'
+      LogGroupArn: '{{ response.Hypervisor.LogGroupArn }}'
+- discovery_id: aws.backup-gateway.get_hypervisor_property_mappings
+  for_each: aws.backup-gateway.list_hypervisors
+  calls:
+  - action: get_hypervisor_property_mappings
+    params:
+      HypervisorArn: '{{ item.HypervisorArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VmwareToAwsTagMappings }}'
+    item:
+      AwsTagKey: '{{ item.AwsTagKey }}'
+      AwsTagValue: '{{ item.AwsTagValue }}'
+      VmwareCategory: '{{ item.VmwareCategory }}'
+      VmwareTagName: '{{ item.VmwareTagName }}'
+- discovery_id: aws.backup-gateway.get_virtual_machine
+  for_each: aws.backup-gateway.list_virtual_machines
+  calls:
+  - action: get_virtual_machine
+    params:
+      ResourceArn: '{{ item.ResourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.VirtualMachine.Name }}'
+      ResourceArn: '{{ response.VirtualMachine.ResourceArn }}'
+      HostName: '{{ response.VirtualMachine.HostName }}'
+      HypervisorId: '{{ response.VirtualMachine.HypervisorId }}'
+      LastBackupDate: '{{ response.VirtualMachine.LastBackupDate }}'
+      Path: '{{ response.VirtualMachine.Path }}'
+      VmwareTags: '{{ response.VirtualMachine.VmwareTags }}'
+- discovery_id: aws.backup-gateway.list_tags_for_resource
+  for_each: aws.backup-gateway.list_virtual_machines
+  calls:
+  - action: list_tags_for_resource
+    params:
+      ResourceArn: '{{ item.ResourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

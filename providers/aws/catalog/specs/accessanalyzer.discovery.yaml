@@ -1,0 +1,78 @@
+version: '1.0'
+provider: aws
+service: accessanalyzer
+discovery:
+- calls:
+  - action: list_analyzers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.accessanalyzer.list_analyzers
+  emit:
+    as: item
+    item:
+      Enabled: '{{ item.Enabled }}'
+      Status: '{{ item.Status }}'
+      accessPreview: '{{ item.accessPreview }}'
+      action: '{{ item.action }}'
+      actions: '{{ item.actions }}'
+      analyzedAt: '{{ item.analyzedAt }}'
+      analyzer: '{{ item.analyzer }}'
+      archiveRule: '{{ item.archiveRule }}'
+      arn: '{{ item.arn }}'
+      changeType: '{{ item.changeType }}'
+      completedAt: '{{ item.completedAt }}'
+      condition: '{{ item.condition }}'
+      configuration: '{{ item.configuration }}'
+      configurations: '{{ item.configurations }}'
+      createdAt: '{{ item.createdAt }}'
+      error: '{{ item.error }}'
+      existingFindingId: '{{ item.existingFindingId }}'
+      existingFindingStatus: '{{ item.existingFindingStatus }}'
+      externalAccessFindingsStatistics: '{{ item.externalAccessFindingsStatistics }}'
+      filter: '{{ item.filter }}'
+      finding: '{{ item.finding }}'
+      findingDetails: '{{ item.findingDetails }}'
+      findingsStatistics: '{{ item.findingsStatistics }}'
+      id: '{{ item.id }}'
+      internalAccessFindingsStatistics: '{{ item.internalAccessFindingsStatistics }}'
+      isPublic: '{{ item.isPublic }}'
+      lastResourceAnalyzed: '{{ item.lastResourceAnalyzed }}'
+      lastResourceAnalyzedAt: '{{ item.lastResourceAnalyzedAt }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      name: '{{ item.name }}'
+      principal: '{{ item.principal }}'
+      recommendationType: '{{ item.recommendationType }}'
+      recommendedSteps: '{{ item.recommendedSteps }}'
+      resource: '{{ item.resource }}'
+      resourceControlPolicyRestriction: '{{ item.resourceControlPolicyRestriction }}'
+      sharedVia: '{{ item.sharedVia }}'
+      sources: '{{ item.sources }}'
+      startedAt: '{{ item.startedAt }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      tags: '{{ item.tags }}'
+      type: '{{ item.type }}'
+      unusedAccessFindingsStatistics: '{{ item.unusedAccessFindingsStatistics }}'
+      unusedPermissionsRecommendedStep: '{{ item.unusedPermissionsRecommendedStep }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.analyzers }}'
+- calls:
+  - action: list_policy_generations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.accessanalyzer.list_policy_generations
+  emit:
+    as: item
+    item:
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+      completedOn: '{{ item.completedOn }}'
+      generatedPolicyResult: '{{ item.generatedPolicyResult }}'
+      jobDetails: '{{ item.jobDetails }}'
+      jobId: '{{ item.jobId }}'
+      principalArn: '{{ item.principalArn }}'
+      startedOn: '{{ item.startedOn }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.policyGenerations }}'

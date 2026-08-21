@@ -1,0 +1,116 @@
+version: '1.0'
+provider: aws
+service: rtbfabric
+services:
+  client: rtbfabric
+  module: boto3.client
+discovery:
+- discovery_id: aws.rtbfabric.list_requester_gateways
+  calls:
+  - action: list_requester_gateways
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.gatewayIds }}'
+    item:
+      description: '{{ item.description }}'
+- discovery_id: aws.rtbfabric.list_responder_gateways
+  calls:
+  - action: list_responder_gateways
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.gatewayIds }}'
+    item:
+      protocol: '{{ item.protocol }}'
+- discovery_id: aws.rtbfabric.get_inbound_external_link
+  calls:
+  - action: get_inbound_external_link
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.flowModules }}'
+    item:
+      DestinationArn: '{{ item.DestinationArn }}'
+      Enabled: '{{ item.Enabled }}'
+      Format: '{{ item.Format }}'
+      Level: '{{ item.Level }}'
+      dependsOn: '{{ item.dependsOn }}'
+      moduleParameters: '{{ item.moduleParameters }}'
+      name: '{{ item.name }}'
+      version: '{{ item.version }}'
+- discovery_id: aws.rtbfabric.get_link
+  calls:
+  - action: get_link
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.flowModules }}'
+    item:
+      dependsOn: '{{ item.dependsOn }}'
+      moduleParameters: '{{ item.moduleParameters }}'
+      name: '{{ item.name }}'
+      version: '{{ item.version }}'
+- discovery_id: aws.rtbfabric.get_outbound_external_link
+  calls:
+  - action: get_outbound_external_link
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      applicationLogs: '{{ response.logSettings.applicationLogs }}'
+- discovery_id: aws.rtbfabric.get_requester_gateway
+  calls:
+  - action: get_requester_gateway
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.subnetIds }}'
+    item:
+      description: '{{ item.description }}'
+- discovery_id: aws.rtbfabric.get_responder_gateway
+  calls:
+  - action: get_responder_gateway
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.subnetIds }}'
+    item:
+      Status: '{{ item.Status }}'
+      protocol: '{{ item.protocol }}'
+- discovery_id: aws.rtbfabric.list_links
+  calls:
+  - action: list_links
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.links }}'
+    item:
+      attributes: '{{ item.attributes }}'
+      createdAt: '{{ item.createdAt }}'
+      direction: '{{ item.direction }}'
+      flowModules: '{{ item.flowModules }}'
+      gatewayId: '{{ item.gatewayId }}'
+      linkId: '{{ item.linkId }}'
+      peerGatewayId: '{{ item.peerGatewayId }}'
+      pendingFlowModules: '{{ item.pendingFlowModules }}'
+      status: '{{ item.status }}'
+      tags: '{{ item.tags }}'
+      updatedAt: '{{ item.updatedAt }}'
+- discovery_id: aws.rtbfabric.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

@@ -1,0 +1,126 @@
+# ============================================================
+# Discovery YAML — appintegrations (AWS)
+# Generated: 2026-02-21T04:56:57Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: appintegrations
+services:
+  client: appintegrations
+  module: boto3.client
+discovery:
+  # ── ListApplications ──
+  - discovery_id: aws.appintegrations.list_applications
+    calls:
+      - action: list_applications
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Applications }}'
+  # ── ListDataIntegrations ──
+  - discovery_id: aws.appintegrations.list_data_integrations
+    calls:
+      - action: list_data_integrations
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.DataIntegrations }}'
+  # ── ListEventIntegrations ──
+  - discovery_id: aws.appintegrations.list_event_integrations
+    calls:
+      - action: list_event_integrations
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.EventIntegrations }}'
+  # ── Dependent read operations (require identifiers) ──
+  # ── GetApplication ──
+  - discovery_id: aws.appintegrations.get_application
+    for_each: aws.appintegrations.list_applications
+    calls:
+      - action: get_application
+        params:
+          Arn: '{{ item.Arn }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Subscriptions }}'
+  # ── GetDataIntegration ──
+  - discovery_id: aws.appintegrations.get_data_integration
+    calls:
+      - action: get_data_integration
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Arn: '{{ response.Arn }}'
+        Id: '{{ response.Id }}'
+        Name: '{{ response.Name }}'
+        Tags: '{{ response.Tags }}'
+        Description: '{{ response.Description }}'
+        FileConfiguration: '{{ response.FileConfiguration }}'
+        KmsKey: '{{ response.KmsKey }}'
+        ObjectConfiguration: '{{ response.ObjectConfiguration }}'
+        ScheduleConfiguration: '{{ response.ScheduleConfiguration }}'
+        SourceURI: '{{ response.SourceURI }}'
+  # ── GetEventIntegration ──
+  - discovery_id: aws.appintegrations.get_event_integration
+    for_each: aws.appintegrations.list_applications
+    calls:
+      - action: get_event_integration
+        params:
+          Name: '{{ item.Name }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Name: '{{ response.Name }}'
+        Tags: '{{ response.Tags }}'
+        Description: '{{ response.Description }}'
+        EventBridgeBus: '{{ response.EventBridgeBus }}'
+        EventFilter: '{{ response.EventFilter }}'
+        EventIntegrationArn: '{{ response.EventIntegrationArn }}'
+  # ── ListApplicationAssociations ──
+  - discovery_id: aws.appintegrations.list_application_associations
+    calls:
+      - action: list_application_associations
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.ApplicationAssociations }}'
+  # ── ListDataIntegrationAssociations ──
+  - discovery_id: aws.appintegrations.list_data_integration_associations
+    calls:
+      - action: list_data_integration_associations
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.DataIntegrationAssociations }}'
+  # ── ListEventIntegrationAssociations ──
+  - discovery_id: aws.appintegrations.list_event_integration_associations
+    calls:
+      - action: list_event_integration_associations
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.EventIntegrationAssociations }}'
+  # ── ListTagsForResource ──
+  - discovery_id: aws.appintegrations.list_tags_for_resource
+    calls:
+      - action: list_tags_for_resource
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        tags: '{{ response.tags }}'

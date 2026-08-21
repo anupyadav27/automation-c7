@@ -1,0 +1,56 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: event (backed by cloudtrail)
+# 2 ops (from checks)
+# Generated: 2026-04-14
+version: '1.0'
+provider: aws
+service: event
+services:
+  client: cloudtrail
+  module: boto3.client
+discovery:
+  - discovery_id: aws.event.list_event_data_stores
+    calls:
+    - action: list_event_data_stores
+      save_as: response
+      on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.EventDataStores }}'
+      item:
+        Status: '{{ item.Status }}'
+        AdvancedEventSelectors: '{{ item.AdvancedEventSelectors }}'
+        CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+        EventDataStoreArn: '{{ item.EventDataStoreArn }}'
+        MultiRegionEnabled: '{{ item.MultiRegionEnabled }}'
+        OrganizationEnabled: '{{ item.OrganizationEnabled }}'
+        RetentionPeriod: '{{ item.RetentionPeriod }}'
+        TerminationProtectionEnabled: '{{ item.TerminationProtectionEnabled }}'
+        UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+  - discovery_id: aws.event.get_event_data_store
+    for_each: aws.event.list_event_data_stores
+    calls:
+    - action: get_event_data_store
+      save_as: response
+      on_error: continue
+      params:
+        EventDataStore: '{{ item.EventDataStoreArn }}'
+    emit:
+      as: item
+      items_for: '{{ response }}'
+      item:
+        Name: '{{ item.Name }}'
+        Status: '{{ item.Status }}'
+        KmsKeyId: '{{ item.KmsKeyId }}'
+        AdvancedEventSelectors: '{{ item.AdvancedEventSelectors }}'
+        BillingMode: '{{ item.BillingMode }}'
+        CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+        EventDataStoreArn: '{{ item.EventDataStoreArn }}'
+        FederationRoleArn: '{{ item.FederationRoleArn }}'
+        FederationStatus: '{{ item.FederationStatus }}'
+        MultiRegionEnabled: '{{ item.MultiRegionEnabled }}'
+        OrganizationEnabled: '{{ item.OrganizationEnabled }}'
+        PartitionKeys: '{{ item.PartitionKeys }}'
+        RetentionPeriod: '{{ item.RetentionPeriod }}'
+        TerminationProtectionEnabled: '{{ item.TerminationProtectionEnabled }}'
+        UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'

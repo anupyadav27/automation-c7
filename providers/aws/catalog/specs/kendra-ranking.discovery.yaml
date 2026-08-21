@@ -1,0 +1,53 @@
+version: '1.0'
+provider: aws
+service: kendra-ranking
+services:
+  client: kendra-ranking
+  module: boto3.client
+discovery:
+- discovery_id: aws.kendra-ranking.list_rescore_execution_plans
+  calls:
+  - action: list_rescore_execution_plans
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SummaryItems }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Description: '{{ item.Description }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.kendra-ranking.describe_rescore_execution_plan
+  for_each: aws.kendra-ranking.list_rescore_execution_plans
+  calls:
+  - action: describe_rescore_execution_plan
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Description: '{{ response.CapacityUnits.Description }}'
+      RescoreCapacityUnits: '{{ response.CapacityUnits.RescoreCapacityUnits }}'
+      Arn: '{{ response.Arn }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      ErrorMessage: '{{ response.ErrorMessage }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      Status: '{{ response.Status }}'
+      UpdatedAt: '{{ response.UpdatedAt }}'
+- discovery_id: aws.kendra-ranking.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

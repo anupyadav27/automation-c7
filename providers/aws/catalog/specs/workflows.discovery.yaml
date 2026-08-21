@@ -1,0 +1,86 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: workflows
+# 4 ops (3 from checks, +1 for inventory)
+version: '1.0'
+provider: aws
+service: workflows
+discovery:
+  - calls:
+    - action: list_executions
+      on_error: continue
+      save_as: response
+    discovery_id: aws.workflows.list_executions
+    emit:
+      as: item
+      item:
+        cause: '{{ response.cause }}'
+        error: '{{ response.error }}'
+        executionArn: '{{ response.executionArn }}'
+        inputDetails: '{{ response.inputDetails }}'
+        itemCount: '{{ response.itemCount }}'
+        mapRunArn: '{{ response.mapRunArn }}'
+        name: '{{ response.name }}'
+        output: '{{ response.output }}'
+        outputDetails: '{{ response.outputDetails }}'
+        redriveCount: '{{ response.redriveCount }}'
+        redriveDate: '{{ response.redriveDate }}'
+        startDate: '{{ response.startDate }}'
+        stateMachineAliasArn: '{{ response.stateMachineAliasArn }}'
+        stateMachineArn: '{{ response.stateMachineArn }}'
+        stateMachineVersionArn: '{{ response.stateMachineVersionArn }}'
+        status: '{{ response.status }}'
+        stopDate: '{{ response.stopDate }}'
+  - calls:
+    - action: list_state_machines
+      on_error: continue
+      save_as: response
+    discovery_id: aws.workflows.list_state_machines
+    emit:
+      as: item
+      item:
+        creationDate: '{{ response.creationDate }}'
+        definition: '{{ response.definition }}'
+        description: '{{ response.description }}'
+        label: '{{ response.label }}'
+        name: '{{ response.name }}'
+        stateMachineArn: '{{ response.stateMachineArn }}'
+        type: '{{ response.type }}'
+  - calls:
+    - action: describe_state_machine
+      on_error: continue
+      params:
+        stateMachineArn: '{{ item.stateMachineArn }}'
+      save_as: response
+    discovery_id: aws.workflows.describe_state_machine
+    emit:
+      as: item
+      item:
+        definition: '{{ response.definition }}'
+        description: '{{ response.description }}'
+        destinations: '{{ response.destinations }}'
+        includeExecutionData: '{{ response.includeExecutionData }}'
+        label: '{{ response.label }}'
+        level: '{{ response.level }}'
+        loggingConfiguration: '{{ response.loggingConfiguration }}'
+        name: '{{ response.name }}'
+        roleArn: '{{ response.roleArn }}'
+        stateMachineArn: '{{ response.stateMachineArn }}'
+        status: '{{ response.status }}'
+        type: '{{ response.type }}'
+    for_each: aws.workflows.list_state_machines
+  - calls:
+    - action: list_activities
+      on_error: continue
+      save_as: response
+    discovery_id: aws.workflows.list_activities
+    emit:
+      as: item
+      item:
+        activityArn: '{{ response.activityArn }}'
+        creationDate: '{{ response.creationDate }}'
+        encryptionConfiguration: '{{ response.encryptionConfiguration }}'
+        input: '{{ response.input }}'
+        kmsDataKeyReusePeriodSeconds: '{{ response.kmsDataKeyReusePeriodSeconds }}'
+        kmsKeyId: '{{ response.kmsKeyId }}'
+        name: '{{ response.name }}'
+        taskToken: '{{ response.taskToken }}'

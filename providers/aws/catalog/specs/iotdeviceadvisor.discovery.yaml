@@ -1,0 +1,125 @@
+version: '1.0'
+provider: aws
+service: iotdeviceadvisor
+services:
+  client: iotdeviceadvisor
+  module: boto3.client
+discovery:
+- discovery_id: aws.iotdeviceadvisor.get_endpoint
+  calls:
+  - action: get_endpoint
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      endpoint: '{{ response.endpoint }}'
+- discovery_id: aws.iotdeviceadvisor.list_suite_definitions
+  calls:
+  - action: list_suite_definitions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.suiteDefinitionInformationList }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      defaultDevices: '{{ item.defaultDevices }}'
+      intendedForQualification: '{{ item.intendedForQualification }}'
+      isLongDurationTest: '{{ item.isLongDurationTest }}'
+      protocol: '{{ item.protocol }}'
+      suiteDefinitionId: '{{ item.suiteDefinitionId }}'
+      suiteDefinitionName: '{{ item.suiteDefinitionName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotdeviceadvisor.list_suite_runs
+  calls:
+  - action: list_suite_runs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.suiteRunsList }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      endAt: '{{ item.endAt }}'
+      failed: '{{ item.failed }}'
+      passed: '{{ item.passed }}'
+      startedAt: '{{ item.startedAt }}'
+      status: '{{ item.status }}'
+      suiteDefinitionId: '{{ item.suiteDefinitionId }}'
+      suiteDefinitionName: '{{ item.suiteDefinitionName }}'
+      suiteDefinitionVersion: '{{ item.suiteDefinitionVersion }}'
+      suiteRunId: '{{ item.suiteRunId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotdeviceadvisor.get_suite_definition
+  for_each: aws.iotdeviceadvisor.list_suite_definitions
+  calls:
+  - action: get_suite_definition
+    params:
+      suiteDefinitionId: '{{ item.suiteDefinitionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.suiteDefinitionConfiguration.Status }}'
+      Enabled: '{{ response.suiteDefinitionConfiguration.Enabled }}'
+      devicePermissionRoleArn: '{{ response.suiteDefinitionConfiguration.devicePermissionRoleArn }}'
+      devices: '{{ response.suiteDefinitionConfiguration.devices[].thingArn }}'
+      intendedForQualification: '{{ response.suiteDefinitionConfiguration.intendedForQualification }}'
+      isLongDurationTest: '{{ response.suiteDefinitionConfiguration.isLongDurationTest }}'
+      protocol: '{{ response.suiteDefinitionConfiguration.protocol }}'
+      rootGroup: '{{ response.suiteDefinitionConfiguration.rootGroup }}'
+      suiteDefinitionName: '{{ response.suiteDefinitionConfiguration.suiteDefinitionName }}'
+      createdAt: '{{ response.createdAt }}'
+      lastModifiedAt: '{{ response.lastModifiedAt }}'
+      latestVersion: '{{ response.latestVersion }}'
+      suiteDefinitionArn: '{{ response.suiteDefinitionArn }}'
+      suiteDefinitionId: '{{ response.suiteDefinitionId }}'
+      suiteDefinitionVersion: '{{ response.suiteDefinitionVersion }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.iotdeviceadvisor.get_suite_run
+  for_each: aws.iotdeviceadvisor.list_suite_definitions
+  calls:
+  - action: get_suite_run
+    params:
+      suiteDefinitionId: '{{ item.suiteDefinitionId }}'
+      suiteRunId: '{{ item.suiteRunId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      parallelRun: '{{ response.suiteRunConfiguration.parallelRun }}'
+      primaryDevice: '{{ response.suiteRunConfiguration.primaryDevice.thingArn }}'
+      selectedTestList: '{{ response.suiteRunConfiguration.selectedTestList }}'
+      endTime: '{{ response.endTime }}'
+      errorReason: '{{ response.errorReason }}'
+      startTime: '{{ response.startTime }}'
+      status: '{{ response.status }}'
+      suiteDefinitionId: '{{ response.suiteDefinitionId }}'
+      suiteDefinitionVersion: '{{ response.suiteDefinitionVersion }}'
+      suiteRunArn: '{{ response.suiteRunArn }}'
+      certificateArn: '{{ response.suiteRunConfiguration.primaryDevice.certificateArn }}'
+      deviceRoleArn: '{{ response.suiteRunConfiguration.primaryDevice.deviceRoleArn }}'
+      thingArn: '{{ response.suiteRunConfiguration.primaryDevice.thingArn }}'
+      suiteRunId: '{{ response.suiteRunId }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.iotdeviceadvisor.get_suite_run_report
+  calls:
+  - action: get_suite_run_report
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      qualificationReportDownloadUrl: '{{ response.qualificationReportDownloadUrl }}'
+- discovery_id: aws.iotdeviceadvisor.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

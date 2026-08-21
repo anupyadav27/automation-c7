@@ -1,0 +1,936 @@
+version: '1.0'
+provider: aws
+service: imagebuilder
+services:
+  client: imagebuilder
+  module: boto3.client
+discovery:
+- discovery_id: aws.imagebuilder.list_component_build_versions
+  calls:
+  - action: list_component_build_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.componentSummaryList }}'
+    item:
+      arn: '{{ item.arn }}'
+      changeDescription: '{{ item.changeDescription }}'
+      component: '{{ item.component }}'
+      dateCreated: '{{ item.dateCreated }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      obfuscate: '{{ item.obfuscate }}'
+      owner: '{{ item.owner }}'
+      platform: '{{ item.platform }}'
+      publisher: '{{ item.publisher }}'
+      requestId: '{{ item.requestId }}'
+      state: '{{ item.state }}'
+      supportedOsVersions: '{{ item.supportedOsVersions }}'
+      tags: '{{ item.tags }}'
+      type: '{{ item.type }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.imagebuilder.list_components
+  calls:
+  - action: list_components
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.componentVersionList }}'
+    item:
+      arn: '{{ item.arn }}'
+      dateCreated: '{{ item.dateCreated }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      owner: '{{ item.owner }}'
+      platform: '{{ item.platform }}'
+      productCodes: '{{ item.productCodes }}'
+      status: '{{ item.status }}'
+      supportedOsVersions: '{{ item.supportedOsVersions }}'
+      type: '{{ item.type }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.list_container_recipes
+  calls:
+  - action: list_container_recipes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.containerRecipeSummaryList }}'
+    item:
+      arn: '{{ item.arn }}'
+      containerType: '{{ item.containerType }}'
+      dateCreated: '{{ item.dateCreated }}'
+      instanceImage: '{{ item.instanceImage }}'
+      name: '{{ item.name }}'
+      owner: '{{ item.owner }}'
+      parentImage: '{{ item.parentImage }}'
+      platform: '{{ item.platform }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.list_distribution_configurations
+  calls:
+  - action: list_distribution_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.distributionConfigurationSummaryList }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      arn: '{{ item.arn }}'
+      dateCreated: '{{ item.dateCreated }}'
+      dateUpdated: '{{ item.dateUpdated }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      regions: '{{ item.regions }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.list_image_build_versions
+  calls:
+  - action: list_image_build_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.imageSummaryList }}'
+    item:
+      arn: '{{ item.arn }}'
+      buildType: '{{ item.buildType }}'
+      dateCreated: '{{ item.dateCreated }}'
+      deprecationTime: '{{ item.deprecationTime }}'
+      image: '{{ item.image }}'
+      imageSource: '{{ item.imageSource }}'
+      lifecycleExecutionId: '{{ item.lifecycleExecutionId }}'
+      loggingConfiguration: '{{ item.loggingConfiguration }}'
+      name: '{{ item.name }}'
+      osVersion: '{{ item.osVersion }}'
+      outputResources: '{{ item.outputResources }}'
+      owner: '{{ item.owner }}'
+      platform: '{{ item.platform }}'
+      state: '{{ item.state }}'
+      tags: '{{ item.tags }}'
+      type: '{{ item.type }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.list_image_pipelines
+  calls:
+  - action: list_image_pipelines
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.imagePipelineList }}'
+    item:
+      arn: '{{ item.arn }}'
+      consecutiveFailures: '{{ item.consecutiveFailures }}'
+      containerRecipeArn: '{{ item.containerRecipeArn }}'
+      dateCreated: '{{ item.dateCreated }}'
+      dateLastRun: '{{ item.dateLastRun }}'
+      dateNextRun: '{{ item.dateNextRun }}'
+      dateUpdated: '{{ item.dateUpdated }}'
+      description: '{{ item.description }}'
+      distributionConfigurationArn: '{{ item.distributionConfigurationArn }}'
+      enhancedImageMetadataEnabled: '{{ item.enhancedImageMetadataEnabled }}'
+      executionRole: '{{ item.executionRole }}'
+      imagePipeline: '{{ item.imagePipeline }}'
+      imageRecipeArn: '{{ item.imageRecipeArn }}'
+      imageScanningConfiguration: '{{ item.imageScanningConfiguration }}'
+      imageTestsConfiguration: '{{ item.imageTestsConfiguration }}'
+      infrastructureConfigurationArn: '{{ item.infrastructureConfigurationArn }}'
+      lastRunStatus: '{{ item.lastRunStatus }}'
+      loggingConfiguration: '{{ item.loggingConfiguration }}'
+      name: '{{ item.name }}'
+      platform: '{{ item.platform }}'
+      schedule: '{{ item.schedule }}'
+      status: '{{ item.status }}'
+      tags: '{{ item.tags }}'
+      workflows: '{{ item.workflows }}'
+      nextToken: '{{ response.nextToken }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.list_image_recipes
+  calls:
+  - action: list_image_recipes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.imageRecipeSummaryList }}'
+    item:
+      arn: '{{ item.arn }}'
+      dateCreated: '{{ item.dateCreated }}'
+      name: '{{ item.name }}'
+      owner: '{{ item.owner }}'
+      parentImage: '{{ item.parentImage }}'
+      platform: '{{ item.platform }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.list_image_scan_finding_aggregations
+  calls:
+  - action: list_image_scan_finding_aggregations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.responses }}'
+    item:
+      accountAggregation: '{{ item.accountAggregation }}'
+      imageAggregation: '{{ item.imageAggregation }}'
+      imagePipelineAggregation: '{{ item.imagePipelineAggregation }}'
+      vulnerabilityIdAggregation: '{{ item.vulnerabilityIdAggregation }}'
+      aggregationType: '{{ response.aggregationType }}'
+      nextToken: '{{ response.nextToken }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.list_image_scan_findings
+  calls:
+  - action: list_image_scan_findings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.findings }}'
+    item:
+      awsAccountId: '{{ item.awsAccountId }}'
+      description: '{{ item.description }}'
+      firstObservedAt: '{{ item.firstObservedAt }}'
+      fixAvailable: '{{ item.fixAvailable }}'
+      imageBuildVersionArn: '{{ item.imageBuildVersionArn }}'
+      imagePipelineArn: '{{ item.imagePipelineArn }}'
+      inspectorScore: '{{ item.inspectorScore }}'
+      inspectorScoreDetails: '{{ item.inspectorScoreDetails }}'
+      packageVulnerabilityDetails: '{{ item.packageVulnerabilityDetails }}'
+      remediation: '{{ item.remediation }}'
+      severity: '{{ item.severity }}'
+      title: '{{ item.title }}'
+      type: '{{ item.type }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.list_images
+  calls:
+  - action: list_images
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.imageVersionList }}'
+    item:
+      arn: '{{ item.arn }}'
+      buildType: '{{ item.buildType }}'
+      dateCreated: '{{ item.dateCreated }}'
+      imageSource: '{{ item.imageSource }}'
+      name: '{{ item.name }}'
+      osVersion: '{{ item.osVersion }}'
+      owner: '{{ item.owner }}'
+      platform: '{{ item.platform }}'
+      type: '{{ item.type }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.list_infrastructure_configurations
+  calls:
+  - action: list_infrastructure_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.infrastructureConfigurationSummaryList }}'
+    item:
+      arn: '{{ item.arn }}'
+      dateCreated: '{{ item.dateCreated }}'
+      dateUpdated: '{{ item.dateUpdated }}'
+      description: '{{ item.description }}'
+      instanceProfileName: '{{ item.instanceProfileName }}'
+      instanceTypes: '{{ item.instanceTypes }}'
+      name: '{{ item.name }}'
+      placement: '{{ item.placement }}'
+      resourceTags: '{{ item.resourceTags }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.list_lifecycle_policies
+  calls:
+  - action: list_lifecycle_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.lifecyclePolicySummaryList }}'
+    item:
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+      arn: '{{ item.arn }}'
+      dateCreated: '{{ item.dateCreated }}'
+      dateLastRun: '{{ item.dateLastRun }}'
+      dateUpdated: '{{ item.dateUpdated }}'
+      description: '{{ item.description }}'
+      executionRole: '{{ item.executionRole }}'
+      lifecyclePolicy: '{{ item.lifecyclePolicy }}'
+      name: '{{ item.name }}'
+      resourceType: '{{ item.resourceType }}'
+      status: '{{ item.status }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.imagebuilder.list_waiting_workflow_steps
+  calls:
+  - action: list_waiting_workflow_steps
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.steps }}'
+    item:
+      action: '{{ item.action }}'
+      imageBuildVersionArn: '{{ item.imageBuildVersionArn }}'
+      name: '{{ item.name }}'
+      startTime: '{{ item.startTime }}'
+      stepExecutionId: '{{ item.stepExecutionId }}'
+      workflow: '{{ item.workflow }}'
+      workflowBuildVersionArn: '{{ item.steps[].workflowBuildVersionArn }}'
+      workflowExecutionId: '{{ item.workflowExecutionId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.imagebuilder.list_workflow_build_versions
+  calls:
+  - action: list_workflow_build_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workflowSummaryList }}'
+    item:
+      arn: '{{ item.arn }}'
+      changeDescription: '{{ item.changeDescription }}'
+      dateCreated: '{{ item.dateCreated }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      owner: '{{ item.owner }}'
+      state: '{{ item.state }}'
+      tags: '{{ item.tags }}'
+      type: '{{ item.type }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.imagebuilder.list_workflows
+  calls:
+  - action: list_workflows
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workflowVersionList }}'
+    item:
+      arn: '{{ item.arn }}'
+      dateCreated: '{{ item.dateCreated }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      owner: '{{ item.owner }}'
+      type: '{{ item.type }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.imagebuilder.get_component
+  calls:
+  - action: get_component
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.component.arn }}'
+      changeDescription: '{{ response.component.changeDescription }}'
+      component: '{{ response.component.component }}'
+      data: '{{ response.component.data }}'
+      dateCreated: '{{ response.component.dateCreated }}'
+      description: '{{ response.component.description }}'
+      encrypted: '{{ response.component.encrypted }}'
+      kmsKeyId: '{{ response.component.kmsKeyId }}'
+      name: '{{ response.component.name }}'
+      obfuscate: '{{ response.component.obfuscate }}'
+      owner: '{{ response.component.owner }}'
+      parameters: '{{ response.component.parameters[].type }}'
+      platform: '{{ response.component.platform }}'
+      productCodes: '{{ response.component.productCodes }}'
+      publisher: '{{ response.component.publisher }}'
+      state: '{{ response.component.state }}'
+      supportedOsVersions: '{{ response.component.supportedOsVersions }}'
+      tags: '{{ response.component.tags }}'
+      type: '{{ response.component.type }}'
+      version: '{{ response.component.version }}'
+      reason: '{{ response.component.state.reason }}'
+      status: '{{ response.component.state.status }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.get_component_policy
+  calls:
+  - action: get_component_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      policy: '{{ response.policy }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.get_container_recipe
+  for_each: aws.imagebuilder.list_image_pipelines
+  calls:
+  - action: get_container_recipe
+    params:
+      containerRecipeArn: '{{ item.containerRecipeArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.containerRecipe.arn }}'
+      components: '{{ response.containerRecipe.components }}'
+      containerType: '{{ response.containerRecipe.containerType }}'
+      dateCreated: '{{ response.containerRecipe.dateCreated }}'
+      description: '{{ response.containerRecipe.description }}'
+      dockerfileTemplateData: '{{ response.containerRecipe.dockerfileTemplateData }}'
+      encrypted: '{{ response.containerRecipe.encrypted }}'
+      instanceConfiguration: '{{ response.containerRecipe.instanceConfiguration.image }}'
+      kmsKeyId: '{{ response.containerRecipe.kmsKeyId }}'
+      name: '{{ response.containerRecipe.name }}'
+      owner: '{{ response.containerRecipe.owner }}'
+      parentImage: '{{ response.containerRecipe.parentImage }}'
+      platform: '{{ response.containerRecipe.platform }}'
+      tags: '{{ response.containerRecipe.tags }}'
+      targetRepository: '{{ response.containerRecipe.targetRepository.service }}'
+      version: '{{ response.containerRecipe.version }}'
+      workingDirectory: '{{ response.containerRecipe.workingDirectory }}'
+      image: '{{ response.containerRecipe.instanceConfiguration.image }}'
+      repositoryName: '{{ response.containerRecipe.targetRepository.repositoryName }}'
+      service: '{{ response.containerRecipe.targetRepository.service }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.get_container_recipe_policy
+  for_each: aws.imagebuilder.list_image_pipelines
+  calls:
+  - action: get_container_recipe_policy
+    params:
+      containerRecipeArn: '{{ item.containerRecipeArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      policy: '{{ response.policy }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.get_distribution_configuration
+  for_each: aws.imagebuilder.list_image_pipelines
+  calls:
+  - action: get_distribution_configuration
+    params:
+      distributionConfigurationArn: '{{ item.distributionConfigurationArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.distributionConfiguration.arn }}'
+      dateCreated: '{{ response.distributionConfiguration.dateCreated }}'
+      dateUpdated: '{{ response.distributionConfiguration.dateUpdated }}'
+      description: '{{ response.distributionConfiguration.description }}'
+      distributions: '{{ response.distributionConfiguration.distributions[].region }}'
+      name: '{{ response.distributionConfiguration.name }}'
+      tags: '{{ response.distributionConfiguration.tags }}'
+      timeoutMinutes: '{{ response.distributionConfiguration.timeoutMinutes }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.get_image
+  for_each: aws.imagebuilder.list_image_scan_findings
+  calls:
+  - action: get_image
+    params:
+      imageBuildVersionArn: '{{ item.imageBuildVersionArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.image.arn }}'
+      buildType: '{{ response.image.buildType }}'
+      containerRecipe: '{{ response.image.containerRecipe.arn }}'
+      dateCreated: '{{ response.image.dateCreated }}'
+      deprecationTime: '{{ response.image.deprecationTime }}'
+      distributionConfiguration: '{{ response.image.distributionConfiguration.arn }}'
+      enhancedImageMetadataEnabled: '{{ response.image.enhancedImageMetadataEnabled }}'
+      executionRole: '{{ response.image.executionRole }}'
+      image: '{{ response.image.image }}'
+      imageRecipe: '{{ response.image.imageRecipe.arn }}'
+      imageScanningConfiguration: '{{ response.image.imageScanningConfiguration }}'
+      imageSource: '{{ response.image.imageSource }}'
+      imageTestsConfiguration: '{{ response.image.imageTestsConfiguration }}'
+      infrastructureConfiguration: '{{ response.image.infrastructureConfiguration.arn }}'
+      lifecycleExecutionId: '{{ response.image.lifecycleExecutionId }}'
+      loggingConfiguration: '{{ response.image.loggingConfiguration }}'
+      name: '{{ response.image.name }}'
+      osVersion: '{{ response.image.osVersion }}'
+      outputResources: '{{ response.image.outputResources }}'
+      platform: '{{ response.image.platform }}'
+      scanState: '{{ response.image.scanState }}'
+      sourcePipelineArn: '{{ response.image.sourcePipelineArn }}'
+      sourcePipelineName: '{{ response.image.sourcePipelineName }}'
+      state: '{{ response.image.state }}'
+      tags: '{{ response.image.tags }}'
+      type: '{{ response.image.type }}'
+      version: '{{ response.image.version }}'
+      workflows: '{{ response.image.workflows }}'
+      containerType: '{{ response.image.containerRecipe.containerType }}'
+      description: '{{ response.image.containerRecipe.description }}'
+      dockerfileTemplateData: '{{ response.image.containerRecipe.dockerfileTemplateData }}'
+      encrypted: '{{ response.image.containerRecipe.encrypted }}'
+      kmsKeyId: '{{ response.image.containerRecipe.kmsKeyId }}'
+      owner: '{{ response.image.containerRecipe.owner }}'
+      parentImage: '{{ response.image.containerRecipe.parentImage }}'
+      repositoryName: '{{ response.image.containerRecipe.targetRepository.repositoryName }}'
+      service: '{{ response.image.containerRecipe.targetRepository.service }}'
+      workingDirectory: '{{ response.image.containerRecipe.workingDirectory }}'
+      dateUpdated: '{{ response.image.distributionConfiguration.dateUpdated }}'
+      timeoutMinutes: '{{ response.image.distributionConfiguration.timeoutMinutes }}'
+      uninstallAfterBuild: '{{ response.image.imageRecipe.additionalInstanceConfiguration.systemsManagerAgent.uninstallAfterBuild }}'
+      userDataOverride: '{{ response.image.imageRecipe.additionalInstanceConfiguration.userDataOverride }}'
+      imageScanningEnabled: '{{ response.image.imageScanningConfiguration.imageScanningEnabled }}'
+      imageTestsEnabled: '{{ response.image.imageTestsConfiguration.imageTestsEnabled }}'
+      httpPutResponseHopLimit: '{{ response.image.infrastructureConfiguration.instanceMetadataOptions.httpPutResponseHopLimit }}'
+      httpTokens: '{{ response.image.infrastructureConfiguration.instanceMetadataOptions.httpTokens }}'
+      instanceProfileName: '{{ response.image.infrastructureConfiguration.instanceProfileName }}'
+      keyPair: '{{ response.image.infrastructureConfiguration.keyPair }}'
+      s3BucketName: '{{ response.image.infrastructureConfiguration.logging.s3Logs.s3BucketName }}'
+      s3KeyPrefix: '{{ response.image.infrastructureConfiguration.logging.s3Logs.s3KeyPrefix }}'
+      availabilityZone: '{{ response.image.infrastructureConfiguration.placement.availabilityZone }}'
+      hostId: '{{ response.image.infrastructureConfiguration.placement.hostId }}'
+      hostResourceGroupArn: '{{ response.image.infrastructureConfiguration.placement.hostResourceGroupArn }}'
+      tenancy: '{{ response.image.infrastructureConfiguration.placement.tenancy }}'
+      resourceTags: '{{ response.image.infrastructureConfiguration.resourceTags }}'
+      snsTopicArn: '{{ response.image.infrastructureConfiguration.snsTopicArn }}'
+      subnetId: '{{ response.image.infrastructureConfiguration.subnetId }}'
+      terminateInstanceOnFailure: '{{ response.image.infrastructureConfiguration.terminateInstanceOnFailure }}'
+      reason: '{{ response.image.scanState.reason }}'
+      status: '{{ response.image.scanState.status }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.get_image_pipeline
+  for_each: aws.imagebuilder.list_image_scan_findings
+  calls:
+  - action: get_image_pipeline
+    params:
+      imagePipelineArn: '{{ item.imagePipelineArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.imagePipeline.arn }}'
+      consecutiveFailures: '{{ response.imagePipeline.consecutiveFailures }}'
+      containerRecipeArn: '{{ response.imagePipeline.containerRecipeArn }}'
+      dateCreated: '{{ response.imagePipeline.dateCreated }}'
+      dateLastRun: '{{ response.imagePipeline.dateLastRun }}'
+      dateNextRun: '{{ response.imagePipeline.dateNextRun }}'
+      dateUpdated: '{{ response.imagePipeline.dateUpdated }}'
+      description: '{{ response.imagePipeline.description }}'
+      distributionConfigurationArn: '{{ response.imagePipeline.distributionConfigurationArn }}'
+      enhancedImageMetadataEnabled: '{{ response.imagePipeline.enhancedImageMetadataEnabled }}'
+      executionRole: '{{ response.imagePipeline.executionRole }}'
+      imagePipeline: '{{ response.imagePipeline.imagePipeline }}'
+      imageRecipeArn: '{{ response.imagePipeline.imageRecipeArn }}'
+      imageScanningConfiguration: '{{ response.imagePipeline.imageScanningConfiguration }}'
+      imageTestsConfiguration: '{{ response.imagePipeline.imageTestsConfiguration }}'
+      infrastructureConfigurationArn: '{{ response.imagePipeline.infrastructureConfigurationArn }}'
+      lastRunStatus: '{{ response.imagePipeline.status }}'
+      loggingConfiguration: '{{ response.imagePipeline.loggingConfiguration }}'
+      name: '{{ response.imagePipeline.name }}'
+      platform: '{{ response.imagePipeline.platform }}'
+      schedule: '{{ response.imagePipeline.schedule }}'
+      status: '{{ response.imagePipeline.status }}'
+      tags: '{{ response.imagePipeline.tags }}'
+      workflows: '{{ response.imagePipeline.workflows }}'
+      repositoryName: '{{ response.imagePipeline.imageScanningConfiguration.ecrConfiguration.repositoryName }}'
+      imageScanningEnabled: '{{ response.imagePipeline.imageScanningConfiguration.imageScanningEnabled }}'
+      imageTestsEnabled: '{{ response.imagePipeline.imageTestsConfiguration.imageTestsEnabled }}'
+      timeoutMinutes: '{{ response.imagePipeline.imageTestsConfiguration.timeoutMinutes }}'
+      pipelineExecutionStartCondition: '{{ response.imagePipeline.schedule.pipelineExecutionStartCondition }}'
+      scheduleExpression: '{{ response.imagePipeline.schedule.scheduleExpression }}'
+      timezone: '{{ response.imagePipeline.schedule.timezone }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.get_image_policy
+  calls:
+  - action: get_image_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      policy: '{{ response.policy }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.get_image_recipe
+  for_each: aws.imagebuilder.list_image_pipelines
+  calls:
+  - action: get_image_recipe
+    params:
+      imageRecipeArn: '{{ item.imageRecipeArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      additionalInstanceConfiguration: '{{ response.imageRecipe.additionalInstanceConfiguration }}'
+      amiTags: '{{ response.imageRecipe.tags }}'
+      arn: '{{ response.imageRecipe.arn }}'
+      blockDeviceMappings: '{{ response.imageRecipe.blockDeviceMappings }}'
+      components: '{{ response.imageRecipe.components }}'
+      dateCreated: '{{ response.imageRecipe.dateCreated }}'
+      description: '{{ response.imageRecipe.description }}'
+      name: '{{ response.imageRecipe.name }}'
+      owner: '{{ response.imageRecipe.owner }}'
+      parentImage: '{{ response.imageRecipe.parentImage }}'
+      platform: '{{ response.imageRecipe.platform }}'
+      tags: '{{ response.imageRecipe.tags }}'
+      type: '{{ response.imageRecipe.type }}'
+      version: '{{ response.imageRecipe.version }}'
+      workingDirectory: '{{ response.imageRecipe.workingDirectory }}'
+      uninstallAfterBuild: '{{ response.imageRecipe.additionalInstanceConfiguration.systemsManagerAgent.uninstallAfterBuild }}'
+      userDataOverride: '{{ response.imageRecipe.additionalInstanceConfiguration.userDataOverride }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.get_image_recipe_policy
+  for_each: aws.imagebuilder.list_image_pipelines
+  calls:
+  - action: get_image_recipe_policy
+    params:
+      imageRecipeArn: '{{ item.imageRecipeArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      policy: '{{ response.policy }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.get_infrastructure_configuration
+  for_each: aws.imagebuilder.list_image_pipelines
+  calls:
+  - action: get_infrastructure_configuration
+    params:
+      infrastructureConfigurationArn: '{{ item.infrastructureConfigurationArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.infrastructureConfiguration.arn }}'
+      dateCreated: '{{ response.infrastructureConfiguration.dateCreated }}'
+      dateUpdated: '{{ response.infrastructureConfiguration.dateUpdated }}'
+      description: '{{ response.infrastructureConfiguration.description }}'
+      instanceMetadataOptions: '{{ response.infrastructureConfiguration.instanceMetadataOptions.httpTokens }}'
+      instanceProfileName: '{{ response.infrastructureConfiguration.instanceProfileName }}'
+      instanceTypes: '{{ response.infrastructureConfiguration.instanceTypes }}'
+      keyPair: '{{ response.infrastructureConfiguration.keyPair }}'
+      logging: '{{ response.infrastructureConfiguration.arn }}'
+      name: '{{ response.infrastructureConfiguration.name }}'
+      placement: '{{ response.infrastructureConfiguration.placement.hostId }}'
+      resourceTags: '{{ response.infrastructureConfiguration.resourceTags }}'
+      securityGroupIds: '{{ response.infrastructureConfiguration.securityGroupIds }}'
+      snsTopicArn: '{{ response.infrastructureConfiguration.snsTopicArn }}'
+      subnetId: '{{ response.infrastructureConfiguration.subnetId }}'
+      tags: '{{ response.infrastructureConfiguration.tags }}'
+      terminateInstanceOnFailure: '{{ response.infrastructureConfiguration.terminateInstanceOnFailure }}'
+      httpPutResponseHopLimit: '{{ response.infrastructureConfiguration.instanceMetadataOptions.httpPutResponseHopLimit }}'
+      httpTokens: '{{ response.infrastructureConfiguration.instanceMetadataOptions.httpTokens }}'
+      s3BucketName: '{{ response.infrastructureConfiguration.logging.s3Logs.s3BucketName }}'
+      s3KeyPrefix: '{{ response.infrastructureConfiguration.logging.s3Logs.s3KeyPrefix }}'
+      availabilityZone: '{{ response.infrastructureConfiguration.placement.availabilityZone }}'
+      hostId: '{{ response.infrastructureConfiguration.placement.hostId }}'
+      hostResourceGroupArn: '{{ response.infrastructureConfiguration.placement.hostResourceGroupArn }}'
+      tenancy: '{{ response.infrastructureConfiguration.placement.tenancy }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.get_lifecycle_execution
+  for_each: aws.imagebuilder.list_image_build_versions
+  calls:
+  - action: get_lifecycle_execution
+    params:
+      lifecycleExecutionId: '{{ item.lifecycleExecutionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      endTime: '{{ response.lifecycleExecution.endTime }}'
+      lifecycleExecutionId: '{{ response.lifecycleExecution.lifecycleExecutionId }}'
+      lifecyclePolicyArn: '{{ response.lifecycleExecution.lifecyclePolicyArn }}'
+      resourcesImpactedSummary: '{{ response.lifecycleExecution.resourcesImpactedSummary }}'
+      startTime: '{{ response.lifecycleExecution.startTime }}'
+      state: '{{ response.lifecycleExecution.startTime }}'
+      hasImpactedResources: '{{ response.lifecycleExecution.resourcesImpactedSummary.hasImpactedResources }}'
+      reason: '{{ response.lifecycleExecution.state.reason }}'
+      status: '{{ response.lifecycleExecution.state.status }}'
+- discovery_id: aws.imagebuilder.get_lifecycle_policy
+  calls:
+  - action: get_lifecycle_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.lifecyclePolicy.arn }}'
+      dateCreated: '{{ response.lifecyclePolicy.dateCreated }}'
+      dateLastRun: '{{ response.lifecyclePolicy.dateLastRun }}'
+      dateUpdated: '{{ response.lifecyclePolicy.dateUpdated }}'
+      description: '{{ response.lifecyclePolicy.description }}'
+      executionRole: '{{ response.lifecyclePolicy.executionRole }}'
+      lifecyclePolicy: '{{ response.lifecyclePolicy.lifecyclePolicy }}'
+      name: '{{ response.lifecyclePolicy.name }}'
+      policyDetails: '{{ response.lifecyclePolicy.policyDetails }}'
+      resourceSelection: '{{ response.lifecyclePolicy.resourceSelection.tagMap }}'
+      resourceType: '{{ response.lifecyclePolicy.resourceType }}'
+      status: '{{ response.lifecyclePolicy.status }}'
+      tags: '{{ response.lifecyclePolicy.tags }}'
+      tagMap: '{{ response.lifecyclePolicy.resourceSelection.tagMap }}'
+- discovery_id: aws.imagebuilder.get_marketplace_resource
+  for_each: aws.imagebuilder.list_lifecycle_policies
+  calls:
+  - action: get_marketplace_resource
+    params:
+      resourceType: '{{ item.resourceType }}'
+      resourceArn: '{{ item.resourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      data: '{{ response.data }}'
+      resourceArn: '{{ response.resourceArn }}'
+      url: '{{ response.url }}'
+- discovery_id: aws.imagebuilder.get_workflow
+  for_each: aws.imagebuilder.list_waiting_workflow_steps
+  calls:
+  - action: get_workflow
+    params:
+      workflowBuildVersionArn: '{{ item.workflowBuildVersionArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.workflow.arn }}'
+      changeDescription: '{{ response.workflow.changeDescription }}'
+      data: '{{ response.workflow.data }}'
+      dateCreated: '{{ response.workflow.dateCreated }}'
+      description: '{{ response.workflow.description }}'
+      kmsKeyId: '{{ response.workflow.kmsKeyId }}'
+      name: '{{ response.workflow.name }}'
+      owner: '{{ response.workflow.owner }}'
+      parameters: '{{ response.workflow.parameters }}'
+      state: '{{ response.workflow.state }}'
+      tags: '{{ response.workflow.tags }}'
+      type: '{{ response.workflow.type }}'
+      version: '{{ response.workflow.version }}'
+      workflow: '{{ response.workflow.workflow }}'
+      reason: '{{ response.workflow.state.reason }}'
+      status: '{{ response.workflow.state.status }}'
+- discovery_id: aws.imagebuilder.get_workflow_execution
+  for_each: aws.imagebuilder.list_waiting_workflow_steps
+  calls:
+  - action: get_workflow_execution
+    params:
+      workflowExecutionId: '{{ item.workflowExecutionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      endTime: '{{ response.endTime }}'
+      imageBuildVersionArn: '{{ response.imageBuildVersionArn }}'
+      message: '{{ response.message }}'
+      parallelGroup: '{{ response.parallelGroup }}'
+      requestId: '{{ response.requestId }}'
+      startTime: '{{ response.startTime }}'
+      status: '{{ response.status }}'
+      totalStepCount: '{{ response.totalStepCount }}'
+      totalStepsFailed: '{{ response.totalStepsFailed }}'
+      totalStepsSkipped: '{{ response.totalStepsSkipped }}'
+      totalStepsSucceeded: '{{ response.totalStepsSucceeded }}'
+      type: '{{ response.type }}'
+      workflowBuildVersionArn: '{{ response.workflowBuildVersionArn }}'
+      workflowExecutionId: '{{ response.workflowExecutionId }}'
+- discovery_id: aws.imagebuilder.get_workflow_step_execution
+  for_each: aws.imagebuilder.list_waiting_workflow_steps
+  calls:
+  - action: get_workflow_step_execution
+    params:
+      stepExecutionId: '{{ item.stepExecutionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      action: '{{ response.action }}'
+      description: '{{ response.description }}'
+      endTime: '{{ response.endTime }}'
+      imageBuildVersionArn: '{{ response.imageBuildVersionArn }}'
+      inputs: '{{ response.inputs }}'
+      message: '{{ response.message }}'
+      name: '{{ response.name }}'
+      onFailure: '{{ response.onFailure }}'
+      outputs: '{{ response.outputs }}'
+      requestId: '{{ response.requestId }}'
+      rollbackStatus: '{{ response.rollbackStatus }}'
+      startTime: '{{ response.startTime }}'
+      status: '{{ response.status }}'
+      stepExecutionId: '{{ response.stepExecutionId }}'
+      timeoutSeconds: '{{ response.timeoutSeconds }}'
+      workflowBuildVersionArn: '{{ response.workflowBuildVersionArn }}'
+      workflowExecutionId: '{{ response.workflowExecutionId }}'
+- discovery_id: aws.imagebuilder.list_image_packages
+  for_each: aws.imagebuilder.list_image_scan_findings
+  calls:
+  - action: list_image_packages
+    params:
+      imageBuildVersionArn: '{{ item.imageBuildVersionArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.imagePackageList }}'
+    item:
+      packageName: '{{ item.packageName }}'
+      packageVersion: '{{ item.packageVersion }}'
+      nextToken: '{{ response.nextToken }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.list_image_pipeline_images
+  for_each: aws.imagebuilder.list_image_scan_findings
+  calls:
+  - action: list_image_pipeline_images
+    params:
+      imagePipelineArn: '{{ item.imagePipelineArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.imageSummaryList }}'
+    item:
+      arn: '{{ item.arn }}'
+      buildType: '{{ item.buildType }}'
+      dateCreated: '{{ item.dateCreated }}'
+      deprecationTime: '{{ item.deprecationTime }}'
+      imageSource: '{{ item.imageSource }}'
+      lifecycleExecutionId: '{{ item.lifecycleExecutionId }}'
+      loggingConfiguration: '{{ item.loggingConfiguration }}'
+      name: '{{ item.name }}'
+      osVersion: '{{ item.osVersion }}'
+      outputResources: '{{ item.outputResources }}'
+      owner: '{{ item.owner }}'
+      platform: '{{ item.platform }}'
+      state: '{{ item.state }}'
+      tags: '{{ item.tags }}'
+      type: '{{ item.type }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.list_lifecycle_execution_resources
+  for_each: aws.imagebuilder.list_image_build_versions
+  calls:
+  - action: list_lifecycle_execution_resources
+    params:
+      lifecycleExecutionId: '{{ item.lifecycleExecutionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.resources }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      action: '{{ item.action }}'
+      endTime: '{{ item.endTime }}'
+      imageUris: '{{ item.imageUris }}'
+      region: '{{ item.region }}'
+      resourceId: '{{ item.resourceId }}'
+      snapshots: '{{ item.snapshots }}'
+      startTime: '{{ item.startTime }}'
+      state: '{{ item.state }}'
+      lifecycleExecutionId: '{{ response.lifecycleExecutionId }}'
+      reason: '{{ response.lifecycleExecutionState.reason }}'
+      status: '{{ response.lifecycleExecutionState.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.imagebuilder.list_lifecycle_executions
+  calls:
+  - action: list_lifecycle_executions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.lifecycleExecutions }}'
+    item:
+      endTime: '{{ item.endTime }}'
+      lifecycleExecutionId: '{{ item.lifecycleExecutionId }}'
+      lifecyclePolicyArn: '{{ item.lifecyclePolicyArn }}'
+      resourcesImpactedSummary: '{{ item.resourcesImpactedSummary }}'
+      startTime: '{{ item.startTime }}'
+      state: '{{ item.state }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.imagebuilder.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.imagebuilder.list_workflow_executions
+  for_each: aws.imagebuilder.list_image_scan_findings
+  calls:
+  - action: list_workflow_executions
+    params:
+      imageBuildVersionArn: '{{ item.imageBuildVersionArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workflowExecutions }}'
+    item:
+      endTime: '{{ item.endTime }}'
+      message: '{{ item.message }}'
+      parallelGroup: '{{ item.parallelGroup }}'
+      retried: '{{ item.retried }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      totalStepCount: '{{ item.totalStepCount }}'
+      totalStepsFailed: '{{ item.totalStepsFailed }}'
+      totalStepsSkipped: '{{ item.totalStepsSkipped }}'
+      totalStepsSucceeded: '{{ item.totalStepsSucceeded }}'
+      type: '{{ item.type }}'
+      workflowBuildVersionArn: '{{ item.workflowBuildVersionArn }}'
+      workflowExecutionId: '{{ item.workflowExecutionId }}'
+      imageBuildVersionArn: '{{ response.imageBuildVersionArn }}'
+      nextToken: '{{ response.nextToken }}'
+      requestId: '{{ response.requestId }}'
+- discovery_id: aws.imagebuilder.list_workflow_step_executions
+  for_each: aws.imagebuilder.list_waiting_workflow_steps
+  calls:
+  - action: list_workflow_step_executions
+    params:
+      workflowExecutionId: '{{ item.workflowExecutionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.steps }}'
+    item:
+      action: '{{ item.action }}'
+      description: '{{ item.description }}'
+      endTime: '{{ item.endTime }}'
+      inputs: '{{ item.inputs }}'
+      message: '{{ item.message }}'
+      name: '{{ item.name }}'
+      outputs: '{{ item.outputs }}'
+      rollbackStatus: '{{ item.rollbackStatus }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      stepExecutionId: '{{ item.stepExecutionId }}'
+      imageBuildVersionArn: '{{ response.imageBuildVersionArn }}'
+      nextToken: '{{ response.nextToken }}'
+      requestId: '{{ response.requestId }}'
+      workflowBuildVersionArn: '{{ response.workflowBuildVersionArn }}'
+      workflowExecutionId: '{{ response.workflowExecutionId }}'

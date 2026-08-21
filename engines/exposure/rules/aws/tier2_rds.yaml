@@ -1,0 +1,38 @@
+# =============================================================================
+# IEDS Tier 2 — AWS RDS (Publicly Accessible flag)
+# =============================================================================
+
+rules:
+
+  # resource_type matches di_table_inventory.resource_type exactly
+  - rule_id: IEDS-T2-AWS-008
+    tier: 2
+    csp: aws
+    resource_type: rds_db_instance
+    origin_type: internet
+    title: "AWS RDS instance is publicly accessible"
+    description: >
+      RDS instances with publicly_accessible=true have a DNS endpoint that resolves
+      to a public IP. Combined with permissive security groups, they are reachable
+      from the internet.
+    severity: critical
+    required_emitted_fields:
+      - publicly_accessible
+    exposure_conditions:
+      - field: publicly_accessible
+        operator: eq
+        value: true
+
+  - rule_id: IEDS-T2-AWS-009
+    tier: 2
+    csp: aws
+    resource_type: rds_db_cluster
+    origin_type: internet
+    title: "AWS RDS Aurora cluster is publicly accessible"
+    severity: critical
+    required_emitted_fields:
+      - publicly_accessible
+    exposure_conditions:
+      - field: publicly_accessible
+        operator: eq
+        value: true

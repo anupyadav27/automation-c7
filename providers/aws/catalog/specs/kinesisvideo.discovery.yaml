@@ -1,0 +1,235 @@
+version: '1.0'
+provider: aws
+service: kinesisvideo
+services:
+  client: kinesisvideo
+  module: boto3.client
+discovery:
+- discovery_id: aws.kinesisvideo.describe_edge_configuration
+  calls:
+  - action: describe_edge_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DeletionConfig: '{{ response.EdgeConfig.DeletionConfig }}'
+      EdgeAgentStatus: '{{ response.EdgeConfig.EdgeAgentStatus }}'
+      HubDeviceArn: '{{ response.EdgeConfig.HubDeviceArn }}'
+      RecorderConfig: '{{ response.EdgeConfig.RecorderConfig }}'
+      UploaderConfig: '{{ response.EdgeConfig.UploaderConfig }}'
+      CreationTime: '{{ response.CreationTime }}'
+      JobStatusDetails: '{{ response.EdgeAgentStatus.LastRecorderStatus.JobStatusDetails }}'
+      LastCollectedTime: '{{ response.EdgeAgentStatus.LastRecorderStatus.LastCollectedTime }}'
+      LastUpdatedTime: '{{ response.EdgeAgentStatus.LastRecorderStatus.LastUpdatedTime }}'
+      RecorderStatus: '{{ response.EdgeAgentStatus.LastRecorderStatus.RecorderStatus }}'
+      UploaderStatus: '{{ response.EdgeAgentStatus.LastUploaderStatus.UploaderStatus }}'
+      DeleteAfterUpload: '{{ response.EdgeConfig.DeletionConfig.DeleteAfterUpload }}'
+      EdgeRetentionInHours: '{{ response.EdgeConfig.DeletionConfig.EdgeRetentionInHours }}'
+      MaxLocalMediaSizeInMB: '{{ response.EdgeConfig.DeletionConfig.LocalSizeConfig.MaxLocalMediaSizeInMB }}'
+      StrategyOnFullSize: '{{ response.EdgeConfig.DeletionConfig.LocalSizeConfig.StrategyOnFullSize }}'
+      MediaUriSecretArn: '{{ response.EdgeConfig.RecorderConfig.MediaSourceConfig.MediaUriSecretArn }}'
+      MediaUriType: '{{ response.EdgeConfig.RecorderConfig.MediaSourceConfig.MediaUriType }}'
+      DurationInSeconds: '{{ response.EdgeConfig.RecorderConfig.ScheduleConfig.DurationInSeconds }}'
+      ScheduleExpression: '{{ response.EdgeConfig.RecorderConfig.ScheduleConfig.ScheduleExpression }}'
+      FailedStatusDetails: '{{ response.FailedStatusDetails }}'
+      StreamARN: '{{ response.StreamARN }}'
+      StreamName: '{{ response.StreamName }}'
+      SyncStatus: '{{ response.SyncStatus }}'
+- discovery_id: aws.kinesisvideo.describe_image_generation_configuration
+  calls:
+  - action: describe_image_generation_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.ImageGenerationConfiguration.Status }}'
+      DestinationConfig: '{{ response.ImageGenerationConfiguration.DestinationConfig.Uri }}'
+      Enabled: '{{ response.ImageGenerationConfiguration.Enabled }}'
+      Format: '{{ response.ImageGenerationConfiguration.Format }}'
+      FormatConfig: '{{ response.ImageGenerationConfiguration.FormatConfig }}'
+      HeightPixels: '{{ response.ImageGenerationConfiguration.HeightPixels }}'
+      ImageGenerationConfiguration: '{{ response.ImageGenerationConfiguration.ImageGenerationConfiguration }}'
+      ImageSelectorType: '{{ response.ImageGenerationConfiguration.ImageSelectorType }}'
+      SamplingInterval: '{{ response.ImageGenerationConfiguration.SamplingInterval }}'
+      WidthPixels: '{{ response.ImageGenerationConfiguration.WidthPixels }}'
+      DestinationRegion: '{{ response.ImageGenerationConfiguration.DestinationConfig.DestinationRegion }}'
+      Uri: '{{ response.ImageGenerationConfiguration.DestinationConfig.Uri }}'
+- discovery_id: aws.kinesisvideo.describe_mapped_resource_configuration
+  calls:
+  - action: describe_mapped_resource_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MappedResourceConfigurationList }}'
+    item:
+      ARN: '{{ item.ARN }}'
+      MappedResourceConfigurationList: '{{ item.MappedResourceConfigurationList[].ARN }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.kinesisvideo.describe_media_storage_configuration
+  calls:
+  - action: describe_media_storage_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.MediaStorageConfiguration.Status }}'
+      MediaStorageConfiguration: '{{ response.MediaStorageConfiguration.MediaStorageConfiguration }}'
+      StreamARN: '{{ response.MediaStorageConfiguration.StreamARN }}'
+- discovery_id: aws.kinesisvideo.describe_notification_configuration
+  calls:
+  - action: describe_notification_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.NotificationConfiguration.Status }}'
+      DestinationConfig: '{{ response.NotificationConfiguration.DestinationConfig.Uri }}'
+      NotificationConfiguration: '{{ response.NotificationConfiguration.NotificationConfiguration }}'
+      Uri: '{{ response.NotificationConfiguration.DestinationConfig.Uri }}'
+- discovery_id: aws.kinesisvideo.describe_signaling_channel
+  calls:
+  - action: describe_signaling_channel
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ response.ChannelInfo.CreationTime }}'
+      ChannelARN: '{{ response.ChannelInfo.ChannelARN }}'
+      ChannelInfo: '{{ response.ChannelInfo.ChannelInfo }}'
+      ChannelName: '{{ response.ChannelInfo.ChannelName }}'
+      SingleMasterConfiguration: '{{ response.ChannelInfo.SingleMasterConfiguration }}'
+      Version: '{{ response.ChannelInfo.Version }}'
+      ChannelStatus: '{{ response.ChannelInfo.ChannelStatus }}'
+      ChannelType: '{{ response.ChannelInfo.ChannelType }}'
+      MessageTtlSeconds: '{{ response.ChannelInfo.SingleMasterConfiguration.MessageTtlSeconds }}'
+- discovery_id: aws.kinesisvideo.describe_stream
+  calls:
+  - action: describe_stream
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ response.StreamInfo.CreationTime }}'
+      KmsKeyId: '{{ response.StreamInfo.KmsKeyId }}'
+      Status: '{{ response.StreamInfo.Status }}'
+      DataRetentionInHours: '{{ response.StreamInfo.DataRetentionInHours }}'
+      DeviceName: '{{ response.StreamInfo.DeviceName }}'
+      MediaType: '{{ response.StreamInfo.MediaType }}'
+      StreamARN: '{{ response.StreamInfo.StreamARN }}'
+      StreamInfo: '{{ response.StreamInfo.StreamInfo }}'
+      StreamName: '{{ response.StreamInfo.StreamName }}'
+      Version: '{{ response.StreamInfo.Version }}'
+- discovery_id: aws.kinesisvideo.describe_stream_storage_configuration
+  calls:
+  - action: describe_stream_storage_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DefaultStorageTier: '{{ response.StreamStorageConfiguration.DefaultStorageTier }}'
+      MediaStorageConfiguration: '{{ response.StreamStorageConfiguration.MediaStorageConfiguration }}'
+      StreamStorageConfiguration: '{{ response.StreamStorageConfiguration.StreamStorageConfiguration }}'
+- discovery_id: aws.kinesisvideo.list_signaling_channels
+  calls:
+  - action: list_signaling_channels
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ChannelInfoList }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      ChannelARN: '{{ item.ChannelARN }}'
+      ChannelInfo: '{{ item.ChannelInfo }}'
+      ChannelName: '{{ item.ChannelName }}'
+      ChannelStatus: '{{ item.ChannelStatus }}'
+      ChannelType: '{{ item.ChannelType }}'
+      SingleMasterConfiguration: '{{ item.SingleMasterConfiguration }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.kinesisvideo.list_streams
+  calls:
+  - action: list_streams
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.StreamInfoList }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      Status: '{{ item.Status }}'
+      DataRetentionInHours: '{{ item.DataRetentionInHours }}'
+      DeviceName: '{{ item.DeviceName }}'
+      MediaType: '{{ item.MediaType }}'
+      StreamARN: '{{ item.StreamARN }}'
+      StreamInfo: '{{ item.StreamInfo }}'
+      StreamName: '{{ item.StreamName }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.kinesisvideo.list_tags_for_stream
+  calls:
+  - action: list_tags_for_stream
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.kinesisvideo.get_data_endpoint
+  calls:
+  - action: get_data_endpoint
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DataEndpoint: '{{ response.DataEndpoint }}'
+- discovery_id: aws.kinesisvideo.get_signaling_channel_endpoint
+  for_each: aws.kinesisvideo.describe_signaling_channel
+  calls:
+  - action: get_signaling_channel_endpoint
+    params:
+      ChannelARN: '{{ item.ChannelARN }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceEndpointList }}'
+    item:
+      Protocol: '{{ item.Protocol }}'
+      ResourceEndpoint: '{{ item.ResourceEndpoint }}'
+- discovery_id: aws.kinesisvideo.list_edge_agent_configurations
+  for_each: aws.kinesisvideo.describe_edge_configuration
+  calls:
+  - action: list_edge_agent_configurations
+    params:
+      HubDeviceArn: '{{ item.HubDeviceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EdgeConfigs }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      EdgeConfig: '{{ item.EdgeConfig }}'
+      FailedStatusDetails: '{{ item.FailedStatusDetails }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      StreamARN: '{{ item.StreamARN }}'
+      StreamName: '{{ item.StreamName }}'
+      SyncStatus: '{{ item.SyncStatus }}'
+- discovery_id: aws.kinesisvideo.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

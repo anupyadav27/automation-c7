@@ -1,0 +1,172 @@
+version: '1.0'
+provider: aws
+service: timestream-write
+services:
+  client: timestream-write
+  module: boto3.client
+discovery:
+- discovery_id: aws.timestream-write.describe_endpoints
+  calls:
+  - action: describe_endpoints
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Endpoints }}'
+    item:
+      Address: '{{ item.Address }}'
+      CachePeriodInMinutes: '{{ item.CachePeriodInMinutes }}'
+      Endpoints: '{{ item.Endpoints }}'
+- discovery_id: aws.timestream-write.list_batch_load_tasks
+  calls:
+  - action: list_batch_load_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.BatchLoadTasks }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      DatabaseName: '{{ item.DatabaseName }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      ResumableUntil: '{{ item.ResumableUntil }}'
+      Table: '{{ item.Table }}'
+      TableName: '{{ item.TableName }}'
+      TaskId: '{{ item.TaskId }}'
+      TaskStatus: '{{ item.TaskStatus }}'
+- discovery_id: aws.timestream-write.list_databases
+  calls:
+  - action: list_databases
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Databases }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      DatabaseName: '{{ item.DatabaseName }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      TableCount: '{{ item.TableCount }}'
+- discovery_id: aws.timestream-write.list_tables
+  calls:
+  - action: list_tables
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tables }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      DatabaseName: '{{ item.DatabaseName }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      MagneticStoreWriteProperties: '{{ item.MagneticStoreWriteProperties }}'
+      RetentionProperties: '{{ item.RetentionProperties }}'
+      Schema: '{{ item.Schema }}'
+      TableName: '{{ item.TableName }}'
+      TableStatus: '{{ item.TableStatus }}'
+- discovery_id: aws.timestream-write.describe_batch_load_task
+  for_each: aws.timestream-write.list_batch_load_tasks
+  calls:
+  - action: describe_batch_load_task
+    params:
+      TaskId: '{{ item.TaskId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ response.BatchLoadTaskDescription.CreationTime }}'
+      Status: '{{ response.BatchLoadTaskDescription.TaskStatus }}'
+      DataModelConfiguration: '{{ response.BatchLoadTaskDescription.DataModelConfiguration }}'
+      DataSourceConfiguration: '{{ response.BatchLoadTaskDescription.DataSourceConfiguration.DataFormat }}'
+      Enabled: '{{ response.BatchLoadTaskDescription.TaskId }}'
+      ErrorMessage: '{{ response.BatchLoadTaskDescription.ErrorMessage }}'
+      LastUpdatedTime: '{{ response.BatchLoadTaskDescription.LastUpdatedTime }}'
+      ProgressReport: '{{ response.BatchLoadTaskDescription.ProgressReport.FileFailures }}'
+      RecordVersion: '{{ response.BatchLoadTaskDescription.RecordVersion }}'
+      ReportConfiguration: '{{ response.BatchLoadTaskDescription.ReportConfiguration }}'
+      ResumableUntil: '{{ response.BatchLoadTaskDescription.ResumableUntil }}'
+      TargetDatabaseName: '{{ response.BatchLoadTaskDescription.TargetDatabaseName }}'
+      TargetTableName: '{{ response.BatchLoadTaskDescription.TargetTableName }}'
+      TaskId: '{{ response.BatchLoadTaskDescription.TaskId }}'
+      TaskStatus: '{{ response.BatchLoadTaskDescription.TaskStatus }}'
+      BucketName: '{{ response.BatchLoadTaskDescription.DataModelConfiguration.DataModelS3Configuration.BucketName }}'
+      ObjectKey: '{{ response.BatchLoadTaskDescription.DataModelConfiguration.DataModelS3Configuration.ObjectKey }}'
+      MeasureNameColumn: '{{ response.BatchLoadTaskDescription.DataModelConfiguration.DataModel.MeasureNameColumn }}'
+      TargetMultiMeasureName: '{{ response.BatchLoadTaskDescription.DataModelConfiguration.DataModel.MultiMeasureMappings.TargetMultiMeasureName }}'
+      TimeColumn: '{{ response.BatchLoadTaskDescription.DataModelConfiguration.DataModel.TimeColumn }}'
+      TimeUnit: '{{ response.BatchLoadTaskDescription.DataModelConfiguration.DataModel.TimeUnit }}'
+      ColumnSeparator: '{{ response.BatchLoadTaskDescription.DataSourceConfiguration.CsvConfiguration.ColumnSeparator }}'
+      EscapeChar: '{{ response.BatchLoadTaskDescription.DataSourceConfiguration.CsvConfiguration.EscapeChar }}'
+      NullValue: '{{ response.BatchLoadTaskDescription.DataSourceConfiguration.CsvConfiguration.NullValue }}'
+      QuoteChar: '{{ response.BatchLoadTaskDescription.DataSourceConfiguration.CsvConfiguration.QuoteChar }}'
+      TrimWhiteSpace: '{{ response.BatchLoadTaskDescription.DataSourceConfiguration.CsvConfiguration.TrimWhiteSpace }}'
+      DataFormat: '{{ response.BatchLoadTaskDescription.DataSourceConfiguration.DataFormat }}'
+      ObjectKeyPrefix: '{{ response.BatchLoadTaskDescription.DataSourceConfiguration.DataSourceS3Configuration.ObjectKeyPrefix }}'
+      BytesMetered: '{{ response.BatchLoadTaskDescription.ProgressReport.BytesMetered }}'
+      FileFailures: '{{ response.BatchLoadTaskDescription.ProgressReport.FileFailures }}'
+      ParseFailures: '{{ response.BatchLoadTaskDescription.ProgressReport.ParseFailures }}'
+      RecordIngestionFailures: '{{ response.BatchLoadTaskDescription.ProgressReport.RecordIngestionFailures }}'
+      RecordsIngested: '{{ response.BatchLoadTaskDescription.ProgressReport.RecordsIngested }}'
+      RecordsProcessed: '{{ response.BatchLoadTaskDescription.ProgressReport.RecordsProcessed }}'
+      EncryptionOption: '{{ response.BatchLoadTaskDescription.ReportConfiguration.ReportS3Configuration.EncryptionOption }}'
+      KmsKeyId: '{{ response.BatchLoadTaskDescription.ReportConfiguration.ReportS3Configuration.KmsKeyId }}'
+- discovery_id: aws.timestream-write.describe_database
+  for_each: aws.timestream-write.list_batch_load_tasks
+  calls:
+  - action: describe_database
+    params:
+      DatabaseName: '{{ item.DatabaseName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Database.Arn }}'
+      CreationTime: '{{ response.Database.CreationTime }}'
+      KmsKeyId: '{{ response.Database.KmsKeyId }}'
+      DatabaseName: '{{ response.Database.DatabaseName }}'
+      LastUpdatedTime: '{{ response.Database.LastUpdatedTime }}'
+      TableCount: '{{ response.Database.TableCount }}'
+- discovery_id: aws.timestream-write.describe_table
+  for_each: aws.timestream-write.list_batch_load_tasks
+  calls:
+  - action: describe_table
+    params:
+      DatabaseName: '{{ item.DatabaseName }}'
+      TableName: '{{ item.TableName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Table.Arn }}'
+      CreationTime: '{{ response.Table.CreationTime }}'
+      DatabaseName: '{{ response.Table.DatabaseName }}'
+      LastUpdatedTime: '{{ response.Table.LastUpdatedTime }}'
+      MagneticStoreWriteProperties: '{{ response.Table.MagneticStoreWriteProperties }}'
+      RetentionProperties: '{{ response.Table.RetentionProperties }}'
+      Schema: '{{ response.Table.Schema }}'
+      TableName: '{{ response.Table.TableName }}'
+      TableStatus: '{{ response.Table.TableStatus }}'
+      EnableMagneticStoreWrites: '{{ response.Table.MagneticStoreWriteProperties.EnableMagneticStoreWrites }}'
+      BucketName: '{{ response.Table.MagneticStoreWriteProperties.MagneticStoreRejectedDataLocation.S3Configuration.BucketName }}'
+      EncryptionOption: '{{ response.Table.MagneticStoreWriteProperties.MagneticStoreRejectedDataLocation.S3Configuration.EncryptionOption }}'
+      KmsKeyId: '{{ response.Table.MagneticStoreWriteProperties.MagneticStoreRejectedDataLocation.S3Configuration.KmsKeyId }}'
+      ObjectKeyPrefix: '{{ response.Table.MagneticStoreWriteProperties.MagneticStoreRejectedDataLocation.S3Configuration.ObjectKeyPrefix }}'
+      MagneticStoreRetentionPeriodInDays: '{{ response.Table.RetentionProperties.MagneticStoreRetentionPeriodInDays }}'
+      MemoryStoreRetentionPeriodInHours: '{{ response.Table.RetentionProperties.MemoryStoreRetentionPeriodInHours }}'
+- discovery_id: aws.timestream-write.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

@@ -1,0 +1,56 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: msk (backed by kafka)
+# 2 ops (from checks)
+# Generated: 2026-04-14
+version: '1.0'
+provider: aws
+service: msk
+services:
+  client: kafka
+  module: boto3.client
+discovery:
+  - discovery_id: aws.msk.list_clusters_v2
+    calls:
+    - action: list_clusters_v2
+      save_as: response
+      on_error: continue
+      params:
+        MaxResults: 100
+    emit:
+      as: item
+      items_for: '{{ response.ClusterInfoList }}'
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        State: '{{ item.State }}'
+        Tags: '{{ item.Tags }}'
+        ActiveOperationArn: '{{ item.ActiveOperationArn }}'
+        ClusterArn: '{{ item.ClusterArn }}'
+        ClusterName: '{{ item.ClusterName }}'
+        ClusterType: '{{ item.ClusterType }}'
+        CurrentVersion: '{{ item.CurrentVersion }}'
+        Provisioned: '{{ item.Provisioned }}'
+        Serverless: '{{ item.Serverless }}'
+        StateInfo: '{{ item.StateInfo }}'
+  - discovery_id: aws.msk.describe_cluster
+    for_each: aws.msk.list_clusters_v2
+    calls:
+    - action: describe_cluster_v2
+      save_as: response
+      on_error: continue
+      params:
+        ClusterArn: '{{ item.ClusterArn }}'
+    emit:
+      as: item
+      items_for: '{{ response.ClusterInfo }}'
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        State: '{{ item.State }}'
+        Tags: '{{ item.Tags }}'
+        ActiveOperationArn: '{{ item.ActiveOperationArn }}'
+        ClusterArn: '{{ item.ClusterArn }}'
+        ClusterName: '{{ item.ClusterName }}'
+        ClusterType: '{{ item.ClusterType }}'
+        CurrentVersion: '{{ item.CurrentVersion }}'
+        Provisioned: '{{ item.Provisioned }}'
+        Serverless: '{{ item.Serverless }}'
+        StateInfo: '{{ item.StateInfo }}'

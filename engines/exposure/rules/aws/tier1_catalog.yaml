@@ -1,0 +1,132 @@
+# =============================================================================
+# IEDS Tier 1 — AWS always-public resource types
+# Tier 1 = catalog flag only; exposure is structural (no field check needed).
+# These resource types are ALWAYS internet-accessible by design.
+# The loader sets network_exposure_tier=1 in di_resource_catalog for each entry.
+# =============================================================================
+# Schema: rule_id, tier, csp, resource_type, origin_type, title, severity
+# Tier 1 rules have empty required_emitted_fields and exposure_conditions.
+
+rules:
+
+  # ---- API Gateway ----
+  # resource_type = exact DI di_table_inventory.resource_type value (underscored, not dotted)
+  - rule_id: IEDS-T1-AWS-001
+    tier: 1
+    csp: aws
+    resource_type: apigateway_rest_api
+    origin_type: internet
+    title: "AWS API Gateway REST API is internet-accessible by default"
+    severity: high
+
+  - rule_id: IEDS-T1-AWS-002
+    tier: 1
+    csp: aws
+    resource_type: apigatewayv2_api
+    origin_type: internet
+    title: "AWS API Gateway v2 HTTP API is internet-accessible by default"
+    severity: high
+
+  - rule_id: IEDS-T1-AWS-003
+    tier: 1
+    csp: aws
+    resource_type: apigatewayv2_api
+    origin_type: internet
+    title: "AWS API Gateway v2 API is internet-accessible by default"
+    severity: high
+
+  # ---- CloudFront ----
+  - rule_id: IEDS-T1-AWS-004
+    tier: 1
+    csp: aws
+    resource_type: cloudfront_distribution
+    origin_type: internet
+    title: "AWS CloudFront distribution is internet-accessible by default"
+    severity: medium
+
+  # ---- Lambda Function URL ----
+  # DI emits lambda_function_url_config (describe_function_url_configs response)
+  - rule_id: IEDS-T1-AWS-005
+    tier: 1
+    csp: aws
+    resource_type: lambda_function_url_config
+    origin_type: internet
+    title: "AWS Lambda Function URL is publicly accessible"
+    severity: critical
+
+  # ---- S3 Website Hosting ----
+  # RETIERED 1 -> 2. The title says "static website hosting endpoint" and the
+  # rule tested nothing, so as tier 1 it fired on every bucket in the estate:
+  # 55 high-severity findings, all false. An S3 bucket is private by default;
+  # "public by construction" is exactly what it is not.
+  #
+  # The honest verdict today is `undetermined`, not `not_exposed`. Proving
+  # website hosting needs GetBucketWebsite, which this collector does not call —
+  # so we cannot clear these buckets either, and saying so is the point. Add the
+  # call and the rule starts answering; until then it reports a coverage gap
+  # instead of a clean bill.
+  - rule_id: IEDS-T1-AWS-006
+    tier: 2
+    csp: aws
+    resource_type: s3_bucket
+    origin_type: internet
+    title: "AWS S3 bucket static website hosting endpoint is publicly accessible"
+    severity: high
+    required_emitted_fields:
+      - name: website_configuration
+        optional: false        # absent -> undetermined; never a clean bill
+    exposure_conditions:
+      - field: website_configuration
+        operator: not_null
+
+  # ---- Route53 / DNS ----
+  # RETIERED 1 -> 2. A PRIVATE hosted zone is not internet-accessible, and the
+  # title always said "public". `Config.PrivateZone` is in the payload we
+  # already collect, so the check costs nothing and the rule stops asserting
+  # something it never tested.
+  - rule_id: IEDS-T1-AWS-007
+    tier: 2
+    csp: aws
+    resource_type: route53_hosted_zone
+    origin_type: internet
+    title: "AWS Route53 public hosted zone is internet-accessible"
+    severity: low
+    required_emitted_fields:
+      - name: private_zone
+        optional: false
+    exposure_conditions:
+      - field: private_zone
+        operator: eq
+        value: false
+
+  # ---- Global Accelerator ----
+  - rule_id: IEDS-T1-AWS-008
+    tier: 1
+    csp: aws
+    resource_type: globalaccelerator_accelerator
+    origin_type: internet
+    title: "AWS Global Accelerator is internet-accessible by default"
+    severity: medium
+
+  # ---- AppSync / GraphQL ----
+  - rule_id: IEDS-T1-AWS-009
+    tier: 1
+    csp: aws
+    resource_type: appsync_graph_ql_api
+    origin_type: internet
+    title: "AWS AppSync GraphQL API is internet-accessible by default"
+    severity: high
+
+  # ---- ECR Public Repository ----
+  # RETARGETED. The title says "public repository" and the rule pointed at
+  # `ecr_repository`, which is the PRIVATE registry — so it fired on all 16
+  # private repos in this estate. ECR Public is a different AWS service with a
+  # different API and its own type, `ecr-public.repository`, and that one IS
+  # public by construction. Tier 1 is correct; the target was not.
+  - rule_id: IEDS-T1-AWS-010
+    tier: 1
+    csp: aws
+    resource_type: ecr-public.repository
+    origin_type: internet
+    title: "AWS ECR public repository is internet-accessible"
+    severity: medium

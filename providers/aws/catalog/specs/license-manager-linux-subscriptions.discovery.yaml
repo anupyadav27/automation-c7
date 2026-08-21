@@ -1,0 +1,103 @@
+version: '1.0'
+provider: aws
+service: license-manager-linux-subscriptions
+services:
+  client: license-manager-linux-subscriptions
+  module: boto3.client
+discovery:
+- discovery_id: aws.license-manager-linux-subscriptions.get_service_settings
+  calls:
+  - action: get_service_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HomeRegions }}'
+    item:
+      DestinationArn: '{{ item.DestinationArn }}'
+      Enabled: '{{ item.Enabled }}'
+      Format: '{{ item.Format }}'
+      HomeRegions: '{{ item.HomeRegions }}'
+      Level: '{{ item.Level }}'
+      LinuxSubscriptionsDiscovery: '{{ item.LinuxSubscriptionsDiscovery }}'
+      LinuxSubscriptionsDiscoverySettings: '{{ item.LinuxSubscriptionsDiscovery }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      OrganizationIntegration: '{{ response.LinuxSubscriptionsDiscoverySettings.OrganizationIntegration }}'
+      Status: '{{ response.Status }}'
+- discovery_id: aws.license-manager-linux-subscriptions.list_linux_subscription_instances
+  calls:
+  - action: list_linux_subscription_instances
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Instances }}'
+    item:
+      Region: '{{ item.Region }}'
+      Status: '{{ item.Status }}'
+      AccountID: '{{ item.AccountID }}'
+      AmiId: '{{ item.AmiId }}'
+      DualSubscription: '{{ item.DualSubscription }}'
+      InstanceID: '{{ item.InstanceID }}'
+      InstanceType: '{{ item.InstanceType }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      OsVersion: '{{ item.OsVersion }}'
+      ProductCode: '{{ item.ProductCode }}'
+      RegisteredWithSubscriptionProvider: '{{ item.Instances[].RegisteredWithSubscriptionProvider }}'
+      SubscriptionName: '{{ item.SubscriptionName }}'
+      SubscriptionProviderCreateTime: '{{ item.SubscriptionProviderCreateTime }}'
+      SubscriptionProviderUpdateTime: '{{ item.SubscriptionProviderUpdateTime }}'
+      UsageOperation: '{{ item.UsageOperation }}'
+- discovery_id: aws.license-manager-linux-subscriptions.list_linux_subscriptions
+  calls:
+  - action: list_linux_subscriptions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Subscriptions }}'
+    item:
+      Name: '{{ item.Name }}'
+      InstanceCount: '{{ item.InstanceCount }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.license-manager-linux-subscriptions.list_registered_subscription_providers
+  calls:
+  - action: list_registered_subscription_providers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RegisteredSubscriptionProviders }}'
+    item:
+      LastSuccessfulDataRetrievalTime: '{{ item.LastSuccessfulDataRetrievalTime }}'
+      SecretArn: '{{ item.SecretArn }}'
+      SubscriptionProviderArn: '{{ item.SubscriptionProviderArn }}'
+      SubscriptionProviderSource: '{{ item.SubscriptionProviderSource }}'
+      SubscriptionProviderStatus: '{{ item.SubscriptionProviderStatus }}'
+      SubscriptionProviderStatusMessage: '{{ item.SubscriptionProviderStatusMessage }}'
+- discovery_id: aws.license-manager-linux-subscriptions.get_registered_subscription_provider
+  for_each: aws.license-manager-linux-subscriptions.list_registered_subscription_providers
+  calls:
+  - action: get_registered_subscription_provider
+    params:
+      SubscriptionProviderArn: '{{ item.SubscriptionProviderArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      LastSuccessfulDataRetrievalTime: '{{ response.LastSuccessfulDataRetrievalTime }}'
+      SecretArn: '{{ response.SecretArn }}'
+      SubscriptionProviderArn: '{{ response.SubscriptionProviderArn }}'
+      SubscriptionProviderSource: '{{ response.SubscriptionProviderSource }}'
+      SubscriptionProviderStatus: '{{ response.SubscriptionProviderStatus }}'
+      SubscriptionProviderStatusMessage: '{{ response.SubscriptionProviderStatusMessage }}'
+- discovery_id: aws.license-manager-linux-subscriptions.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

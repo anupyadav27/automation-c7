@@ -1,0 +1,197 @@
+version: '1.0'
+provider: aws
+service: pca-connector-ad
+services:
+  client: pca-connector-ad
+  module: boto3.client
+discovery:
+- discovery_id: aws.pca-connector-ad.list_connectors
+  calls:
+  - action: list_connectors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Connectors }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Status: '{{ item.Status }}'
+      CertificateAuthorityArn: '{{ item.CertificateAuthorityArn }}'
+      CertificateEnrollmentPolicyServerEndpoint: '{{ item.CertificateEnrollmentPolicyServerEndpoint
+        }}'
+      Connector: '{{ item.Connector }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DirectoryId: '{{ item.DirectoryId }}'
+      ServicePrincipalName: '{{ item.ServicePrincipalName }}'
+      Statement: '{{ item.Statement }}'
+      StatusReason: '{{ item.StatusReason }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+      Version: '{{ item.Version }}'
+      VpcInformation: '{{ item.VpcInformation }}'
+- discovery_id: aws.pca-connector-ad.list_directory_registrations
+  calls:
+  - action: list_directory_registrations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DirectoryRegistrations }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DirectoryId: '{{ item.DirectoryId }}'
+      StatusReason: '{{ item.StatusReason }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.pca-connector-ad.get_connector
+  for_each: aws.pca-connector-ad.list_connectors
+  calls:
+  - action: get_connector
+    params:
+      ConnectorArn: '{{ item.ConnectorArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Connector.Arn }}'
+      Status: '{{ response.Connector.Status }}'
+      CertificateAuthorityArn: '{{ response.Connector.CertificateAuthorityArn }}'
+      CertificateEnrollmentPolicyServerEndpoint: '{{ response.Connector.CertificateEnrollmentPolicyServerEndpoint
+        }}'
+      Connector: '{{ response.Connector.Connector }}'
+      CreatedAt: '{{ response.Connector.CreatedAt }}'
+      DirectoryId: '{{ response.Connector.DirectoryId }}'
+      StatusReason: '{{ response.Connector.StatusReason }}'
+      UpdatedAt: '{{ response.Connector.UpdatedAt }}'
+      VpcInformation: '{{ response.Connector.VpcInformation }}'
+- discovery_id: aws.pca-connector-ad.get_directory_registration
+  calls:
+  - action: get_directory_registration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.DirectoryRegistration.Arn }}'
+      Status: '{{ response.DirectoryRegistration.Status }}'
+      CreatedAt: '{{ response.DirectoryRegistration.CreatedAt }}'
+      DirectoryId: '{{ response.DirectoryRegistration.DirectoryId }}'
+      StatusReason: '{{ response.DirectoryRegistration.StatusReason }}'
+      UpdatedAt: '{{ response.DirectoryRegistration.UpdatedAt }}'
+- discovery_id: aws.pca-connector-ad.get_service_principal_name
+  for_each: aws.pca-connector-ad.list_connectors
+  calls:
+  - action: get_service_principal_name
+    params:
+      ConnectorArn: '{{ item.ConnectorArn }}'
+      DirectoryRegistrationArn: '{{ item.DirectoryRegistrationArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.ServicePrincipalName.Status }}'
+      ConnectorArn: '{{ response.ServicePrincipalName.ConnectorArn }}'
+      CreatedAt: '{{ response.ServicePrincipalName.CreatedAt }}'
+      DirectoryRegistrationArn: '{{ response.ServicePrincipalName.DirectoryRegistrationArn
+        }}'
+      ServicePrincipalName: '{{ response.ServicePrincipalName.ServicePrincipalName
+        }}'
+      StatusReason: '{{ response.ServicePrincipalName.StatusReason }}'
+      UpdatedAt: '{{ response.ServicePrincipalName.UpdatedAt }}'
+- discovery_id: aws.pca-connector-ad.get_template
+  calls:
+  - action: get_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Template.Arn }}'
+      Name: '{{ response.Template.Name }}'
+      Status: '{{ response.Template.Status }}'
+      ConnectorArn: '{{ response.Template.ConnectorArn }}'
+      CreatedAt: '{{ response.Template.CreatedAt }}'
+      Definition: '{{ response.Template.Definition }}'
+      ObjectIdentifier: '{{ response.Template.ObjectIdentifier }}'
+      PolicySchema: '{{ response.Template.PolicySchema }}'
+      Revision: '{{ response.Template.Revision }}'
+      UpdatedAt: '{{ response.Template.UpdatedAt }}'
+- discovery_id: aws.pca-connector-ad.get_template_group_access_control_entry
+  calls:
+  - action: get_template_group_access_control_entry
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccessRights: '{{ response.AccessControlEntry.AccessRights }}'
+      CreatedAt: '{{ response.AccessControlEntry.CreatedAt }}'
+      GroupDisplayName: '{{ response.AccessControlEntry.GroupDisplayName }}'
+      GroupSecurityIdentifier: '{{ response.AccessControlEntry.GroupSecurityIdentifier
+        }}'
+      TemplateArn: '{{ response.AccessControlEntry.TemplateArn }}'
+      UpdatedAt: '{{ response.AccessControlEntry.UpdatedAt }}'
+- discovery_id: aws.pca-connector-ad.list_service_principal_names
+  calls:
+  - action: list_service_principal_names
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ServicePrincipalNames }}'
+    item:
+      Status: '{{ item.Status }}'
+      ConnectorArn: '{{ item.ConnectorArn }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DirectoryRegistrationArn: '{{ item.DirectoryRegistrationArn }}'
+      ServicePrincipalName: '{{ item.ServicePrincipalName }}'
+      StatusReason: '{{ item.StatusReason }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.pca-connector-ad.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.pca-connector-ad.list_template_group_access_control_entries
+  calls:
+  - action: list_template_group_access_control_entries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AccessControlEntries }}'
+    item:
+      AccessRights: '{{ item.AccessRights }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      GroupDisplayName: '{{ item.GroupDisplayName }}'
+      GroupSecurityIdentifier: '{{ item.GroupSecurityIdentifier }}'
+      TemplateArn: '{{ item.TemplateArn }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.pca-connector-ad.list_templates
+  for_each: aws.pca-connector-ad.list_connectors
+  calls:
+  - action: list_templates
+    params:
+      ConnectorArn: '{{ item.ConnectorArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Templates }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      ConnectorArn: '{{ item.ConnectorArn }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Definition: '{{ item.Definition }}'
+      ObjectIdentifier: '{{ item.ObjectIdentifier }}'
+      PolicySchema: '{{ item.PolicySchema }}'
+      Revision: '{{ item.Revision }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'

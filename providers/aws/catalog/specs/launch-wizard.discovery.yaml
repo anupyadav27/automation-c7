@@ -1,0 +1,162 @@
+version: '1.0'
+provider: aws
+service: launch-wizard
+services:
+  client: launch-wizard
+  module: boto3.client
+discovery:
+- discovery_id: aws.launch-wizard.list_deployments
+  calls:
+  - action: list_deployments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.deployments }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      deletedAt: '{{ item.deletedAt }}'
+      deployment: '{{ item.deployment }}'
+      deploymentPatternName: '{{ item.deployments[].patternName }}'
+      description: '{{ item.description }}'
+      documentationUrl: '{{ item.documentationUrl }}'
+      iconUrl: '{{ item.iconUrl }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      patternName: '{{ item.patternName }}'
+      resourceGroup: '{{ item.resourceGroup }}'
+      specifications: '{{ item.specifications }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      statusReason: '{{ item.statusReason }}'
+      tags: '{{ item.tags }}'
+      timestamp: '{{ item.timestamp }}'
+      workloadDeploymentPattern: '{{ item.workloadDeploymentPattern }}'
+      workloadName: '{{ item.workloadName }}'
+      workloadVersionName: '{{ item.workloadVersionName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.launch-wizard.list_workloads
+  calls:
+  - action: list_workloads
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workloads }}'
+    item:
+      displayName: '{{ item.displayName }}'
+      workload: '{{ item.workload }}'
+      workloadName: '{{ item.workloadName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.launch-wizard.get_deployment
+  for_each: aws.launch-wizard.list_deployments
+  calls:
+  - action: get_deployment
+    params:
+      deploymentId: '{{ item.deploymentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdAt: '{{ response.deployment.createdAt }}'
+      deletedAt: '{{ response.deployment.deletedAt }}'
+      deployment: '{{ response.deployment.deploymentArn }}'
+      deploymentArn: '{{ response.deployment.deploymentArn }}'
+      id: '{{ response.deployment.id }}'
+      name: '{{ response.deployment.name }}'
+      patternName: '{{ response.deployment.patternName }}'
+      resourceGroup: '{{ response.deployment.resourceGroup }}'
+      specifications: '{{ response.deployment.specifications }}'
+      status: '{{ response.deployment.status }}'
+      tags: '{{ response.deployment.tags }}'
+      workloadName: '{{ response.deployment.workloadName }}'
+- discovery_id: aws.launch-wizard.get_workload
+  for_each: aws.launch-wizard.list_deployments
+  calls:
+  - action: get_workload
+    params:
+      workloadName: '{{ item.workloadName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      description: '{{ response.workload.description }}'
+      displayName: '{{ response.workload.displayName }}'
+      documentationUrl: '{{ response.workload.documentationUrl }}'
+      iconUrl: '{{ response.workload.iconUrl }}'
+      status: '{{ response.workload.status }}'
+      statusMessage: '{{ response.workload.statusMessage }}'
+      workload: '{{ response.workload.workloadName }}'
+      workloadName: '{{ response.workload.workloadName }}'
+- discovery_id: aws.launch-wizard.get_workload_deployment_pattern
+  for_each: aws.launch-wizard.list_deployments
+  calls:
+  - action: get_workload_deployment_pattern
+    params:
+      deploymentPatternName: '{{ item.deploymentPatternName }}'
+      workloadName: '{{ item.workloadName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      description: '{{ response.workloadDeploymentPattern.description }}'
+      displayName: '{{ response.workloadDeploymentPattern.displayName }}'
+      specifications: '{{ response.workloadDeploymentPattern.specifications[].name }}'
+      status: '{{ response.workloadDeploymentPattern.status }}'
+      statusMessage: '{{ response.workloadDeploymentPattern.statusMessage }}'
+      workloadDeploymentPattern: '{{ response.workloadDeploymentPattern.deploymentPatternName }}'
+      workloadName: '{{ response.workloadDeploymentPattern.workloadName }}'
+      deploymentPatternName: '{{ response.workloadDeploymentPattern.deploymentPatternName }}'
+      workloadVersionName: '{{ response.workloadDeploymentPattern.workloadVersionName }}'
+- discovery_id: aws.launch-wizard.list_deployment_events
+  for_each: aws.launch-wizard.list_deployments
+  calls:
+  - action: list_deployment_events
+    params:
+      deploymentId: '{{ item.deploymentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.deploymentEvents }}'
+    item:
+      deployment: '{{ item.deployment }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      timestamp: '{{ item.timestamp }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.launch-wizard.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.launch-wizard.list_workload_deployment_patterns
+  for_each: aws.launch-wizard.list_deployments
+  calls:
+  - action: list_workload_deployment_patterns
+    params:
+      workloadName: '{{ item.workloadName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workloadDeploymentPatterns }}'
+    item:
+      deploymentPatternName: '{{ item.deploymentPatternName }}'
+      description: '{{ item.description }}'
+      displayName: '{{ item.displayName }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      workloadDeploymentPattern: '{{ item.workloadDeploymentPattern }}'
+      workloadName: '{{ item.workloadName }}'
+      workloadVersionName: '{{ item.workloadVersionName }}'
+      nextToken: '{{ response.nextToken }}'

@@ -1,0 +1,327 @@
+version: '1.0'
+provider: aws
+service: dms
+discovery:
+- calls:
+  - action: describe_replication_configs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.dms.describe_replication_configs
+  emit:
+    as: item
+    item:
+      ComputeConfig: '{{ item.ComputeConfig }}'
+      IsReadOnly: '{{ item.IsReadOnly }}'
+      ReplicationConfigArn: '{{ item.ReplicationConfigArn }}'
+      ReplicationConfigCreateTime: '{{ item.ReplicationConfigCreateTime }}'
+      ReplicationConfigIdentifier: '{{ item.ReplicationConfigIdentifier }}'
+      ReplicationConfigUpdateTime: '{{ item.ReplicationConfigUpdateTime }}'
+      ReplicationConfigs: '{{ item.ReplicationConfigs }}'
+      ReplicationSettings: '{{ item.ReplicationSettings }}'
+      ReplicationType: '{{ item.ReplicationType }}'
+      SourceEndpointArn: '{{ item.SourceEndpointArn }}'
+      SupplementalSettings: '{{ item.SupplementalSettings }}'
+      TableMappings: '{{ item.TableMappings }}'
+      TargetEndpointArn: '{{ item.TargetEndpointArn }}'
+    items_for: '{{ response.ReplicationConfigs }}'
+- calls:
+  - action: describe_endpoints
+    on_error: continue
+    save_as: response
+  discovery_id: aws.dms.describe_endpoints
+  emit:
+    as: item
+    item:
+      CertificateArn: '{{ item.CertificateArn }}'
+      DatabaseName: '{{ item.DatabaseName }}'
+      DmsTransferSettings: '{{ item.DmsTransferSettings }}'
+      DocDbSettings: '{{ item.DocDbSettings }}'
+      DynamoDbSettings: '{{ item.DynamoDbSettings }}'
+      ElasticsearchSettings: '{{ item.ElasticsearchSettings }}'
+      EndpointArn: '{{ item.EndpointArn }}'
+      EndpointIdentifier: '{{ item.EndpointIdentifier }}'
+      EndpointType: '{{ item.EndpointType }}'
+      Endpoints: '{{ item.Endpoints }}'
+      EngineDisplayName: '{{ item.EngineDisplayName }}'
+      EngineName: '{{ item.EngineName }}'
+      ExternalId: '{{ item.ExternalId }}'
+      ExternalTableDefinition: '{{ item.ExternalTableDefinition }}'
+      ExtraConnectionAttributes: '{{ item.ExtraConnectionAttributes }}'
+      GcpMySQLSettings: '{{ item.GcpMySQLSettings }}'
+      IBMDb2Settings: '{{ item.IBMDb2Settings }}'
+      IsReadOnly: '{{ item.IsReadOnly }}'
+      KafkaSettings: '{{ item.KafkaSettings }}'
+      KinesisSettings: '{{ item.KinesisSettings }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      LakehouseSettings: '{{ item.LakehouseSettings }}'
+      MicrosoftSQLServerSettings: '{{ item.MicrosoftSQLServerSettings }}'
+      MongoDbSettings: '{{ item.MongoDbSettings }}'
+      MySQLSettings: '{{ item.MySQLSettings }}'
+      NeptuneSettings: '{{ item.NeptuneSettings }}'
+      OracleSettings: '{{ item.OracleSettings }}'
+      Port: '{{ item.Port }}'
+      PostgreSQLSettings: '{{ item.PostgreSQLSettings }}'
+      RedisSettings: '{{ item.RedisSettings }}'
+      RedshiftSettings: '{{ item.RedshiftSettings }}'
+      S3Settings: '{{ item.S3Settings }}'
+      ServerName: '{{ item.ServerName }}'
+      ServiceAccessRoleArn: '{{ item.ServiceAccessRoleArn }}'
+      SslMode: '{{ item.SslMode }}'
+      Status: '{{ item.Status }}'
+      SybaseSettings: '{{ item.SybaseSettings }}'
+      TimestreamSettings: '{{ item.TimestreamSettings }}'
+      Username: '{{ item.Username }}'
+    items_for: '{{ response.Endpoints }}'
+- calls:
+  - action: describe_instance_profiles
+    on_error: continue
+    save_as: response
+  discovery_id: aws.dms.describe_instance_profiles
+  emit:
+    as: item
+    item:
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      Description: '{{ item.Description }}'
+      InstanceProfileArn: '{{ item.InstanceProfileArn }}'
+      InstanceProfileCreationTime: '{{ item.InstanceProfileCreationTime }}'
+      InstanceProfileName: '{{ item.InstanceProfileName }}'
+      InstanceProfiles: '{{ item.InstanceProfiles }}'
+      KmsKeyArn: '{{ item.KmsKeyArn }}'
+      NetworkType: '{{ item.NetworkType }}'
+      PubliclyAccessible: '{{ item.PubliclyAccessible }}'
+      SubnetGroupIdentifier: '{{ item.SubnetGroupIdentifier }}'
+      VpcSecurityGroups: '{{ item.VpcSecurityGroups }}'
+    items_for: '{{ response.InstanceProfiles }}'
+- calls:
+  - action: describe_replication_tasks
+    on_error: continue
+    save_as: response
+  discovery_id: aws.dms.describe_replication_tasks
+  emit:
+    as: item
+    item:
+      CdcStartPosition: '{{ item.CdcStartPosition }}'
+      CdcStopPosition: '{{ item.CdcStopPosition }}'
+      LastFailureMessage: '{{ item.LastFailureMessage }}'
+      MigrationType: '{{ item.MigrationType }}'
+      RecoveryCheckpoint: '{{ item.RecoveryCheckpoint }}'
+      ReplicationInstanceArn: '{{ item.ReplicationInstanceArn }}'
+      ReplicationTaskArn: '{{ item.ReplicationTaskArn }}'
+      ReplicationTaskCreationDate: '{{ item.ReplicationTaskCreationDate }}'
+      ReplicationTaskIdentifier: '{{ item.ReplicationTaskIdentifier }}'
+      ReplicationTaskSettings: '{{ item.ReplicationTaskSettings }}'
+      ReplicationTaskStartDate: '{{ item.ReplicationTaskStartDate }}'
+      ReplicationTaskStats: '{{ item.ReplicationTasks[].Status }}'
+      ReplicationTasks: '{{ item.ReplicationTasks }}'
+      SourceEndpointArn: '{{ item.SourceEndpointArn }}'
+      Status: '{{ item.Status }}'
+      StopReason: '{{ item.StopReason }}'
+      TableMappings: '{{ item.TableMappings }}'
+      TargetEndpointArn: '{{ item.TargetEndpointArn }}'
+      TargetReplicationInstanceArn: '{{ item.TargetReplicationInstanceArn }}'
+      TaskData: '{{ item.TaskData }}'
+    items_for: '{{ response.ReplicationTasks }}'
+- calls:
+  - action: describe_data_migrations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.dms.describe_data_migrations
+  emit:
+    as: item
+    item:
+      DataMigrationArn: '{{ item.DataMigrationArn }}'
+      DataMigrationCidrBlocks: '{{ item.DataMigrationCidrBlocks }}'
+      DataMigrationCreateTime: '{{ item.DataMigrationCreateTime }}'
+      DataMigrationEndTime: '{{ item.DataMigrationEndTime }}'
+      DataMigrationName: '{{ item.DataMigrationName }}'
+      DataMigrationSettings: '{{ item.DataMigrationSettings }}'
+      DataMigrationStartTime: '{{ item.DataMigrationStartTime }}'
+      DataMigrationStatistics: '{{ item.DataMigrationStatistics }}'
+      DataMigrationStatus: '{{ item.DataMigrationStatus }}'
+      DataMigrationType: '{{ item.DataMigrationType }}'
+      DataMigrations: '{{ item.DataMigrations }}'
+      DestinationArn: '{{ item.DestinationArn }}'
+      Format: '{{ item.Format }}'
+      LastFailureMessage: '{{ item.LastFailureMessage }}'
+      Level: '{{ item.Level }}'
+      MigrationProjectArn: '{{ item.MigrationProjectArn }}'
+      PublicIpAddresses: '{{ item.PublicIpAddresses }}'
+      ServiceAccessRoleArn: '{{ item.ServiceAccessRoleArn }}'
+      SourceDataSettings: '{{ item.SourceDataSettings }}'
+      StopReason: '{{ item.StopReason }}'
+      TargetDataSettings: '{{ item.TargetDataSettings }}'
+    items_for: '{{ response.DataMigrations }}'
+- calls:
+  - action: describe_replication_instances
+    on_error: continue
+    save_as: response
+  discovery_id: aws.dms.describe_replication_instances
+  emit:
+    as: item
+    item:
+      AllocatedStorage: '{{ item.AllocatedStorage }}'
+      AutoMinorVersionUpgrade: '{{ item.AutoMinorVersionUpgrade }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      DnsNameServers: '{{ item.DnsNameServers }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      FreeUntil: '{{ item.FreeUntil }}'
+      InstanceCreateTime: '{{ item.InstanceCreateTime }}'
+      KerberosAuthenticationSettings: '{{ item.KerberosAuthenticationSettings }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      MultiAZ: '{{ item.MultiAZ }}'
+      NetworkType: '{{ item.NetworkType }}'
+      PendingModifiedValues: '{{ item.PendingModifiedValues }}'
+      PreferredMaintenanceWindow: '{{ item.PreferredMaintenanceWindow }}'
+      PubliclyAccessible: '{{ item.PubliclyAccessible }}'
+      ReplicationInstanceArn: '{{ item.ReplicationInstanceArn }}'
+      ReplicationInstanceClass: '{{ item.ReplicationInstanceClass }}'
+      ReplicationInstanceIdentifier: '{{ item.ReplicationInstanceIdentifier }}'
+      ReplicationInstanceIpv6Addresses: '{{ item.ReplicationInstanceIpv6Addresses }}'
+      ReplicationInstancePrivateIpAddress: '{{ item.ReplicationInstancePrivateIpAddress }}'
+      ReplicationInstancePrivateIpAddresses: '{{ item.ReplicationInstancePrivateIpAddresses }}'
+      ReplicationInstancePublicIpAddress: '{{ item.ReplicationInstancePublicIpAddress }}'
+      ReplicationInstancePublicIpAddresses: '{{ item.ReplicationInstancePublicIpAddresses }}'
+      ReplicationInstanceStatus: '{{ item.ReplicationInstanceStatus }}'
+      ReplicationInstances: '{{ item.ReplicationInstances }}'
+      ReplicationSubnetGroup: '{{ item.ReplicationSubnetGroup }}'
+      SecondaryAvailabilityZone: '{{ item.SecondaryAvailabilityZone }}'
+      VpcSecurityGroups: '{{ item.VpcSecurityGroups }}'
+    items_for: '{{ response.ReplicationInstances }}'
+- calls:
+  - action: describe_replication_task_assessment_runs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.dms.describe_replication_task_assessment_runs
+  emit:
+    as: item
+    item:
+      AssessmentProgress: '{{ item.AssessmentProgress }}'
+      AssessmentRunName: '{{ item.AssessmentRunName }}'
+      IsLatestTaskAssessmentRun: '{{ item.IsLatestTaskAssessmentRun }}'
+      LastFailureMessage: '{{ item.LastFailureMessage }}'
+      ReplicationTaskArn: '{{ item.ReplicationTaskArn }}'
+      ReplicationTaskAssessmentRunArn: '{{ item.ReplicationTaskAssessmentRunArn }}'
+      ReplicationTaskAssessmentRunCreationDate: '{{ item.ReplicationTaskAssessmentRunCreationDate }}'
+      ReplicationTaskAssessmentRuns: '{{ item.ReplicationTaskAssessmentRuns[].Status }}'
+      ResultEncryptionMode: '{{ item.ResultEncryptionMode }}'
+      ResultKmsKeyArn: '{{ item.ResultKmsKeyArn }}'
+      ResultLocationBucket: '{{ item.ResultLocationBucket }}'
+      ResultLocationFolder: '{{ item.ResultLocationFolder }}'
+      ResultStatistic: '{{ item.ResultStatistic }}'
+      ServiceAccessRoleArn: '{{ item.ServiceAccessRoleArn }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.ReplicationTaskAssessmentRuns }}'
+- calls:
+  - action: describe_data_providers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.dms.describe_data_providers
+  emit:
+    as: item
+    item:
+      DataProviderArn: '{{ item.DataProviderArn }}'
+      DataProviderCreationTime: '{{ item.DataProviderCreationTime }}'
+      DataProviderName: '{{ item.DataProviderName }}'
+      DataProviders: '{{ item.DataProviders }}'
+      Description: '{{ item.Description }}'
+      Engine: '{{ item.Engine }}'
+      Settings: '{{ item.Settings }}'
+      Virtual: '{{ item.Virtual }}'
+    items_for: '{{ response.DataProviders }}'
+- calls:
+  - action: describe_migration_projects
+    on_error: continue
+    save_as: response
+  discovery_id: aws.dms.describe_migration_projects
+  emit:
+    as: item
+    item:
+      Description: '{{ item.Description }}'
+      InstanceProfileArn: '{{ item.InstanceProfileArn }}'
+      InstanceProfileName: '{{ item.InstanceProfileName }}'
+      MigrationProjectArn: '{{ item.MigrationProjectArn }}'
+      MigrationProjectCreationTime: '{{ item.MigrationProjectCreationTime }}'
+      MigrationProjectName: '{{ item.MigrationProjectName }}'
+      MigrationProjects: '{{ item.MigrationProjects }}'
+      SchemaConversionApplicationAttributes: '{{ item.SchemaConversionApplicationAttributes }}'
+      SourceDataProviderDescriptors: '{{ item.SourceDataProviderDescriptors }}'
+      TargetDataProviderDescriptors: '{{ item.TargetDataProviderDescriptors }}'
+      TransformationRules: '{{ item.TransformationRules }}'
+    items_for: '{{ response.MigrationProjects }}'
+- calls:
+  - action: describe_event_subscriptions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.dms.describe_event_subscriptions
+  emit:
+    as: item
+    item:
+      CustSubscriptionId: '{{ item.CustSubscriptionId }}'
+      CustomerAwsId: '{{ item.CustomerAwsId }}'
+      Enabled: '{{ item.Enabled }}'
+      EventCategoriesList: '{{ item.EventCategoriesList }}'
+      EventSubscriptionsList: '{{ item.EventSubscriptionsList }}'
+      SnsTopicArn: '{{ item.SnsTopicArn }}'
+      SourceIdsList: '{{ item.SourceIdsList }}'
+      SourceType: '{{ item.SourceType }}'
+      Status: '{{ item.Status }}'
+      SubscriptionCreationTime: '{{ item.SubscriptionCreationTime }}'
+    items_for: '{{ response.EventSubscriptionsList }}'
+- calls:
+  - action: describe_replication_task_individual_assessments
+    on_error: continue
+    save_as: response
+  discovery_id: aws.dms.describe_replication_task_individual_assessments
+  emit:
+    as: item
+    item:
+      IndividualAssessmentName: '{{ item.IndividualAssessmentName }}'
+      ReplicationTaskAssessmentRunArn: '{{ item.ReplicationTaskAssessmentRunArn }}'
+      ReplicationTaskIndividualAssessmentArn: '{{ item.ReplicationTaskIndividualAssessmentArn }}'
+      ReplicationTaskIndividualAssessmentStartDate: '{{ item.ReplicationTaskIndividualAssessments[].Status }}'
+      ReplicationTaskIndividualAssessments: '{{ item.ReplicationTaskIndividualAssessments[].Status }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.ReplicationTaskIndividualAssessments }}'
+- calls:
+  - action: list_tags_for_resource
+    on_error: continue
+    save_as: response
+  discovery_id: aws.dms.list_tags_for_resource
+  emit:
+    as: item
+    item:
+      Key: '{{ item.Key }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      Value: '{{ item.Value }}'
+    items_for: '{{ response.TagList }}'
+- calls:
+  - action: describe_replications
+    on_error: continue
+    save_as: response
+  discovery_id: aws.dms.describe_replications
+  emit:
+    as: item
+    item:
+      CdcStartPosition: '{{ item.CdcStartPosition }}'
+      CdcStartTime: '{{ item.CdcStartTime }}'
+      CdcStopPosition: '{{ item.CdcStopPosition }}'
+      FailureMessages: '{{ item.FailureMessages }}'
+      IsReadOnly: '{{ item.IsReadOnly }}'
+      PremigrationAssessmentStatuses: '{{ item.PremigrationAssessmentStatuses }}'
+      ProvisionData: '{{ item.ProvisionData }}'
+      RecoveryCheckpoint: '{{ item.RecoveryCheckpoint }}'
+      ReplicationConfigArn: '{{ item.ReplicationConfigArn }}'
+      ReplicationConfigIdentifier: '{{ item.ReplicationConfigIdentifier }}'
+      ReplicationCreateTime: '{{ item.ReplicationCreateTime }}'
+      ReplicationDeprovisionTime: '{{ item.ReplicationDeprovisionTime }}'
+      ReplicationLastStopTime: '{{ item.ReplicationLastStopTime }}'
+      ReplicationStats: '{{ item.Replications[].Status }}'
+      ReplicationType: '{{ item.ReplicationType }}'
+      ReplicationUpdateTime: '{{ item.ReplicationUpdateTime }}'
+      Replications: '{{ item.Replications }}'
+      SourceEndpointArn: '{{ item.SourceEndpointArn }}'
+      StartReplicationType: '{{ item.StartReplicationType }}'
+      Status: '{{ item.Status }}'
+      StopReason: '{{ item.StopReason }}'
+      TargetEndpointArn: '{{ item.TargetEndpointArn }}'
+    items_for: '{{ response.Replications }}'

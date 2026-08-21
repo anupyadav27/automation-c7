@@ -1,0 +1,231 @@
+version: '1.0'
+provider: aws
+service: codestar-connections
+services:
+  client: codestar-connections
+  module: boto3.client
+discovery:
+- discovery_id: aws.codestar-connections.list_connections
+  calls:
+  - action: list_connections
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Connections }}'
+    item:
+      SecurityGroupIds: '{{ item.SecurityGroupIds }}'
+      SubnetIds: '{{ item.SubnetIds }}'
+      VpcId: '{{ item.VpcId }}'
+      Connection: '{{ item.Connection }}'
+      ConnectionArn: '{{ item.ConnectionArn }}'
+      ConnectionName: '{{ item.ConnectionName }}'
+      ConnectionStatus: '{{ item.ConnectionStatus }}'
+      HostArn: '{{ item.HostArn }}'
+      OwnerAccountId: '{{ item.OwnerAccountId }}'
+      ProviderType: '{{ item.ProviderType }}'
+      TlsCertificate: '{{ item.TlsCertificate }}'
+- discovery_id: aws.codestar-connections.list_hosts
+  calls:
+  - action: list_hosts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Hosts }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      HostArn: '{{ item.HostArn }}'
+      ProviderEndpoint: '{{ item.ProviderEndpoint }}'
+      ProviderType: '{{ item.ProviderType }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      VpcConfiguration: '{{ item.VpcConfiguration }}'
+- discovery_id: aws.codestar-connections.list_repository_links
+  calls:
+  - action: list_repository_links
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RepositoryLinks }}'
+    item:
+      OwnerId: '{{ item.OwnerId }}'
+      ConnectionArn: '{{ item.ConnectionArn }}'
+      EncryptionKeyArn: '{{ item.EncryptionKeyArn }}'
+      ProviderType: '{{ item.ProviderType }}'
+      RepositoryLinkArn: '{{ item.RepositoryLinkArn }}'
+      RepositoryLinkId: '{{ item.RepositoryLinkId }}'
+      RepositoryName: '{{ item.RepositoryName }}'
+- discovery_id: aws.codestar-connections.get_connection
+  for_each: aws.codestar-connections.list_connections
+  calls:
+  - action: get_connection
+    params:
+      ConnectionArn: '{{ item.ConnectionArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Connection: '{{ response.Connection.ConnectionArn }}'
+      ConnectionArn: '{{ response.Connection.ConnectionArn }}'
+      ConnectionName: '{{ response.Connection.ConnectionName }}'
+      ConnectionStatus: '{{ response.Connection.ConnectionStatus }}'
+      HostArn: '{{ response.Connection.HostArn }}'
+      OwnerAccountId: '{{ response.Connection.OwnerAccountId }}'
+      ProviderType: '{{ response.Connection.ProviderType }}'
+- discovery_id: aws.codestar-connections.get_host
+  for_each: aws.codestar-connections.list_connections
+  calls:
+  - action: get_host
+    params:
+      HostArn: '{{ item.HostArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      SecurityGroupIds: '{{ response.VpcConfiguration.SecurityGroupIds }}'
+      SubnetIds: '{{ response.VpcConfiguration.SubnetIds }}'
+      VpcId: '{{ response.VpcConfiguration.VpcId }}'
+      TlsCertificate: '{{ response.VpcConfiguration.TlsCertificate }}'
+      Name: '{{ response.Name }}'
+      ProviderEndpoint: '{{ response.ProviderEndpoint }}'
+      ProviderType: '{{ response.ProviderType }}'
+      Status: '{{ response.Status }}'
+- discovery_id: aws.codestar-connections.get_repository_link
+  for_each: aws.codestar-connections.list_repository_links
+  calls:
+  - action: get_repository_link
+    params:
+      RepositoryLinkId: '{{ item.RepositoryLinkId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      OwnerId: '{{ response.RepositoryLinkInfo.OwnerId }}'
+      ConnectionArn: '{{ response.RepositoryLinkInfo.ConnectionArn }}'
+      EncryptionKeyArn: '{{ response.RepositoryLinkInfo.EncryptionKeyArn }}'
+      ProviderType: '{{ response.RepositoryLinkInfo.ProviderType }}'
+      RepositoryLinkArn: '{{ response.RepositoryLinkInfo.RepositoryLinkArn }}'
+      RepositoryLinkId: '{{ response.RepositoryLinkInfo.RepositoryLinkId }}'
+      RepositoryName: '{{ response.RepositoryLinkInfo.RepositoryName }}'
+- discovery_id: aws.codestar-connections.get_repository_sync_status
+  for_each: aws.codestar-connections.list_repository_links
+  calls:
+  - action: get_repository_sync_status
+    params:
+      Branch: '{{ item.Branch }}'
+      RepositoryLinkId: '{{ item.RepositoryLinkId }}'
+      SyncType: '{{ item.SyncType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.LatestSync.Status }}'
+      Events: '{{ response.LatestSync.Events }}'
+      StartedAt: '{{ response.LatestSync.StartedAt }}'
+- discovery_id: aws.codestar-connections.get_resource_sync_status
+  calls:
+  - action: get_resource_sync_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      OwnerId: '{{ response.DesiredState.OwnerId }}'
+      Branch: '{{ response.DesiredState.Branch }}'
+      Directory: '{{ response.DesiredState.Directory }}'
+      ProviderType: '{{ response.DesiredState.ProviderType }}'
+      RepositoryName: '{{ response.DesiredState.RepositoryName }}'
+      Sha: '{{ response.DesiredState.Sha }}'
+      StartedAt: '{{ response.LatestSuccessfulSync.StartedAt }}'
+      Status: '{{ response.LatestSuccessfulSync.Status }}'
+      Target: '{{ response.LatestSuccessfulSync.Target }}'
+- discovery_id: aws.codestar-connections.get_sync_blocker_summary
+  calls:
+  - action: get_sync_blocker_summary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ResourceName: '{{ response.SyncBlockerSummary.ResourceName }}'
+      LatestBlockers: '{{ response.SyncBlockerSummary.LatestBlockers[].Id }}'
+      ParentResourceName: '{{ response.SyncBlockerSummary.ParentResourceName }}'
+      SyncBlockerSummary: '{{ response.SyncBlockerSummary.SyncBlockerSummary }}'
+- discovery_id: aws.codestar-connections.get_sync_configuration
+  calls:
+  - action: get_sync_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      OwnerId: '{{ response.SyncConfiguration.OwnerId }}'
+      ResourceName: '{{ response.SyncConfiguration.ResourceName }}'
+      RoleArn: '{{ response.SyncConfiguration.RoleArn }}'
+      Branch: '{{ response.SyncConfiguration.Branch }}'
+      ConfigFile: '{{ response.SyncConfiguration.ConfigFile }}'
+      ProviderType: '{{ response.SyncConfiguration.ProviderType }}'
+      PublishDeploymentStatus: '{{ response.SyncConfiguration.PublishDeploymentStatus }}'
+      RepositoryLinkId: '{{ response.SyncConfiguration.RepositoryLinkId }}'
+      RepositoryName: '{{ response.SyncConfiguration.RepositoryName }}'
+      SyncType: '{{ response.SyncConfiguration.SyncType }}'
+      TriggerResourceUpdateOn: '{{ response.SyncConfiguration.TriggerResourceUpdateOn }}'
+- discovery_id: aws.codestar-connections.list_repository_sync_definitions
+  for_each: aws.codestar-connections.list_repository_links
+  calls:
+  - action: list_repository_sync_definitions
+    params:
+      RepositoryLinkId: '{{ item.RepositoryLinkId }}'
+      SyncType: '{{ item.SyncType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RepositorySyncDefinitions }}'
+    item:
+      Branch: '{{ item.Branch }}'
+      Directory: '{{ item.Directory }}'
+      Parent: '{{ item.Parent }}'
+      Target: '{{ item.Target }}'
+- discovery_id: aws.codestar-connections.list_sync_configurations
+  for_each: aws.codestar-connections.list_repository_links
+  calls:
+  - action: list_sync_configurations
+    params:
+      RepositoryLinkId: '{{ item.RepositoryLinkId }}'
+      SyncType: '{{ item.SyncType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SyncConfigurations }}'
+    item:
+      OwnerId: '{{ item.OwnerId }}'
+      ResourceName: '{{ item.ResourceName }}'
+      RoleArn: '{{ item.RoleArn }}'
+      Branch: '{{ item.Branch }}'
+      ConfigFile: '{{ item.ConfigFile }}'
+      ProviderType: '{{ item.ProviderType }}'
+      PublishDeploymentStatus: '{{ item.PublishDeploymentStatus }}'
+      RepositoryLinkId: '{{ item.RepositoryLinkId }}'
+      RepositoryName: '{{ item.RepositoryName }}'
+      SyncType: '{{ item.SyncType }}'
+      TriggerResourceUpdateOn: '{{ item.TriggerResourceUpdateOn }}'
+- discovery_id: aws.codestar-connections.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

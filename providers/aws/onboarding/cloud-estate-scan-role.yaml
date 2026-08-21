@@ -1,0 +1,134 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+# The role a customer creates so Cloud Estate can read their account.
+#
+# Handed to the customer with ExternalId already filled in, because an external
+# ID the customer invents is one they have to transcribe into two places, and a
+# transcription error surfaces as an opaque AccessDenied that looks exactly like
+# a broken trust policy. The console derives it from their tenant and injects it
+# here — see `derive_external_id` in providers/aws/runtime/credentials.py.
+#
+# READ ONLY, and that is enforced in three independent places, because a cloud
+# scanner asking for write access is a scanner that can be turned into a weapon:
+#
+#   1. this policy grants `SecurityAudit` and `ViewOnlyAccess`, both AWS-managed
+#      and both read-only by construction;
+#   2. an explicit Deny on the mutating verbs, so a future managed-policy change
+#      by AWS cannot silently widen us;
+#   3. the collector refuses at runtime to call any operation whose verb is not
+#      a read verb (`assert_read_only`), so a mis-scoped role still cannot be
+#      used to change anything.
+#
+# Any one of the three would do. All three are here because the cost is a few
+# lines and the failure being prevented is unbounded.
+
+Description: >-
+  Read-only cross-account role for Cloud Estate inventory and posture scanning.
+  Grants no write, delete or modify permission of any kind.
+
+Parameters:
+  ScannerPrincipal:
+    Type: String
+    Description: >-
+      The Cloud Estate scanner's IAM principal ARN. Only this principal may
+      assume the role, and only when it presents the ExternalId below.
+    AllowedPattern: "^arn:aws[a-z\\-]*:iam::\\d{12}:(role|user)/.+$"
+
+  ExternalId:
+    Type: String
+    Description: >-
+      Shared secret pinned into the trust policy. Pre-filled by the console —
+      do not edit it, and do not reuse one account's value in another.
+    MinLength: 16
+    NoEcho: true
+
+  RoleName:
+    Type: String
+    Default: CloudEstateScanRole
+    Description: Name of the role to create.
+
+Resources:
+  CloudEstateScanRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref RoleName
+      Description: Read-only access for Cloud Estate inventory and posture scanning.
+      # One hour. A scan takes minutes; anything longer only widens the window
+      # in which a leaked session token is still usable.
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Ref ScannerPrincipal
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                # Without this, anyone who learns this role's ARN can ask the
+                # Cloud Estate scanner to assume it on their behalf. That is the
+                # confused-deputy problem, and this one line is the whole fix.
+                sts:ExternalId: !Ref ExternalId
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/SecurityAudit
+        - arn:aws:iam::aws:policy/job-function/ViewOnlyAccess
+      Policies:
+        - PolicyName: CloudEstateDenyMutation
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # Belt and braces over the managed policies above. If AWS ever
+              # widens SecurityAudit or ViewOnlyAccess, this Deny still holds —
+              # an explicit Deny cannot be overridden by any Allow.
+              - Effect: Deny
+                Action:
+                  - "*:Create*"
+                  - "*:Delete*"
+                  - "*:Update*"
+                  - "*:Put*"
+                  - "*:Modify*"
+                  - "*:Attach*"
+                  - "*:Detach*"
+                  - "*:Add*"
+                  - "*:Remove*"
+                  - "*:Set*"
+                  - "*:Start*"
+                  - "*:Stop*"
+                  - "*:Terminate*"
+                  - "*:Reboot*"
+                  - "*:Run*"
+                  - "*:Invoke*"
+                  - "*:Associate*"
+                  - "*:Disassociate*"
+                  - "*:Enable*"
+                  - "*:Disable*"
+                  - "*:Tag*"
+                  - "*:Untag*"
+                Resource: "*"
+              # Reading a secret's VALUE is not inventory. We record that a
+              # secret exists, its rotation state and its tags; we never need
+              # what is inside it, so we decline the ability to find out.
+              - Effect: Deny
+                Action:
+                  - secretsmanager:GetSecretValue
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:GetParameterHistory
+                  - kms:Decrypt
+                  - kms:GenerateDataKey*
+                Resource: "*"
+
+Outputs:
+  RoleArn:
+    Description: Paste this back into the Cloud Estate onboarding form.
+    Value: !GetAtt CloudEstateScanRole.Arn
+
+  AccountId:
+    Description: The account this role belongs to.
+    Value: !Ref AWS::AccountId
+
+  ExternalIdUsed:
+    Description: >-
+      Confirms which external ID was pinned, so a mismatch can be diagnosed
+      without reading the trust policy back out of IAM.
+    Value: !Ref ExternalId

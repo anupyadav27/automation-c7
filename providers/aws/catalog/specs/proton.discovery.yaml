@@ -1,0 +1,835 @@
+version: '1.0'
+provider: aws
+service: proton
+services:
+  client: proton
+  module: boto3.client
+discovery:
+- discovery_id: aws.proton.get_account_settings
+  calls:
+  - action: get_account_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DestinationArn: '{{ response.accountSettings.DestinationArn }}'
+      Enabled: '{{ response.accountSettings.Enabled }}'
+      Format: '{{ response.accountSettings.Format }}'
+      Level: '{{ response.accountSettings.Level }}'
+      accountSettings: '{{ response.accountSettings.accountSettings }}'
+      pipelineCodebuildRoleArn: '{{ response.accountSettings.pipelineCodebuildRoleArn }}'
+      pipelineProvisioningRepository: '{{ response.accountSettings.pipelineProvisioningRepository.arn }}'
+      pipelineServiceRoleArn: '{{ response.accountSettings.pipelineServiceRoleArn }}'
+      arn: '{{ response.accountSettings.pipelineProvisioningRepository.arn }}'
+      branch: '{{ response.accountSettings.pipelineProvisioningRepository.branch }}'
+      name: '{{ response.accountSettings.pipelineProvisioningRepository.name }}'
+      provider: '{{ response.accountSettings.pipelineProvisioningRepository.provider }}'
+- discovery_id: aws.proton.get_resources_summary
+  calls:
+  - action: get_resources_summary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      component: '{{ response.counts.component }}'
+      components: '{{ response.counts.components.total }}'
+      counts: '{{ response.counts.counts }}'
+      environmentTemplates: '{{ response.counts.environmentTemplates.total }}'
+      environments: '{{ response.counts.environments.total }}'
+      pipelines: '{{ response.counts.pipelines }}'
+      serviceInstances: '{{ response.counts.serviceInstances.total }}'
+      serviceTemplates: '{{ response.counts.serviceTemplates.total }}'
+      services: '{{ response.counts.services }}'
+      behindMajor: '{{ response.counts.components.behindMajor }}'
+      behindMinor: '{{ response.counts.components.behindMinor }}'
+      failed: '{{ response.counts.components.failed }}'
+      total: '{{ response.counts.components.total }}'
+      upToDate: '{{ response.counts.components.upToDate }}'
+- discovery_id: aws.proton.list_components
+  calls:
+  - action: list_components
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.components }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      deploymentStatus: '{{ item.deploymentStatus }}'
+      deploymentStatusMessage: '{{ item.deploymentStatusMessage }}'
+      environment: '{{ item.environment }}'
+      environmentName: '{{ item.environmentName }}'
+      id: '{{ item.id }}'
+      lastAttemptedDeploymentId: '{{ item.lastAttemptedDeploymentId }}'
+      lastDeploymentAttemptedAt: '{{ item.lastDeploymentAttemptedAt }}'
+      lastDeploymentSucceededAt: '{{ item.lastDeploymentSucceededAt }}'
+      lastModifiedAt: '{{ item.lastModifiedAt }}'
+      lastSucceededDeploymentId: '{{ item.lastSucceededDeploymentId }}'
+      name: '{{ item.name }}'
+      serviceInstanceName: '{{ item.serviceInstanceName }}'
+      serviceName: '{{ item.serviceName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_deployments
+  calls:
+  - action: list_deployments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.deployments }}'
+    item:
+      arn: '{{ item.arn }}'
+      completedAt: '{{ item.completedAt }}'
+      componentName: '{{ item.componentName }}'
+      createdAt: '{{ item.createdAt }}'
+      deploymentStatus: '{{ item.deploymentStatus }}'
+      environmentName: '{{ item.environmentName }}'
+      lastAttemptedDeploymentId: '{{ item.lastAttemptedDeploymentId }}'
+      lastModifiedAt: '{{ item.lastModifiedAt }}'
+      lastSucceededDeploymentId: '{{ item.lastSucceededDeploymentId }}'
+      serviceInstanceName: '{{ item.serviceInstanceName }}'
+      serviceName: '{{ item.serviceName }}'
+      targetArn: '{{ item.targetArn }}'
+      targetResourceCreatedAt: '{{ item.targetResourceCreatedAt }}'
+      targetResourceType: '{{ item.targetResourceType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_environment_templates
+  calls:
+  - action: list_environment_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.templates }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      displayName: '{{ item.displayName }}'
+      lastModifiedAt: '{{ item.lastModifiedAt }}'
+      name: '{{ item.name }}'
+      provisioning: '{{ item.provisioning }}'
+      recommendedVersion: '{{ item.recommendedVersion }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_environments
+  calls:
+  - action: list_environments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.environments }}'
+    item:
+      arn: '{{ item.arn }}'
+      componentRoleArn: '{{ item.componentRoleArn }}'
+      createdAt: '{{ item.createdAt }}'
+      deploymentStatus: '{{ item.deploymentStatus }}'
+      deploymentStatusMessage: '{{ item.deploymentStatusMessage }}'
+      description: '{{ item.description }}'
+      environmentAccountConnectionId: '{{ item.environmentAccountConnectionId }}'
+      environmentAccountId: '{{ item.environmentAccountId }}'
+      lastAttemptedDeploymentId: '{{ item.lastAttemptedDeploymentId }}'
+      lastDeploymentAttemptedAt: '{{ item.lastDeploymentAttemptedAt }}'
+      lastDeploymentSucceededAt: '{{ item.lastDeploymentSucceededAt }}'
+      lastSucceededDeploymentId: '{{ item.lastSucceededDeploymentId }}'
+      name: '{{ item.name }}'
+      protonServiceRoleArn: '{{ item.protonServiceRoleArn }}'
+      provisioning: '{{ item.provisioning }}'
+      templateMajorVersion: '{{ item.templateMajorVersion }}'
+      templateMinorVersion: '{{ item.templateMinorVersion }}'
+      templateName: '{{ item.templateName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_repositories
+  calls:
+  - action: list_repositories
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.repositories }}'
+    item:
+      arn: '{{ item.arn }}'
+      connectionArn: '{{ item.connectionArn }}'
+      name: '{{ item.name }}'
+      provider: '{{ item.provider }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_service_instances
+  calls:
+  - action: list_service_instances
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.serviceInstances }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      deploymentStatus: '{{ item.deploymentStatus }}'
+      deploymentStatusMessage: '{{ item.deploymentStatusMessage }}'
+      environmentName: '{{ item.environmentName }}'
+      lastAttemptedDeploymentId: '{{ item.lastAttemptedDeploymentId }}'
+      lastDeploymentAttemptedAt: '{{ item.lastDeploymentAttemptedAt }}'
+      lastDeploymentSucceededAt: '{{ item.lastDeploymentSucceededAt }}'
+      lastSucceededDeploymentId: '{{ item.lastSucceededDeploymentId }}'
+      name: '{{ item.name }}'
+      serviceName: '{{ item.serviceName }}'
+      templateMajorVersion: '{{ item.templateMajorVersion }}'
+      templateMinorVersion: '{{ item.templateMinorVersion }}'
+      templateName: '{{ item.templateName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_service_templates
+  calls:
+  - action: list_service_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.templates }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      displayName: '{{ item.displayName }}'
+      lastModifiedAt: '{{ item.lastModifiedAt }}'
+      name: '{{ item.name }}'
+      pipelineProvisioning: '{{ item.pipelineProvisioning }}'
+      recommendedVersion: '{{ item.recommendedVersion }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_services
+  calls:
+  - action: list_services
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.services }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      lastModifiedAt: '{{ item.lastModifiedAt }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      templateName: '{{ item.templateName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.get_component
+  for_each: aws.proton.list_components
+  calls:
+  - action: get_component
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.component.arn }}'
+      createdAt: '{{ response.component.createdAt }}'
+      deploymentStatus: '{{ response.component.deploymentStatus }}'
+      deploymentStatusMessage: '{{ response.component.deploymentStatusMessage }}'
+      description: '{{ response.component.description }}'
+      environmentName: '{{ response.component.environmentName }}'
+      lastAttemptedDeploymentId: '{{ response.component.lastAttemptedDeploymentId }}'
+      lastClientRequestToken: '{{ response.component.lastClientRequestToken }}'
+      lastDeploymentAttemptedAt: '{{ response.component.lastDeploymentAttemptedAt }}'
+      lastDeploymentSucceededAt: '{{ response.component.lastDeploymentSucceededAt }}'
+      lastModifiedAt: '{{ response.component.lastModifiedAt }}'
+      lastSucceededDeploymentId: '{{ response.component.lastSucceededDeploymentId }}'
+      name: '{{ response.component.name }}'
+      serviceInstanceName: '{{ response.component.serviceInstanceName }}'
+      serviceName: '{{ response.component.serviceName }}'
+      serviceSpec: '{{ response.component.serviceSpec }}'
+- discovery_id: aws.proton.get_deployment
+  for_each: aws.proton.list_deployments
+  calls:
+  - action: get_deployment
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.deployment.arn }}'
+      completedAt: '{{ response.deployment.completedAt }}'
+      componentName: '{{ response.deployment.componentName }}'
+      createdAt: '{{ response.deployment.createdAt }}'
+      deploymentStatus: '{{ response.deployment.deploymentStatus }}'
+      deploymentStatusMessage: '{{ response.deployment.deploymentStatusMessage }}'
+      environmentName: '{{ response.deployment.environmentName }}'
+      id: '{{ response.deployment.id }}'
+      initialState: '{{ response.deployment.initialState }}'
+      lastAttemptedDeploymentId: '{{ response.deployment.lastAttemptedDeploymentId }}'
+      lastModifiedAt: '{{ response.deployment.lastModifiedAt }}'
+      lastSucceededDeploymentId: '{{ response.deployment.lastSucceededDeploymentId }}'
+      serviceInstanceName: '{{ response.deployment.serviceInstanceName }}'
+      serviceName: '{{ response.deployment.serviceName }}'
+      targetArn: '{{ response.deployment.targetArn }}'
+      targetResourceCreatedAt: '{{ response.deployment.targetResourceCreatedAt }}'
+      targetResourceType: '{{ response.deployment.targetResourceType }}'
+      targetState: '{{ response.deployment.targetState }}'
+      serviceSpec: '{{ response.deployment.initialState.component.serviceSpec }}'
+      templateFile: '{{ response.deployment.initialState.component.templateFile }}'
+      spec: '{{ response.deployment.initialState.environment.spec }}'
+      templateMajorVersion: '{{ response.deployment.initialState.environment.templateMajorVersion }}'
+      templateMinorVersion: '{{ response.deployment.initialState.environment.templateMinorVersion }}'
+      templateName: '{{ response.deployment.initialState.environment.templateName }}'
+      lastSuccessfulEnvironmentDeploymentId: '{{ response.deployment.initialState.serviceInstance.lastSuccessfulEnvironmentDeploymentId }}'
+      lastSuccessfulServicePipelineDeploymentId: '{{ response.deployment.initialState.serviceInstance.lastSuccessfulServicePipelineDeploymentId }}'
+- discovery_id: aws.proton.get_environment
+  for_each: aws.proton.list_components
+  calls:
+  - action: get_environment
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.environment.arn }}'
+      codebuildRoleArn: '{{ response.environment.codebuildRoleArn }}'
+      componentRoleArn: '{{ response.environment.componentRoleArn }}'
+      createdAt: '{{ response.environment.createdAt }}'
+      deploymentStatus: '{{ response.environment.deploymentStatus }}'
+      deploymentStatusMessage: '{{ response.environment.deploymentStatusMessage }}'
+      description: '{{ response.environment.description }}'
+      environmentAccountConnectionId: '{{ response.environment.environmentAccountConnectionId }}'
+      environmentAccountId: '{{ response.environment.environmentAccountId }}'
+      lastAttemptedDeploymentId: '{{ response.environment.lastAttemptedDeploymentId }}'
+      lastDeploymentAttemptedAt: '{{ response.environment.lastDeploymentAttemptedAt }}'
+      lastDeploymentSucceededAt: '{{ response.environment.lastDeploymentSucceededAt }}'
+      lastSucceededDeploymentId: '{{ response.environment.lastSucceededDeploymentId }}'
+      name: '{{ response.environment.name }}'
+      protonServiceRoleArn: '{{ response.environment.protonServiceRoleArn }}'
+      provisioning: '{{ response.environment.provisioning }}'
+      provisioningRepository: '{{ response.environment.provisioningRepository.arn }}'
+      spec: '{{ response.environment.spec }}'
+      templateMajorVersion: '{{ response.environment.templateMajorVersion }}'
+      templateMinorVersion: '{{ response.environment.templateMinorVersion }}'
+      templateName: '{{ response.environment.templateName }}'
+      branch: '{{ response.environment.provisioningRepository.branch }}'
+      provider: '{{ response.environment.provisioningRepository.provider }}'
+- discovery_id: aws.proton.get_environment_account_connection
+  for_each: aws.proton.list_deployments
+  calls:
+  - action: get_environment_account_connection
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.environmentAccountConnection.arn }}'
+      codebuildRoleArn: '{{ response.environmentAccountConnection.codebuildRoleArn }}'
+      componentRoleArn: '{{ response.environmentAccountConnection.componentRoleArn }}'
+      environmentAccountId: '{{ response.environmentAccountConnection.environmentAccountId }}'
+      environmentName: '{{ response.environmentAccountConnection.environmentName }}'
+      id: '{{ response.environmentAccountConnection.id }}'
+      lastModifiedAt: '{{ response.environmentAccountConnection.lastModifiedAt }}'
+      managementAccountId: '{{ response.environmentAccountConnection.managementAccountId }}'
+      requestedAt: '{{ response.environmentAccountConnection.requestedAt }}'
+      roleArn: '{{ response.environmentAccountConnection.roleArn }}'
+      status: '{{ response.environmentAccountConnection.status }}'
+- discovery_id: aws.proton.get_environment_template
+  for_each: aws.proton.list_components
+  calls:
+  - action: get_environment_template
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.environmentTemplate.arn }}'
+      createdAt: '{{ response.environmentTemplate.createdAt }}'
+      description: '{{ response.environmentTemplate.description }}'
+      displayName: '{{ response.environmentTemplate.displayName }}'
+      encryptionKey: '{{ response.environmentTemplate.encryptionKey }}'
+      lastModifiedAt: '{{ response.environmentTemplate.lastModifiedAt }}'
+      name: '{{ response.environmentTemplate.name }}'
+      provisioning: '{{ response.environmentTemplate.provisioning }}'
+      recommendedVersion: '{{ response.environmentTemplate.recommendedVersion }}'
+- discovery_id: aws.proton.get_environment_template_version
+  for_each: aws.proton.list_environments
+  calls:
+  - action: get_environment_template_version
+    params:
+      majorVersion: '{{ item.majorVersion }}'
+      minorVersion: '{{ item.minorVersion }}'
+      templateName: '{{ item.templateName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.environmentTemplateVersion.arn }}'
+      createdAt: '{{ response.environmentTemplateVersion.createdAt }}'
+      description: '{{ response.environmentTemplateVersion.description }}'
+      lastModifiedAt: '{{ response.environmentTemplateVersion.lastModifiedAt }}'
+      majorVersion: '{{ response.environmentTemplateVersion.majorVersion }}'
+      minorVersion: '{{ response.environmentTemplateVersion.minorVersion }}'
+      recommendedMinorVersion: '{{ response.environmentTemplateVersion.recommendedMinorVersion }}'
+      schema: '{{ response.environmentTemplateVersion.schema }}'
+      status: '{{ response.environmentTemplateVersion.status }}'
+      statusMessage: '{{ response.environmentTemplateVersion.statusMessage }}'
+      templateName: '{{ response.environmentTemplateVersion.templateName }}'
+- discovery_id: aws.proton.get_repository
+  for_each: aws.proton.list_components
+  calls:
+  - action: get_repository
+    params:
+      name: '{{ item.name }}'
+      provider: '{{ item.provider }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.repository.arn }}'
+      connectionArn: '{{ response.repository.connectionArn }}'
+      encryptionKey: '{{ response.repository.encryptionKey }}'
+      name: '{{ response.repository.name }}'
+      provider: '{{ response.repository.provider }}'
+- discovery_id: aws.proton.get_repository_sync_status
+  for_each: aws.proton.list_repositories
+  calls:
+  - action: get_repository_sync_status
+    params:
+      branch: '{{ item.branch }}'
+      repositoryName: '{{ item.repositoryName }}'
+      repositoryProvider: '{{ item.repositoryProvider }}'
+      syncType: '{{ item.syncType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      events: '{{ response.latestSync.events }}'
+      startedAt: '{{ response.latestSync.startedAt }}'
+      status: '{{ response.latestSync.status }}'
+- discovery_id: aws.proton.get_service
+  for_each: aws.proton.list_components
+  calls:
+  - action: get_service
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.service.arn }}'
+      branchName: '{{ response.service.branchName }}'
+      createdAt: '{{ response.service.createdAt }}'
+      description: '{{ response.service.description }}'
+      lastModifiedAt: '{{ response.service.lastModifiedAt }}'
+      name: '{{ response.service.name }}'
+      pipeline: '{{ response.service.pipeline.arn }}'
+      repositoryConnectionArn: '{{ response.service.repositoryConnectionArn }}'
+      repositoryId: '{{ response.service.repositoryId }}'
+      spec: '{{ response.service.spec }}'
+      status: '{{ response.service.status }}'
+      statusMessage: '{{ response.service.statusMessage }}'
+      templateName: '{{ response.service.templateName }}'
+      deploymentStatus: '{{ response.service.pipeline.deploymentStatus }}'
+      deploymentStatusMessage: '{{ response.service.pipeline.deploymentStatusMessage }}'
+      lastAttemptedDeploymentId: '{{ response.service.pipeline.lastAttemptedDeploymentId }}'
+      lastDeploymentAttemptedAt: '{{ response.service.pipeline.lastDeploymentAttemptedAt }}'
+      lastDeploymentSucceededAt: '{{ response.service.pipeline.lastDeploymentSucceededAt }}'
+      lastSucceededDeploymentId: '{{ response.service.pipeline.lastSucceededDeploymentId }}'
+      templateMajorVersion: '{{ response.service.pipeline.templateMajorVersion }}'
+      templateMinorVersion: '{{ response.service.pipeline.templateMinorVersion }}'
+- discovery_id: aws.proton.get_service_instance
+  for_each: aws.proton.list_components
+  calls:
+  - action: get_service_instance
+    params:
+      name: '{{ item.name }}'
+      serviceName: '{{ item.serviceName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.serviceInstance.arn }}'
+      createdAt: '{{ response.serviceInstance.createdAt }}'
+      deploymentStatus: '{{ response.serviceInstance.deploymentStatus }}'
+      deploymentStatusMessage: '{{ response.serviceInstance.deploymentStatusMessage }}'
+      environmentName: '{{ response.serviceInstance.environmentName }}'
+      lastAttemptedDeploymentId: '{{ response.serviceInstance.lastAttemptedDeploymentId }}'
+      lastClientRequestToken: '{{ response.serviceInstance.lastClientRequestToken }}'
+      lastDeploymentAttemptedAt: '{{ response.serviceInstance.lastDeploymentAttemptedAt }}'
+      lastDeploymentSucceededAt: '{{ response.serviceInstance.lastDeploymentSucceededAt }}'
+      lastSucceededDeploymentId: '{{ response.serviceInstance.lastSucceededDeploymentId }}'
+      name: '{{ response.serviceInstance.name }}'
+      serviceName: '{{ response.serviceInstance.serviceName }}'
+      spec: '{{ response.serviceInstance.spec }}'
+      templateMajorVersion: '{{ response.serviceInstance.templateMajorVersion }}'
+      templateMinorVersion: '{{ response.serviceInstance.templateMinorVersion }}'
+      templateName: '{{ response.serviceInstance.templateName }}'
+- discovery_id: aws.proton.get_service_instance_sync_status
+  for_each: aws.proton.list_components
+  calls:
+  - action: get_service_instance_sync_status
+    params:
+      serviceInstanceName: '{{ item.serviceInstanceName }}'
+      serviceName: '{{ item.serviceName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      branch: '{{ response.desiredState.branch }}'
+      directory: '{{ response.desiredState.directory }}'
+      repositoryName: '{{ response.desiredState.repositoryName }}'
+      repositoryProvider: '{{ response.desiredState.repositoryProvider }}'
+      sha: '{{ response.desiredState.sha }}'
+      startedAt: '{{ response.latestSuccessfulSync.startedAt }}'
+      status: '{{ response.latestSuccessfulSync.status }}'
+      target: '{{ response.latestSuccessfulSync.target }}'
+- discovery_id: aws.proton.get_service_sync_blocker_summary
+  for_each: aws.proton.list_components
+  calls:
+  - action: get_service_sync_blocker_summary
+    params:
+      serviceName: '{{ item.serviceName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      latestBlockers: '{{ response.serviceSyncBlockerSummary.latestBlockers[].id }}'
+      serviceInstanceName: '{{ response.serviceSyncBlockerSummary.serviceInstanceName }}'
+      serviceName: '{{ response.serviceSyncBlockerSummary.serviceName }}'
+      serviceSyncBlockerSummary: '{{ response.serviceSyncBlockerSummary.serviceSyncBlockerSummary }}'
+- discovery_id: aws.proton.get_service_sync_config
+  for_each: aws.proton.list_components
+  calls:
+  - action: get_service_sync_config
+    params:
+      serviceName: '{{ item.serviceName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      branch: '{{ response.serviceSyncConfig.branch }}'
+      filePath: '{{ response.serviceSyncConfig.filePath }}'
+      repositoryName: '{{ response.serviceSyncConfig.repositoryName }}'
+      repositoryProvider: '{{ response.serviceSyncConfig.repositoryProvider }}'
+      serviceName: '{{ response.serviceSyncConfig.serviceName }}'
+- discovery_id: aws.proton.get_service_template
+  for_each: aws.proton.list_components
+  calls:
+  - action: get_service_template
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.serviceTemplate.arn }}'
+      createdAt: '{{ response.serviceTemplate.createdAt }}'
+      description: '{{ response.serviceTemplate.description }}'
+      displayName: '{{ response.serviceTemplate.displayName }}'
+      encryptionKey: '{{ response.serviceTemplate.encryptionKey }}'
+      lastModifiedAt: '{{ response.serviceTemplate.lastModifiedAt }}'
+      name: '{{ response.serviceTemplate.name }}'
+      pipelineProvisioning: '{{ response.serviceTemplate.pipelineProvisioning }}'
+      recommendedVersion: '{{ response.serviceTemplate.recommendedVersion }}'
+- discovery_id: aws.proton.get_service_template_version
+  for_each: aws.proton.list_environments
+  calls:
+  - action: get_service_template_version
+    params:
+      majorVersion: '{{ item.majorVersion }}'
+      minorVersion: '{{ item.minorVersion }}'
+      templateName: '{{ item.templateName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.serviceTemplateVersion.arn }}'
+      compatibleEnvironmentTemplates: '{{ response.serviceTemplateVersion.compatibleEnvironmentTemplates[].templateName }}'
+      createdAt: '{{ response.serviceTemplateVersion.createdAt }}'
+      description: '{{ response.serviceTemplateVersion.description }}'
+      lastModifiedAt: '{{ response.serviceTemplateVersion.lastModifiedAt }}'
+      majorVersion: '{{ response.serviceTemplateVersion.majorVersion }}'
+      minorVersion: '{{ response.serviceTemplateVersion.minorVersion }}'
+      recommendedMinorVersion: '{{ response.serviceTemplateVersion.recommendedMinorVersion }}'
+      schema: '{{ response.serviceTemplateVersion.schema }}'
+      status: '{{ response.serviceTemplateVersion.status }}'
+      statusMessage: '{{ response.serviceTemplateVersion.statusMessage }}'
+      supportedComponentSources: '{{ response.serviceTemplateVersion.supportedComponentSources }}'
+      templateName: '{{ response.serviceTemplateVersion.templateName }}'
+- discovery_id: aws.proton.get_template_sync_config
+  for_each: aws.proton.list_environments
+  calls:
+  - action: get_template_sync_config
+    params:
+      templateName: '{{ item.templateName }}'
+      templateType: '{{ item.templateType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      branch: '{{ response.templateSyncConfig.branch }}'
+      repositoryName: '{{ response.templateSyncConfig.repositoryName }}'
+      repositoryProvider: '{{ response.templateSyncConfig.repositoryProvider }}'
+      subdirectory: '{{ response.templateSyncConfig.subdirectory }}'
+      templateName: '{{ response.templateSyncConfig.templateName }}'
+      templateType: '{{ response.templateSyncConfig.templateType }}'
+- discovery_id: aws.proton.get_template_sync_status
+  for_each: aws.proton.list_environments
+  calls:
+  - action: get_template_sync_status
+    params:
+      templateName: '{{ item.templateName }}'
+      templateType: '{{ item.templateType }}'
+      templateVersion: '{{ item.templateVersion }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      branch: '{{ response.desiredState.branch }}'
+      directory: '{{ response.desiredState.directory }}'
+      repositoryName: '{{ response.desiredState.repositoryName }}'
+      repositoryProvider: '{{ response.desiredState.repositoryProvider }}'
+      sha: '{{ response.desiredState.sha }}'
+      startedAt: '{{ response.latestSuccessfulSync.startedAt }}'
+      status: '{{ response.latestSuccessfulSync.status }}'
+      target: '{{ response.latestSuccessfulSync.target }}'
+- discovery_id: aws.proton.list_component_outputs
+  for_each: aws.proton.list_components
+  calls:
+  - action: list_component_outputs
+    params:
+      componentName: '{{ item.componentName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.outputs }}'
+    item:
+      key: '{{ item.key }}'
+      valueString: '{{ item.valueString }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_component_provisioned_resources
+  for_each: aws.proton.list_components
+  calls:
+  - action: list_component_provisioned_resources
+    params:
+      componentName: '{{ item.componentName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.provisionedResources }}'
+    item:
+      identifier: '{{ item.identifier }}'
+      name: '{{ item.name }}'
+      provisioningEngine: '{{ item.provisioningEngine }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_environment_account_connections
+  calls:
+  - action: list_environment_account_connections
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.environmentAccountConnections }}'
+    item:
+      arn: '{{ item.arn }}'
+      componentRoleArn: '{{ item.componentRoleArn }}'
+      environmentAccountId: '{{ item.environmentAccountId }}'
+      environmentName: '{{ item.environmentName }}'
+      id: '{{ item.id }}'
+      lastModifiedAt: '{{ item.lastModifiedAt }}'
+      managementAccountId: '{{ item.managementAccountId }}'
+      requestedAt: '{{ item.requestedAt }}'
+      roleArn: '{{ item.roleArn }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_environment_outputs
+  for_each: aws.proton.list_components
+  calls:
+  - action: list_environment_outputs
+    params:
+      environmentName: '{{ item.environmentName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.outputs }}'
+    item:
+      key: '{{ item.key }}'
+      valueString: '{{ item.valueString }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_environment_provisioned_resources
+  for_each: aws.proton.list_components
+  calls:
+  - action: list_environment_provisioned_resources
+    params:
+      environmentName: '{{ item.environmentName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.provisionedResources }}'
+    item:
+      identifier: '{{ item.identifier }}'
+      name: '{{ item.name }}'
+      provisioningEngine: '{{ item.provisioningEngine }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_environment_template_versions
+  for_each: aws.proton.list_environments
+  calls:
+  - action: list_environment_template_versions
+    params:
+      templateName: '{{ item.templateName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.templateVersions }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      lastModifiedAt: '{{ item.lastModifiedAt }}'
+      majorVersion: '{{ item.majorVersion }}'
+      minorVersion: '{{ item.minorVersion }}'
+      recommendedMinorVersion: '{{ item.recommendedMinorVersion }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      templateName: '{{ item.templateName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_repository_sync_definitions
+  for_each: aws.proton.list_repositories
+  calls:
+  - action: list_repository_sync_definitions
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+      repositoryProvider: '{{ item.repositoryProvider }}'
+      syncType: '{{ item.syncType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.syncDefinitions }}'
+    item:
+      branch: '{{ item.branch }}'
+      directory: '{{ item.directory }}'
+      parent: '{{ item.parent }}'
+      target: '{{ item.target }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_service_instance_outputs
+  for_each: aws.proton.list_components
+  calls:
+  - action: list_service_instance_outputs
+    params:
+      serviceInstanceName: '{{ item.serviceInstanceName }}'
+      serviceName: '{{ item.serviceName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.outputs }}'
+    item:
+      key: '{{ item.key }}'
+      valueString: '{{ item.valueString }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_service_instance_provisioned_resources
+  for_each: aws.proton.list_components
+  calls:
+  - action: list_service_instance_provisioned_resources
+    params:
+      serviceInstanceName: '{{ item.serviceInstanceName }}'
+      serviceName: '{{ item.serviceName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.provisionedResources }}'
+    item:
+      identifier: '{{ item.identifier }}'
+      name: '{{ item.name }}'
+      provisioningEngine: '{{ item.provisioningEngine }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_service_pipeline_outputs
+  for_each: aws.proton.list_components
+  calls:
+  - action: list_service_pipeline_outputs
+    params:
+      serviceName: '{{ item.serviceName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.outputs }}'
+    item:
+      key: '{{ item.key }}'
+      valueString: '{{ item.valueString }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_service_pipeline_provisioned_resources
+  for_each: aws.proton.list_components
+  calls:
+  - action: list_service_pipeline_provisioned_resources
+    params:
+      serviceName: '{{ item.serviceName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.provisionedResources }}'
+    item:
+      identifier: '{{ item.identifier }}'
+      name: '{{ item.name }}'
+      provisioningEngine: '{{ item.provisioningEngine }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_service_template_versions
+  for_each: aws.proton.list_environments
+  calls:
+  - action: list_service_template_versions
+    params:
+      templateName: '{{ item.templateName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.templateVersions }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      lastModifiedAt: '{{ item.lastModifiedAt }}'
+      majorVersion: '{{ item.majorVersion }}'
+      minorVersion: '{{ item.minorVersion }}'
+      recommendedMinorVersion: '{{ item.recommendedMinorVersion }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      templateName: '{{ item.templateName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.proton.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'

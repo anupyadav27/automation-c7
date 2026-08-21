@@ -1,0 +1,221 @@
+version: '1.0'
+provider: aws
+service: bedrock-agentcore
+services:
+  client: bedrock-agentcore
+  module: boto3.client
+discovery:
+- discovery_id: aws.bedrock-agentcore.get_agent_card
+  calls:
+  - action: get_agent_card
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      agentCard: '{{ response.agentCard }}'
+      runtimeSessionId: '{{ response.runtimeSessionId }}'
+      statusCode: '{{ response.statusCode }}'
+- discovery_id: aws.bedrock-agentcore.get_browser_session
+  calls:
+  - action: get_browser_session
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      height: '{{ response.viewPort.height }}'
+      streams: '{{ response.viewPort.streams }}'
+      width: '{{ response.viewPort.width }}'
+- discovery_id: aws.bedrock-agentcore.get_code_interpreter_session
+  calls:
+  - action: get_code_interpreter_session
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      codeInterpreterIdentifier: '{{ response.codeInterpreterIdentifier }}'
+      createdAt: '{{ response.createdAt }}'
+      name: '{{ response.name }}'
+      sessionId: '{{ response.sessionId }}'
+      sessionTimeoutSeconds: '{{ response.sessionTimeoutSeconds }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.bedrock-agentcore.get_event
+  calls:
+  - action: get_event
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      actorId: '{{ response.event.actorId }}'
+      branch: '{{ response.event.branch }}'
+      eventId: '{{ response.event.eventId }}'
+      eventTimestamp: '{{ response.event.eventTimestamp }}'
+      memoryId: '{{ response.event.memoryId }}'
+      metadata: '{{ response.event.metadata }}'
+      payload: '{{ response.event.payload }}'
+      sessionId: '{{ response.event.sessionId }}'
+- discovery_id: aws.bedrock-agentcore.get_memory_record
+  calls:
+  - action: get_memory_record
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      content: '{{ response.memoryRecord.content }}'
+      createdAt: '{{ response.memoryRecord.createdAt }}'
+      memoryRecordId: '{{ response.memoryRecord.memoryRecordId }}'
+      memoryStrategyId: '{{ response.memoryRecord.memoryStrategyId }}'
+      namespaces: '{{ response.memoryRecord.namespaces }}'
+- discovery_id: aws.bedrock-agentcore.get_resource_api_key
+  calls:
+  - action: get_resource_api_key
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      apiKey: '{{ response.apiKey }}'
+- discovery_id: aws.bedrock-agentcore.get_resource_oauth2_token
+  calls:
+  - action: get_resource_oauth2_token
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      accessToken: '{{ response.accessToken }}'
+      authorizationUrl: '{{ response.authorizationUrl }}'
+      sessionStatus: '{{ response.sessionStatus }}'
+      sessionUri: '{{ response.sessionUri }}'
+- discovery_id: aws.bedrock-agentcore.get_workload_access_token
+  calls:
+  - action: get_workload_access_token
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      workloadAccessToken: '{{ response.workloadAccessToken }}'
+- discovery_id: aws.bedrock-agentcore.get_workload_access_token_for_jwt
+  calls:
+  - action: get_workload_access_token_for_jwt
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      workloadAccessToken: '{{ response.workloadAccessToken }}'
+- discovery_id: aws.bedrock-agentcore.get_workload_access_token_for_user_id
+  calls:
+  - action: get_workload_access_token_for_user_id
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      workloadAccessToken: '{{ response.workloadAccessToken }}'
+- discovery_id: aws.bedrock-agentcore.list_actors
+  calls:
+  - action: list_actors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.actorSummaries }}'
+    item:
+      actorId: '{{ item.actorId }}'
+- discovery_id: aws.bedrock-agentcore.list_browser_sessions
+  calls:
+  - action: list_browser_sessions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      browserIdentifier: '{{ item.browserIdentifier }}'
+      createdAt: '{{ item.createdAt }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      name: '{{ item.name }}'
+      sessionId: '{{ item.sessionId }}'
+      status: '{{ item.status }}'
+      streams: '{{ item.streams }}'
+- discovery_id: aws.bedrock-agentcore.list_code_interpreter_sessions
+  calls:
+  - action: list_code_interpreter_sessions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      codeInterpreterIdentifier: '{{ item.codeInterpreterIdentifier }}'
+      createdAt: '{{ item.createdAt }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      name: '{{ item.name }}'
+      sessionId: '{{ item.sessionId }}'
+      status: '{{ item.status }}'
+- discovery_id: aws.bedrock-agentcore.list_events
+  calls:
+  - action: list_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.events }}'
+    item:
+      actorId: '{{ item.actorId }}'
+      branch: '{{ item.branch }}'
+      eventId: '{{ item.eventId }}'
+      eventTimestamp: '{{ item.eventTimestamp }}'
+      memoryId: '{{ item.memoryId }}'
+      metadata: '{{ item.metadata }}'
+      payload: '{{ item.payload }}'
+      sessionId: '{{ item.sessionId }}'
+- discovery_id: aws.bedrock-agentcore.list_memory_extraction_jobs
+  calls:
+  - action: list_memory_extraction_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.jobs }}'
+    item:
+      actorId: '{{ item.actorId }}'
+      failureReason: '{{ item.failureReason }}'
+      jobID: '{{ item.jobID }}'
+      messages: '{{ item.messages }}'
+      sessionId: '{{ item.sessionId }}'
+      status: '{{ item.status }}'
+      strategyId: '{{ item.strategyId }}'
+- discovery_id: aws.bedrock-agentcore.list_memory_records
+  calls:
+  - action: list_memory_records
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.memoryRecordSummaries }}'
+    item:
+      content: '{{ item.content }}'
+      createdAt: '{{ item.createdAt }}'
+      memoryRecordId: '{{ item.memoryRecordId }}'
+      memoryStrategyId: '{{ item.memoryStrategyId }}'
+      namespaces: '{{ item.namespaces }}'
+      score: '{{ item.score }}'
+- discovery_id: aws.bedrock-agentcore.list_sessions
+  calls:
+  - action: list_sessions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.sessionSummaries }}'
+    item:
+      actorId: '{{ item.actorId }}'
+      createdAt: '{{ item.createdAt }}'
+      sessionId: '{{ item.sessionId }}'

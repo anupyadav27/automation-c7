@@ -1,0 +1,42 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: parameterstore, ssm
+# 2 ops (1 from checks, +1 for inventory)
+version: '1.0'
+provider: aws
+service: parameterstore
+discovery:
+  - calls:
+    - action: list_ops_metadata
+      on_error: continue
+      save_as: response
+    discovery_id: aws.parameterstore.list_ops_metadata
+    emit:
+      as: item
+      item:
+        CreationDate: '{{ response.CreationDate }}'
+        LastModifiedDate: '{{ response.LastModifiedDate }}'
+        LastModifiedUser: '{{ response.LastModifiedUser }}'
+        Metadata: '{{ response.Metadata }}'
+        OpsMetadataArn: '{{ response.OpsMetadataArn }}'
+        ResourceId: '{{ response.ResourceId }}'
+  - calls:
+    - action: describe_parameters
+      on_error: continue
+      save_as: response
+    discovery_id: aws.ssm.describe_parameters
+    emit:
+      as: item
+      item:
+        ARN: '{{ item.ARN }}'
+        AllowedPattern: '{{ item.AllowedPattern }}'
+        DataType: '{{ item.DataType }}'
+        Description: '{{ item.Description }}'
+        KeyId: '{{ item.KeyId }}'
+        LastModifiedDate: '{{ item.LastModifiedDate }}'
+        LastModifiedUser: '{{ item.LastModifiedUser }}'
+        Name: '{{ item.Name }}'
+        Policies: '{{ item.Policies }}'
+        Tier: '{{ item.Tier }}'
+        Type: '{{ item.Type }}'
+        Version: '{{ item.Version }}'
+      items_for: '{{ response.Parameters }}'

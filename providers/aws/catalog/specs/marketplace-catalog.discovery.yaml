@@ -1,0 +1,99 @@
+version: '1.0'
+provider: aws
+service: marketplace-catalog
+services:
+  client: marketplace-catalog
+  module: boto3.client
+discovery:
+- discovery_id: aws.marketplace-catalog.describe_change_set
+  calls:
+  - action: describe_change_set
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ChangeSet }}'
+    item:
+      ChangeName: '{{ item.ChangeName }}'
+      ChangeType: '{{ item.ChangeType }}'
+      Details: '{{ item.Details }}'
+      DetailsDocument: '{{ item.DetailsDocument }}'
+      Entity: '{{ item.Entity }}'
+      ErrorDetailList: '{{ item.ErrorDetailList }}'
+      Intent: '{{ item.Intent }}'
+- discovery_id: aws.marketplace-catalog.describe_entity
+  calls:
+  - action: describe_entity
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Details: '{{ response.Details }}'
+      DetailsDocument: '{{ response.DetailsDocument }}'
+      EntityArn: '{{ response.EntityArn }}'
+      EntityIdentifier: '{{ response.EntityIdentifier }}'
+      EntityType: '{{ response.EntityType }}'
+      LastModifiedDate: '{{ response.LastModifiedDate }}'
+- discovery_id: aws.marketplace-catalog.get_resource_policy
+  calls:
+  - action: get_resource_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.marketplace-catalog.list_change_sets
+  calls:
+  - action: list_change_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ChangeSetSummaryList }}'
+    item:
+      Status: '{{ item.Status }}'
+      ChangeSetArn: '{{ item.ChangeSetArn }}'
+      ChangeSetId: '{{ item.ChangeSetId }}'
+      ChangeSetName: '{{ item.ChangeSetName }}'
+      EndTime: '{{ item.EndTime }}'
+      EntityIdList: '{{ item.EntityIdList }}'
+      FailureCode: '{{ item.FailureCode }}'
+      Intent: '{{ item.Intent }}'
+      StartTime: '{{ item.StartTime }}'
+- discovery_id: aws.marketplace-catalog.list_entities
+  calls:
+  - action: list_entities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EntitySummaryList }}'
+    item:
+      Name: '{{ item.Name }}'
+      AmiProductSummary: '{{ item.AmiProductSummary }}'
+      ContainerProductSummary: '{{ item.ContainerProductSummary }}'
+      DataProductSummary: '{{ item.DataProductSummary }}'
+      EntityArn: '{{ item.EntityArn }}'
+      EntityId: '{{ item.EntityId }}'
+      EntityType: '{{ item.EntityType }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      MachineLearningProductSummary: '{{ item.MachineLearningProductSummary }}'
+      OfferSummary: '{{ item.OfferSummary }}'
+      ResaleAuthorizationSummary: '{{ item.ResaleAuthorizationSummary }}'
+      SaaSProductSummary: '{{ item.SaaSProductSummary }}'
+      Visibility: '{{ item.Visibility }}'
+- discovery_id: aws.marketplace-catalog.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

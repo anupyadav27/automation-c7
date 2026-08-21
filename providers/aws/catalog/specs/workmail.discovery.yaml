@@ -1,0 +1,747 @@
+version: '1.0'
+provider: aws
+service: workmail
+services:
+  client: workmail
+  module: boto3.client
+discovery:
+- discovery_id: aws.workmail.list_organizations
+  calls:
+  - action: list_organizations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.OrganizationSummaries }}'
+    item:
+      Name: '{{ item.Name }}'
+      RoleArn: '{{ item.RoleArn }}'
+      State: '{{ item.State }}'
+      ARN: '{{ item.ARN }}'
+      Action: '{{ item.Action }}'
+      Actions: '{{ item.Actions }}'
+      Alias: '{{ item.Alias }}'
+      AuthenticationMode: '{{ item.AuthenticationMode }}'
+      CompletedDate: '{{ item.CompletedDate }}'
+      DateCreated: '{{ item.DateCreated }}'
+      DateModified: '{{ item.DateModified }}'
+      DefaultDomain: '{{ item.DefaultDomain }}'
+      DefaultMailDomain: '{{ item.DefaultMailDomain }}'
+      Description: '{{ item.Description }}'
+      DeviceModels: '{{ item.DeviceModels }}'
+      DeviceOperatingSystems: '{{ item.DeviceOperatingSystems }}'
+      DeviceTypes: '{{ item.DeviceTypes }}'
+      DeviceUserAgents: '{{ item.DeviceUserAgents }}'
+      DirectoryId: '{{ item.DirectoryId }}'
+      DirectoryType: '{{ item.DirectoryType }}'
+      DkimVerificationStatus: '{{ item.DkimVerificationStatus }}'
+      Effect: '{{ item.Effect }}'
+      Email: '{{ item.Email }}'
+      EndTime: '{{ item.EndTime }}'
+      ErrorMessage: '{{ item.ErrorMessage }}'
+      EstimatedProgress: '{{ item.EstimatedProgress }}'
+      EwsProvider: '{{ item.EwsProvider }}'
+      FolderConfigurations: '{{ item.FolderConfigurations }}'
+      Hostname: '{{ item.Hostname }}'
+      IdentityCenterConfiguration: '{{ item.IdentityCenterConfiguration }}'
+      IdentityProviderIdentityStoreId: '{{ item.IdentityProviderIdentityStoreId }}'
+      ImpersonationRoleIds: '{{ item.ImpersonationRoleIds }}'
+      ImpersonationRuleId: '{{ item.ImpersonationRuleId }}'
+      InteroperabilityEnabled: '{{ item.InteroperabilityEnabled }}'
+      IpRanges: '{{ item.IpRanges }}'
+      IsDefault: '{{ item.IsDefault }}'
+      IsTestDomain: '{{ item.IsTestDomain }}'
+      LambdaProvider: '{{ item.LambdaProvider }}'
+      LogGroupArn: '{{ item.LogGroupArn }}'
+      MatchedRules: '{{ item.MatchedRules }}'
+      MigrationAdmin: '{{ item.MigrationAdmin }}'
+      MobileDeviceAccessRuleId: '{{ item.MobileDeviceAccessRuleId }}'
+      NotActions: '{{ item.NotActions }}'
+      NotDeviceModels: '{{ item.NotDeviceModels }}'
+      NotDeviceOperatingSystems: '{{ item.NotDeviceOperatingSystems }}'
+      NotDeviceTypes: '{{ item.NotDeviceTypes }}'
+      NotDeviceUserAgents: '{{ item.NotDeviceUserAgents }}'
+      NotImpersonationRoleIds: '{{ item.NotImpersonationRoleIds }}'
+      NotIpRanges: '{{ item.NotIpRanges }}'
+      NotTargetUsers: '{{ item.NotTargetUsers }}'
+      NotUserIds: '{{ item.NotUserIds }}'
+      OrganizationId: '{{ item.OrganizationId }}'
+      OwnershipVerificationStatus: '{{ item.OwnershipVerificationStatus }}'
+      Period: '{{ item.Period }}'
+      PersonalAccessTokenConfiguration: '{{ item.PersonalAccessTokenConfiguration }}'
+      ProviderType: '{{ item.ProviderType }}'
+      S3BucketName: '{{ item.S3BucketName }}'
+      S3Path: '{{ item.S3Path }}'
+      StartTime: '{{ item.StartTime }}'
+      TargetUsers: '{{ item.TargetUsers }}'
+      Type: '{{ item.Type }}'
+      UserIds: '{{ item.UserIds }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.workmail.describe_email_monitoring_configuration
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: describe_email_monitoring_configuration
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      RoleArn: '{{ response.RoleArn }}'
+      LogGroupArn: '{{ response.LogGroupArn }}'
+- discovery_id: aws.workmail.describe_entity
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: describe_entity
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+      Email: '{{ item.Email }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.Name }}'
+      EntityId: '{{ response.EntityId }}'
+      Type: '{{ response.Type }}'
+- discovery_id: aws.workmail.describe_group
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: describe_group
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+      GroupId: '{{ item.GroupId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.Name }}'
+      State: '{{ response.State }}'
+      DisabledDate: '{{ response.DisabledDate }}'
+      Email: '{{ response.Email }}'
+      EnabledDate: '{{ response.EnabledDate }}'
+      GroupId: '{{ response.GroupId }}'
+      HiddenFromGlobalAddressList: '{{ response.HiddenFromGlobalAddressList }}'
+- discovery_id: aws.workmail.describe_identity_provider_configuration
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: describe_identity_provider_configuration
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.IdentityCenterConfiguration.Status }}'
+      ApplicationArn: '{{ response.IdentityCenterConfiguration.ApplicationArn }}'
+      AuthenticationMode: '{{ response.IdentityCenterConfiguration.AuthenticationMode }}'
+      Enabled: '{{ response.IdentityCenterConfiguration.Enabled }}'
+      IdentityCenterConfiguration: '{{ response.IdentityCenterConfiguration.IdentityCenterConfiguration }}'
+      InstanceArn: '{{ response.IdentityCenterConfiguration.InstanceArn }}'
+      PersonalAccessTokenConfiguration: '{{ response.IdentityCenterConfiguration.PersonalAccessTokenConfiguration }}'
+      LifetimeInDays: '{{ response.PersonalAccessTokenConfiguration.LifetimeInDays }}'
+- discovery_id: aws.workmail.describe_inbound_dmarc_settings
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: describe_inbound_dmarc_settings
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Enforced: '{{ response.Enforced }}'
+- discovery_id: aws.workmail.describe_mailbox_export_job
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: describe_mailbox_export_job
+    params:
+      JobId: '{{ item.JobId }}'
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      RoleArn: '{{ response.RoleArn }}'
+      State: '{{ response.State }}'
+      Description: '{{ response.Description }}'
+      EndTime: '{{ response.EndTime }}'
+      EntityId: '{{ response.EntityId }}'
+      ErrorInfo: '{{ response.ErrorInfo }}'
+      EstimatedProgress: '{{ response.EstimatedProgress }}'
+      KmsKeyArn: '{{ response.KmsKeyArn }}'
+      S3BucketName: '{{ response.S3BucketName }}'
+      S3Path: '{{ response.S3Path }}'
+      S3Prefix: '{{ response.S3Prefix }}'
+      StartTime: '{{ response.StartTime }}'
+- discovery_id: aws.workmail.describe_organization
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: describe_organization
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ARN: '{{ response.ARN }}'
+      CompletedDate: '{{ response.CompletedDate }}'
+      DirectoryId: '{{ response.DirectoryId }}'
+      DirectoryType: '{{ response.DirectoryType }}'
+      InteroperabilityEnabled: '{{ response.InteroperabilityEnabled }}'
+      MigrationAdmin: '{{ response.MigrationAdmin }}'
+      Alias: '{{ response.Alias }}'
+      DefaultMailDomain: '{{ response.DefaultMailDomain }}'
+      ErrorMessage: '{{ response.ErrorMessage }}'
+      OrganizationId: '{{ response.OrganizationId }}'
+      State: '{{ response.State }}'
+- discovery_id: aws.workmail.describe_resource
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: describe_resource
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+      ResourceId: '{{ item.ResourceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AutoAcceptRequests: '{{ response.BookingOptions.AutoAcceptRequests }}'
+      AutoDeclineConflictingRequests: '{{ response.BookingOptions.AutoDeclineConflictingRequests }}'
+      AutoDeclineRecurringRequests: '{{ response.BookingOptions.AutoDeclineRecurringRequests }}'
+      Description: '{{ response.Description }}'
+      DisabledDate: '{{ response.DisabledDate }}'
+      Email: '{{ response.Email }}'
+      EnabledDate: '{{ response.EnabledDate }}'
+      HiddenFromGlobalAddressList: '{{ response.HiddenFromGlobalAddressList }}'
+      Name: '{{ response.Name }}'
+      ResourceId: '{{ response.ResourceId }}'
+      State: '{{ response.State }}'
+      Type: '{{ response.Type }}'
+- discovery_id: aws.workmail.describe_user
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: describe_user
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+      UserId: '{{ item.UserId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      City: '{{ response.City }}'
+      Company: '{{ response.Company }}'
+      Country: '{{ response.Country }}'
+      Department: '{{ response.Department }}'
+      Initials: '{{ response.Initials }}'
+      Office: '{{ response.Office }}'
+      Street: '{{ response.Street }}'
+      Telephone: '{{ response.Telephone }}'
+      DisabledDate: '{{ response.DisabledDate }}'
+      DisplayName: '{{ response.DisplayName }}'
+      Email: '{{ response.Email }}'
+      EnabledDate: '{{ response.EnabledDate }}'
+      FirstName: '{{ response.FirstName }}'
+      HiddenFromGlobalAddressList: '{{ response.HiddenFromGlobalAddressList }}'
+      IdentityProviderIdentityStoreId: '{{ response.IdentityProviderIdentityStoreId }}'
+      IdentityProviderUserId: '{{ response.IdentityProviderUserId }}'
+      JobTitle: '{{ response.JobTitle }}'
+      LastName: '{{ response.LastName }}'
+      MailboxDeprovisionedDate: '{{ response.MailboxDeprovisionedDate }}'
+      MailboxProvisionedDate: '{{ response.MailboxProvisionedDate }}'
+      Name: '{{ response.Name }}'
+      State: '{{ response.State }}'
+      UserId: '{{ response.UserId }}'
+      UserRole: '{{ response.UserRole }}'
+      ZipCode: '{{ response.ZipCode }}'
+- discovery_id: aws.workmail.get_access_control_effect
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: get_access_control_effect
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+      IpAddress: '{{ item.IpAddress }}'
+      Action: '{{ item.Action }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MatchedRules }}'
+    item:
+      MatchedRules: '{{ item.MatchedRules }}'
+      Effect: '{{ response.Effect }}'
+- discovery_id: aws.workmail.get_default_retention_policy
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: get_default_retention_policy
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.FolderConfigurations }}'
+    item:
+      Name: '{{ item.Name }}'
+      Action: '{{ item.Action }}'
+      FolderConfigurations: '{{ item.FolderConfigurations[].Name }}'
+      Period: '{{ item.Period }}'
+      Description: '{{ response.Description }}'
+      Id: '{{ response.Id }}'
+- discovery_id: aws.workmail.get_impersonation_role
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: get_impersonation_role
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+      ImpersonationRoleId: '{{ item.ImpersonationRoleId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Rules }}'
+    item:
+      Name: '{{ item.Name }}'
+      ImpersonationRuleId: '{{ item.ImpersonationRoleId }}'
+      NotTargetUsers: '{{ item.NotTargetUsers }}'
+      Rules: '{{ item.Rules }}'
+      TargetUsers: '{{ item.TargetUsers }}'
+      DateCreated: '{{ response.DateCreated }}'
+      DateModified: '{{ response.DateModified }}'
+      Description: '{{ response.Description }}'
+      ImpersonationRoleId: '{{ response.ImpersonationRoleId }}'
+      Type: '{{ response.Type }}'
+- discovery_id: aws.workmail.get_impersonation_role_effect
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: get_impersonation_role_effect
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+      ImpersonationRoleId: '{{ item.ImpersonationRoleId }}'
+      TargetUser: '{{ item.TargetUser }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MatchedRules }}'
+    item:
+      Name: '{{ item.Name }}'
+      ImpersonationRuleId: '{{ item.ImpersonationRuleId }}'
+      Effect: '{{ response.Effect }}'
+      Type: '{{ response.Type }}'
+- discovery_id: aws.workmail.get_mail_domain
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: get_mail_domain
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Records }}'
+    item:
+      DkimVerificationStatus: '{{ item.DkimVerificationStatus }}'
+      Hostname: '{{ item.Hostname }}'
+      IsDefault: '{{ item.IsDefault }}'
+      IsTestDomain: '{{ item.IsTestDomain }}'
+      OwnershipVerificationStatus: '{{ item.OwnershipVerificationStatus }}'
+      Records: '{{ item.Records }}'
+      Type: '{{ item.Type }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.workmail.get_mailbox_details
+  calls:
+  - action: get_mailbox_details
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      MailboxQuota: '{{ response.MailboxQuota }}'
+      MailboxSize: '{{ response.MailboxSize }}'
+- discovery_id: aws.workmail.get_mobile_device_access_effect
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: get_mobile_device_access_effect
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MatchedRules }}'
+    item:
+      Name: '{{ item.Name }}'
+      MatchedRules: '{{ item.MatchedRules }}'
+      MobileDeviceAccessRuleId: '{{ item.MobileDeviceAccessRuleId }}'
+      Effect: '{{ response.Effect }}'
+- discovery_id: aws.workmail.get_mobile_device_access_override
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: get_mobile_device_access_override
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+      UserId: '{{ item.UserId }}'
+      DeviceId: '{{ item.DeviceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DateCreated: '{{ response.DateCreated }}'
+      DateModified: '{{ response.DateModified }}'
+      Description: '{{ response.Description }}'
+      DeviceId: '{{ response.DeviceId }}'
+      Effect: '{{ response.Effect }}'
+      UserId: '{{ response.UserId }}'
+- discovery_id: aws.workmail.get_personal_access_token_metadata
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: get_personal_access_token_metadata
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+      PersonalAccessTokenId: '{{ item.PersonalAccessTokenId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Scopes }}'
+    item:
+      DateCreated: '{{ response.DateCreated }}'
+      DateLastUsed: '{{ response.DateLastUsed }}'
+      ExpiresTime: '{{ response.ExpiresTime }}'
+      Name: '{{ response.Name }}'
+      PersonalAccessTokenId: '{{ response.PersonalAccessTokenId }}'
+      UserId: '{{ response.UserId }}'
+- discovery_id: aws.workmail.list_access_control_rules
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_access_control_rules
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Rules }}'
+    item:
+      Name: '{{ item.Name }}'
+      Actions: '{{ item.Actions }}'
+      DateCreated: '{{ item.DateCreated }}'
+      DateModified: '{{ item.DateModified }}'
+      Description: '{{ item.Description }}'
+      Effect: '{{ item.Effect }}'
+      ImpersonationRoleIds: '{{ item.ImpersonationRoleIds }}'
+      IpRanges: '{{ item.IpRanges }}'
+      NotActions: '{{ item.NotActions }}'
+      NotImpersonationRoleIds: '{{ item.NotImpersonationRoleIds }}'
+      NotIpRanges: '{{ item.NotIpRanges }}'
+      NotUserIds: '{{ item.NotUserIds }}'
+      UserIds: '{{ item.UserIds }}'
+- discovery_id: aws.workmail.list_aliases
+  calls:
+  - action: list_aliases
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Aliases }}'
+- discovery_id: aws.workmail.list_availability_configurations
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_availability_configurations
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AvailabilityConfigurations }}'
+    item:
+      DateCreated: '{{ item.DateCreated }}'
+      DateModified: '{{ item.DateModified }}'
+      DkimVerificationStatus: '{{ item.DkimVerificationStatus }}'
+      DomainName: '{{ item.DomainName }}'
+      EwsProvider: '{{ item.EwsProvider }}'
+      Hostname: '{{ item.Hostname }}'
+      IsDefault: '{{ item.IsDefault }}'
+      IsTestDomain: '{{ item.IsTestDomain }}'
+      LambdaProvider: '{{ item.LambdaProvider }}'
+      OwnershipVerificationStatus: '{{ item.OwnershipVerificationStatus }}'
+      ProviderType: '{{ item.ProviderType }}'
+      Type: '{{ item.Type }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.workmail.list_group_members
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_group_members
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+      GroupId: '{{ item.GroupId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Members }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      DisabledDate: '{{ item.DisabledDate }}'
+      EnabledDate: '{{ item.EnabledDate }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.workmail.list_groups
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_groups
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Groups }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      DisabledDate: '{{ item.DisabledDate }}'
+      Email: '{{ item.Email }}'
+      EnabledDate: '{{ item.EnabledDate }}'
+- discovery_id: aws.workmail.list_groups_for_entity
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_groups_for_entity
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+      EntityId: '{{ item.EntityId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Groups }}'
+    item:
+      GroupId: '{{ item.GroupId }}'
+      GroupName: '{{ item.GroupName }}'
+- discovery_id: aws.workmail.list_impersonation_roles
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_impersonation_roles
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Roles }}'
+    item:
+      Name: '{{ item.Name }}'
+      DateCreated: '{{ item.DateCreated }}'
+      DateModified: '{{ item.DateModified }}'
+      ImpersonationRoleId: '{{ item.ImpersonationRoleId }}'
+      Rules: '{{ item.Rules }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.workmail.list_mail_domains
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_mail_domains
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MailDomains }}'
+    item:
+      DefaultDomain: '{{ item.DefaultDomain }}'
+      DkimVerificationStatus: '{{ item.DkimVerificationStatus }}'
+      DomainName: '{{ item.DomainName }}'
+      IsDefault: '{{ item.IsDefault }}'
+      IsTestDomain: '{{ item.IsTestDomain }}'
+      OwnershipVerificationStatus: '{{ item.OwnershipVerificationStatus }}'
+      Records: '{{ item.Records }}'
+- discovery_id: aws.workmail.list_mailbox_export_jobs
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_mailbox_export_jobs
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Jobs }}'
+    item:
+      State: '{{ item.State }}'
+      Description: '{{ item.Description }}'
+      EndTime: '{{ item.EndTime }}'
+      EntityId: '{{ item.EntityId }}'
+      EstimatedProgress: '{{ item.EstimatedProgress }}'
+      JobId: '{{ item.JobId }}'
+      S3BucketName: '{{ item.S3BucketName }}'
+      S3Path: '{{ item.S3Path }}'
+      StartTime: '{{ item.StartTime }}'
+- discovery_id: aws.workmail.list_mailbox_permissions
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_mailbox_permissions
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+      EntityId: '{{ item.EntityId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Permissions }}'
+    item:
+      GranteeId: '{{ item.GranteeId }}'
+      GranteeType: '{{ item.GranteeType }}'
+      PermissionValues: '{{ item.PermissionValues }}'
+- discovery_id: aws.workmail.list_mobile_device_access_overrides
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_mobile_device_access_overrides
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Overrides }}'
+    item:
+      DateCreated: '{{ item.DateCreated }}'
+      DateModified: '{{ item.DateModified }}'
+      Description: '{{ item.Description }}'
+      DeviceId: '{{ item.DeviceId }}'
+      Effect: '{{ item.Effect }}'
+      UserId: '{{ item.UserId }}'
+- discovery_id: aws.workmail.list_mobile_device_access_rules
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_mobile_device_access_rules
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Rules }}'
+    item:
+      Name: '{{ item.Name }}'
+      DateCreated: '{{ item.DateCreated }}'
+      DateModified: '{{ item.DateModified }}'
+      Description: '{{ item.Description }}'
+      DeviceModels: '{{ item.DeviceModels }}'
+      DeviceOperatingSystems: '{{ item.DeviceOperatingSystems }}'
+      DeviceTypes: '{{ item.DeviceTypes }}'
+      DeviceUserAgents: '{{ item.DeviceUserAgents }}'
+      Effect: '{{ item.Effect }}'
+      MobileDeviceAccessRuleId: '{{ item.Rules[].MobileDeviceAccessRuleId }}'
+      NotDeviceModels: '{{ item.NotDeviceModels }}'
+      NotDeviceOperatingSystems: '{{ item.NotDeviceOperatingSystems }}'
+      NotDeviceTypes: '{{ item.NotDeviceTypes }}'
+      NotDeviceUserAgents: '{{ item.NotDeviceUserAgents }}'
+- discovery_id: aws.workmail.list_personal_access_tokens
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_personal_access_tokens
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PersonalAccessTokenSummaries }}'
+    item:
+      Name: '{{ item.Name }}'
+      DateCreated: '{{ item.DateCreated }}'
+      DateLastUsed: '{{ item.DateLastUsed }}'
+      ExpiresTime: '{{ item.ExpiresTime }}'
+      PersonalAccessTokenId: '{{ item.PersonalAccessTokenId }}'
+      Scopes: '{{ item.Scopes }}'
+      UserId: '{{ item.UserId }}'
+- discovery_id: aws.workmail.list_resource_delegates
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_resource_delegates
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+      ResourceId: '{{ item.ResourceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Delegates }}'
+    item:
+      Id: '{{ item.Id }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.workmail.list_resources
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_resources
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Resources }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      Description: '{{ item.Description }}'
+      DisabledDate: '{{ item.DisabledDate }}'
+      Email: '{{ item.Email }}'
+      EnabledDate: '{{ item.EnabledDate }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.workmail.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.workmail.list_users
+  for_each: aws.workmail.list_organizations
+  calls:
+  - action: list_users
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Users }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      City: '{{ item.City }}'
+      Company: '{{ item.Company }}'
+      Country: '{{ item.Country }}'
+      Department: '{{ item.Department }}'
+      DisabledDate: '{{ item.DisabledDate }}'
+      DisplayName: '{{ item.DisplayName }}'
+      Email: '{{ item.Email }}'
+      EnabledDate: '{{ item.EnabledDate }}'
+      IdentityProviderIdentityStoreId: '{{ item.Users[].IdentityProviderIdentityStoreId }}'
+      IdentityProviderUserId: '{{ item.IdentityProviderUserId }}'
+      Initials: '{{ item.Initials }}'
+      Office: '{{ item.Office }}'
+      Street: '{{ item.Street }}'
+      Telephone: '{{ item.Telephone }}'
+      UserRole: '{{ item.UserRole }}'

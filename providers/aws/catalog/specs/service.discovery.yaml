@@ -1,0 +1,56 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: service (backed by servicecatalog)
+# 2 ops (from checks)
+# Generated: 2026-04-14
+version: '1.0'
+provider: aws
+service: service
+services:
+  client: servicecatalog
+  module: boto3.client
+discovery:
+  - discovery_id: aws.service.list_portfolios
+    calls:
+    - action: list_portfolios
+      save_as: response
+      on_error: continue
+      params:
+        PageSize: 20
+    emit:
+      as: item
+      items_for: '{{ response.PortfolioDetails }}'
+      item:
+        Id: '{{ item.Id }}'
+        ARN: '{{ item.ARN }}'
+        Description: '{{ item.Description }}'
+        DisplayName: '{{ item.DisplayName }}'
+        PortfolioShareDetails: '{{ item.PortfolioShareDetails }}'
+        ProviderName: '{{ item.ProviderName }}'
+  - discovery_id: aws.service.describe_portfolio
+    for_each: aws.service.list_portfolios
+    calls:
+    - action: describe_portfolio
+      save_as: response
+      on_error: continue
+      params:
+        Id: '{{ item.Id }}'
+    emit:
+      as: item
+      items_for: '{{ response }}'
+      item:
+        Tags: '{{ item.Tags }}'
+        TagOptions: '{{ item.TagOptions }}'
+        PortfolioDetail: '{{ item.PortfolioDetail }}'
+  - discovery_id: aws.service.list_portfolio_access
+    for_each: aws.service.list_portfolios
+    calls:
+    - action: list_portfolio_access
+      save_as: response
+      on_error: continue
+      params:
+        PortfolioId: '{{ item.Id }}'
+    emit:
+      as: item
+      items_for: '{{ response.AccountIds }}'
+      item:
+        PortfolioShareDetails: '{{ item.PortfolioShareDetails }}'

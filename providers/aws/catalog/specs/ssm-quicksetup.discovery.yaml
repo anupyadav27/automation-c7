@@ -1,0 +1,124 @@
+version: '1.0'
+provider: aws
+service: ssm-quicksetup
+services:
+  client: ssm-quicksetup
+  module: boto3.client
+discovery:
+- discovery_id: aws.ssm-quicksetup.get_service_settings
+  calls:
+  - action: get_service_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DestinationArn: '{{ response.ServiceSettings.DestinationArn }}'
+      Enabled: '{{ response.ServiceSettings.Enabled }}'
+      ExplorerEnablingRoleArn: '{{ response.ServiceSettings.ExplorerEnablingRoleArn }}'
+      Format: '{{ response.ServiceSettings.Format }}'
+      Level: '{{ response.ServiceSettings.Level }}'
+      ServiceSettings: '{{ response.ServiceSettings.ServiceSettings }}'
+- discovery_id: aws.ssm-quicksetup.list_configuration_managers
+  calls:
+  - action: list_configuration_managers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ConfigurationManagersList }}'
+    item:
+      Name: '{{ item.Name }}'
+      ConfigurationDefinitionSummaries: '{{ item.ConfigurationDefinitionSummaries }}'
+      Description: '{{ item.Description }}'
+      ManagerArn: '{{ item.ManagerArn }}'
+      StatusSummaries: '{{ item.StatusSummaries }}'
+- discovery_id: aws.ssm-quicksetup.list_configurations
+  calls:
+  - action: list_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ConfigurationsList }}'
+    item:
+      Id: '{{ item.Id }}'
+      Region: '{{ item.Region }}'
+      Account: '{{ item.Account }}'
+      ConfigurationDefinitionId: '{{ item.ConfigurationDefinitionId }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      FirstClassParameters: '{{ item.FirstClassParameters }}'
+      ManagerArn: '{{ item.ManagerArn }}'
+      StatusSummaries: '{{ item.StatusSummaries }}'
+      Type: '{{ item.Type }}'
+      TypeVersion: '{{ item.TypeVersion }}'
+- discovery_id: aws.ssm-quicksetup.list_quick_setup_types
+  calls:
+  - action: list_quick_setup_types
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.QuickSetupTypeList }}'
+    item:
+      LatestVersion: '{{ item.LatestVersion }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.ssm-quicksetup.get_configuration
+  calls:
+  - action: get_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.StatusSummaries }}'
+    item:
+      Status: '{{ item.Status }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      StatusDetails: '{{ item.StatusDetails }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      StatusType: '{{ item.StatusType }}'
+      Account: '{{ response.Account }}'
+      ConfigurationDefinitionId: '{{ response.ConfigurationDefinitionId }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      Id: '{{ response.Id }}'
+      LastModifiedAt: '{{ response.LastModifiedAt }}'
+      ManagerArn: '{{ response.ManagerArn }}'
+      Parameters: '{{ response.Parameters }}'
+      Region: '{{ response.Region }}'
+      Type: '{{ response.Type }}'
+      TypeVersion: '{{ response.TypeVersion }}'
+- discovery_id: aws.ssm-quicksetup.get_configuration_manager
+  for_each: aws.ssm-quicksetup.list_configuration_managers
+  calls:
+  - action: get_configuration_manager
+    params:
+      ManagerArn: '{{ item.ManagerArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ConfigurationDefinitions }}'
+    item:
+      Id: '{{ item.Id }}'
+      LocalDeploymentAdministrationRoleArn: '{{ item.LocalDeploymentAdministrationRoleArn }}'
+      LocalDeploymentExecutionRoleName: '{{ item.LocalDeploymentExecutionRoleName }}'
+      Parameters: '{{ item.Parameters }}'
+      Type: '{{ item.Type }}'
+      TypeVersion: '{{ item.TypeVersion }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      Description: '{{ response.Description }}'
+      LastModifiedAt: '{{ response.LastModifiedAt }}'
+      ManagerArn: '{{ response.ManagerArn }}'
+      Name: '{{ response.Name }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.ssm-quicksetup.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

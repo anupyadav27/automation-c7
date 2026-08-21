@@ -1,0 +1,94 @@
+version: '1.0'
+provider: aws
+service: elastictranscoder
+services:
+  client: elastictranscoder
+  module: boto3.client
+discovery:
+- discovery_id: aws.elastictranscoder.list_pipelines
+  calls:
+  - action: list_pipelines
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Pipelines }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      AwsKmsKeyArn: '{{ item.AwsKmsKeyArn }}'
+      ContentConfig: '{{ item.ContentConfig }}'
+      InputBucket: '{{ item.InputBucket }}'
+      Notifications: '{{ item.Notifications }}'
+      OutputBucket: '{{ item.OutputBucket }}'
+      Role: '{{ item.Role }}'
+      ThumbnailConfig: '{{ item.ThumbnailConfig }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+- discovery_id: aws.elastictranscoder.list_presets
+  calls:
+  - action: list_presets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Presets }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Audio: '{{ item.Audio }}'
+      Container: '{{ item.Container }}'
+      Description: '{{ item.Description }}'
+      Thumbnails: '{{ item.Thumbnails }}'
+      Type: '{{ item.Type }}'
+      Video: '{{ item.Video }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+- discovery_id: aws.elastictranscoder.list_jobs_by_pipeline
+  calls:
+  - action: list_jobs_by_pipeline
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Jobs }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      Input: '{{ item.Input }}'
+      Inputs: '{{ item.Inputs }}'
+      Output: '{{ item.Output }}'
+      OutputKeyPrefix: '{{ item.OutputKeyPrefix }}'
+      Outputs: '{{ item.Outputs }}'
+      PipelineId: '{{ item.PipelineId }}'
+      Playlists: '{{ item.Playlists }}'
+      Timing: '{{ item.Timing }}'
+      UserMetadata: '{{ item.UserMetadata }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+- discovery_id: aws.elastictranscoder.list_jobs_by_status
+  for_each: aws.elastictranscoder.list_pipelines
+  calls:
+  - action: list_jobs_by_status
+    params:
+      Status: '{{ item.Status }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Jobs }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      Input: '{{ item.Input }}'
+      Inputs: '{{ item.Inputs }}'
+      Output: '{{ item.Output }}'
+      OutputKeyPrefix: '{{ item.OutputKeyPrefix }}'
+      Outputs: '{{ item.Outputs }}'
+      PipelineId: '{{ item.PipelineId }}'
+      Playlists: '{{ item.Playlists }}'
+      Timing: '{{ item.Timing }}'
+      UserMetadata: '{{ item.UserMetadata }}'
+      NextPageToken: '{{ response.NextPageToken }}'

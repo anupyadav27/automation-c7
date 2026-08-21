@@ -1,0 +1,388 @@
+version: '1.0'
+provider: aws
+service: chime
+services:
+  client: chime
+  module: boto3.client
+discovery:
+- discovery_id: aws.chime.get_global_settings
+  calls:
+  - action: get_global_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      BusinessCalling: '{{ response.BusinessCalling.BusinessCalling }}'
+      CdrBucket: '{{ response.BusinessCalling.CdrBucket }}'
+      VoiceConnector: '{{ response.BusinessCalling.VoiceConnector }}'
+- discovery_id: aws.chime.get_phone_number_settings
+  calls:
+  - action: get_phone_number_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CallingNameUpdatedTimestamp: '{{ response.CallingNameUpdatedTimestamp }}'
+      CallingName: '{{ response.CallingName }}'
+- discovery_id: aws.chime.list_accounts
+  calls:
+  - action: list_accounts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Accounts }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      Name: '{{ item.Name }}'
+      AccountStatus: '{{ item.AccountStatus }}'
+      AccountType: '{{ item.AccountType }}'
+      AwsAccountId: '{{ item.AwsAccountId }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      DefaultLicense: '{{ item.DefaultLicense }}'
+      SigninDelegateGroups: '{{ item.SigninDelegateGroups }}'
+      SupportedLicenses: '{{ item.SupportedLicenses }}'
+- discovery_id: aws.chime.list_phone_number_orders
+  calls:
+  - action: list_phone_number_orders
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PhoneNumberOrders }}'
+    item:
+      Status: '{{ item.Status }}'
+      CallingNameUpdatedTimestamp: '{{ item.CallingNameUpdatedTimestamp }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      OrderedPhoneNumbers: '{{ item.OrderedPhoneNumbers }}'
+      PhoneNumber: '{{ item.PhoneNumber }}'
+      PhoneNumberOrderId: '{{ item.PhoneNumberOrderId }}'
+      ProductType: '{{ item.ProductType }}'
+      UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+- discovery_id: aws.chime.list_phone_numbers
+  calls:
+  - action: list_phone_numbers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PhoneNumbers }}'
+    item:
+      Status: '{{ item.Status }}'
+      Associations: '{{ item.Associations }}'
+      CallingName: '{{ item.CallingName }}'
+      CallingNameStatus: '{{ item.CallingNameStatus }}'
+      Capabilities: '{{ item.Capabilities }}'
+      Country: '{{ item.Country }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      DeletionTimestamp: '{{ item.DeletionTimestamp }}'
+      E164PhoneNumber: '{{ item.E164PhoneNumber }}'
+      InitiateDeletionTimestamp: '{{ item.InitiateDeletionTimestamp }}'
+      PhoneNumber: '{{ item.PhoneNumber }}'
+      PhoneNumberId: '{{ item.PhoneNumberId }}'
+      ProductType: '{{ item.ProductType }}'
+      Type: '{{ item.Type }}'
+      UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+- discovery_id: aws.chime.search_available_phone_numbers
+  calls:
+  - action: search_available_phone_numbers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.E164PhoneNumbers }}'
+- discovery_id: aws.chime.get_account
+  for_each: aws.chime.list_accounts
+  calls:
+  - action: get_account
+    params:
+      AccountId: '{{ item.AccountId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccountId: '{{ response.Account.AccountId }}'
+      Name: '{{ response.Account.Name }}'
+      AccountStatus: '{{ response.Account.AccountStatus }}'
+      AccountType: '{{ response.Account.AccountType }}'
+      AwsAccountId: '{{ response.Account.AwsAccountId }}'
+      CreatedTimestamp: '{{ response.Account.CreatedTimestamp }}'
+      DefaultLicense: '{{ response.Account.DefaultLicense }}'
+      SigninDelegateGroups: '{{ response.Account.SigninDelegateGroups }}'
+      SupportedLicenses: '{{ response.Account.SupportedLicenses }}'
+- discovery_id: aws.chime.get_account_settings
+  for_each: aws.chime.list_accounts
+  calls:
+  - action: get_account_settings
+    params:
+      AccountId: '{{ item.AccountId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DestinationArn: '{{ response.AccountSettings.DestinationArn }}'
+      DisableRemoteControl: '{{ response.AccountSettings.DisableRemoteControl }}'
+      EnableDialOut: '{{ response.AccountSettings.EnableDialOut }}'
+      Enabled: '{{ response.AccountSettings.Enabled }}'
+      Format: '{{ response.AccountSettings.Format }}'
+      Level: '{{ response.AccountSettings.Level }}'
+- discovery_id: aws.chime.get_bot
+  for_each: aws.chime.list_accounts
+  calls:
+  - action: get_bot
+    params:
+      AccountId: '{{ item.AccountId }}'
+      BotId: '{{ item.BotId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      BotEmail: '{{ response.Bot.BotEmail }}'
+      BotId: '{{ response.Bot.BotId }}'
+      BotType: '{{ response.Bot.BotType }}'
+      CreatedTimestamp: '{{ response.Bot.CreatedTimestamp }}'
+      Disabled: '{{ response.Bot.Disabled }}'
+      DisplayName: '{{ response.Bot.DisplayName }}'
+      SecurityToken: '{{ response.Bot.SecurityToken }}'
+      UpdatedTimestamp: '{{ response.Bot.UpdatedTimestamp }}'
+      UserId: '{{ response.Bot.UserId }}'
+- discovery_id: aws.chime.get_events_configuration
+  for_each: aws.chime.list_accounts
+  calls:
+  - action: get_events_configuration
+    params:
+      AccountId: '{{ item.AccountId }}'
+      BotId: '{{ item.BotId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      BotId: '{{ response.EventsConfiguration.BotId }}'
+      LambdaFunctionArn: '{{ response.EventsConfiguration.LambdaFunctionArn }}'
+      OutboundEventsHTTPSEndpoint: '{{ response.EventsConfiguration.OutboundEventsHTTPSEndpoint }}'
+- discovery_id: aws.chime.get_phone_number
+  for_each: aws.chime.list_phone_numbers
+  calls:
+  - action: get_phone_number
+    params:
+      PhoneNumberId: '{{ item.PhoneNumberId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.PhoneNumber.Status }}'
+      Associations: '{{ response.PhoneNumber.Associations[].Name }}'
+      CallingName: '{{ response.PhoneNumber.CallingName }}'
+      CallingNameStatus: '{{ response.PhoneNumber.CallingNameStatus }}'
+      Capabilities: '{{ response.PhoneNumber.Capabilities }}'
+      Country: '{{ response.PhoneNumber.Country }}'
+      CreatedTimestamp: '{{ response.PhoneNumber.CreatedTimestamp }}'
+      DeletionTimestamp: '{{ response.PhoneNumber.DeletionTimestamp }}'
+      E164PhoneNumber: '{{ response.PhoneNumber.E164PhoneNumber }}'
+      PhoneNumber: '{{ response.PhoneNumber.PhoneNumberId }}'
+      PhoneNumberId: '{{ response.PhoneNumber.PhoneNumberId }}'
+      ProductType: '{{ response.PhoneNumber.ProductType }}'
+      Type: '{{ response.PhoneNumber.Type }}'
+      UpdatedTimestamp: '{{ response.PhoneNumber.UpdatedTimestamp }}'
+      InboundCall: '{{ response.PhoneNumber.Capabilities.InboundCall }}'
+      InboundMMS: '{{ response.PhoneNumber.Capabilities.InboundMMS }}'
+      InboundSMS: '{{ response.PhoneNumber.Capabilities.InboundSMS }}'
+      OutboundCall: '{{ response.PhoneNumber.Capabilities.OutboundCall }}'
+      OutboundMMS: '{{ response.PhoneNumber.Capabilities.OutboundMMS }}'
+      OutboundSMS: '{{ response.PhoneNumber.Capabilities.OutboundSMS }}'
+- discovery_id: aws.chime.get_phone_number_order
+  for_each: aws.chime.list_phone_number_orders
+  calls:
+  - action: get_phone_number_order
+    params:
+      PhoneNumberOrderId: '{{ item.PhoneNumberOrderId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.PhoneNumberOrder.Status }}'
+      CreatedTimestamp: '{{ response.PhoneNumberOrder.CreatedTimestamp }}'
+      OrderedPhoneNumbers: '{{ response.PhoneNumberOrder.OrderedPhoneNumbers[].Status }}'
+      PhoneNumberOrderId: '{{ response.PhoneNumberOrder.PhoneNumberOrderId }}'
+      ProductType: '{{ response.PhoneNumberOrder.ProductType }}'
+      UpdatedTimestamp: '{{ response.PhoneNumberOrder.UpdatedTimestamp }}'
+- discovery_id: aws.chime.get_retention_settings
+  for_each: aws.chime.list_accounts
+  calls:
+  - action: get_retention_settings
+    params:
+      AccountId: '{{ item.AccountId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ConversationRetentionSettings: '{{ response.RetentionSettings.ConversationRetentionSettings.RetentionDays }}'
+      InitiateDeletionTimestamp: '{{ response.RetentionSettings.InitiateDeletionTimestamp }}'
+      RoomRetentionSettings: '{{ response.RetentionSettings.RoomRetentionSettings }}'
+      RetentionDays: '{{ response.RetentionSettings.ConversationRetentionSettings.RetentionDays }}'
+- discovery_id: aws.chime.get_room
+  for_each: aws.chime.list_accounts
+  calls:
+  - action: get_room
+    params:
+      AccountId: '{{ item.AccountId }}'
+      RoomId: '{{ item.RoomId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccountId: '{{ response.Room.AccountId }}'
+      Name: '{{ response.Room.Name }}'
+      CreatedBy: '{{ response.Room.CreatedBy }}'
+      CreatedTimestamp: '{{ response.Room.CreatedTimestamp }}'
+      RoomId: '{{ response.Room.RoomId }}'
+      UpdatedTimestamp: '{{ response.Room.UpdatedTimestamp }}'
+- discovery_id: aws.chime.get_user
+  for_each: aws.chime.list_accounts
+  calls:
+  - action: get_user
+    params:
+      AccountId: '{{ item.AccountId }}'
+      UserId: '{{ item.UserId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccountId: '{{ response.User.AccountId }}'
+      AlexaForBusinessMetadata: '{{ response.User.AlexaForBusinessMetadata }}'
+      DisplayName: '{{ response.User.DisplayName }}'
+      InvitedOn: '{{ response.User.InvitedOn }}'
+      LicenseType: '{{ response.User.LicenseType }}'
+      PersonalPIN: '{{ response.User.PersonalPIN }}'
+      PrimaryEmail: '{{ response.User.PrimaryEmail }}'
+      PrimaryProvisionedNumber: '{{ response.User.PrimaryProvisionedNumber }}'
+      RegisteredOn: '{{ response.User.RegisteredOn }}'
+      UserId: '{{ response.User.UserId }}'
+      UserInvitationStatus: '{{ response.User.UserInvitationStatus }}'
+      UserRegistrationStatus: '{{ response.User.UserRegistrationStatus }}'
+      UserType: '{{ response.User.UserType }}'
+      AlexaForBusinessRoomArn: '{{ response.User.AlexaForBusinessMetadata.AlexaForBusinessRoomArn }}'
+      IsAlexaForBusinessEnabled: '{{ response.User.AlexaForBusinessMetadata.IsAlexaForBusinessEnabled }}'
+- discovery_id: aws.chime.get_user_settings
+  for_each: aws.chime.list_accounts
+  calls:
+  - action: get_user_settings
+    params:
+      AccountId: '{{ item.AccountId }}'
+      UserId: '{{ item.UserId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Telephony: '{{ response.UserSettings.Telephony.SMS }}'
+      InboundCalling: '{{ response.UserSettings.Telephony.InboundCalling }}'
+      OutboundCalling: '{{ response.UserSettings.Telephony.OutboundCalling }}'
+      SMS: '{{ response.UserSettings.Telephony.SMS }}'
+- discovery_id: aws.chime.list_bots
+  for_each: aws.chime.list_accounts
+  calls:
+  - action: list_bots
+    params:
+      AccountId: '{{ item.AccountId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Bots }}'
+    item:
+      BotEmail: '{{ item.BotEmail }}'
+      BotId: '{{ item.BotId }}'
+      BotType: '{{ item.BotType }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      Disabled: '{{ item.Disabled }}'
+      DisplayName: '{{ item.DisplayName }}'
+      SecurityToken: '{{ item.SecurityToken }}'
+      UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+      UserId: '{{ item.UserId }}'
+- discovery_id: aws.chime.list_room_memberships
+  for_each: aws.chime.list_accounts
+  calls:
+  - action: list_room_memberships
+    params:
+      AccountId: '{{ item.AccountId }}'
+      RoomId: '{{ item.RoomId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RoomMemberships }}'
+    item:
+      InvitedBy: '{{ item.InvitedBy }}'
+      Member: '{{ item.Member }}'
+      Role: '{{ item.Role }}'
+      RoomId: '{{ item.RoomId }}'
+      UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+- discovery_id: aws.chime.list_rooms
+  for_each: aws.chime.list_accounts
+  calls:
+  - action: list_rooms
+    params:
+      AccountId: '{{ item.AccountId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Rooms }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      Name: '{{ item.Name }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      RoomId: '{{ item.RoomId }}'
+      UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+- discovery_id: aws.chime.list_supported_phone_number_countries
+  for_each: aws.chime.list_phone_number_orders
+  calls:
+  - action: list_supported_phone_number_countries
+    params:
+      ProductType: '{{ item.ProductType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PhoneNumberCountries }}'
+    item:
+      CountryCode: '{{ item.CountryCode }}'
+      SupportedPhoneNumberTypes: '{{ item.SupportedPhoneNumberTypes }}'
+- discovery_id: aws.chime.list_users
+  for_each: aws.chime.list_accounts
+  calls:
+  - action: list_users
+    params:
+      AccountId: '{{ item.AccountId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Users }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      AlexaForBusinessMetadata: '{{ item.AlexaForBusinessMetadata }}'
+      DisplayName: '{{ item.DisplayName }}'
+      InvitedOn: '{{ item.InvitedOn }}'
+      LicenseType: '{{ item.LicenseType }}'
+      PersonalPIN: '{{ item.PersonalPIN }}'
+      PrimaryEmail: '{{ item.PrimaryEmail }}'
+      PrimaryProvisionedNumber: '{{ item.Users[].PrimaryProvisionedNumber }}'
+      RegisteredOn: '{{ item.RegisteredOn }}'
+      UserId: '{{ item.UserId }}'
+      UserInvitationStatus: '{{ item.UserInvitationStatus }}'
+      UserRegistrationStatus: '{{ item.UserRegistrationStatus }}'
+      UserType: '{{ item.UserType }}'

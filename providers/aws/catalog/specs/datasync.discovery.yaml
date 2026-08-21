@@ -1,0 +1,131 @@
+version: '1.0'
+provider: aws
+service: datasync
+discovery:
+- calls:
+  - action: list_agents
+    on_error: continue
+    save_as: response
+  discovery_id: aws.datasync.list_agents
+  emit:
+    as: item
+    item:
+      AgentArn: '{{ item.AgentArn }}'
+      AuthenticationType: '{{ item.AuthenticationType }}'
+      BlobType: '{{ item.BlobType }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Ec2Config: '{{ item.Ec2Config }}'
+      EndTime: '{{ item.EndTime }}'
+      EndpointType: '{{ item.EndpointType }}'
+      LastConnectionTime: '{{ item.LastConnectionTime }}'
+      LaunchTime: '{{ item.LaunchTime }}'
+      ManifestConfig: '{{ item.ManifestConfig }}'
+      Name: '{{ item.Name }}'
+      NameNodes: '{{ item.NameNodes }}'
+      OnPremConfig: '{{ item.OnPremConfig }}'
+      Platform: '{{ item.Platform }}'
+      PrivateLinkConfig: '{{ item.PrivateLinkConfig }}'
+      PrivateLinkEndpoint: '{{ item.PrivateLinkEndpoint }}'
+      S3Config: '{{ item.S3Config }}'
+      SecurityGroupArns: '{{ item.SecurityGroupArns }}'
+      StartTime: '{{ item.StartTime }}'
+      Status: '{{ item.Status }}'
+      SubnetArns: '{{ item.SubnetArns }}'
+      VpcEndpointId: '{{ item.VpcEndpointId }}'
+    items_for: '{{ response.Agents }}'
+- calls:
+  - action: list_locations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.datasync.list_locations
+  emit:
+    as: item
+    item:
+      DestinationLocationArn: '{{ item.DestinationLocationArn }}'
+      LocationArn: '{{ item.LocationArn }}'
+      LocationUri: '{{ item.LocationUri }}'
+      SourceLocationArn: '{{ item.SourceLocationArn }}'
+    items_for: '{{ response.Locations }}'
+- calls:
+  - action: list_tasks
+    on_error: continue
+    save_as: response
+  discovery_id: aws.datasync.list_tasks
+  emit:
+    as: item
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      TaskArn: '{{ item.TaskArn }}'
+      TaskMode: '{{ item.TaskMode }}'
+    items_for: '{{ response.Tasks }}'
+- calls:
+  - action: list_task_executions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.datasync.list_task_executions
+  emit:
+    as: item
+    item:
+      CurrentTaskExecutionArn: '{{ item.CurrentTaskExecutionArn }}'
+      Status: '{{ item.Status }}'
+      TaskExecutionArn: '{{ item.TaskExecutionArn }}'
+      TaskMode: '{{ item.TaskMode }}'
+    items_for: '{{ response.TaskExecutions }}'
+- calls:
+  - action: describe_task
+    on_error: continue
+    params:
+      TaskArn: '{{ item.TaskArn }}'
+    save_as: response
+  discovery_id: aws.datasync.describe_task
+  emit:
+    as: item
+    item:
+      CloudWatchLogGroupArn: '{{ response.CloudWatchLogGroupArn }}'
+      DestinationLocationArn: '{{ response.DestinationLocationArn }}'
+      Excludes: '{{ response.Excludes }}'
+      Includes: '{{ response.Includes }}'
+      Name: '{{ response.Name }}'
+      SourceLocationArn: '{{ response.SourceLocationArn }}'
+      Status: '{{ response.Status }}'
+      TaskArn: '{{ response.TaskArn }}'
+      CreationTime: '{{ response.CreationTime }}'
+      CurrentTaskExecutionArn: '{{ response.CurrentTaskExecutionArn }}'
+      ErrorCode: '{{ response.ErrorCode }}'
+      ErrorDetail: '{{ response.ErrorDetail }}'
+      Action: '{{ response.ManifestConfig.Action }}'
+      Format: '{{ response.ManifestConfig.Format }}'
+      BucketAccessRoleArn: '{{ response.ManifestConfig.Source.S3.BucketAccessRoleArn
+        }}'
+      ManifestObjectPath: '{{ response.ManifestConfig.Source.S3.ManifestObjectPath
+        }}'
+      ManifestObjectVersionId: '{{ response.ManifestConfig.Source.S3.ManifestObjectVersionId
+        }}'
+      S3BucketArn: '{{ response.ManifestConfig.Source.S3.S3BucketArn }}'
+      Atime: '{{ response.Options.Atime }}'
+      BytesPerSecond: '{{ response.Options.BytesPerSecond }}'
+      Gid: '{{ response.Options.Gid }}'
+      LogLevel: '{{ response.Options.LogLevel }}'
+      Mtime: '{{ response.Options.Mtime }}'
+      ObjectTags: '{{ response.Options.ObjectTags }}'
+      OverwriteMode: '{{ response.Options.OverwriteMode }}'
+      PosixPermissions: '{{ response.Options.PosixPermissions }}'
+      PreserveDeletedFiles: '{{ response.Options.PreserveDeletedFiles }}'
+      PreserveDevices: '{{ response.Options.PreserveDevices }}'
+      SecurityDescriptorCopyFlags: '{{ response.Options.SecurityDescriptorCopyFlags
+        }}'
+      TaskQueueing: '{{ response.Options.TaskQueueing }}'
+      TransferMode: '{{ response.Options.TransferMode }}'
+      Uid: '{{ response.Options.Uid }}'
+      VerifyMode: '{{ response.Options.VerifyMode }}'
+      DisabledBy: '{{ response.ScheduleDetails.DisabledBy }}'
+      DisabledReason: '{{ response.ScheduleDetails.DisabledReason }}'
+      StatusUpdateTime: '{{ response.ScheduleDetails.StatusUpdateTime }}'
+      ScheduleExpression: '{{ response.Schedule.ScheduleExpression }}'
+      TaskMode: '{{ response.TaskMode }}'
+      Subdirectory: '{{ response.TaskReportConfig.Destination.S3.Subdirectory }}'
+      ObjectVersionIds: '{{ response.TaskReportConfig.ObjectVersionIds }}'
+      OutputType: '{{ response.TaskReportConfig.OutputType }}'
+      ReportLevel: '{{ response.TaskReportConfig.Overrides.Deleted.ReportLevel }}'
+  for_each: aws.datasync.list_tasks

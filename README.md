@@ -1,176 +1,170 @@
-# automation-c7
+# cloud-estate
 
-Cloud Custodian (c7n) governance platform — FinOps & Security as Policy for AWS.
-React dashboard for scanning, inspecting, and remediating AWS resources across 94 built-in policies,
-plus a drag-and-drop Policy Builder for custom rules.
-
----
-
-## What it does
-
-- **Scan** — runs Cloud Custodian policies against your AWS account (dry-run by default)
-- **Inspect** — hierarchical results grouped by service → resource type → resource ID
-- **Remediate** — apply actions (tag, stop, delete, revoke…) per resource or in bulk
-- **Build** — create custom policies with a point-and-click builder; save locally and run them
-- **History** — browse past scan runs with per-policy breakdowns
-
----
-
-## 94 Built-in Policies
-
-| Service | Policies |
-|---|---|
-| EC2 / Security Groups | sg-open-ssh, sg-open-rdp, ec2-no-iam-role, ec2-stopped-30d, ec2-underutilised-instances, ec2-missing-required-tags … |
-| S3 | s3-public-access-bucket, s3-encryption-disabled, s3-missing-lifecycle, s3-versioning-disabled … |
-| EBS | ebs-unattached-volumes, ebs-gp2-upgrade-to-gp3, ebs-old-snapshots, ebs-encrypted-volumes … |
-| RDS | rds-public-instance, rds-no-backup, rds-encryption-disabled, rds-idle-instance … |
-| IAM | iam-inactive-user, iam-unused-access-key, iam-mfa-disabled, iam-admin-policy-attached … |
-| Lambda | lambda-old-runtime, lambda-no-vpc, lambda-unused-function … |
-| CloudTrail | cloudtrail-disabled, cloudtrail-no-log-validation … |
-| VPC / Network | vpc-no-flow-logs, sg-unrestricted-egress, eip-unattached, eni-unused … |
-| Secrets Manager | secrets-not-rotated, secrets-not-used-90d … |
-| AMI | ami-unused-detection, ami-not-in-launch-config … |
-
----
-
-## Architecture — Dual Execution Modes
+A cloud architecture diagram engine. It reads a live AWS account and draws it —
+account → region → VPC → AZ → subnet → workload — with every box in a place it
+can justify.
 
 ```
-Mode 1: Local dev / real AWS (access-key or aws-profile)
-  Browser → http://localhost:3000 (Vite)
-           → http://localhost:8081 (local-server.py)
-           → handler.py → AWS APIs via boto3
-
-Mode 2: Production (IAM Role / Lambda)
-  Browser → http://localhost:3001 (nginx built UI)
-           → https://vgs6w2yd2d.execute-api.ap-south-1.amazonaws.com (API Gateway)
-           → handler.lambda_handler → handler.py → AWS APIs
-
-Mode 3: Mock / offline dev
-  Browser → http://localhost:3000 (Vite)
-           → http://localhost:8080 (mock-api.py)
-           → returns deterministic fake data, no AWS access needed
+discover → build assets → build architecture
 ```
 
-The UI's **Settings** page switches between modes at runtime.
-
----
-
-## Quick Start — Mock Mode (no AWS needed)
-
-```bash
-# 1. Start the mock API server
-python mock-api.py
-# → listening on http://localhost:8080
-
-# 2. In another terminal, start the UI
-cd ui
-npm install
-npm run dev
-# → http://localhost:3000
-
-# 3. In the UI Settings, set endpoint to http://localhost:8080
-```
-
----
-
-## Quick Start — Real AWS
-
-```bash
-# Option A: Docker (recommended)
-docker build -t c7n-local -f Dockerfile.local .
-docker run -d --name c7n-local -p 8081:8081 \
-  -v "$HOME/.aws:/root/.aws:ro" \
-  -e C7N_REGION="ap-south-1" \
-  c7n-local
-
-docker build -t c7n-ui ./ui
-docker run -d --name c7n-ui -p 3001:80 c7n-ui
-
-# Option B: Bare metal
-pip install -e ".[aws]"
-python local-server.py   # port 8081
-
-cd ui && npm install && npm run dev
-```
-
----
-
-## Policy YAML Format (Cloud Custodian)
-
-Policies live in `policies/` and are standard c7n YAML:
-
-```yaml
-policies:
-  - name: sg-open-ssh
-    resource: aws.security-group
-    description: Security groups with unrestricted SSH inbound
-    filters:
-      - type: ingress
-        Ports: [22]
-        Cidr:
-          value: "0.0.0.0/0"
-    actions:
-      - type: tag
-        tags:
-          Remediation: "open-ssh-flagged"
-```
-
----
-
-## UI Pages
-
-| Page | Route | Description |
+| stage | what it does | where |
 |---|---|---|
-| Run & Report | `/` | Policy selector, scan trigger, hierarchical results with per-resource actions |
-| Policy Builder | `/builder` | Visual rule builder — pick resource, filters, actions; save custom rules to localStorage |
-| Run History | `/history` | Past scan runs list with per-policy findings breakdown |
-| Settings | `/settings` | Auth type, endpoint URL, region |
+| 1. discover | collect raw resources, read-only by construction | `providers/` — catalog-driven AWS collector, 4,647 known types, 2,972 collectable |
+| 2. build assets | normalise into canonical `cspm_asset.v2` records, one per ARN | `cspm/` contract + `providers/aws/runtime/emit.py` |
+| 3. build architecture | place every asset in the layered diagram | `providers/common/topology/` → `out/scene.json` → the Architecture page |
+
+Compliance, posture and FinOps are **not** here. They live in the threat-engine
+platform; this one draws pictures.
 
 ---
 
-## Project Structure
+## Run it
+
+```bash
+# everything, in order
+python -m orchestration.pipeline all --region ap-south-1
+
+# any stage alone — each reads the previous stage's artifact from out/
+python -m orchestration.pipeline discover --region ap-south-1 --scope all
+python -m orchestration.pipeline assets
+python -m orchestration.pipeline architecture
+```
+
+`discover` is the only command that calls AWS. Its results cache in `out/`, so
+the other two re-run for free. Always `--dry-run` first on a new account: at
+full scope it plans ~1,400 root calls and tells you the cost before you pay it.
+
+Artifacts land in `out/`: `assets.json` (raw), `cspm/assets.v2.json`
+(canonical), `edges.csv` (relationships), `scene.json` (the diagram).
+
+---
+
+## The console
+
+`console-app/` — TanStack Start + Tailwind.
+
+| Page | Route | What it shows |
+|---|---|---|
+| Overview | `/` | the estate: assets, accounts, regions, networks |
+| Inventory | `/inventory` | every asset, filterable |
+| Architecture | `/architecture` | the diagram |
+| Settings | `/settings` | execution mode, endpoint, region |
+
+```bash
+cd console-app && npm install && npm run dev    # port 3200
+```
+
+---
+
+## How placement is decided
+
+Two independent axes, and the grammar is provider-neutral — a new cloud is a
+binding file, not a renderer.
+
+- **KIND** decides placement: `boundary · resident · part · door · rule · record`.
+  A role name IS its kind, optionally qualified — `door.egress`, `rule.identity`.
+- **DOMAIN** decides grouping and filtering: 13 categories × 74 subcategories.
+
+Two axioms hold everywhere: **vertical is the traffic path**, **horizontal is
+redundancy**. Residents carry an exposure level, L1 internet through L4
+internal, and groups read outward-in from there.
+
+Supporting services ride a border rail as tabs. Which border comes from the
+DOMAIN, so a domain cannot appear in two places:
 
 ```
-automation-c7/
-├── handler.py              Core engine — policy runner, normalizer, action executor
-├── local-server.py         HTTP wrapper for local mode (port 8081)
-├── mock-api.py             Mock server for offline dev (port 8080) — 94 policies with fake data
-├── policies/               Cloud Custodian YAML files (source of truth)
-│   ├── finops/             Cost optimization policies
-│   └── security/           Security & compliance policies
-├── ui/
-│   ├── src/
-│   │   ├── api.js          Endpoint router + fetch wrappers
-│   │   ├── lib/
-│   │   │   ├── policyInfo.js   Static UI metadata for all 94 policies
-│   │   │   └── userRules.js    localStorage CRUD for custom rules
-│   │   ├── pages/
-│   │   │   ├── RunReport.jsx   Main scan + results page
-│   │   │   ├── PolicyBuilder.jsx   Custom policy builder
-│   │   │   ├── RunHistory.jsx  Scan history viewer
-│   │   │   └── Settings.jsx    Config page
-│   │   └── components/
-│   │       ├── ReportTable.jsx Hierarchical results tree
-│   │       └── Layout.jsx      Nav shell
-│   ├── Dockerfile          nginx production image
-│   └── vite.config.js
-├── Dockerfile              Lambda container image
-├── Dockerfile.local        Local dev container
-└── c7n_schema.csv          Full c7n schema: 273 resources, 2641 filters, 1728 actions
+              N — doors only (IGW, TGW, Direct Connect, NAT, endpoints)
+   ╭────────────────────────────────────────╮  NE ── dns
+   │                                        │
+ W │            the container               │  E ─── identity · encryption
+   │                                        │        certificates · secrets
+   ╰────────────────────────────────────────╯
+        SW ──────── S-middle ──────── SE
+     governance    connectivity     firewall
+     detection      (outbound)      routing
 ```
+
+`docs/diagram-layout-spec.md` is the authoritative account of every rule and why
+it exists. `docs/supporting-services.md` is generated — the full table of which
+domain draws where, at which scope, in what order.
+
+---
+
+## What a resource panel shows
+
+Click a box and a panel opens, built from four tiers. Three are structural and
+identical for every resource; one varies by type.
+
+| Tier | Shows | Read from |
+|---|---|---|
+| 1 | identity and placement | `inventory_assets` columns |
+| 2 | what the resource IS | `metadata`, per type |
+| 3 | what it is made of | `inventory_edges`, this asset as parent |
+| 4 | what governs it | `inventory_edges`, this asset as source |
+
+Only Tier 2 needs a catalog. `rule_diagram_discovery` holds it, and it drives
+both what `emit` stores and what the panel shows — one list, so a field worth
+storing is a field worth showing.
+
+```bash
+python3 scripts/build-detail-fields.py          # propose columns from real payloads
+python3 scripts/build-detail-fields.py --write  # apply
+python3 scripts/build-panel-reference.py > docs/panel-columns.md
+```
+
+The columns are **derived, not invented**: the generator reads the payloads in
+`out/assets.json` and proposes only fields that are actually there. A column
+that cannot be filled reads as "this resource has no encryption setting" when
+the truth is "nobody asked". Hand-authored rows always win.
+
+`docs/panel-columns.md` is generated — every type, its columns, and for the
+types with none, the reason. It imports the generator's own classifier rather
+than re-deriving one, so the reference cannot drift from the catalog.
 
 ---
 
 ## Development
 
 ```bash
-# Backend tests (requires AWS creds or moto)
-pip install -e ".[dev]"
-pytest tests/ -v
+# engine — placement, collection, catalog consistency
+pytest cspm/tests providers/aws/tests -q
 
-# Frontend lint/type check
-cd ui && npm run lint
+# renderer — the decisions, without a browser
+cd console-app && npm test
+
+# the diagram, against the rendered page
+cd console-app && npm run check:overlap
+```
+
+`console-app/src/components/console/decide.ts` holds the renderer's pure
+decisions — the grey ramp, container colours, tab geometry, cluster and group
+ordering — separated from the JSX that draws them so a test can call them.
+Every case in `decide.test.ts` is a defect that actually shipped: each one
+type-checked, passed lint, passed the build and rendered the wrong diagram,
+which is exactly the class of bug `tsc` cannot see.
+
+`check:overlap` loads the rendered page and cross-checks every rail tab against
+every box it is not inside. The clearance arithmetic is unit-tested, but whether
+a box passes the right layer count is a wiring question no unit test sees.
+
+---
+
+## Storage
+
+Postgres, dual-backend — set `STORE_DATABASE_URL`, or run in files mode against
+`out/`. The catalog is git-authored CSV synced into `rule_diagram_*` tables:
+
+| table | holds |
+|---|---|
+| `rule_diagram_services` | one row per resource type — how to collect it, where it draws |
+| `rule_diagram_relationship` | one row per edge rule |
+| `rule_diagram_discovery` | which fields matter per type, and which call fetches them |
+| `rule_diagram_discovery_enrich` | the second call, for types whose list returns identifiers |
+| `inventory_assets` | the estate itself, one row per ARN |
+
+```bash
+python -m store.catalog_sync          # git → Postgres, skips unchanged files
 ```
 
 ---

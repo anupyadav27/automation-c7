@@ -1,0 +1,102 @@
+policies:
+
+  # ---------------------------------------------------------------
+  # 1. Find AMIs not used by any running or stopped EC2 instance.
+  # ---------------------------------------------------------------
+  - name: ami-unused-detection
+    resource: ami
+    description: >
+      Identify AMIs owned by this account that are not
+      currently referenced by any EC2 instance.
+    filters:
+      - type: unused
+        value: true
+    actions:
+      - type: tag
+        key: c7n:status
+        value: "unused-ami-review-needed"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Unused AMIs detected – review for deregistration"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 2. Unused AMIs older than 90 days – mark for deregistration.
+  # ---------------------------------------------------------------
+  - name: ami-unused-90d-mark
+    resource: ami
+    description: >
+      AMIs unused for over 90 days. Mark for deregistration
+      after a 14-day grace period.
+    filters:
+      - type: unused
+        value: true
+      - type: image-age
+        days: 90
+        op: greater-than
+      - "tag:c7n:marked-for-deregister": absent
+    actions:
+      - type: mark-for-op
+        tag: c7n:marked-for-deregister
+        op: deregister
+        days: 14
+      - type: notify
+        template: default.html
+        subject: "[c7n] Unused AMI (90+ days) marked for deregistration in 14 days"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 3. Execute deregistration of AMIs past their grace period.
+  # ---------------------------------------------------------------
+  - name: ami-unused-deregister
+    resource: ami
+    description: >
+      Deregister AMIs whose grace period has expired and
+      delete their associated EBS snapshots.
+    filters:
+      - type: marked-for-op
+        tag: c7n:marked-for-deregister
+        op: deregister
+    actions:
+      - type: deregister
+        delete-snapshots: true
+      - type: notify
+        template: default.html
+        subject: "[c7n] Unused AMI deregistered and snapshots removed"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 4. AMIs not in any Launch Template or ASG config.
+  # ---------------------------------------------------------------
+  - name: ami-not-in-launch-config
+    resource: ami
+    description: >
+      AMIs not referenced by any Launch Template, Launch
+      Configuration, or running instance.
+    filters:
+      - type: unused
+        value: true
+    actions:
+      - type: tag
+        key: c7n:status
+        value: "unused-no-launch-ref"
+      - type: notify
+        template: default.html
+        subject: "[c7n] AMI has no instance or launch-config reference"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

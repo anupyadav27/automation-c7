@@ -1,0 +1,78 @@
+version: '1.0'
+provider: aws
+service: shield
+discovery:
+- calls:
+  - action: describe_protection
+    on_error: continue
+    save_as: response
+  discovery_id: aws.shield.describe_protection
+  emit:
+    as: item
+    item:
+      Enabled: '{{ response.Protection.Enabled }}'
+      Protection: '{{ response.Protection.ProtectionArn }}'
+      ProtectionArn: '{{ response.Protection.ProtectionArn }}'
+      ResourceArn: '{{ response.Protection.ResourceArn }}'
+      Status: '{{ response.Protection.Status }}'
+      Id: '{{ response.Protection.Id }}'
+      Name: '{{ response.Protection.Name }}'
+- calls:
+  - action: list_protections
+    on_error: continue
+    save_as: response
+  discovery_id: aws.shield.list_protections
+  emit:
+    as: item
+    item:
+      ApplicationLayerAutomaticResponseConfiguration: '{{ item.ApplicationLayerAutomaticResponseConfiguration }}'
+      HealthCheckIds: '{{ item.HealthCheckIds }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      ProtectionArn: '{{ item.ProtectionArn }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+    items_for: '{{ response.Protections }}'
+- calls:
+  - action: describe_drt_access
+    on_error: continue
+    save_as: response
+  discovery_id: aws.shield.describe_drt_access
+  emit:
+    as: item
+    item:
+      LogBucketList: '{{ item.LogBucketList }}'
+      RoleArn: '{{ item.RoleArn }}'
+    items_for: '{{ response.LogBucketList }}'
+- calls:
+  - action: describe_subscription
+    on_error: continue
+    save_as: response
+  discovery_id: aws.shield.describe_subscription
+  emit:
+    as: item
+    item:
+      AutoRenew: '{{ response.Subscription.AutoRenew }}'
+      EndTime: '{{ response.Subscription.EndTime }}'
+      Limits: '{{ response.Subscription.Limits[].Max }}'
+      ProactiveEngagementStatus: '{{ response.Subscription.ProactiveEngagementStatus }}'
+      StartTime: '{{ response.Subscription.StartTime }}'
+      Subscription: '{{ response.Subscription.SubscriptionArn }}'
+      SubscriptionArn: '{{ response.Subscription.SubscriptionArn }}'
+      SubscriptionLimits: '{{ response.Subscription.SubscriptionLimits }}'
+      TimeCommitmentInSeconds: '{{ response.Subscription.TimeCommitmentInSeconds }}'
+      MaxProtectionGroups: '{{ response.Subscription.SubscriptionLimits.ProtectionGroupLimits.MaxProtectionGroups }}'
+- calls:
+  - action: list_protection_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.shield.list_protection_groups
+  emit:
+    as: item
+    item:
+      Aggregation: '{{ item.Aggregation }}'
+      Members: '{{ item.Members }}'
+      Pattern: '{{ item.Pattern }}'
+      ProtectionGroupArn: '{{ item.ProtectionGroupArn }}'
+      ProtectionGroupId: '{{ item.ProtectionGroupId }}'
+      ResourceType: '{{ item.ResourceType }}'
+    items_for: '{{ response.ProtectionGroups }}'

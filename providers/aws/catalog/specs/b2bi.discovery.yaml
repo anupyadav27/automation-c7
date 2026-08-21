@@ -1,0 +1,210 @@
+version: '1.0'
+provider: aws
+service: b2bi
+services:
+  client: b2bi
+  module: boto3.client
+discovery:
+- discovery_id: aws.b2bi.list_capabilities
+  calls:
+  - action: list_capabilities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.capabilities }}'
+    item:
+      bucketName: '{{ item.bucketName }}'
+      capabilityArn: '{{ item.capabilityArn }}'
+      capabilityId: '{{ item.capabilityId }}'
+      createdAt: '{{ item.createdAt }}'
+      email: '{{ item.email }}'
+      instructionsDocuments: '{{ item.instructionsDocuments }}'
+      key: '{{ item.key }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      name: '{{ item.name }}'
+      phone: '{{ item.phone }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.b2bi.list_partnerships
+  calls:
+  - action: list_partnerships
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.partnerships }}'
+    item:
+      capabilities: '{{ item.capabilities }}'
+      capabilityOptions: '{{ item.capabilityOptions }}'
+      createdAt: '{{ item.createdAt }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      name: '{{ item.name }}'
+      partnershipId: '{{ item.partnershipId }}'
+      profileId: '{{ item.profileId }}'
+      tradingPartnerId: '{{ item.tradingPartnerId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.b2bi.list_profiles
+  calls:
+  - action: list_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.profiles }}'
+    item:
+      businessName: '{{ item.businessName }}'
+      createdAt: '{{ item.createdAt }}'
+      logGroupName: '{{ item.logGroupName }}'
+      logging: '{{ item.logging }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      name: '{{ item.name }}'
+      profileId: '{{ item.profileId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.b2bi.list_transformers
+  calls:
+  - action: list_transformers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.transformers }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      ediType: '{{ item.ediType }}'
+      fileFormat: '{{ item.fileFormat }}'
+      inputConversion: '{{ item.inputConversion }}'
+      mapping: '{{ item.mapping }}'
+      mappingTemplate: '{{ item.mappingTemplate }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      name: '{{ item.name }}'
+      outputConversion: '{{ item.outputConversion }}'
+      sampleDocument: '{{ item.sampleDocument }}'
+      sampleDocuments: '{{ item.sampleDocuments }}'
+      status: '{{ item.status }}'
+      transformerId: '{{ item.transformerId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.b2bi.get_capability
+  for_each: aws.b2bi.list_capabilities
+  calls:
+  - action: get_capability
+    params:
+      capabilityId: '{{ item.capabilityId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.instructionsDocuments }}'
+    item:
+      bucketName: '{{ item.bucketName }}'
+      capabilityArn: '{{ item.capabilityArn }}'
+      instructionsDocuments: '{{ item.instructionsDocuments[].key }}'
+      key: '{{ item.key }}'
+      capabilityId: '{{ response.capabilityId }}'
+      capabilityDirection: '{{ response.configuration.edi.capabilityDirection }}'
+      transformerId: '{{ response.configuration.edi.transformerId }}'
+      transactionSet: '{{ response.configuration.edi.type.x12Details.transactionSet }}'
+      version: '{{ response.configuration.edi.type.x12Details.version }}'
+      createdAt: '{{ response.createdAt }}'
+      modifiedAt: '{{ response.modifiedAt }}'
+      name: '{{ response.name }}'
+      type: '{{ response.type }}'
+- discovery_id: aws.b2bi.get_partnership
+  for_each: aws.b2bi.list_partnerships
+  calls:
+  - action: get_partnership
+    params:
+      partnershipId: '{{ item.partnershipId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.capabilities }}'
+    item:
+      validateEdi: '{{ response.capabilityOptions.outboundEdi.x12.common.validateEdi }}'
+      createdAt: '{{ response.createdAt }}'
+      email: '{{ response.email }}'
+      modifiedAt: '{{ response.modifiedAt }}'
+      name: '{{ response.name }}'
+      partnershipArn: '{{ response.partnershipArn }}'
+      partnershipId: '{{ response.partnershipId }}'
+      phone: '{{ response.phone }}'
+      profileId: '{{ response.profileId }}'
+      tradingPartnerId: '{{ response.tradingPartnerId }}'
+- discovery_id: aws.b2bi.get_profile
+  for_each: aws.b2bi.list_partnerships
+  calls:
+  - action: get_profile
+    params:
+      profileId: '{{ item.profileId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      businessName: '{{ response.businessName }}'
+      createdAt: '{{ response.createdAt }}'
+      email: '{{ response.email }}'
+      logGroupName: '{{ response.logGroupName }}'
+      logging: '{{ response.logging }}'
+      modifiedAt: '{{ response.modifiedAt }}'
+      name: '{{ response.name }}'
+      phone: '{{ response.phone }}'
+      profileArn: '{{ response.profileArn }}'
+      profileId: '{{ response.profileId }}'
+- discovery_id: aws.b2bi.get_transformer
+  for_each: aws.b2bi.list_transformers
+  calls:
+  - action: get_transformer
+    params:
+      transformerId: '{{ item.transformerId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      x12Details: '{{ response.ediType.x12Details }}'
+      createdAt: '{{ response.createdAt }}'
+      transactionSet: '{{ response.ediType.x12Details.transactionSet }}'
+      version: '{{ response.ediType.x12Details.version }}'
+      fileFormat: '{{ response.fileFormat }}'
+      fromFormat: '{{ response.inputConversion.fromFormat }}'
+      mappingTemplate: '{{ response.mappingTemplate }}'
+      template: '{{ response.mapping.template }}'
+      templateLanguage: '{{ response.mapping.templateLanguage }}'
+      modifiedAt: '{{ response.modifiedAt }}'
+      name: '{{ response.name }}'
+      toFormat: '{{ response.outputConversion.toFormat }}'
+      sampleDocument: '{{ response.sampleDocument }}'
+      bucketName: '{{ response.sampleDocuments.bucketName }}'
+      status: '{{ response.status }}'
+      transformerArn: '{{ response.transformerArn }}'
+      transformerId: '{{ response.transformerId }}'
+- discovery_id: aws.b2bi.get_transformer_job
+  for_each: aws.b2bi.list_transformers
+  calls:
+  - action: get_transformer_job
+    params:
+      transformerJobId: '{{ item.transformerJobId }}'
+      transformerId: '{{ item.transformerId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.outputFiles }}'
+    item:
+      bucketName: '{{ item.bucketName }}'
+      key: '{{ item.key }}'
+      message: '{{ response.message }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.b2bi.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

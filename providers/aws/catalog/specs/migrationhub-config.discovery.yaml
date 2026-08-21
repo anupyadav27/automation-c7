@@ -1,0 +1,37 @@
+# ============================================================
+# Discovery YAML — migrationhub-config (AWS)
+# Generated: 2026-02-21T04:56:59Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: migrationhub-config
+services:
+  client: migrationhub-config
+  module: boto3.client
+discovery:
+  # ── DescribeHomeRegionControls ──
+  - discovery_id: aws.migrationhub-config.describe_home_region_controls
+    calls:
+      - action: describe_home_region_controls
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.HomeRegionControls }}'
+      item:
+        ControlId: '{{ item.ControlId }}'
+        HomeRegion: '{{ item.HomeRegion }}'
+        HomeRegionControls: '{{ item.HomeRegionControls }}'
+        RequestedTime: '{{ item.RequestedTime }}'
+        Target: '{{ item.Target }}'
+  # ── GetHomeRegion ──
+  - discovery_id: aws.migrationhub-config.get_home_region
+    calls:
+      - action: get_home_region
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        HomeRegion: '{{ response.HomeRegion }}'

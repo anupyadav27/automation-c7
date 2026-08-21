@@ -1,0 +1,180 @@
+version: '1.0'
+provider: aws
+service: workspaces-thin-client
+services:
+  client: workspaces-thin-client
+  module: boto3.client
+discovery:
+- discovery_id: aws.workspaces-thin-client.list_devices
+  calls:
+  - action: list_devices
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.devices }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      currentSoftwareSetId: '{{ item.currentSoftwareSetId }}'
+      desiredSoftwareSetId: '{{ item.desiredSoftwareSetId }}'
+      device: '{{ item.device }}'
+      deviceCreationTags: '{{ item.deviceCreationTags }}'
+      environmentId: '{{ item.environmentId }}'
+      id: '{{ item.id }}'
+      lastConnectedAt: '{{ item.lastConnectedAt }}'
+      lastPostureAt: '{{ item.lastPostureAt }}'
+      lastUserId: '{{ item.lastUserId }}'
+      model: '{{ item.model }}'
+      name: '{{ item.name }}'
+      pendingSoftwareSetId: '{{ item.pendingSoftwareSetId }}'
+      registeredDevicesCount: '{{ item.registeredDevicesCount }}'
+      serialNumber: '{{ item.serialNumber }}'
+      software: '{{ item.software }}'
+      softwareSet: '{{ item.softwareSet }}'
+      softwareSetUpdateSchedule: '{{ item.softwareSetUpdateSchedule }}'
+      status: '{{ item.status }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.workspaces-thin-client.list_environments
+  calls:
+  - action: list_environments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.environments }}'
+    item:
+      activationCode: '{{ item.activationCode }}'
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      desiredSoftwareSetId: '{{ item.desiredSoftwareSetId }}'
+      desktopArn: '{{ item.desktopArn }}'
+      desktopEndpoint: '{{ item.desktopEndpoint }}'
+      desktopType: '{{ item.desktopType }}'
+      environment: '{{ item.environment }}'
+      id: '{{ item.id }}'
+      maintenanceWindow: '{{ item.maintenanceWindow }}'
+      name: '{{ item.name }}'
+      pendingSoftwareSetId: '{{ item.pendingSoftwareSetId }}'
+      softwareSetUpdateMode: '{{ item.softwareSetUpdateMode }}'
+      softwareSetUpdateSchedule: '{{ item.softwareSetUpdateSchedule }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.workspaces-thin-client.list_software_sets
+  calls:
+  - action: list_software_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.softwareSets }}'
+    item:
+      arn: '{{ item.arn }}'
+      id: '{{ item.id }}'
+      releasedAt: '{{ item.releasedAt }}'
+      softwareSet: '{{ item.softwareSet }}'
+      supportedUntil: '{{ item.supportedUntil }}'
+      validationStatus: '{{ item.validationStatus }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.workspaces-thin-client.get_device
+  for_each: aws.workspaces-thin-client.list_devices
+  calls:
+  - action: get_device
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.device.arn }}'
+      createdAt: '{{ response.device.createdAt }}'
+      currentSoftwareSetId: '{{ response.device.currentSoftwareSetId }}'
+      currentSoftwareSetVersion: '{{ response.device.currentSoftwareSetVersion }}'
+      desiredSoftwareSetId: '{{ response.device.desiredSoftwareSetId }}'
+      device: '{{ response.device.device }}'
+      environmentId: '{{ response.device.environmentId }}'
+      id: '{{ response.device.id }}'
+      kmsKeyArn: '{{ response.device.kmsKeyArn }}'
+      lastConnectedAt: '{{ response.device.lastConnectedAt }}'
+      lastPostureAt: '{{ response.device.lastPostureAt }}'
+      lastUserId: '{{ response.device.lastUserId }}'
+      model: '{{ response.device.model }}'
+      name: '{{ response.device.name }}'
+      pendingSoftwareSetId: '{{ response.device.pendingSoftwareSetId }}'
+      pendingSoftwareSetVersion: '{{ response.device.pendingSoftwareSetVersion }}'
+      serialNumber: '{{ response.device.serialNumber }}'
+      softwareSetComplianceStatus: '{{ response.device.softwareSetComplianceStatus }}'
+      softwareSetUpdateSchedule: '{{ response.device.softwareSetUpdateSchedule }}'
+      softwareSetUpdateStatus: '{{ response.device.softwareSetUpdateStatus }}'
+      status: '{{ response.device.status }}'
+      updatedAt: '{{ response.device.updatedAt }}'
+      tags: '{{ response.device.tags }}'
+- discovery_id: aws.workspaces-thin-client.get_environment
+  for_each: aws.workspaces-thin-client.list_devices
+  calls:
+  - action: get_environment
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      activationCode: '{{ response.environment.activationCode }}'
+      arn: '{{ response.environment.arn }}'
+      createdAt: '{{ response.environment.createdAt }}'
+      desiredSoftwareSetId: '{{ response.environment.desiredSoftwareSetId }}'
+      desktopArn: '{{ response.environment.desktopArn }}'
+      desktopEndpoint: '{{ response.environment.desktopEndpoint }}'
+      desktopType: '{{ response.environment.desktopType }}'
+      deviceCreationTags: '{{ response.environment.deviceCreationTags }}'
+      id: '{{ response.environment.id }}'
+      kmsKeyArn: '{{ response.environment.kmsKeyArn }}'
+      maintenanceWindow: '{{ response.environment.maintenanceWindow.type }}'
+      name: '{{ response.environment.name }}'
+      pendingSoftwareSetId: '{{ response.environment.pendingSoftwareSetId }}'
+      pendingSoftwareSetVersion: '{{ response.environment.pendingSoftwareSetVersion }}'
+      registeredDevicesCount: '{{ response.environment.registeredDevicesCount }}'
+      softwareSetComplianceStatus: '{{ response.environment.softwareSetComplianceStatus }}'
+      softwareSetUpdateMode: '{{ response.environment.softwareSetUpdateMode }}'
+      softwareSetUpdateSchedule: '{{ response.environment.softwareSetUpdateSchedule }}'
+      updatedAt: '{{ response.environment.updatedAt }}'
+      applyTimeOf: '{{ response.environment.maintenanceWindow.applyTimeOf }}'
+      endTimeHour: '{{ response.environment.maintenanceWindow.endTimeHour }}'
+      endTimeMinute: '{{ response.environment.maintenanceWindow.endTimeMinute }}'
+      startTimeHour: '{{ response.environment.maintenanceWindow.startTimeHour }}'
+      startTimeMinute: '{{ response.environment.maintenanceWindow.startTimeMinute }}'
+      type: '{{ response.environment.maintenanceWindow.type }}'
+      tags: '{{ response.environment.tags }}'
+- discovery_id: aws.workspaces-thin-client.get_software_set
+  for_each: aws.workspaces-thin-client.list_devices
+  calls:
+  - action: get_software_set
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.softwareSet.arn }}'
+      id: '{{ response.softwareSet.id }}'
+      releasedAt: '{{ response.softwareSet.releasedAt }}'
+      software: '{{ response.softwareSet.software[].name }}'
+      softwareSet: '{{ response.softwareSet.softwareSet }}'
+      supportedUntil: '{{ response.softwareSet.supportedUntil }}'
+      validationStatus: '{{ response.softwareSet.validationStatus }}'
+      version: '{{ response.softwareSet.version }}'
+      tags: '{{ response.softwareSet.tags }}'
+- discovery_id: aws.workspaces-thin-client.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

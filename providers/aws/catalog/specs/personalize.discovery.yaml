@@ -1,0 +1,346 @@
+version: '1.0'
+provider: aws
+service: personalize
+discovery:
+- calls:
+  - action: list_batch_inference_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_batch_inference_jobs
+  emit:
+    as: item
+    item:
+      batchInferenceJobArn: '{{ item.batchInferenceJobArn }}'
+      batchInferenceJobMode: '{{ item.batchInferenceJobMode }}'
+      creationDateTime: '{{ item.creationDateTime }}'
+      failureReason: '{{ item.failureReason }}'
+      jobName: '{{ item.jobName }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      solutionVersionArn: '{{ item.solutionVersionArn }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.batchInferenceJobs }}'
+- calls:
+  - action: list_batch_segment_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_batch_segment_jobs
+  emit:
+    as: item
+    item:
+      batchSegmentJobArn: '{{ item.batchSegmentJobArn }}'
+      creationDateTime: '{{ item.creationDateTime }}'
+      failureReason: '{{ item.failureReason }}'
+      jobName: '{{ item.jobName }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      solutionVersionArn: '{{ item.solutionVersionArn }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.batchSegmentJobs }}'
+- calls:
+  - action: list_campaigns
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_campaigns
+  emit:
+    as: item
+    item:
+      campaign: '{{ item.campaign }}'
+      campaignArn: '{{ item.campaignArn }}'
+      creationDateTime: '{{ item.creationDateTime }}'
+      failureReason: '{{ item.failureReason }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.campaigns }}'
+- calls:
+  - action: list_data_deletion_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_data_deletion_jobs
+  emit:
+    as: item
+    item:
+      creationDateTime: '{{ item.creationDateTime }}'
+      dataDeletionJobArn: '{{ item.dataDeletionJobArn }}'
+      datasetGroupArn: '{{ item.datasetGroupArn }}'
+      failureReason: '{{ item.failureReason }}'
+      jobName: '{{ item.jobName }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.dataDeletionJobs }}'
+- calls:
+  - action: list_dataset_export_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_dataset_export_jobs
+  emit:
+    as: item
+    item:
+      creationDateTime: '{{ item.creationDateTime }}'
+      dataset: '{{ item.dataset }}'
+      datasetExportJobArn: '{{ item.datasetExportJobArn }}'
+      failureReason: '{{ item.failureReason }}'
+      jobName: '{{ item.jobName }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.datasetExportJobs }}'
+- calls:
+  - action: list_dataset_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_dataset_groups
+  emit:
+    as: item
+    item:
+      creationDateTime: '{{ item.creationDateTime }}'
+      datasetGroupArn: '{{ item.datasetGroupArn }}'
+      domain: '{{ item.domain }}'
+      failureReason: '{{ item.failureReason }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.datasetGroups }}'
+- calls:
+  - action: list_dataset_import_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_dataset_import_jobs
+  emit:
+    as: item
+    item:
+      creationDateTime: '{{ item.creationDateTime }}'
+      datasetImportJobArn: '{{ item.datasetImportJobArn }}'
+      failureReason: '{{ item.failureReason }}'
+      importMode: '{{ item.importMode }}'
+      jobName: '{{ item.jobName }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.datasetImportJobs }}'
+- calls:
+  - action: list_datasets
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_datasets
+  emit:
+    as: item
+    item:
+      creationDateTime: '{{ item.creationDateTime }}'
+      dataset: '{{ item.dataset }}'
+      datasetArn: '{{ item.datasetArn }}'
+      datasetType: '{{ item.datasetType }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.datasets }}'
+- calls:
+  - action: list_event_trackers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_event_trackers
+  emit:
+    as: item
+    item:
+      creationDateTime: '{{ item.creationDateTime }}'
+      eventTrackerArn: '{{ item.eventTrackerArn }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.eventTrackers }}'
+- calls:
+  - action: list_filters
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_filters
+  emit:
+    as: item
+    item:
+      creationDateTime: '{{ item.creationDateTime }}'
+      datasetGroupArn: '{{ item.datasetGroupArn }}'
+      failureReason: '{{ item.failureReason }}'
+      filter: '{{ item.filter }}'
+      filterArn: '{{ item.filterArn }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.Filters }}'
+- calls:
+  - action: list_metric_attribution_metrics
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_metric_attribution_metrics
+  emit:
+    as: item
+    item:
+      eventType: '{{ item.eventType }}'
+      expression: '{{ item.expression }}'
+      metricName: '{{ item.metricName }}'
+      metrics: '{{ item.metrics }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.metrics }}'
+- calls:
+  - action: list_metric_attributions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_metric_attributions
+  emit:
+    as: item
+    item:
+      creationDateTime: '{{ item.creationDateTime }}'
+      failureReason: '{{ item.failureReason }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      metricAttributionArn: '{{ item.metricAttributionArn }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.metricAttributions }}'
+- calls:
+  - action: list_recipes
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_recipes
+  emit:
+    as: item
+    item:
+      algorithm: '{{ item.algorithm }}'
+      creationDateTime: '{{ item.creationDateTime }}'
+      description: '{{ item.description }}'
+      domain: '{{ item.domain }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      name: '{{ item.name }}'
+      recipe: '{{ item.recipe }}'
+      recipeArn: '{{ item.recipeArn }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.recipes }}'
+- calls:
+  - action: list_recommenders
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_recommenders
+  emit:
+    as: item
+    item:
+      creationDateTime: '{{ item.creationDateTime }}'
+      datasetGroupArn: '{{ item.datasetGroupArn }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      latestRecommenderUpdate: '{{ item.latestRecommenderUpdate }}'
+      modelMetrics: '{{ item.modelMetrics }}'
+      name: '{{ item.name }}'
+      recipeArn: '{{ item.recipeArn }}'
+      recommender: '{{ item.recommender }}'
+      recommenderArn: '{{ item.recommenderArn }}'
+      recommenderConfig: '{{ item.recommenderConfig }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.recommenders }}'
+- calls:
+  - action: list_schemas
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_schemas
+  emit:
+    as: item
+    item:
+      creationDateTime: '{{ item.creationDateTime }}'
+      domain: '{{ item.domain }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      name: '{{ item.name }}'
+      schema: '{{ item.schema }}'
+      schemaArn: '{{ item.schemaArn }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.schemas }}'
+- calls:
+  - action: list_solution_versions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_solution_versions
+  emit:
+    as: item
+    item:
+      creationDateTime: '{{ item.creationDateTime }}'
+      failureReason: '{{ item.failureReason }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      solutionVersion: '{{ item.solutionVersion }}'
+      solutionVersionArn: '{{ item.solutionVersionArn }}'
+      status: '{{ item.status }}'
+      trainingMode: '{{ item.trainingMode }}'
+      trainingType: '{{ item.trainingType }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.solutionVersions }}'
+- calls:
+  - action: list_solutions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_solutions
+  emit:
+    as: item
+    item:
+      autoMLResult: '{{ item.autoMLResult }}'
+      creationDateTime: '{{ item.creationDateTime }}'
+      lastUpdatedDateTime: '{{ item.lastUpdatedDateTime }}'
+      latestSolutionUpdate: '{{ item.latestSolutionUpdate }}'
+      latestSolutionVersion: '{{ item.latestSolutionVersion }}'
+      name: '{{ item.name }}'
+      performAutoML: '{{ item.performAutoML }}'
+      performAutoTraining: '{{ item.performAutoTraining }}'
+      performHPO: '{{ item.performHPO }}'
+      recipeArn: '{{ item.recipeArn }}'
+      solutionArn: '{{ item.solutionArn }}'
+      solutionVersion: '{{ item.solutionVersion }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.solutions }}'
+- calls:
+  - action: describe_algorithm
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.describe_algorithm
+  emit:
+    as: item
+    item:
+      algorithm: '{{ response.algorithm.algorithmArn }}'
+      algorithmArn: '{{ response.algorithm.algorithmArn }}'
+      algorithmImage: '{{ response.algorithm.algorithmImage.name }}'
+      creationDateTime: '{{ response.algorithm.creationDateTime }}'
+      defaultHyperParameterRanges: '{{ response.algorithm.defaultHyperParameters }}'
+      defaultHyperParameters: '{{ response.algorithm.defaultHyperParameters }}'
+      defaultResourceConfig: '{{ response.algorithm.defaultResourceConfig }}'
+      lastUpdatedDateTime: '{{ response.algorithm.lastUpdatedDateTime }}'
+      name: '{{ response.algorithm.name }}'
+      roleArn: '{{ response.algorithm.roleArn }}'
+      trainingInputMode: '{{ response.algorithm.trainingInputMode }}'
+      dockerURI: '{{ response.algorithm.algorithmImage.dockerURI }}'
+- calls:
+  - action: describe_feature_transformation
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.describe_feature_transformation
+  emit:
+    as: item
+    item:
+      creationDateTime: '{{ response.featureTransformation.creationDateTime }}'
+      defaultParameters: '{{ response.featureTransformation.defaultParameters }}'
+      featureTransformationArn: '{{ response.featureTransformation.featureTransformationArn }}'
+      lastUpdatedDateTime: '{{ response.featureTransformation.lastUpdatedDateTime }}'
+      name: '{{ response.featureTransformation.name }}'
+      status: '{{ response.featureTransformation.status }}'
+- calls:
+  - action: list_tags_for_resource
+    on_error: continue
+    save_as: response
+  discovery_id: aws.personalize.list_tags_for_resource
+  emit:
+    as: item
+    item:
+      tagKey: '{{ item.tagKey }}'
+      tagValue: '{{ item.tagValue }}'
+    items_for: '{{ response.tags }}'

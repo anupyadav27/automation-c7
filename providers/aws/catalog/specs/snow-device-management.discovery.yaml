@@ -1,0 +1,163 @@
+version: '1.0'
+provider: aws
+service: snow-device-management
+services:
+  client: snow-device-management
+  module: boto3.client
+discovery:
+- discovery_id: aws.snow-device-management.list_devices
+  calls:
+  - action: list_devices
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.devices }}'
+    item:
+      associatedWithJob: '{{ item.associatedWithJob }}'
+      managedDeviceArn: '{{ item.managedDeviceArn }}'
+      managedDeviceId: '{{ item.managedDeviceId }}'
+      software: '{{ item.software }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.snow-device-management.list_tasks
+  calls:
+  - action: list_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tasks }}'
+    item:
+      state: '{{ item.state }}'
+      tags: '{{ item.tags }}'
+      targets: '{{ item.targets }}'
+      taskArn: '{{ item.taskArn }}'
+      taskId: '{{ item.taskId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.snow-device-management.describe_device
+  for_each: aws.snow-device-management.list_devices
+  calls:
+  - action: describe_device
+    params:
+      managedDeviceId: '{{ item.managedDeviceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.deviceCapacities }}'
+    item:
+      available: '{{ item.available }}'
+      name: '{{ item.name }}'
+      software: '{{ item.software }}'
+      total: '{{ item.total }}'
+      unit: '{{ item.unit }}'
+      used: '{{ item.used }}'
+      associatedWithJob: '{{ response.associatedWithJob }}'
+      deviceState: '{{ response.deviceState }}'
+      deviceType: '{{ response.deviceType }}'
+      lastReachedOutAt: '{{ response.lastReachedOutAt }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      managedDeviceArn: '{{ response.managedDeviceArn }}'
+      managedDeviceId: '{{ response.managedDeviceId }}'
+      installState: '{{ response.software.installState }}'
+      installedVersion: '{{ response.software.installedVersion }}'
+      installingVersion: '{{ response.software.installingVersion }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.snow-device-management.describe_device_ec2_instances
+  for_each: aws.snow-device-management.list_devices
+  calls:
+  - action: describe_device_ec2_instances
+    params:
+      instanceIds: '{{ item.instanceIds }}'
+      managedDeviceId: '{{ item.managedDeviceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.instances }}'
+    item:
+      instance: '{{ item.instance }}'
+      instances: '{{ item.instances }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+- discovery_id: aws.snow-device-management.describe_execution
+  for_each: aws.snow-device-management.list_devices
+  calls:
+  - action: describe_execution
+    params:
+      managedDeviceId: '{{ item.managedDeviceId }}'
+      taskId: '{{ item.taskId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      executionId: '{{ response.executionId }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      managedDeviceId: '{{ response.managedDeviceId }}'
+      startedAt: '{{ response.startedAt }}'
+      state: '{{ response.state }}'
+      taskId: '{{ response.taskId }}'
+- discovery_id: aws.snow-device-management.describe_task
+  for_each: aws.snow-device-management.list_tasks
+  calls:
+  - action: describe_task
+    params:
+      taskId: '{{ item.taskId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.targets }}'
+    item:
+      targets: '{{ item.targets }}'
+      completedAt: '{{ response.completedAt }}'
+      createdAt: '{{ response.createdAt }}'
+      description: '{{ response.description }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      state: '{{ response.state }}'
+      tags: '{{ response.tags }}'
+      taskArn: '{{ response.taskArn }}'
+      taskId: '{{ response.taskId }}'
+- discovery_id: aws.snow-device-management.list_device_resources
+  for_each: aws.snow-device-management.list_devices
+  calls:
+  - action: list_device_resources
+    params:
+      managedDeviceId: '{{ item.managedDeviceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.resources }}'
+    item:
+      arn: '{{ item.arn }}'
+      id: '{{ item.id }}'
+      resourceType: '{{ item.resourceType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.snow-device-management.list_executions
+  for_each: aws.snow-device-management.list_tasks
+  calls:
+  - action: list_executions
+    params:
+      taskId: '{{ item.taskId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.executions }}'
+    item:
+      executionId: '{{ item.executionId }}'
+      managedDeviceId: '{{ item.managedDeviceId }}'
+      state: '{{ item.state }}'
+      taskId: '{{ item.taskId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.snow-device-management.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

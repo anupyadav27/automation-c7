@@ -1,0 +1,207 @@
+version: '1.0'
+provider: aws
+service: kafkaconnect
+services:
+  client: kafkaconnect
+  module: boto3.client
+discovery:
+- discovery_id: aws.kafkaconnect.list_connectors
+  calls:
+  - action: list_connectors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.connectors }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      capacity: '{{ item.capacity }}'
+      connectorArn: '{{ item.connectorArn }}'
+      connectorDescription: '{{ item.connectorDescription }}'
+      connectorName: '{{ item.connectorName }}'
+      connectorState: '{{ item.connectorState }}'
+      creationTime: '{{ item.creationTime }}'
+      currentVersion: '{{ item.currentVersion }}'
+      customPlugin: '{{ item.customPlugin }}'
+      endTime: '{{ item.endTime }}'
+      kafkaCluster: '{{ item.kafkaCluster }}'
+      kafkaClusterClientAuthentication: '{{ item.kafkaClusterClientAuthentication }}'
+      kafkaClusterEncryptionInTransit: '{{ item.kafkaClusterEncryptionInTransit }}'
+      kafkaConnectVersion: '{{ item.kafkaConnectVersion }}'
+      logDelivery: '{{ item.logDelivery }}'
+      plugins: '{{ item.plugins }}'
+      serviceExecutionRoleArn: '{{ item.serviceExecutionRoleArn }}'
+      stateDescription: '{{ item.stateDescription }}'
+      workerConfiguration: '{{ item.workerConfiguration }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.kafkaconnect.list_custom_plugins
+  calls:
+  - action: list_custom_plugins
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.customPlugins }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      customPluginArn: '{{ item.customPluginArn }}'
+      customPluginState: '{{ item.customPluginState }}'
+      description: '{{ item.description }}'
+      latestRevision: '{{ item.latestRevision }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.kafkaconnect.list_worker_configurations
+  calls:
+  - action: list_worker_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workerConfigurations }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      latestRevision: '{{ item.latestRevision }}'
+      name: '{{ item.name }}'
+      workerConfigurationArn: '{{ item.workerConfigurationArn }}'
+      workerConfigurationState: '{{ item.workerConfigurationState }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.kafkaconnect.describe_connector
+  for_each: aws.kafkaconnect.list_connectors
+  calls:
+  - action: describe_connector
+    params:
+      connectorArn: '{{ item.connectorArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.plugins }}'
+    item:
+      customPlugin: '{{ item.customPlugin }}'
+      stateDescription: '{{ item.stateDescription.code }}'
+      maxWorkerCount: '{{ response.capacity.autoScaling.maxWorkerCount }}'
+      mcuCount: '{{ response.capacity.autoScaling.mcuCount }}'
+      minWorkerCount: '{{ response.capacity.autoScaling.minWorkerCount }}'
+      cpuUtilizationPercentage: '{{ response.capacity.autoScaling.scaleInPolicy.cpuUtilizationPercentage }}'
+      workerCount: '{{ response.capacity.provisionedCapacity.workerCount }}'
+      connectorArn: '{{ response.connectorArn }}'
+      connectorConfiguration: '{{ response.connectorConfiguration }}'
+      connectorDescription: '{{ response.connectorDescription }}'
+      connectorName: '{{ response.connectorName }}'
+      connectorState: '{{ response.connectorState }}'
+      creationTime: '{{ response.creationTime }}'
+      currentVersion: '{{ response.currentVersion }}'
+      authenticationType: '{{ response.kafkaClusterClientAuthentication.authenticationType }}'
+      encryptionType: '{{ response.kafkaClusterEncryptionInTransit.encryptionType }}'
+      bootstrapServers: '{{ response.kafkaCluster.apacheKafkaCluster.bootstrapServers }}'
+      kafkaConnectVersion: '{{ response.kafkaConnectVersion }}'
+      enabled: '{{ response.logDelivery.workerLogDelivery.cloudWatchLogs.enabled }}'
+      logGroup: '{{ response.logDelivery.workerLogDelivery.cloudWatchLogs.logGroup }}'
+      deliveryStream: '{{ response.logDelivery.workerLogDelivery.firehose.deliveryStream }}'
+      bucket: '{{ response.logDelivery.workerLogDelivery.s3.bucket }}'
+      prefix: '{{ response.logDelivery.workerLogDelivery.s3.prefix }}'
+      serviceExecutionRoleArn: '{{ response.serviceExecutionRoleArn }}'
+      code: '{{ response.stateDescription.code }}'
+      message: '{{ response.stateDescription.message }}'
+      revision: '{{ response.workerConfiguration.revision }}'
+      workerConfigurationArn: '{{ response.workerConfiguration.workerConfigurationArn }}'
+- discovery_id: aws.kafkaconnect.describe_connector_operation
+  calls:
+  - action: describe_connector_operation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.operationSteps }}'
+    item:
+      stepState: '{{ item.stepState }}'
+      stepType: '{{ item.stepType }}'
+      connectorArn: '{{ response.connectorArn }}'
+      connectorOperationArn: '{{ response.connectorOperationArn }}'
+      connectorOperationState: '{{ response.connectorOperationState }}'
+      connectorOperationType: '{{ response.connectorOperationType }}'
+      creationTime: '{{ response.creationTime }}'
+      endTime: '{{ response.endTime }}'
+      code: '{{ response.errorInfo.code }}'
+      message: '{{ response.errorInfo.message }}'
+      originConnectorConfiguration: '{{ response.originConnectorConfiguration }}'
+      maxWorkerCount: '{{ response.originWorkerSetting.capacity.autoScaling.maxWorkerCount }}'
+      mcuCount: '{{ response.originWorkerSetting.capacity.autoScaling.mcuCount }}'
+      minWorkerCount: '{{ response.originWorkerSetting.capacity.autoScaling.minWorkerCount }}'
+      cpuUtilizationPercentage: '{{ response.originWorkerSetting.capacity.autoScaling.scaleInPolicy.cpuUtilizationPercentage }}'
+      workerCount: '{{ response.originWorkerSetting.capacity.provisionedCapacity.workerCount }}'
+      targetConnectorConfiguration: '{{ response.targetConnectorConfiguration }}'
+- discovery_id: aws.kafkaconnect.describe_custom_plugin
+  for_each: aws.kafkaconnect.list_custom_plugins
+  calls:
+  - action: describe_custom_plugin
+    params:
+      customPluginArn: '{{ item.customPluginArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      contentType: '{{ response.latestRevision.contentType }}'
+      creationTime: '{{ response.latestRevision.creationTime }}'
+      description: '{{ response.latestRevision.description }}'
+      fileDescription: '{{ response.latestRevision.description }}'
+      location: '{{ response.latestRevision.location }}'
+      revision: '{{ response.latestRevision.revision }}'
+      customPluginArn: '{{ response.customPluginArn }}'
+      customPluginState: '{{ response.customPluginState }}'
+      fileMd5: '{{ response.latestRevision.fileDescription.fileMd5 }}'
+      fileSize: '{{ response.latestRevision.fileDescription.fileSize }}'
+      bucketArn: '{{ response.latestRevision.location.s3Location.bucketArn }}'
+      fileKey: '{{ response.latestRevision.location.s3Location.fileKey }}'
+      objectVersion: '{{ response.latestRevision.location.s3Location.objectVersion }}'
+      name: '{{ response.name }}'
+      code: '{{ response.stateDescription.code }}'
+      message: '{{ response.stateDescription.message }}'
+- discovery_id: aws.kafkaconnect.describe_worker_configuration
+  for_each: aws.kafkaconnect.list_worker_configurations
+  calls:
+  - action: describe_worker_configuration
+    params:
+      workerConfigurationArn: '{{ item.workerConfigurationArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      creationTime: '{{ response.latestRevision.creationTime }}'
+      description: '{{ response.latestRevision.description }}'
+      propertiesFileContent: '{{ response.latestRevision.propertiesFileContent }}'
+      revision: '{{ response.latestRevision.revision }}'
+      name: '{{ response.name }}'
+      workerConfigurationArn: '{{ response.workerConfigurationArn }}'
+      workerConfigurationState: '{{ response.workerConfigurationState }}'
+- discovery_id: aws.kafkaconnect.list_connector_operations
+  for_each: aws.kafkaconnect.list_connectors
+  calls:
+  - action: list_connector_operations
+    params:
+      connectorArn: '{{ item.connectorArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.connectorOperations }}'
+    item:
+      connectorOperationArn: '{{ item.connectorOperationArn }}'
+      connectorOperationState: '{{ item.connectorOperationState }}'
+      connectorOperationType: '{{ item.connectorOperationType }}'
+      creationTime: '{{ item.creationTime }}'
+      endTime: '{{ item.endTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.kafkaconnect.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

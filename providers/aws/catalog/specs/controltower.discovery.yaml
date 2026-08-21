@@ -1,0 +1,79 @@
+version: '1.0'
+provider: aws
+service: controltower
+discovery:
+- calls:
+  - action: list_control_operations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.controltower.list_control_operations
+  emit:
+    as: item
+    item:
+      controlIdentifier: '{{ item.controlIdentifier }}'
+      enabledControlIdentifier: '{{ item.enabledControlIdentifier }}'
+      endTime: '{{ item.endTime }}'
+      operationIdentifier: '{{ item.operationIdentifier }}'
+      operationType: '{{ item.operationType }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      targetIdentifier: '{{ item.targetIdentifier }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.controlOperations }}'
+- calls:
+  - action: list_enabled_baselines
+    on_error: continue
+    save_as: response
+  discovery_id: aws.controltower.list_enabled_baselines
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      baselineIdentifier: '{{ item.baselineIdentifier }}'
+      baselineVersion: '{{ item.baselineVersion }}'
+      driftStatusSummary: '{{ item.driftStatusSummary }}'
+      parentIdentifier: '{{ item.parentIdentifier }}'
+      statusSummary: '{{ item.statusSummary }}'
+      targetIdentifier: '{{ item.targetIdentifier }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.enabledBaselines }}'
+- calls:
+  - action: list_enabled_controls
+    on_error: continue
+    save_as: response
+  discovery_id: aws.controltower.list_enabled_controls
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      controlIdentifier: '{{ item.controlIdentifier }}'
+      driftStatusSummary: '{{ item.driftStatusSummary }}'
+      parentIdentifier: '{{ item.parentIdentifier }}'
+      statusSummary: '{{ item.statusSummary }}'
+      targetIdentifier: '{{ item.targetIdentifier }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.enabledControls }}'
+- calls:
+  - action: get_enabled_control
+    on_error: continue
+    params:
+      enabledControlIdentifier: '{{ item.enabledControlIdentifier }}'
+    save_as: response
+  discovery_id: aws.controltower.get_enabled_control
+  emit:
+    as: item
+    item:
+      arn: '{{ response.enabledControlDetails.arn }}'
+      controlIdentifier: '{{ response.enabledControlDetails.controlIdentifier }}'
+      driftStatusSummary: '{{ response.enabledControlDetails.driftStatusSummary.driftStatus }}'
+      enabledControlDetails: '{{ response.enabledControlDetails.enabledControlDetails }}'
+      parameters: '{{ response.enabledControlDetails.parameters[].key }}'
+      parentIdentifier: '{{ response.enabledControlDetails.targetIdentifier }}'
+      statusSummary: '{{ response.enabledControlDetails.statusSummary.status }}'
+      targetIdentifier: '{{ response.enabledControlDetails.targetIdentifier }}'
+      targetRegions: '{{ response.enabledControlDetails.targetRegions[].name }}'
+      driftStatus: '{{ response.enabledControlDetails.driftStatusSummary.driftStatus }}'
+      lastOperationIdentifier: '{{ response.enabledControlDetails.statusSummary.lastOperationIdentifier }}'
+      status: '{{ response.enabledControlDetails.statusSummary.status }}'
+  for_each: aws.controltower.list_control_operations

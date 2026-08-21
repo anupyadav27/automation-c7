@@ -1,0 +1,121 @@
+# ============================================================
+# Discovery YAML — license-manager-user-subscriptions (AWS)
+# Generated: 2026-02-21T04:56:58Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: license-manager-user-subscriptions
+services:
+  client: license-manager-user-subscriptions
+  module: boto3.client
+discovery:
+  # ── ListIdentityProviders ──
+  - discovery_id: aws.license-manager-user-subscriptions.list_identity_providers
+    calls:
+      - action: list_identity_providers
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.IdentityProviderSummaries }}'
+      item:
+        Status: '{{ item.Status }}'
+        FailureMessage: '{{ item.FailureMessage }}'
+        IdentityProvider: '{{ item.IdentityProvider }}'
+        IdentityProviderArn: '{{ item.IdentityProviderArn }}'
+        OwnerAccountId: '{{ item.OwnerAccountId }}'
+        Product: '{{ item.Product }}'
+        Settings: '{{ item.Settings }}'
+  # ── ListInstances ──
+  - discovery_id: aws.license-manager-user-subscriptions.list_instances
+    calls:
+      - action: list_instances
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.InstanceSummaries }}'
+      item:
+        Status: '{{ item.Status }}'
+        IdentityProvider: '{{ item.IdentityProvider }}'
+        InstanceId: '{{ item.InstanceId }}'
+        LastStatusCheckDate: '{{ item.LastStatusCheckDate }}'
+        OwnerAccountId: '{{ item.OwnerAccountId }}'
+        Products: '{{ item.Products }}'
+        StatusMessage: '{{ item.StatusMessage }}'
+  # ── ListLicenseServerEndpoints ──
+  - discovery_id: aws.license-manager-user-subscriptions.list_license_server_endpoints
+    calls:
+      - action: list_license_server_endpoints
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.LicenseServerEndpoints }}'
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        IdentityProviderArn: '{{ item.IdentityProviderArn }}'
+        LicenseServerEndpointArn: '{{ item.LicenseServerEndpointArn }}'
+        LicenseServerEndpointId: '{{ item.LicenseServerEndpointId }}'
+        LicenseServerEndpointProvisioningStatus: '{{ item.LicenseServerEndpointProvisioningStatus }}'
+        LicenseServers: '{{ item.LicenseServers }}'
+        ServerEndpoint: '{{ item.ServerEndpoint }}'
+        ServerType: '{{ item.ServerType }}'
+        StatusMessage: '{{ item.StatusMessage }}'
+  # ── Dependent read operations (require identifiers) ──
+  # ── ListProductSubscriptions ──
+  - discovery_id: aws.license-manager-user-subscriptions.list_product_subscriptions
+    for_each: aws.license-manager-user-subscriptions.list_identity_providers
+    calls:
+      - action: list_product_subscriptions
+        params:
+          IdentityProvider: '{{ item.IdentityProvider }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.ProductUserSummaries }}'
+      item:
+        Status: '{{ item.Status }}'
+        Domain: '{{ item.Domain }}'
+        IdentityProvider: '{{ item.IdentityProvider }}'
+        Product: '{{ item.Product }}'
+        ProductUserArn: '{{ item.ProductUserArn }}'
+        StatusMessage: '{{ item.StatusMessage }}'
+        SubscriptionEndDate: '{{ item.SubscriptionEndDate }}'
+        SubscriptionStartDate: '{{ item.SubscriptionStartDate }}'
+        Username: '{{ item.Username }}'
+  # ── ListTagsForResource ──
+  - discovery_id: aws.license-manager-user-subscriptions.list_tags_for_resource
+    calls:
+      - action: list_tags_for_resource
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Tags: '{{ response.Tags }}'
+  # ── ListUserAssociations ──
+  - discovery_id: aws.license-manager-user-subscriptions.list_user_associations
+    for_each: aws.license-manager-user-subscriptions.list_identity_providers
+    calls:
+      - action: list_user_associations
+        params:
+          InstanceId: '{{ item.InstanceId }}'
+          IdentityProvider: '{{ item.IdentityProvider }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.InstanceUserSummaries }}'
+      item:
+        Status: '{{ item.Status }}'
+        AssociationDate: '{{ item.AssociationDate }}'
+        DisassociationDate: '{{ item.DisassociationDate }}'
+        Domain: '{{ item.Domain }}'
+        IdentityProvider: '{{ item.IdentityProvider }}'
+        InstanceId: '{{ item.InstanceId }}'
+        InstanceUserArn: '{{ item.InstanceUserArn }}'
+        StatusMessage: '{{ item.StatusMessage }}'
+        Username: '{{ item.Username }}'

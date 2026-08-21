@@ -1,0 +1,521 @@
+version: '1.0'
+provider: aws
+service: mediaconvert
+services:
+  client: mediaconvert
+  module: boto3.client
+discovery:
+- discovery_id: aws.mediaconvert.describe_endpoints
+  calls:
+  - action: describe_endpoints
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Endpoints }}'
+    item:
+      Endpoints: '{{ item.Endpoints }}'
+      Url: '{{ item.Url }}'
+- discovery_id: aws.mediaconvert.get_policy
+  calls:
+  - action: get_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy.Policy }}'
+      HttpInputs: '{{ response.Policy.HttpInputs }}'
+      HttpsInputs: '{{ response.Policy.HttpsInputs }}'
+      S3Inputs: '{{ response.Policy.S3Inputs }}'
+      Statement: '{{ response.Policy.Statement }}'
+- discovery_id: aws.mediaconvert.list_job_templates
+  calls:
+  - action: list_job_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.JobTemplates }}'
+    item:
+      Name: '{{ item.Name }}'
+      Category: '{{ item.Category }}'
+      Description: '{{ item.Description }}'
+      DestinationArn: '{{ item.DestinationArn }}'
+      Enabled: '{{ item.Enabled }}'
+      Format: '{{ item.Format }}'
+      LastUpdated: '{{ item.LastUpdated }}'
+      Level: '{{ item.Level }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.mediaconvert.list_jobs
+  calls:
+  - action: list_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Jobs }}'
+    item:
+      Jobs: '{{ item.Jobs }}'
+- discovery_id: aws.mediaconvert.list_presets
+  calls:
+  - action: list_presets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Presets }}'
+    item:
+      Name: '{{ item.Name }}'
+      Category: '{{ item.Category }}'
+      Description: '{{ item.Description }}'
+      LastUpdated: '{{ item.LastUpdated }}'
+      Preset: '{{ item.Preset }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.mediaconvert.list_queues
+  calls:
+  - action: list_queues
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Queues }}'
+    item:
+      Name: '{{ item.Name }}'
+      ConcurrentJobs: '{{ item.ConcurrentJobs }}'
+      Description: '{{ item.Description }}'
+      LastUpdated: '{{ item.LastUpdated }}'
+      PricingPlan: '{{ item.PricingPlan }}'
+      ProgressingJobsCount: '{{ item.ProgressingJobsCount }}'
+      ReservationPlan: '{{ item.ReservationPlan }}'
+      ServiceOverrides: '{{ item.ServiceOverrides }}'
+      SubmittedJobsCount: '{{ item.SubmittedJobsCount }}'
+      Type: '{{ item.Type }}'
+      TotalConcurrentJobs: '{{ response.TotalConcurrentJobs }}'
+      UnallocatedConcurrentJobs: '{{ response.UnallocatedConcurrentJobs }}'
+- discovery_id: aws.mediaconvert.list_versions
+  calls:
+  - action: list_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Versions }}'
+    item:
+      ExpirationDate: '{{ item.ExpirationDate }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.mediaconvert.search_jobs
+  calls:
+  - action: search_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Jobs }}'
+- discovery_id: aws.mediaconvert.get_job
+  calls:
+  - action: get_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Mode: '{{ response.Job.AccelerationSettings.Mode }}'
+      AccelerationStatus: '{{ response.Job.AccelerationStatus }}'
+      Arn: '{{ response.Job.Arn }}'
+      BillingTagsSource: '{{ response.Job.BillingTagsSource }}'
+      ClientRequestToken: '{{ response.Job.ClientRequestToken }}'
+      CreatedAt: '{{ response.Job.CreatedAt }}'
+      CurrentPhase: '{{ response.Job.CurrentPhase }}'
+      ErrorCode: '{{ response.Job.ErrorCode }}'
+      ErrorMessage: '{{ response.Job.ErrorMessage }}'
+      Id: '{{ response.Job.Id }}'
+      JobEngineVersionRequested: '{{ response.Job.JobEngineVersionRequested }}'
+      JobEngineVersionUsed: '{{ response.Job.JobEngineVersionUsed }}'
+      JobPercentComplete: '{{ response.Job.JobPercentComplete }}'
+      JobTemplate: '{{ response.Job.JobTemplate }}'
+      Priority: '{{ response.Job.Priority }}'
+      Queue: '{{ response.Job.Queue }}'
+      RetryCount: '{{ response.Job.RetryCount }}'
+      Role: '{{ response.Job.Role }}'
+      AdAvailOffset: '{{ response.Job.Settings.AdAvailOffset }}'
+      AvailBlankingImage: '{{ response.Job.Settings.AvailBlanking.AvailBlankingImage
+        }}'
+      MccXml: '{{ response.Job.Settings.Esam.ManifestConfirmConditionNotification.MccXml
+        }}'
+      ResponseSignalPreroll: '{{ response.Job.Settings.Esam.ResponseSignalPreroll
+        }}'
+      SccXml: '{{ response.Job.Settings.Esam.SignalProcessingNotification.SccXml }}'
+      CopyProtectionAction: '{{ response.Job.Settings.ExtendedDataServices.CopyProtectionAction
+        }}'
+      VchipAction: '{{ response.Job.Settings.ExtendedDataServices.VchipAction }}'
+      FollowSource: '{{ response.Job.Settings.FollowSource }}'
+      ChannelName: '{{ response.Job.Settings.KantarWatermark.ChannelName }}'
+      ContentReference: '{{ response.Job.Settings.KantarWatermark.ContentReference
+        }}'
+      CredentialsSecretName: '{{ response.Job.Settings.KantarWatermark.CredentialsSecretName
+        }}'
+      FileOffset: '{{ response.Job.Settings.KantarWatermark.FileOffset }}'
+      KantarLicenseId: '{{ response.Job.Settings.KantarWatermark.KantarLicenseId }}'
+      KantarServerUrl: '{{ response.Job.Settings.KantarWatermark.KantarServerUrl }}'
+      LogDestination: '{{ response.Job.Settings.KantarWatermark.LogDestination }}'
+      Metadata3: '{{ response.Job.Settings.KantarWatermark.Metadata3 }}'
+      Metadata4: '{{ response.Job.Settings.KantarWatermark.Metadata4 }}'
+      Metadata5: '{{ response.Job.Settings.KantarWatermark.Metadata5 }}'
+      Metadata6: '{{ response.Job.Settings.KantarWatermark.Metadata6 }}'
+      Metadata7: '{{ response.Job.Settings.KantarWatermark.Metadata7 }}'
+      Metadata8: '{{ response.Job.Settings.KantarWatermark.Metadata8 }}'
+      FramerateDenominator: '{{ response.Job.Settings.MotionImageInserter.Framerate.FramerateDenominator
+        }}'
+      FramerateNumerator: '{{ response.Job.Settings.MotionImageInserter.Framerate.FramerateNumerator
+        }}'
+      Input: '{{ response.Job.Settings.MotionImageInserter.Input }}'
+      InsertionMode: '{{ response.Job.Settings.MotionImageInserter.InsertionMode }}'
+      ImageX: '{{ response.Job.Settings.MotionImageInserter.Offset.ImageX }}'
+      ImageY: '{{ response.Job.Settings.MotionImageInserter.Offset.ImageY }}'
+      Playback: '{{ response.Job.Settings.MotionImageInserter.Playback }}'
+      StartTime: '{{ response.Job.Settings.MotionImageInserter.StartTime }}'
+      BreakoutCode: '{{ response.Job.Settings.NielsenConfiguration.BreakoutCode }}'
+      DistributorId: '{{ response.Job.Settings.NielsenConfiguration.DistributorId
+        }}'
+      ActiveWatermarkProcess: '{{ response.Job.Settings.NielsenNonLinearWatermark.ActiveWatermarkProcess
+        }}'
+      AdiFilename: '{{ response.Job.Settings.NielsenNonLinearWatermark.AdiFilename
+        }}'
+      AssetId: '{{ response.Job.Settings.NielsenNonLinearWatermark.AssetId }}'
+      AssetName: '{{ response.Job.Settings.NielsenNonLinearWatermark.AssetName }}'
+      CbetSourceId: '{{ response.Job.Settings.NielsenNonLinearWatermark.CbetSourceId
+        }}'
+      EpisodeId: '{{ response.Job.Settings.NielsenNonLinearWatermark.EpisodeId }}'
+      MetadataDestination: '{{ response.Job.Settings.NielsenNonLinearWatermark.MetadataDestination
+        }}'
+      SourceId: '{{ response.Job.Settings.NielsenNonLinearWatermark.SourceId }}'
+      SourceWatermarkStatus: '{{ response.Job.Settings.NielsenNonLinearWatermark.SourceWatermarkStatus
+        }}'
+      TicServerUrl: '{{ response.Job.Settings.NielsenNonLinearWatermark.TicServerUrl
+        }}'
+      UniqueTicPerAudioTrack: '{{ response.Job.Settings.NielsenNonLinearWatermark.UniqueTicPerAudioTrack
+        }}'
+      Anchor: '{{ response.Job.Settings.TimecodeConfig.Anchor }}'
+      Source: '{{ response.Job.Settings.TimecodeConfig.Source }}'
+      Start: '{{ response.Job.Settings.TimecodeConfig.Start }}'
+      TimestampOffset: '{{ response.Job.Settings.TimecodeConfig.TimestampOffset }}'
+      SimulateReservedQueue: '{{ response.Job.SimulateReservedQueue }}'
+      Status: '{{ response.Job.Status }}'
+      StatusUpdateInterval: '{{ response.Job.StatusUpdateInterval }}'
+      FinishTime: '{{ response.Job.Timing.FinishTime }}'
+      SubmitTime: '{{ response.Job.Timing.SubmitTime }}'
+      UserMetadata: '{{ response.Job.UserMetadata }}'
+      LastShareDetails: '{{ response.Job.LastShareDetails }}'
+      ShareStatus: '{{ response.Job.ShareStatus }}'
+- discovery_id: aws.mediaconvert.get_job_template
+  for_each: aws.mediaconvert.list_job_templates
+  calls:
+  - action: get_job_template
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.JobTemplate.Name }}'
+      Category: '{{ response.JobTemplate.Category }}'
+      Description: '{{ response.JobTemplate.Description }}'
+      LastUpdated: '{{ response.JobTemplate.LastUpdated }}'
+      Type: '{{ response.JobTemplate.Type }}'
+      Mode: '{{ response.JobTemplate.AccelerationSettings.Mode }}'
+      Arn: '{{ response.JobTemplate.Arn }}'
+      CreatedAt: '{{ response.JobTemplate.CreatedAt }}'
+      Priority: '{{ response.JobTemplate.Priority }}'
+      Queue: '{{ response.JobTemplate.Queue }}'
+      AdAvailOffset: '{{ response.JobTemplate.Settings.AdAvailOffset }}'
+      AvailBlankingImage: '{{ response.JobTemplate.Settings.AvailBlanking.AvailBlankingImage
+        }}'
+      MccXml: '{{ response.JobTemplate.Settings.Esam.ManifestConfirmConditionNotification.MccXml
+        }}'
+      ResponseSignalPreroll: '{{ response.JobTemplate.Settings.Esam.ResponseSignalPreroll
+        }}'
+      SccXml: '{{ response.JobTemplate.Settings.Esam.SignalProcessingNotification.SccXml
+        }}'
+      CopyProtectionAction: '{{ response.JobTemplate.Settings.ExtendedDataServices.CopyProtectionAction
+        }}'
+      VchipAction: '{{ response.JobTemplate.Settings.ExtendedDataServices.VchipAction
+        }}'
+      FollowSource: '{{ response.JobTemplate.Settings.FollowSource }}'
+      ChannelName: '{{ response.JobTemplate.Settings.KantarWatermark.ChannelName }}'
+      ContentReference: '{{ response.JobTemplate.Settings.KantarWatermark.ContentReference
+        }}'
+      CredentialsSecretName: '{{ response.JobTemplate.Settings.KantarWatermark.CredentialsSecretName
+        }}'
+      FileOffset: '{{ response.JobTemplate.Settings.KantarWatermark.FileOffset }}'
+      KantarLicenseId: '{{ response.JobTemplate.Settings.KantarWatermark.KantarLicenseId
+        }}'
+      KantarServerUrl: '{{ response.JobTemplate.Settings.KantarWatermark.KantarServerUrl
+        }}'
+      LogDestination: '{{ response.JobTemplate.Settings.KantarWatermark.LogDestination
+        }}'
+      Metadata3: '{{ response.JobTemplate.Settings.KantarWatermark.Metadata3 }}'
+      Metadata4: '{{ response.JobTemplate.Settings.KantarWatermark.Metadata4 }}'
+      Metadata5: '{{ response.JobTemplate.Settings.KantarWatermark.Metadata5 }}'
+      Metadata6: '{{ response.JobTemplate.Settings.KantarWatermark.Metadata6 }}'
+      Metadata7: '{{ response.JobTemplate.Settings.KantarWatermark.Metadata7 }}'
+      Metadata8: '{{ response.JobTemplate.Settings.KantarWatermark.Metadata8 }}'
+      FramerateDenominator: '{{ response.JobTemplate.Settings.MotionImageInserter.Framerate.FramerateDenominator
+        }}'
+      FramerateNumerator: '{{ response.JobTemplate.Settings.MotionImageInserter.Framerate.FramerateNumerator
+        }}'
+      Input: '{{ response.JobTemplate.Settings.MotionImageInserter.Input }}'
+      InsertionMode: '{{ response.JobTemplate.Settings.MotionImageInserter.InsertionMode
+        }}'
+      ImageX: '{{ response.JobTemplate.Settings.MotionImageInserter.Offset.ImageX
+        }}'
+      ImageY: '{{ response.JobTemplate.Settings.MotionImageInserter.Offset.ImageY
+        }}'
+      Playback: '{{ response.JobTemplate.Settings.MotionImageInserter.Playback }}'
+      StartTime: '{{ response.JobTemplate.Settings.MotionImageInserter.StartTime }}'
+      BreakoutCode: '{{ response.JobTemplate.Settings.NielsenConfiguration.BreakoutCode
+        }}'
+      DistributorId: '{{ response.JobTemplate.Settings.NielsenConfiguration.DistributorId
+        }}'
+      ActiveWatermarkProcess: '{{ response.JobTemplate.Settings.NielsenNonLinearWatermark.ActiveWatermarkProcess
+        }}'
+      AdiFilename: '{{ response.JobTemplate.Settings.NielsenNonLinearWatermark.AdiFilename
+        }}'
+      AssetId: '{{ response.JobTemplate.Settings.NielsenNonLinearWatermark.AssetId
+        }}'
+      AssetName: '{{ response.JobTemplate.Settings.NielsenNonLinearWatermark.AssetName
+        }}'
+      CbetSourceId: '{{ response.JobTemplate.Settings.NielsenNonLinearWatermark.CbetSourceId
+        }}'
+      EpisodeId: '{{ response.JobTemplate.Settings.NielsenNonLinearWatermark.EpisodeId
+        }}'
+      MetadataDestination: '{{ response.JobTemplate.Settings.NielsenNonLinearWatermark.MetadataDestination
+        }}'
+      SourceId: '{{ response.JobTemplate.Settings.NielsenNonLinearWatermark.SourceId
+        }}'
+      SourceWatermarkStatus: '{{ response.JobTemplate.Settings.NielsenNonLinearWatermark.SourceWatermarkStatus
+        }}'
+      TicServerUrl: '{{ response.JobTemplate.Settings.NielsenNonLinearWatermark.TicServerUrl
+        }}'
+      UniqueTicPerAudioTrack: '{{ response.JobTemplate.Settings.NielsenNonLinearWatermark.UniqueTicPerAudioTrack
+        }}'
+      Anchor: '{{ response.JobTemplate.Settings.TimecodeConfig.Anchor }}'
+      Source: '{{ response.JobTemplate.Settings.TimecodeConfig.Source }}'
+      Start: '{{ response.JobTemplate.Settings.TimecodeConfig.Start }}'
+      TimestampOffset: '{{ response.JobTemplate.Settings.TimecodeConfig.TimestampOffset
+        }}'
+      StatusUpdateInterval: '{{ response.JobTemplate.StatusUpdateInterval }}'
+- discovery_id: aws.mediaconvert.get_jobs_query_results
+  calls:
+  - action: get_jobs_query_results
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Jobs }}'
+    item:
+      Status: '{{ response.Status }}'
+- discovery_id: aws.mediaconvert.get_preset
+  for_each: aws.mediaconvert.list_job_templates
+  calls:
+  - action: get_preset
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.Preset.Name }}'
+      Category: '{{ response.Preset.Category }}'
+      Description: '{{ response.Preset.Description }}'
+      LastUpdated: '{{ response.Preset.LastUpdated }}'
+      Type: '{{ response.Preset.Type }}'
+      Arn: '{{ response.Preset.Arn }}'
+      CreatedAt: '{{ response.Preset.CreatedAt }}'
+      AudioDuration: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.AudioDuration
+        }}'
+      AudioGroupId: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.AudioGroupId
+        }}'
+      AudioRenditionSets: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.AudioRenditionSets
+        }}'
+      AudioTrackType: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.AudioTrackType
+        }}'
+      DescriptiveVideoServiceFlag: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.DescriptiveVideoServiceFlag
+        }}'
+      IFrameOnlyManifest: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.IFrameOnlyManifest
+        }}'
+      KlvMetadata: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.KlvMetadata
+        }}'
+      ManifestMetadataSignaling: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.ManifestMetadataSignaling
+        }}'
+      Scte35Esam: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.Scte35Esam
+        }}'
+      Scte35Source: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.Scte35Source
+        }}'
+      TimedMetadata: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.TimedMetadata
+        }}'
+      TimedMetadataBoxVersion: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.TimedMetadataBoxVersion
+        }}'
+      TimedMetadataSchemeIdUri: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.TimedMetadataSchemeIdUri
+        }}'
+      TimedMetadataValue: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.TimedMetadataValue
+        }}'
+      Container: '{{ response.Preset.Settings.ContainerSettings.Container }}'
+      MoovPlacement: '{{ response.Preset.Settings.ContainerSettings.F4vSettings.MoovPlacement
+        }}'
+      AudioBufferModel: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.AudioBufferModel
+        }}'
+      AudioFramesPerPes: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.AudioFramesPerPes
+        }}'
+      AudioPtsOffsetDelta: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.AudioPtsOffsetDelta
+        }}'
+      Bitrate: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.Bitrate
+        }}'
+      BufferModel: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.BufferModel
+        }}'
+      DataPTSControl: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.DataPTSControl
+        }}'
+      DvbTeletextPid: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.DvbTeletextPid
+        }}'
+      EbpAudioInterval: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.EbpAudioInterval
+        }}'
+      EbpPlacement: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.EbpPlacement
+        }}'
+      EsRateInPes: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.EsRateInPes
+        }}'
+      ForceTsVideoEbpOrder: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.ForceTsVideoEbpOrder
+        }}'
+      FragmentTime: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.FragmentTime
+        }}'
+      MaxPcrInterval: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.MaxPcrInterval
+        }}'
+      MinEbpInterval: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.MinEbpInterval
+        }}'
+      NielsenId3: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.NielsenId3
+        }}'
+      NullPacketBitrate: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.NullPacketBitrate
+        }}'
+      PatInterval: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.PatInterval
+        }}'
+      PcrControl: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.PcrControl
+        }}'
+      PcrPid: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.PcrPid }}'
+      PmtInterval: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.PmtInterval
+        }}'
+      PmtPid: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.PmtPid }}'
+      PreventBufferUnderflow: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.PreventBufferUnderflow
+        }}'
+      PrivateMetadataPid: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.PrivateMetadataPid
+        }}'
+      ProgramNumber: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.ProgramNumber
+        }}'
+      PtsOffset: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.PtsOffset
+        }}'
+      PtsOffsetMode: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.PtsOffsetMode
+        }}'
+      RateMode: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.RateMode
+        }}'
+      Scte35Pid: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.Scte35Pid
+        }}'
+      SegmentationMarkers: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.SegmentationMarkers
+        }}'
+      SegmentationStyle: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.SegmentationStyle
+        }}'
+      SegmentationTime: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.SegmentationTime
+        }}'
+      TimedMetadataPid: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.TimedMetadataPid
+        }}'
+      TransportStreamId: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.TransportStreamId
+        }}'
+      VideoPid: '{{ response.Preset.Settings.ContainerSettings.M2tsSettings.VideoPid
+        }}'
+      ClapAtom: '{{ response.Preset.Settings.ContainerSettings.MovSettings.ClapAtom
+        }}'
+      CslgAtom: '{{ response.Preset.Settings.ContainerSettings.MovSettings.CslgAtom
+        }}'
+      Mpeg2FourCCControl: '{{ response.Preset.Settings.ContainerSettings.MovSettings.Mpeg2FourCCControl
+        }}'
+      PaddingControl: '{{ response.Preset.Settings.ContainerSettings.MovSettings.PaddingControl
+        }}'
+      Reference: '{{ response.Preset.Settings.ContainerSettings.MovSettings.Reference
+        }}'
+      CttsVersion: '{{ response.Preset.Settings.ContainerSettings.Mp4Settings.CttsVersion
+        }}'
+      FreeSpaceBox: '{{ response.Preset.Settings.ContainerSettings.Mp4Settings.FreeSpaceBox
+        }}'
+      Mp4MajorBrand: '{{ response.Preset.Settings.ContainerSettings.Mp4Settings.Mp4MajorBrand
+        }}'
+      AccessibilityCaptionHints: '{{ response.Preset.Settings.ContainerSettings.MpdSettings.AccessibilityCaptionHints
+        }}'
+      CaptionContainerType: '{{ response.Preset.Settings.ContainerSettings.MpdSettings.CaptionContainerType
+        }}'
+      AfdSignaling: '{{ response.Preset.Settings.ContainerSettings.MxfSettings.AfdSignaling
+        }}'
+      Profile: '{{ response.Preset.Settings.ContainerSettings.MxfSettings.Profile
+        }}'
+      AntiAlias: '{{ response.Preset.Settings.VideoDescription.AntiAlias }}'
+      ChromaPositionMode: '{{ response.Preset.Settings.VideoDescription.ChromaPositionMode
+        }}'
+      Codec: '{{ response.Preset.Settings.VideoDescription.CodecSettings.Codec }}'
+      ColorMetadata: '{{ response.Preset.Settings.VideoDescription.ColorMetadata }}'
+      Height: '{{ response.Preset.Settings.VideoDescription.Crop.Height }}'
+      Width: '{{ response.Preset.Settings.VideoDescription.Crop.Width }}'
+      X: '{{ response.Preset.Settings.VideoDescription.Crop.X }}'
+      Y: '{{ response.Preset.Settings.VideoDescription.Crop.Y }}'
+      DropFrameTimecode: '{{ response.Preset.Settings.VideoDescription.DropFrameTimecode
+        }}'
+      FixedAfd: '{{ response.Preset.Settings.VideoDescription.FixedAfd }}'
+      RespondToAfd: '{{ response.Preset.Settings.VideoDescription.RespondToAfd }}'
+      ScalingBehavior: '{{ response.Preset.Settings.VideoDescription.ScalingBehavior
+        }}'
+      Sharpness: '{{ response.Preset.Settings.VideoDescription.Sharpness }}'
+      TimecodeInsertion: '{{ response.Preset.Settings.VideoDescription.TimecodeInsertion
+        }}'
+      TimecodeTrack: '{{ response.Preset.Settings.VideoDescription.TimecodeTrack }}'
+      C2paManifest: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.C2paManifest
+        }}'
+      CertificateSecret: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.CertificateSecret
+        }}'
+      SigningKmsKey: '{{ response.Preset.Settings.ContainerSettings.CmfcSettings.SigningKmsKey
+        }}'
+- discovery_id: aws.mediaconvert.get_queue
+  for_each: aws.mediaconvert.list_job_templates
+  calls:
+  - action: get_queue
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.Queue.Name }}'
+      ConcurrentJobs: '{{ response.Queue.ConcurrentJobs }}'
+      Description: '{{ response.Queue.Description }}'
+      LastUpdated: '{{ response.Queue.LastUpdated }}'
+      PricingPlan: '{{ response.Queue.PricingPlan }}'
+      ProgressingJobsCount: '{{ response.Queue.ProgressingJobsCount }}'
+      ReservationPlan: '{{ response.Queue.ReservationPlan.Status }}'
+      ServiceOverrides: '{{ response.Queue.ServiceOverrides[].Name }}'
+      SubmittedJobsCount: '{{ response.Queue.SubmittedJobsCount }}'
+      Type: '{{ response.Queue.Type }}'
+      Arn: '{{ response.Queue.Arn }}'
+      CreatedAt: '{{ response.Queue.CreatedAt }}'
+      Commitment: '{{ response.Queue.ReservationPlan.Commitment }}'
+      ExpiresAt: '{{ response.Queue.ReservationPlan.ExpiresAt }}'
+      PurchasedAt: '{{ response.Queue.ReservationPlan.PurchasedAt }}'
+      RenewalType: '{{ response.Queue.ReservationPlan.RenewalType }}'
+      ReservedSlots: '{{ response.Queue.ReservationPlan.ReservedSlots }}'
+      Status: '{{ response.Queue.ReservationPlan.Status }}'
+- discovery_id: aws.mediaconvert.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.ResourceTags.Tags }}'
+      Arn: '{{ response.ResourceTags.Arn }}'

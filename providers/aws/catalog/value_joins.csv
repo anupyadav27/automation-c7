@@ -1,0 +1,12 @@
+source_key,source_path,match_kind,target_key,target_path,edge_type,confidence,notes
+ec2.vpc_endpoint,ServiceName,aws_service_name,,,fronts,high,"com.amazonaws.<region>.<service> names the service an endpoint fronts. Resolving it is what draws 'this VPC reaches S3 privately' - without it the private path stops at the endpoint and the reader cannot tell what it connects to."
+route53.resource_record_set,AliasTarget.DNSName,dns_name,elbv2.load_balancer,DNSName,routes-to,high,"An alias record points at a load balancer by DNS name, never by id. Pure value equality is the only join available."
+route53.resource_record_set,AliasTarget.DNSName,dns_name,cloudfront.distribution,DomainName,routes-to,high,Alias records to a CloudFront distribution match on its domain name.
+route53.resource_record_set,AliasTarget.DNSName,dns_name,elb.load_balancer,DNSName,routes-to,high,Classic ELB alias target.
+route53.resource_record_set,ResourceRecords[].Value,dns_name,elbv2.load_balancer,DNSName,routes-to,medium,"A CNAME holding a load balancer's DNS name. Weaker than an alias because the value is free text and may point outside the account."
+elbv2.target_group,LoadBalancerArns[],arn,elbv2.load_balancer,LoadBalancerArn,attached-to,high,"Target group back to its load balancer. An ARN join rather than a name join, so it is exact."
+elbv2.target_health_description,Target.Id,instance_or_ip,ec2.instance,InstanceId,routes-to,high,"Registered targets are instance ids when TargetType is instance, and raw IPs when it is ip - the value's shape decides which."
+ec2.security_group,IpPermissions[].IpRanges[].CidrIp,cidr_contains,ec2.subnet,CidrBlock,allows-from,medium,"A rule CIDR that contains or overlaps a subnet's CIDR. Containment, not equality, and 0.0.0.0/0 must be treated as the internet rather than as matching every subnet."
+ec2.route_table,Routes[].DestinationCidrBlock,cidr_is_default,,,routes-to-internet,high,"0.0.0.0/0 or ::/0 marks a default route. Not a join to another resource - it qualifies the route's gateway edge, and is the single value that decides public versus private."
+cloudfront.distribution,Origins.Items[].DomainName,dns_name,s3.bucket,Name,routes-to,medium,"An S3 origin's domain embeds the bucket name (<bucket>.s3.<region>.amazonaws.com), so the bucket must be parsed out before matching."
+cloudfront.distribution,Origins.Items[].DomainName,dns_name,elbv2.load_balancer,DNSName,routes-to,high,A custom origin pointing at a load balancer.

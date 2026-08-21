@@ -1,0 +1,23 @@
+version: '1.0'
+provider: aws
+service: cloudsearchdomain
+services:
+  client: cloudsearchdomain
+  module: boto3.client
+discovery:
+- discovery_id: aws.cloudsearchdomain.search
+  calls:
+  - action: search
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      facets: '{{ response.facets }}'
+      stats: '{{ response.stats }}'
+      status: '{{ response.stats }}'
+      cursor: '{{ response.hits.cursor }}'
+      found: '{{ response.hits.found }}'
+      start: '{{ response.hits.start }}'
+      rid: '{{ response.status.rid }}'
+      timems: '{{ response.status.timems }}'

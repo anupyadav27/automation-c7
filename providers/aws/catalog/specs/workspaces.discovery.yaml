@@ -1,0 +1,103 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: workspaces
+# 3 ops (2 from checks, +1 for inventory)
+version: '1.0'
+provider: aws
+service: workspaces
+discovery:
+  - calls:
+    - action: describe_workspaces
+      on_error: continue
+      save_as: response
+    discovery_id: aws.workspaces.describe_workspaces
+    emit:
+      as: item
+      item:
+        BundleId: '{{ item.BundleId }}'
+        ComputerName: '{{ item.ComputerName }}'
+        DataReplicationSettings: '{{ item.DataReplicationSettings }}'
+        DestinationArn: '{{ item.DestinationArn }}'
+        DirectoryId: '{{ item.DirectoryId }}'
+        Enabled: '{{ item.Enabled }}'
+        ErrorCode: '{{ item.ErrorCode }}'
+        ErrorMessage: '{{ item.ErrorMessage }}'
+        Format: '{{ item.Format }}'
+        IpAddress: '{{ item.IpAddress }}'
+        Ipv6Address: '{{ item.Ipv6Address }}'
+        Level: '{{ item.Level }}'
+        ModificationStates: '{{ item.ModificationStates }}'
+        RelatedWorkspaces: '{{ item.RelatedWorkspaces }}'
+        RootVolumeEncryptionEnabled: '{{ item.RootVolumeEncryptionEnabled }}'
+        StandbyWorkspacesProperties: '{{ item.StandbyWorkspacesProperties }}'
+        State: '{{ item.State }}'
+        SubnetId: '{{ item.SubnetId }}'
+        UserName: '{{ item.UserName }}'
+        UserVolumeEncryptionEnabled: '{{ item.UserVolumeEncryptionEnabled }}'
+        VolumeEncryptionKey: '{{ item.VolumeEncryptionKey }}'
+        WorkspaceId: '{{ item.WorkspaceId }}'
+        WorkspaceName: '{{ item.WorkspaceName }}'
+        WorkspaceProperties: '{{ item.WorkspaceProperties }}'
+        Workspaces: '{{ item.Workspaces }}'
+      items_for: '{{ response.Workspaces }}'
+  - calls:
+    - action: describe_workspaces_pools
+      on_error: continue
+      save_as: response
+    discovery_id: aws.workspaces.describe_workspaces_pools
+    emit:
+      as: item
+      item:
+        ApplicationSettings: '{{ item.ApplicationSettings }}'
+        BundleId: '{{ item.BundleId }}'
+        CapacityStatus: '{{ item.CapacityStatus }}'
+        CreatedAt: '{{ item.CreatedAt }}'
+        Description: '{{ item.Description }}'
+        DirectoryId: '{{ item.DirectoryId }}'
+        Errors: '{{ item.Errors }}'
+        PoolArn: '{{ item.PoolArn }}'
+        PoolId: '{{ item.PoolId }}'
+        PoolName: '{{ item.PoolName }}'
+        RunningMode: '{{ item.RunningMode }}'
+        State: '{{ item.State }}'
+        TimeoutSettings: '{{ item.TimeoutSettings }}'
+        WorkspacesPools: '{{ item.WorkspacesPools }}'
+      items_for: '{{ response.WorkspacesPools }}'
+  - calls:
+    - action: describe_workspace_directories
+      on_error: continue
+      save_as: response
+    discovery_id: aws.workspaces.describe_workspace_directories
+    emit:
+      as: item
+      item:
+        ActiveDirectoryConfig: '{{ item.ActiveDirectoryConfig }}'
+        Alias: '{{ item.Alias }}'
+        CertificateBasedAuthProperties: '{{ item.CertificateBasedAuthProperties }}'
+        CustomerUserName: '{{ item.CustomerUserName }}'
+        Directories: '{{ item.Directories }}'
+        DirectoryId: '{{ item.DirectoryId }}'
+        DirectoryName: '{{ item.DirectoryName }}'
+        DirectoryType: '{{ item.DirectoryType }}'
+        DnsIpAddresses: '{{ item.DnsIpAddresses }}'
+        DnsIpv6Addresses: '{{ item.DnsIpv6Addresses }}'
+        EndpointEncryptionMode: '{{ item.EndpointEncryptionMode }}'
+        ErrorMessage: '{{ item.ErrorMessage }}'
+        IDCConfig: '{{ item.IDCConfig }}'
+        IamRoleId: '{{ item.IamRoleId }}'
+        MicrosoftEntraConfig: '{{ item.MicrosoftEntraConfig }}'
+        RegistrationCode: '{{ item.RegistrationCode }}'
+        SamlProperties: '{{ item.SamlProperties }}'
+        SelfservicePermissions: '{{ item.SelfservicePermissions }}'
+        State: '{{ item.State }}'
+        StreamingProperties: '{{ item.StreamingProperties }}'
+        SubnetIds: '{{ item.SubnetIds }}'
+        Tenancy: '{{ item.Tenancy }}'
+        UserIdentityType: '{{ item.UserIdentityType }}'
+        WorkspaceAccessProperties: '{{ item.WorkspaceAccessProperties }}'
+        WorkspaceCreationProperties: '{{ item.WorkspaceCreationProperties }}'
+        WorkspaceDirectoryDescription: '{{ item.WorkspaceDirectoryDescription }}'
+        WorkspaceDirectoryName: '{{ item.WorkspaceDirectoryName }}'
+        WorkspaceSecurityGroupId: '{{ item.WorkspaceSecurityGroupId }}'
+        WorkspaceType: '{{ item.WorkspaceType }}'
+        ipGroupIds: '{{ item.ipGroupIds }}'
+      items_for: '{{ response.Directories }}'

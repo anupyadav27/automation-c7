@@ -1,0 +1,54 @@
+# ============================================================
+# Discovery YAML — cur (AWS)
+# Generated: 2026-02-21T04:56:57Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: cur
+services:
+  client: cur
+  module: boto3.client
+discovery:
+  # ── DescribeReportDefinitions ──
+  - discovery_id: aws.cur.describe_report_definitions
+    calls:
+      - action: describe_report_definitions
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.ReportDefinitions }}'
+      item:
+        AdditionalArtifacts: '{{ item.AdditionalArtifacts }}'
+        AdditionalSchemaElements: '{{ item.AdditionalSchemaElements }}'
+        BillingViewArn: '{{ item.BillingViewArn }}'
+        Compression: '{{ item.Compression }}'
+        Format: '{{ item.Format }}'
+        Key: '{{ item.Key }}'
+        RefreshClosedReports: '{{ item.RefreshClosedReports }}'
+        ReportDefinitions: '{{ item.ReportDefinitions }}'
+        ReportName: '{{ item.ReportName }}'
+        ReportStatus: '{{ item.ReportStatus }}'
+        ReportVersioning: '{{ item.ReportVersioning }}'
+        S3Bucket: '{{ item.S3Bucket }}'
+        S3Prefix: '{{ item.S3Prefix }}'
+        S3Region: '{{ item.S3Region }}'
+        TimeUnit: '{{ item.TimeUnit }}'
+        Value: '{{ item.Value }}'
+  # ── Dependent read operations (require identifiers) ──
+  # ── ListTagsForResource ──
+  - discovery_id: aws.cur.list_tags_for_resource
+    for_each: aws.cur.describe_report_definitions
+    calls:
+      - action: list_tags_for_resource
+        params:
+          ReportName: '{{ item.ReportName }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Tags }}'
+      item:
+        Key: '{{ item.Key }}'
+        Value: '{{ item.Value }}'

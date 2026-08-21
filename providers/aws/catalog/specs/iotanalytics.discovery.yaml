@@ -1,0 +1,237 @@
+version: '1.0'
+provider: aws
+service: iotanalytics
+services:
+  client: iotanalytics
+  module: boto3.client
+discovery:
+- discovery_id: aws.iotanalytics.describe_logging_options
+  calls:
+  - action: describe_logging_options
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      enabled: '{{ response.loggingOptions.enabled }}'
+      level: '{{ response.loggingOptions.level }}'
+      loggingOptions: '{{ response.loggingOptions.loggingOptions }}'
+      roleArn: '{{ response.loggingOptions.roleArn }}'
+- discovery_id: aws.iotanalytics.list_channels
+  calls:
+  - action: list_channels
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.channelSummaries }}'
+    item:
+      channel: '{{ item.channel }}'
+      channelName: '{{ item.channelName }}'
+      channelStorage: '{{ item.channelStorage }}'
+      creationTime: '{{ item.creationTime }}'
+      lastMessageArrivalTime: '{{ item.lastMessageArrivalTime }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      name: '{{ item.name }}'
+      statistics: '{{ item.statistics }}'
+      status: '{{ item.status }}'
+      storage: '{{ item.storage }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotanalytics.list_datasets
+  calls:
+  - action: list_datasets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.datasetSummaries }}'
+    item:
+      actions: '{{ item.actions }}'
+      creationTime: '{{ item.creationTime }}'
+      dataset: '{{ item.dataset }}'
+      datasetName: '{{ item.datasetName }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      status: '{{ item.status }}'
+      triggers: '{{ item.triggers }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotanalytics.list_datastores
+  calls:
+  - action: list_datastores
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.datastoreSummaries }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      datastore: '{{ item.datastore }}'
+      datastoreName: '{{ item.datastoreName }}'
+      datastorePartitions: '{{ item.datastorePartitions }}'
+      datastoreStorage: '{{ item.datastoreStorage }}'
+      fileFormatType: '{{ item.fileFormatType }}'
+      lastMessageArrivalTime: '{{ item.lastMessageArrivalTime }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotanalytics.list_pipelines
+  calls:
+  - action: list_pipelines
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.pipelineSummaries }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      pipeline: '{{ item.pipeline }}'
+      pipelineName: '{{ item.pipelineName }}'
+      reprocessingSummaries: '{{ item.reprocessingSummaries }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotanalytics.describe_channel
+  calls:
+  - action: describe_channel
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.channel.arn }}'
+      channel: '{{ response.channel.channel }}'
+      creationTime: '{{ response.channel.creationTime }}'
+      lastMessageArrivalTime: '{{ response.channel.lastMessageArrivalTime }}'
+      lastUpdateTime: '{{ response.channel.lastUpdateTime }}'
+      retentionPeriod: '{{ response.channel.retentionPeriod }}'
+      statistics: '{{ response.channel.statistics }}'
+      status: '{{ response.channel.status }}'
+      name: '{{ response.channel.name }}'
+      numberOfDays: '{{ response.channel.retentionPeriod.numberOfDays }}'
+      unlimited: '{{ response.channel.retentionPeriod.unlimited }}'
+      bucket: '{{ response.channel.storage.customerManagedS3.bucket }}'
+      keyPrefix: '{{ response.channel.storage.customerManagedS3.keyPrefix }}'
+      roleArn: '{{ response.channel.storage.customerManagedS3.roleArn }}'
+      estimatedOn: '{{ response.statistics.size.estimatedOn }}'
+      estimatedSizeInBytes: '{{ response.statistics.size.estimatedSizeInBytes }}'
+- discovery_id: aws.iotanalytics.describe_dataset
+  for_each: aws.iotanalytics.list_datasets
+  calls:
+  - action: describe_dataset
+    params:
+      datasetName: '{{ item.datasetName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.dataset.status }}'
+      Enabled: '{{ response.dataset.Enabled }}'
+      actions: '{{ response.dataset.actions }}'
+      arn: '{{ response.dataset.arn }}'
+      contentDeliveryRules: '{{ response.dataset.contentDeliveryRules }}'
+      creationTime: '{{ response.dataset.creationTime }}'
+      dataset: '{{ response.dataset.dataset }}'
+      lastUpdateTime: '{{ response.dataset.lastUpdateTime }}'
+      lateDataRules: '{{ response.dataset.lateDataRules }}'
+      name: '{{ response.dataset.name }}'
+      retentionPeriod: '{{ response.dataset.retentionPeriod }}'
+      status: '{{ response.dataset.status }}'
+      triggers: '{{ response.dataset.triggers }}'
+      versioningConfiguration: '{{ response.dataset.versioningConfiguration.unlimited }}'
+      numberOfDays: '{{ response.dataset.retentionPeriod.numberOfDays }}'
+      unlimited: '{{ response.dataset.retentionPeriod.unlimited }}'
+      maxVersions: '{{ response.dataset.versioningConfiguration.maxVersions }}'
+- discovery_id: aws.iotanalytics.describe_datastore
+  for_each: aws.iotanalytics.list_datastores
+  calls:
+  - action: describe_datastore
+    params:
+      datastoreName: '{{ item.datastoreName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.datastore.arn }}'
+      creationTime: '{{ response.datastore.creationTime }}'
+      datastore: '{{ response.datastore.datastore }}'
+      datastorePartitions: '{{ response.datastore.datastorePartitions }}'
+      fileFormatConfiguration: '{{ response.datastore.fileFormatConfiguration }}'
+      lastMessageArrivalTime: '{{ response.datastore.lastMessageArrivalTime }}'
+      lastUpdateTime: '{{ response.datastore.lastUpdateTime }}'
+      name: '{{ response.datastore.name }}'
+      retentionPeriod: '{{ response.datastore.retentionPeriod }}'
+      status: '{{ response.datastore.status }}'
+      storage: '{{ response.datastore.storage }}'
+      numberOfDays: '{{ response.datastore.retentionPeriod.numberOfDays }}'
+      unlimited: '{{ response.datastore.retentionPeriod.unlimited }}'
+      bucket: '{{ response.datastore.storage.customerManagedS3.bucket }}'
+      keyPrefix: '{{ response.datastore.storage.customerManagedS3.keyPrefix }}'
+      roleArn: '{{ response.datastore.storage.customerManagedS3.roleArn }}'
+      estimatedOn: '{{ response.statistics.size.estimatedOn }}'
+      estimatedSizeInBytes: '{{ response.statistics.size.estimatedSizeInBytes }}'
+- discovery_id: aws.iotanalytics.describe_pipeline
+  for_each: aws.iotanalytics.list_pipelines
+  calls:
+  - action: describe_pipeline
+    params:
+      pipelineName: '{{ item.pipelineName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      activities: '{{ response.pipeline.activities }}'
+      arn: '{{ response.pipeline.arn }}'
+      creationTime: '{{ response.pipeline.creationTime }}'
+      lastUpdateTime: '{{ response.pipeline.lastUpdateTime }}'
+      name: '{{ response.pipeline.name }}'
+      pipeline: '{{ response.pipeline.pipeline }}'
+      reprocessingSummaries: '{{ response.pipeline.reprocessingSummaries[].id }}'
+- discovery_id: aws.iotanalytics.get_dataset_content
+  for_each: aws.iotanalytics.list_datasets
+  calls:
+  - action: get_dataset_content
+    params:
+      datasetName: '{{ item.datasetName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.entries }}'
+    item:
+      dataURI: '{{ item.dataURI }}'
+      entries: '{{ item.entries }}'
+      entryName: '{{ item.entryName }}'
+      reason: '{{ response.status.reason }}'
+      state: '{{ response.status.state }}'
+      timestamp: '{{ response.timestamp }}'
+- discovery_id: aws.iotanalytics.list_dataset_contents
+  for_each: aws.iotanalytics.list_datasets
+  calls:
+  - action: list_dataset_contents
+    params:
+      datasetName: '{{ item.datasetName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.datasetContentSummaries }}'
+    item:
+      completionTime: '{{ item.completionTime }}'
+      creationTime: '{{ item.creationTime }}'
+      entries: '{{ item.entries }}'
+      scheduleTime: '{{ item.scheduleTime }}'
+      status: '{{ item.status }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotanalytics.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'

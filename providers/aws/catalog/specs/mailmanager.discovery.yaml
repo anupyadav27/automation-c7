@@ -1,0 +1,488 @@
+version: '1.0'
+provider: aws
+service: mailmanager
+services:
+  client: mailmanager
+  module: boto3.client
+discovery:
+- discovery_id: aws.mailmanager.list_addon_instances
+  calls:
+  - action: list_addon_instances
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AddonInstances }}'
+    item:
+      AddonInstanceArn: '{{ item.AddonInstanceArn }}'
+      AddonInstanceId: '{{ item.AddonInstanceId }}'
+      AddonName: '{{ item.AddonName }}'
+      AddonSubscriptionId: '{{ item.AddonSubscriptionId }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+- discovery_id: aws.mailmanager.list_addon_subscriptions
+  calls:
+  - action: list_addon_subscriptions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AddonSubscriptions }}'
+    item:
+      AddonName: '{{ item.AddonName }}'
+      AddonSubscriptionArn: '{{ item.AddonSubscriptionArn }}'
+      AddonSubscriptionId: '{{ item.AddonSubscriptionId }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+- discovery_id: aws.mailmanager.list_address_lists
+  calls:
+  - action: list_address_lists
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AddressLists }}'
+    item:
+      AddressListArn: '{{ item.AddressListArn }}'
+      AddressListId: '{{ item.AddressListId }}'
+      AddressListName: '{{ item.AddressListName }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+- discovery_id: aws.mailmanager.list_archives
+  calls:
+  - action: list_archives
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Archives }}'
+    item:
+      ArchiveId: '{{ item.ArchiveId }}'
+      ArchiveName: '{{ item.ArchiveName }}'
+      ArchiveState: '{{ item.ArchiveState }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+      Retention: '{{ item.Retention }}'
+- discovery_id: aws.mailmanager.list_ingress_points
+  calls:
+  - action: list_ingress_points
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.IngressPoints }}'
+    item:
+      Status: '{{ item.Status }}'
+      ARecord: '{{ item.ARecord }}'
+      IngressPointId: '{{ item.IngressPointId }}'
+      IngressPointName: '{{ item.IngressPointName }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.mailmanager.list_relays
+  calls:
+  - action: list_relays
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Relays }}'
+    item:
+      Authentication: '{{ item.Authentication }}'
+      LastModifiedTimestamp: '{{ item.LastModifiedTimestamp }}'
+      RelayId: '{{ item.RelayId }}'
+      RelayName: '{{ item.RelayName }}'
+- discovery_id: aws.mailmanager.list_rule_sets
+  calls:
+  - action: list_rule_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RuleSets }}'
+    item:
+      LastModificationDate: '{{ item.LastModificationDate }}'
+      RuleSetId: '{{ item.RuleSetId }}'
+      RuleSetName: '{{ item.RuleSetName }}'
+- discovery_id: aws.mailmanager.list_traffic_policies
+  calls:
+  - action: list_traffic_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TrafficPolicies }}'
+    item:
+      DefaultAction: '{{ item.DefaultAction }}'
+      Statement: '{{ item.Statement }}'
+      TrafficPolicyId: '{{ item.TrafficPolicyId }}'
+      TrafficPolicyName: '{{ item.TrafficPolicyName }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.mailmanager.get_addon_instance
+  for_each: aws.mailmanager.list_addon_instances
+  calls:
+  - action: get_addon_instance
+    params:
+      AddonInstanceId: '{{ item.AddonInstanceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AddonInstanceArn: '{{ response.AddonInstanceArn }}'
+      AddonName: '{{ response.AddonName }}'
+      AddonSubscriptionId: '{{ response.AddonSubscriptionId }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+- discovery_id: aws.mailmanager.get_addon_subscription
+  for_each: aws.mailmanager.list_addon_instances
+  calls:
+  - action: get_addon_subscription
+    params:
+      AddonSubscriptionId: '{{ item.AddonSubscriptionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AddonName: '{{ response.AddonName }}'
+      AddonSubscriptionArn: '{{ response.AddonSubscriptionArn }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+- discovery_id: aws.mailmanager.get_address_list
+  for_each: aws.mailmanager.list_address_lists
+  calls:
+  - action: get_address_list
+    params:
+      AddressListId: '{{ item.AddressListId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AddressListArn: '{{ response.AddressListArn }}'
+      AddressListId: '{{ response.AddressListId }}'
+      AddressListName: '{{ response.AddressListName }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+- discovery_id: aws.mailmanager.get_address_list_import_job
+  calls:
+  - action: get_address_list_import_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ImportDataType: '{{ response.ImportDataFormat.ImportDataType }}'
+      AddressListId: '{{ response.AddressListId }}'
+      CompletedTimestamp: '{{ response.CompletedTimestamp }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+      Error: '{{ response.Error }}'
+      FailedItemsCount: '{{ response.FailedItemsCount }}'
+      ImportedItemsCount: '{{ response.ImportedItemsCount }}'
+      JobId: '{{ response.JobId }}'
+      Name: '{{ response.Name }}'
+      PreSignedUrl: '{{ response.PreSignedUrl }}'
+      StartTimestamp: '{{ response.StartTimestamp }}'
+      Status: '{{ response.Status }}'
+- discovery_id: aws.mailmanager.get_archive
+  for_each: aws.mailmanager.list_archives
+  calls:
+  - action: get_archive
+    params:
+      ArchiveId: '{{ item.ArchiveId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      RetentionPeriod: '{{ response.Retention.RetentionPeriod }}'
+      Retention: '{{ response.Retention.RetentionPeriod }}'
+      ArchiveArn: '{{ response.ArchiveArn }}'
+      ArchiveId: '{{ response.ArchiveId }}'
+      ArchiveName: '{{ response.ArchiveName }}'
+      ArchiveState: '{{ response.ArchiveState }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+      KmsKeyArn: '{{ response.KmsKeyArn }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+- discovery_id: aws.mailmanager.get_archive_export
+  calls:
+  - action: get_archive_export
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Enabled: '{{ response.Filters.Enabled }}'
+      Filters: '{{ response.Filters.Filters }}'
+      Include: '{{ response.Filters.Include }}'
+      Unless: '{{ response.Filters.Unless }}'
+      ArchiveId: '{{ response.ArchiveId }}'
+      S3Location: '{{ response.ExportDestinationConfiguration.S3.S3Location }}'
+      FromTimestamp: '{{ response.FromTimestamp }}'
+      MaxResults: '{{ response.MaxResults }}'
+      CompletionTimestamp: '{{ response.Status.CompletionTimestamp }}'
+      ErrorMessage: '{{ response.Status.ErrorMessage }}'
+      State: '{{ response.Status.State }}'
+      SubmissionTimestamp: '{{ response.Status.SubmissionTimestamp }}'
+      ToTimestamp: '{{ response.ToTimestamp }}'
+- discovery_id: aws.mailmanager.get_archive_message
+  calls:
+  - action: get_archive_message
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ConfigurationSet: '{{ response.Metadata.ConfigurationSet }}'
+      IngressPointId: '{{ response.Metadata.IngressPointId }}'
+      Metadata: '{{ response.Metadata.Metadata }}'
+      RuleSetId: '{{ response.Metadata.RuleSetId }}'
+      SenderHostname: '{{ response.Metadata.SenderHostname }}'
+      SenderIpAddress: '{{ response.Metadata.SenderIpAddress }}'
+      SendingMethod: '{{ response.Metadata.SendingMethod }}'
+      SendingPool: '{{ response.Metadata.SendingPool }}'
+      SourceArn: '{{ response.Metadata.SourceArn }}'
+      SourceIdentity: '{{ response.Metadata.SourceIdentity }}'
+      Timestamp: '{{ response.Metadata.Timestamp }}'
+      TlsCipherSuite: '{{ response.Metadata.TlsCipherSuite }}'
+      TlsProtocol: '{{ response.Metadata.TlsProtocol }}'
+      TrafficPolicyId: '{{ response.Metadata.TrafficPolicyId }}'
+      From: '{{ response.Envelope.From }}'
+      Helo: '{{ response.Envelope.Helo }}'
+      MessageDownloadLink: '{{ response.MessageDownloadLink }}'
+- discovery_id: aws.mailmanager.get_archive_message_content
+  calls:
+  - action: get_archive_message_content
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Body: '{{ response.Body.Body }}'
+      Html: '{{ response.Body.Html }}'
+      MessageMalformed: '{{ response.Body.MessageMalformed }}'
+      Text: '{{ response.Body.Text }}'
+- discovery_id: aws.mailmanager.get_archive_search
+  calls:
+  - action: get_archive_search
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Include: '{{ response.Filters.Include }}'
+      Unless: '{{ response.Filters.Unless }}'
+      ArchiveId: '{{ response.ArchiveId }}'
+      FromTimestamp: '{{ response.FromTimestamp }}'
+      MaxResults: '{{ response.MaxResults }}'
+      CompletionTimestamp: '{{ response.Status.CompletionTimestamp }}'
+      ErrorMessage: '{{ response.Status.ErrorMessage }}'
+      State: '{{ response.Status.State }}'
+      SubmissionTimestamp: '{{ response.Status.SubmissionTimestamp }}'
+      ToTimestamp: '{{ response.ToTimestamp }}'
+- discovery_id: aws.mailmanager.get_archive_search_results
+  calls:
+  - action: get_archive_search_results
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Rows }}'
+    item:
+      ArchivedMessageId: '{{ item.ArchivedMessageId }}'
+      Cc: '{{ item.Cc }}'
+      Date: '{{ item.Date }}'
+      Envelope: '{{ item.Envelope }}'
+      From: '{{ item.From }}'
+      HasAttachments: '{{ item.HasAttachments }}'
+      InReplyTo: '{{ item.InReplyTo }}'
+      IngressPointId: '{{ item.IngressPointId }}'
+      MessageId: '{{ item.MessageId }}'
+      ReceivedHeaders: '{{ item.ReceivedHeaders }}'
+      ReceivedTimestamp: '{{ item.ReceivedTimestamp }}'
+      Rows: '{{ item.Rows }}'
+      SenderHostname: '{{ item.SenderHostname }}'
+      SenderIpAddress: '{{ item.SenderIpAddress }}'
+      SourceArn: '{{ item.SourceArn }}'
+      Subject: '{{ item.Subject }}'
+      To: '{{ item.To }}'
+      XMailer: '{{ item.XMailer }}'
+      XOriginalMailer: '{{ item.XOriginalMailer }}'
+      XPriority: '{{ item.XPriority }}'
+- discovery_id: aws.mailmanager.get_ingress_point
+  for_each: aws.mailmanager.list_ingress_points
+  calls:
+  - action: get_ingress_point
+    params:
+      IngressPointId: '{{ item.IngressPointId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      IngressPointPasswordConfiguration: '{{ response.IngressPointAuthConfiguration.IngressPointPasswordConfiguration.SmtpPasswordVersion }}'
+      SecretArn: '{{ response.IngressPointAuthConfiguration.SecretArn }}'
+      ARecord: '{{ response.ARecord }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+      IngressPointArn: '{{ response.IngressPointArn }}'
+      PreviousSmtpPasswordExpiryTimestamp: '{{ response.IngressPointAuthConfiguration.IngressPointPasswordConfiguration.PreviousSmtpPasswordExpiryTimestamp }}'
+      PreviousSmtpPasswordVersion: '{{ response.IngressPointAuthConfiguration.IngressPointPasswordConfiguration.PreviousSmtpPasswordVersion }}'
+      SmtpPasswordVersion: '{{ response.IngressPointAuthConfiguration.IngressPointPasswordConfiguration.SmtpPasswordVersion }}'
+      IngressPointId: '{{ response.IngressPointId }}'
+      IngressPointName: '{{ response.IngressPointName }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+      VpcEndpointId: '{{ response.NetworkConfiguration.PrivateNetworkConfiguration.VpcEndpointId }}'
+      IpType: '{{ response.NetworkConfiguration.PublicNetworkConfiguration.IpType }}'
+      RuleSetId: '{{ response.RuleSetId }}'
+      Status: '{{ response.Status }}'
+      TrafficPolicyId: '{{ response.TrafficPolicyId }}'
+      Type: '{{ response.Type }}'
+- discovery_id: aws.mailmanager.get_member_of_address_list
+  for_each: aws.mailmanager.list_address_lists
+  calls:
+  - action: get_member_of_address_list
+    params:
+      AddressListId: '{{ item.AddressListId }}'
+      Address: '{{ item.Address }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Address: '{{ response.Address }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+- discovery_id: aws.mailmanager.get_relay
+  for_each: aws.mailmanager.list_relays
+  calls:
+  - action: get_relay
+    params:
+      RelayId: '{{ item.RelayId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Authentication: '{{ response.Authentication.Authentication }}'
+      NoAuthentication: '{{ response.Authentication.NoAuthentication }}'
+      SecretArn: '{{ response.Authentication.SecretArn }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+      LastModifiedTimestamp: '{{ response.LastModifiedTimestamp }}'
+      RelayArn: '{{ response.RelayArn }}'
+      RelayId: '{{ response.RelayId }}'
+      RelayName: '{{ response.RelayName }}'
+      ServerName: '{{ response.ServerName }}'
+      ServerPort: '{{ response.ServerPort }}'
+- discovery_id: aws.mailmanager.get_rule_set
+  for_each: aws.mailmanager.list_rule_sets
+  calls:
+  - action: get_rule_set
+    params:
+      RuleSetId: '{{ item.RuleSetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Rules }}'
+    item:
+      Name: '{{ item.Name }}'
+      Actions: '{{ item.Actions }}'
+      Conditions: '{{ item.Conditions }}'
+      Unless: '{{ item.Unless }}'
+      CreatedDate: '{{ response.CreatedDate }}'
+      LastModificationDate: '{{ response.LastModificationDate }}'
+      RuleSetArn: '{{ response.RuleSetArn }}'
+      RuleSetId: '{{ response.RuleSetId }}'
+      RuleSetName: '{{ response.RuleSetName }}'
+- discovery_id: aws.mailmanager.get_traffic_policy
+  for_each: aws.mailmanager.list_traffic_policies
+  calls:
+  - action: get_traffic_policy
+    params:
+      TrafficPolicyId: '{{ item.TrafficPolicyId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PolicyStatements }}'
+    item:
+      Action: '{{ item.Action }}'
+      Conditions: '{{ item.Conditions }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+      DefaultAction: '{{ response.DefaultAction }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+      MaxMessageSizeBytes: '{{ response.MaxMessageSizeBytes }}'
+      TrafficPolicyArn: '{{ response.TrafficPolicyArn }}'
+      TrafficPolicyId: '{{ response.TrafficPolicyId }}'
+      TrafficPolicyName: '{{ response.TrafficPolicyName }}'
+- discovery_id: aws.mailmanager.list_address_list_import_jobs
+  for_each: aws.mailmanager.list_address_lists
+  calls:
+  - action: list_address_list_import_jobs
+    params:
+      AddressListId: '{{ item.AddressListId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ImportJobs }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      AddressListId: '{{ item.AddressListId }}'
+      CompletedTimestamp: '{{ item.CompletedTimestamp }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      Error: '{{ item.Error }}'
+      FailedItemsCount: '{{ item.FailedItemsCount }}'
+      ImportDataFormat: '{{ item.ImportDataFormat }}'
+      ImportedItemsCount: '{{ item.ImportedItemsCount }}'
+      JobId: '{{ item.JobId }}'
+      PreSignedUrl: '{{ item.PreSignedUrl }}'
+      StartTimestamp: '{{ item.StartTimestamp }}'
+- discovery_id: aws.mailmanager.list_archive_exports
+  for_each: aws.mailmanager.list_archives
+  calls:
+  - action: list_archive_exports
+    params:
+      ArchiveId: '{{ item.ArchiveId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Exports }}'
+    item:
+      Status: '{{ item.Status }}'
+      ExportId: '{{ item.ExportId }}'
+      Filters: '{{ item.Filters }}'
+- discovery_id: aws.mailmanager.list_archive_searches
+  for_each: aws.mailmanager.list_archives
+  calls:
+  - action: list_archive_searches
+    params:
+      ArchiveId: '{{ item.ArchiveId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Searches }}'
+    item:
+      Status: '{{ item.Status }}'
+      SearchId: '{{ item.SearchId }}'
+- discovery_id: aws.mailmanager.list_members_of_address_list
+  for_each: aws.mailmanager.list_address_lists
+  calls:
+  - action: list_members_of_address_list
+    params:
+      AddressListId: '{{ item.AddressListId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Addresses }}'
+    item:
+      Address: '{{ item.Address }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+- discovery_id: aws.mailmanager.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

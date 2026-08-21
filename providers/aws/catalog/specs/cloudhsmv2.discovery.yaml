@@ -1,0 +1,89 @@
+# ============================================================
+# Discovery YAML — cloudhsmv2 (AWS)
+# Generated: 2026-02-21T04:56:57Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: cloudhsmv2
+services:
+  client: cloudhsmv2
+  module: boto3.client
+discovery:
+  # ── DescribeBackups ──
+  - discovery_id: aws.cloudhsmv2.describe_backups
+    calls:
+      - action: describe_backups
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Backups }}'
+      item:
+        BackupArn: '{{ item.BackupArn }}'
+        BackupId: '{{ item.BackupId }}'
+        BackupState: '{{ item.BackupState }}'
+        Backups: '{{ item.Backups }}'
+        ClusterId: '{{ item.ClusterId }}'
+        CopyTimestamp: '{{ item.CopyTimestamp }}'
+        CreateTimestamp: '{{ item.CreateTimestamp }}'
+        DeleteTimestamp: '{{ item.DeleteTimestamp }}'
+        HsmType: '{{ item.HsmType }}'
+        Mode: '{{ item.Mode }}'
+        NeverExpires: '{{ item.NeverExpires }}'
+        SourceBackup: '{{ item.SourceBackup }}'
+        SourceCluster: '{{ item.SourceCluster }}'
+        SourceRegion: '{{ item.SourceRegion }}'
+        TagList: '{{ item.TagList }}'
+  # ── DescribeClusters ──
+  - discovery_id: aws.cloudhsmv2.describe_clusters
+    calls:
+      - action: describe_clusters
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Clusters }}'
+      item:
+        State: '{{ item.State }}'
+        VpcId: '{{ item.VpcId }}'
+        BackupPolicy: '{{ item.BackupPolicy }}'
+        BackupRetentionPolicy: '{{ item.BackupRetentionPolicy }}'
+        Certificates: '{{ item.Certificates }}'
+        ClusterId: '{{ item.ClusterId }}'
+        Clusters: '{{ item.Clusters }}'
+        CreateTimestamp: '{{ item.CreateTimestamp }}'
+        HsmType: '{{ item.HsmType }}'
+        HsmTypeRollbackExpiration: '{{ item.HsmTypeRollbackExpiration }}'
+        Hsms: '{{ item.Hsms }}'
+        Mode: '{{ item.Mode }}'
+        NetworkType: '{{ item.NetworkType }}'
+        PreCoPassword: '{{ item.PreCoPassword }}'
+        SecurityGroup: '{{ item.SecurityGroup }}'
+        SourceBackupId: '{{ item.SourceBackupId }}'
+        StateMessage: '{{ item.StateMessage }}'
+        SubnetMapping: '{{ item.SubnetMapping }}'
+        TagList: '{{ item.TagList }}'
+  # ── GetResourcePolicy ──
+  - discovery_id: aws.cloudhsmv2.get_resource_policy
+    calls:
+      - action: get_resource_policy
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Policy: '{{ response.Policy }}'
+  # ── Dependent read operations (require identifiers) ──
+  # ── ListTags ──
+  - discovery_id: aws.cloudhsmv2.list_tags
+    calls:
+      - action: list_tags
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.TagList }}'
+      item:
+        Key: '{{ item.Key }}'
+        Value: '{{ item.Value }}'

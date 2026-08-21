@@ -1,0 +1,474 @@
+# ============================================================
+# Discovery YAML — s3control (AWS)
+# Generated: 2026-02-21T04:56:59Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: s3control
+services:
+  client: s3control
+  module: boto3.client
+discovery:
+  # ── Dependent read operations (require identifiers) ──
+  # ── DescribeJob ──
+  - discovery_id: aws.s3control.describe_job
+    calls:
+      - action: describe_job
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Job: '{{ response.Job }}'
+  # ── DescribeMultiRegionAccessPointOperation ──
+  - discovery_id: aws.s3control.describe_multi_region_access_point_operation
+    calls:
+      - action: describe_multi_region_access_point_operation
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        AsyncOperation: '{{ response.AsyncOperation }}'
+  # ── GetAccessGrant ──
+  - discovery_id: aws.s3control.get_access_grant
+    calls:
+      - action: get_access_grant
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        AccessGrantArn: '{{ response.AccessGrantArn }}'
+        AccessGrantId: '{{ response.AccessGrantId }}'
+        AccessGrantsLocationConfiguration: '{{ response.AccessGrantsLocationConfiguration }}'
+        AccessGrantsLocationId: '{{ response.AccessGrantsLocationId }}'
+        ApplicationArn: '{{ response.ApplicationArn }}'
+        CreatedAt: '{{ response.CreatedAt }}'
+        GrantScope: '{{ response.GrantScope }}'
+        Grantee: '{{ response.Grantee }}'
+        Permission: '{{ response.Permission }}'
+  # ── GetAccessGrantsInstance ──
+  - discovery_id: aws.s3control.get_access_grants_instance
+    calls:
+      - action: get_access_grants_instance
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        AccessGrantsInstanceArn: '{{ response.AccessGrantsInstanceArn }}'
+        AccessGrantsInstanceId: '{{ response.AccessGrantsInstanceId }}'
+        CreatedAt: '{{ response.CreatedAt }}'
+        IdentityCenterApplicationArn: '{{ response.IdentityCenterApplicationArn }}'
+        IdentityCenterArn: '{{ response.IdentityCenterArn }}'
+        IdentityCenterInstanceArn: '{{ response.IdentityCenterInstanceArn }}'
+  # ── GetAccessGrantsInstanceForPrefix ──
+  - discovery_id: aws.s3control.get_access_grants_instance_for_prefix
+    calls:
+      - action: get_access_grants_instance_for_prefix
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        AccessGrantsInstanceArn: '{{ response.AccessGrantsInstanceArn }}'
+        AccessGrantsInstanceId: '{{ response.AccessGrantsInstanceId }}'
+  # ── GetAccessGrantsInstanceResourcePolicy ──
+  - discovery_id: aws.s3control.get_access_grants_instance_resource_policy
+    calls:
+      - action: get_access_grants_instance_resource_policy
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Policy: '{{ response.Policy }}'
+        CreatedAt: '{{ response.CreatedAt }}'
+        Organization: '{{ response.Organization }}'
+  # ── GetAccessGrantsLocation ──
+  - discovery_id: aws.s3control.get_access_grants_location
+    calls:
+      - action: get_access_grants_location
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        AccessGrantsLocationArn: '{{ response.AccessGrantsLocationArn }}'
+        AccessGrantsLocationId: '{{ response.AccessGrantsLocationId }}'
+        CreatedAt: '{{ response.CreatedAt }}'
+        IAMRoleArn: '{{ response.IAMRoleArn }}'
+        LocationScope: '{{ response.LocationScope }}'
+  # ── GetAccessPoint ──
+  - discovery_id: aws.s3control.get_access_point
+    calls:
+      - action: get_access_point
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        CreationDate: '{{ response.CreationDate }}'
+        Name: '{{ response.Name }}'
+        AccessPointArn: '{{ response.AccessPointArn }}'
+        Alias: '{{ response.Alias }}'
+        Bucket: '{{ response.Bucket }}'
+        BucketAccountId: '{{ response.BucketAccountId }}'
+        DataSourceId: '{{ response.DataSourceId }}'
+        DataSourceType: '{{ response.DataSourceType }}'
+        Endpoints: '{{ response.Endpoints }}'
+        NetworkOrigin: '{{ response.NetworkOrigin }}'
+        PublicAccessBlockConfiguration: '{{ response.PublicAccessBlockConfiguration }}'
+        VpcConfiguration: '{{ response.VpcConfiguration }}'
+  # ── GetAccessPointConfigurationForObjectLambda ──
+  - discovery_id: aws.s3control.get_access_point_configuration_for_object_lambda
+    calls:
+      - action: get_access_point_configuration_for_object_lambda
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Configuration: '{{ response.Configuration }}'
+  # ── GetAccessPointForObjectLambda ──
+  - discovery_id: aws.s3control.get_access_point_for_object_lambda
+    calls:
+      - action: get_access_point_for_object_lambda
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        CreationDate: '{{ response.CreationDate }}'
+        Name: '{{ response.Name }}'
+        Alias: '{{ response.Alias }}'
+        PublicAccessBlockConfiguration: '{{ response.PublicAccessBlockConfiguration }}'
+  # ── GetAccessPointPolicy ──
+  - discovery_id: aws.s3control.get_access_point_policy
+    calls:
+      - action: get_access_point_policy
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Policy: '{{ response.Policy }}'
+  # ── GetAccessPointPolicyForObjectLambda ──
+  - discovery_id: aws.s3control.get_access_point_policy_for_object_lambda
+    calls:
+      - action: get_access_point_policy_for_object_lambda
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Policy: '{{ response.Policy }}'
+  # ── GetAccessPointPolicyStatus ──
+  - discovery_id: aws.s3control.get_access_point_policy_status
+    calls:
+      - action: get_access_point_policy_status
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        PolicyStatus: '{{ response.PolicyStatus }}'
+  # ── GetAccessPointPolicyStatusForObjectLambda ──
+  - discovery_id: aws.s3control.get_access_point_policy_status_for_object_lambda
+    calls:
+      - action: get_access_point_policy_status_for_object_lambda
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        PolicyStatus: '{{ response.PolicyStatus }}'
+  # ── GetAccessPointScope ──
+  - discovery_id: aws.s3control.get_access_point_scope
+    calls:
+      - action: get_access_point_scope
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Scope: '{{ response.Scope }}'
+  # ── GetBucket ──
+  - discovery_id: aws.s3control.get_bucket
+    calls:
+      - action: get_bucket
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        CreationDate: '{{ response.CreationDate }}'
+        Bucket: '{{ response.Bucket }}'
+        PublicAccessBlockEnabled: '{{ response.PublicAccessBlockEnabled }}'
+  # ── GetBucketLifecycleConfiguration ──
+  - discovery_id: aws.s3control.get_bucket_lifecycle_configuration
+    calls:
+      - action: get_bucket_lifecycle_configuration
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Rules }}'
+  # ── GetBucketPolicy ──
+  - discovery_id: aws.s3control.get_bucket_policy
+    calls:
+      - action: get_bucket_policy
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Policy: '{{ response.Policy }}'
+  # ── GetBucketReplication ──
+  - discovery_id: aws.s3control.get_bucket_replication
+    calls:
+      - action: get_bucket_replication
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ReplicationConfiguration: '{{ response.ReplicationConfiguration }}'
+  # ── GetBucketTagging ──
+  - discovery_id: aws.s3control.get_bucket_tagging
+    calls:
+      - action: get_bucket_tagging
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.TagSet }}'
+  # ── GetBucketVersioning ──
+  - discovery_id: aws.s3control.get_bucket_versioning
+    calls:
+      - action: get_bucket_versioning
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Status: '{{ response.Status }}'
+        MFADelete: '{{ response.MFADelete }}'
+  # ── GetDataAccess ──
+  - discovery_id: aws.s3control.get_data_access
+    calls:
+      - action: get_data_access
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Credentials: '{{ response.Credentials }}'
+        Grantee: '{{ response.Grantee }}'
+        MatchedGrantTarget: '{{ response.MatchedGrantTarget }}'
+  # ── GetJobTagging ──
+  - discovery_id: aws.s3control.get_job_tagging
+    calls:
+      - action: get_job_tagging
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Tags }}'
+  # ── GetMultiRegionAccessPoint ──
+  - discovery_id: aws.s3control.get_multi_region_access_point
+    calls:
+      - action: get_multi_region_access_point
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        AccessPoint: '{{ response.AccessPoint }}'
+  # ── GetMultiRegionAccessPointPolicy ──
+  - discovery_id: aws.s3control.get_multi_region_access_point_policy
+    calls:
+      - action: get_multi_region_access_point_policy
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Policy: '{{ response.Policy }}'
+  # ── GetMultiRegionAccessPointPolicyStatus ──
+  - discovery_id: aws.s3control.get_multi_region_access_point_policy_status
+    calls:
+      - action: get_multi_region_access_point_policy_status
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Established: '{{ response.Established }}'
+  # ── GetMultiRegionAccessPointRoutes ──
+  - discovery_id: aws.s3control.get_multi_region_access_point_routes
+    calls:
+      - action: get_multi_region_access_point_routes
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Routes }}'
+  # ── GetPublicAccessBlock ──
+  - discovery_id: aws.s3control.get_public_access_block
+    calls:
+      - action: get_public_access_block
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        PublicAccessBlockConfiguration: '{{ response.PublicAccessBlockConfiguration }}'
+  # ── GetStorageLensConfiguration ──
+  - discovery_id: aws.s3control.get_storage_lens_configuration
+    calls:
+      - action: get_storage_lens_configuration
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        StorageLensConfiguration: '{{ response.StorageLensConfiguration }}'
+  # ── GetStorageLensConfigurationTagging ──
+  - discovery_id: aws.s3control.get_storage_lens_configuration_tagging
+    calls:
+      - action: get_storage_lens_configuration_tagging
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Tags }}'
+  # ── GetStorageLensGroup ──
+  - discovery_id: aws.s3control.get_storage_lens_group
+    calls:
+      - action: get_storage_lens_group
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        StorageLensGroup: '{{ response.StorageLensGroup }}'
+  # ── ListAccessGrants ──
+  - discovery_id: aws.s3control.list_access_grants
+    calls:
+      - action: list_access_grants
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.AccessGrantsList }}'
+  # ── ListAccessGrantsInstances ──
+  - discovery_id: aws.s3control.list_access_grants_instances
+    calls:
+      - action: list_access_grants_instances
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.AccessGrantsInstancesList }}'
+  # ── ListAccessGrantsLocations ──
+  - discovery_id: aws.s3control.list_access_grants_locations
+    calls:
+      - action: list_access_grants_locations
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.AccessGrantsLocationsList }}'
+  # ── ListAccessPoints ──
+  - discovery_id: aws.s3control.list_access_points
+    calls:
+      - action: list_access_points
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.AccessPointList }}'
+  # ── ListAccessPointsForDirectoryBuckets ──
+  - discovery_id: aws.s3control.list_access_points_for_directory_buckets
+    calls:
+      - action: list_access_points_for_directory_buckets
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.AccessPointList }}'
+  # ── ListAccessPointsForObjectLambda ──
+  - discovery_id: aws.s3control.list_access_points_for_object_lambda
+    calls:
+      - action: list_access_points_for_object_lambda
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.ObjectLambdaAccessPointList }}'
+  # ── ListCallerAccessGrants ──
+  - discovery_id: aws.s3control.list_caller_access_grants
+    calls:
+      - action: list_caller_access_grants
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.CallerAccessGrantsList }}'
+  # ── ListJobs ──
+  - discovery_id: aws.s3control.list_jobs
+    calls:
+      - action: list_jobs
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Jobs }}'
+  # ── ListMultiRegionAccessPoints ──
+  - discovery_id: aws.s3control.list_multi_region_access_points
+    calls:
+      - action: list_multi_region_access_points
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.AccessPoints }}'
+  # ── ListRegionalBuckets ──
+  - discovery_id: aws.s3control.list_regional_buckets
+    calls:
+      - action: list_regional_buckets
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.RegionalBucketList }}'
+  # ── ListStorageLensConfigurations ──
+  - discovery_id: aws.s3control.list_storage_lens_configurations
+    calls:
+      - action: list_storage_lens_configurations
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.StorageLensConfigurationList }}'
+  # ── ListStorageLensGroups ──
+  - discovery_id: aws.s3control.list_storage_lens_groups
+    calls:
+      - action: list_storage_lens_groups
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.StorageLensGroupList }}'
+  # ── ListTagsForResource ──
+  - discovery_id: aws.s3control.list_tags_for_resource
+    calls:
+      - action: list_tags_for_resource
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Tags }}'

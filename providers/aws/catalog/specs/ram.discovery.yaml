@@ -1,0 +1,187 @@
+version: '1.0'
+provider: aws
+service: ram
+enabled: false
+services:
+  client: ram
+  module: boto3.client
+discovery:
+- discovery_id: aws.ram.get_resource_share_invitations
+  calls:
+  - action: get_resource_share_invitations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.resourceShareInvitations }}'
+    item:
+      invitationTimestamp: '{{ item.invitationTimestamp }}'
+      receiverAccountId: '{{ item.receiverAccountId }}'
+      receiverArn: '{{ item.receiverArn }}'
+      resourceShareArn: '{{ item.resourceShareArn }}'
+      resourceShareAssociations: '{{ item.resourceShareAssociations }}'
+      resourceShareInvitationArn: '{{ item.resourceShareInvitationArn }}'
+      resourceShareInvitations: '{{ item.resourceShareInvitations }}'
+      resourceShareName: '{{ item.resourceShareName }}'
+      senderAccountId: '{{ item.senderAccountId }}'
+      status: '{{ item.status }}'
+- discovery_id: aws.ram.list_permission_associations
+  calls:
+  - action: list_permission_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.permissions }}'
+    item:
+      arn: '{{ item.arn }}'
+      defaultVersion: '{{ item.defaultVersion }}'
+      featureSet: '{{ item.featureSet }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      permissionVersion: '{{ item.permissionVersion }}'
+      resourceShareArn: '{{ item.resourceShareArn }}'
+      resourceType: '{{ item.resourceType }}'
+      status: '{{ item.status }}'
+      version: '{{ item.version }}'
+- discovery_id: aws.ram.list_replace_permission_associations_work
+  calls:
+  - action: list_replace_permission_associations_work
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.replacePermissionAssociationsWorks }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      fromPermissionArn: '{{ item.fromPermissionArn }}'
+      fromPermissionVersion: '{{ item.fromPermissionVersion }}'
+      id: '{{ item.id }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      toPermissionArn: '{{ item.toPermissionArn }}'
+      toPermissionVersion: '{{ item.toPermissionVersion }}'
+- discovery_id: aws.ram.get_permission
+  for_each: aws.ram.list_permission_associations
+  calls:
+  - action: get_permission
+    params:
+      permissionArn: '{{ item.permissionArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.permission.arn }}'
+      creationTime: '{{ response.permission.creationTime }}'
+      defaultVersion: '{{ response.permission.defaultVersion }}'
+      featureSet: '{{ response.permission.featureSet }}'
+      isResourceTypeDefault: '{{ response.permission.isResourceTypeDefault }}'
+      lastUpdatedTime: '{{ response.permission.lastUpdatedTime }}'
+      name: '{{ response.permission.name }}'
+      permission: '{{ response.permission.permission }}'
+      permissionType: '{{ response.permission.permissionType }}'
+      resourceType: '{{ response.permission.resourceType }}'
+      status: '{{ response.permission.status }}'
+      tags: '{{ response.permission.tags }}'
+      version: '{{ response.permission.version }}'
+- discovery_id: aws.ram.get_resource_policies
+  calls:
+  - action: get_resource_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.policies }}'
+    item:
+      policies: '{{ item.policies }}'
+- discovery_id: aws.ram.get_resource_share_associations
+  calls:
+  - action: get_resource_share_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.resourceShareAssociations }}'
+    item:
+      associatedEntity: '{{ item.associatedEntity }}'
+      associationType: '{{ item.associationType }}'
+      creationTime: '{{ item.creationTime }}'
+      external: '{{ item.external }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      resourceShareArn: '{{ item.resourceShareArn }}'
+      resourceShareName: '{{ item.resourceShareName }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+- discovery_id: aws.ram.get_resource_shares
+  calls:
+  - action: get_resource_shares
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.resourceShares }}'
+    item:
+      allowExternalPrincipals: '{{ item.allowExternalPrincipals }}'
+      creationTime: '{{ item.creationTime }}'
+      featureSet: '{{ item.featureSet }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      name: '{{ item.name }}'
+      owningAccountId: '{{ item.owningAccountId }}'
+      resourceShareArn: '{{ item.resourceShareArn }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      tags: '{{ item.tags }}'
+- discovery_id: aws.ram.list_pending_invitation_resources
+  for_each: aws.ram.get_resource_share_invitations
+  calls:
+  - action: list_pending_invitation_resources
+    params:
+      resourceShareInvitationArn: '{{ item.resourceShareInvitationArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.resources }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      resourceGroupArn: '{{ item.resourceGroupArn }}'
+      resourceRegionScope: '{{ item.resourceRegionScope }}'
+      resourceShareArn: '{{ item.resourceShareArn }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      type: '{{ item.type }}'
+- discovery_id: aws.ram.list_principals
+  calls:
+  - action: list_principals
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.principals }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      external: '{{ item.external }}'
+      id: '{{ item.id }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      resourceShareArn: '{{ item.resourceShareArn }}'
+- discovery_id: aws.ram.list_resources
+  calls:
+  - action: list_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.resources }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      resourceGroupArn: '{{ item.resourceGroupArn }}'
+      resourceRegionScope: '{{ item.resourceRegionScope }}'
+      resourceShareArn: '{{ item.resourceShareArn }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      type: '{{ item.type }}'

@@ -1,0 +1,523 @@
+version: '1.0'
+provider: aws
+service: lookoutequipment
+services:
+  client: lookoutequipment
+  module: boto3.client
+discovery:
+- discovery_id: aws.lookoutequipment.list_data_ingestion_jobs
+  calls:
+  - action: list_data_ingestion_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DataIngestionJobSummaries }}'
+    item:
+      RoleArn: '{{ item.RoleArn }}'
+      Status: '{{ item.Status }}'
+      DataQualitySummary: '{{ item.DataQualitySummary }}'
+      DatasetArn: '{{ item.DatasetArn }}'
+      DatasetName: '{{ item.DatasetName }}'
+      Enabled: '{{ item.Enabled }}'
+      IngestedDataSize: '{{ item.IngestedDataSize }}'
+      IngestedFilesSummary: '{{ item.IngestedFilesSummary }}'
+      IngestionInputConfiguration: '{{ item.IngestionInputConfiguration }}'
+      JobId: '{{ item.JobId }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      S3InputConfiguration: '{{ item.S3InputConfiguration }}'
+      Schema: '{{ item.Schema }}'
+      ServerSideKmsKeyId: '{{ item.ServerSideKmsKeyId }}'
+      SourceDatasetArn: '{{ item.SourceDatasetArn }}'
+      StatusDetail: '{{ item.StatusDetail }}'
+- discovery_id: aws.lookoutequipment.list_datasets
+  calls:
+  - action: list_datasets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DatasetSummaries }}'
+    item:
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DatasetArn: '{{ item.DatasetArn }}'
+      DatasetName: '{{ item.DatasetName }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      Schema: '{{ item.Schema }}'
+      ServerSideKmsKeyId: '{{ item.ServerSideKmsKeyId }}'
+- discovery_id: aws.lookoutequipment.list_inference_schedulers
+  calls:
+  - action: list_inference_schedulers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.InferenceSchedulerSummaries }}'
+    item:
+      Status: '{{ item.Status }}'
+      DataDelayOffsetInMinutes: '{{ item.DataDelayOffsetInMinutes }}'
+      DataUploadFrequency: '{{ item.DataUploadFrequency }}'
+      InferenceSchedulerArn: '{{ item.InferenceSchedulerArn }}'
+      InferenceSchedulerName: '{{ item.InferenceSchedulerName }}'
+      LatestInferenceResult: '{{ item.LatestInferenceResult }}'
+      ModelArn: '{{ item.ModelArn }}'
+      ModelName: '{{ item.ModelName }}'
+- discovery_id: aws.lookoutequipment.list_label_groups
+  calls:
+  - action: list_label_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LabelGroupSummaries }}'
+    item:
+      CreatedAt: '{{ item.CreatedAt }}'
+      LabelGroupArn: '{{ item.LabelGroupArn }}'
+      LabelGroupName: '{{ item.LabelGroupName }}'
+      Notes: '{{ item.Notes }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.lookoutequipment.list_models
+  calls:
+  - action: list_models
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ModelSummaries }}'
+    item:
+      Status: '{{ item.Status }}'
+      ActiveModelVersion: '{{ item.ActiveModelVersion }}'
+      ActiveModelVersionArn: '{{ item.ActiveModelVersionArn }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DatasetArn: '{{ item.DatasetArn }}'
+      DatasetName: '{{ item.DatasetName }}'
+      LatestScheduledRetrainingModelVersion: '{{ item.LatestScheduledRetrainingModelVersion }}'
+      LatestScheduledRetrainingStartTime: '{{ item.LatestScheduledRetrainingStartTime }}'
+      LatestScheduledRetrainingStatus: '{{ item.LatestScheduledRetrainingStatus }}'
+      ModelArn: '{{ item.ModelArn }}'
+      ModelDiagnosticsOutputConfiguration: '{{ item.ModelDiagnosticsOutputConfiguration }}'
+      ModelName: '{{ item.ModelName }}'
+      ModelQuality: '{{ item.ModelQuality }}'
+      NextScheduledRetrainingStartDate: '{{ item.NextScheduledRetrainingStartDate }}'
+      PreviousActiveModelVersion: '{{ item.PreviousActiveModelVersion }}'
+      RetrainingSchedulerStatus: '{{ item.RetrainingSchedulerStatus }}'
+      SourceModelVersionArn: '{{ item.SourceModelVersionArn }}'
+      TrainingDataStartTime: '{{ item.TrainingDataStartTime }}'
+      TrainingExecutionStartTime: '{{ item.TrainingExecutionStartTime }}'
+- discovery_id: aws.lookoutequipment.list_retraining_schedulers
+  calls:
+  - action: list_retraining_schedulers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RetrainingSchedulerSummaries }}'
+    item:
+      Status: '{{ item.Status }}'
+      LookbackWindow: '{{ item.LookbackWindow }}'
+      ModelArn: '{{ item.ModelArn }}'
+      ModelName: '{{ item.ModelName }}'
+      RetrainingFrequency: '{{ item.RetrainingFrequency }}'
+      RetrainingStartDate: '{{ item.RetrainingStartDate }}'
+- discovery_id: aws.lookoutequipment.describe_data_ingestion_job
+  for_each: aws.lookoutequipment.list_data_ingestion_jobs
+  calls:
+  - action: describe_data_ingestion_job
+    params:
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      RoleArn: '{{ response.IngestionInputConfiguration.RoleArn }}'
+      DataQualitySummary: '{{ response.IngestionInputConfiguration.DataQualitySummary }}'
+      IngestedDataSize: '{{ response.IngestionInputConfiguration.IngestedDataSize }}'
+      IngestedFilesSummary: '{{ response.IngestionInputConfiguration.IngestedFilesSummary }}'
+      S3InputConfiguration: '{{ response.IngestionInputConfiguration.S3InputConfiguration.Prefix }}'
+      Schema: '{{ response.IngestionInputConfiguration.Schema }}'
+      SourceDatasetArn: '{{ response.IngestionInputConfiguration.SourceDatasetArn }}'
+      StatusDetail: '{{ response.IngestionInputConfiguration.StatusDetail }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      DataEndTime: '{{ response.DataEndTime }}'
+      TotalNumberOfDuplicateTimestamps: '{{ response.DataQualitySummary.DuplicateTimestamps.TotalNumberOfDuplicateTimestamps }}'
+      AffectedSensorCount: '{{ response.DataQualitySummary.InsufficientSensorData.MissingCompleteSensorData.AffectedSensorCount }}'
+      TotalNumberOfInvalidValues: '{{ response.DataQualitySummary.InvalidSensorData.TotalNumberOfInvalidValues }}'
+      TotalNumberOfMissingValues: '{{ response.DataQualitySummary.MissingSensorData.TotalNumberOfMissingValues }}'
+      TotalNumberOfUnsupportedTimestamps: '{{ response.DataQualitySummary.UnsupportedTimestamps.TotalNumberOfUnsupportedTimestamps }}'
+      DataStartTime: '{{ response.DataStartTime }}'
+      DatasetArn: '{{ response.DatasetArn }}'
+      FailedReason: '{{ response.FailedReason }}'
+      IngestedNumberOfFiles: '{{ response.IngestedFilesSummary.IngestedNumberOfFiles }}'
+      TotalNumberOfFiles: '{{ response.IngestedFilesSummary.TotalNumberOfFiles }}'
+      Bucket: '{{ response.IngestionInputConfiguration.S3InputConfiguration.Bucket }}'
+      KeyPattern: '{{ response.IngestionInputConfiguration.S3InputConfiguration.KeyPattern }}'
+      Prefix: '{{ response.IngestionInputConfiguration.S3InputConfiguration.Prefix }}'
+      JobId: '{{ response.JobId }}'
+      Status: '{{ response.Status }}'
+- discovery_id: aws.lookoutequipment.describe_dataset
+  for_each: aws.lookoutequipment.list_data_ingestion_jobs
+  calls:
+  - action: describe_dataset
+    params:
+      DatasetName: '{{ item.DatasetName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      LastUpdatedAt: '{{ response.IngestionInputConfiguration.LastUpdatedAt }}'
+      S3InputConfiguration: '{{ response.IngestionInputConfiguration.S3InputConfiguration.Prefix }}'
+      Schema: '{{ response.IngestionInputConfiguration.Schema }}'
+      ServerSideKmsKeyId: '{{ response.IngestionInputConfiguration.ServerSideKmsKeyId }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      DataEndTime: '{{ response.DataEndTime }}'
+      TotalNumberOfDuplicateTimestamps: '{{ response.DataQualitySummary.DuplicateTimestamps.TotalNumberOfDuplicateTimestamps }}'
+      AffectedSensorCount: '{{ response.DataQualitySummary.InsufficientSensorData.MissingCompleteSensorData.AffectedSensorCount }}'
+      TotalNumberOfInvalidValues: '{{ response.DataQualitySummary.InvalidSensorData.TotalNumberOfInvalidValues }}'
+      TotalNumberOfMissingValues: '{{ response.DataQualitySummary.MissingSensorData.TotalNumberOfMissingValues }}'
+      TotalNumberOfUnsupportedTimestamps: '{{ response.DataQualitySummary.UnsupportedTimestamps.TotalNumberOfUnsupportedTimestamps }}'
+      DataStartTime: '{{ response.DataStartTime }}'
+      DatasetArn: '{{ response.DatasetArn }}'
+      DatasetName: '{{ response.DatasetName }}'
+      IngestedNumberOfFiles: '{{ response.IngestedFilesSummary.IngestedNumberOfFiles }}'
+      TotalNumberOfFiles: '{{ response.IngestedFilesSummary.TotalNumberOfFiles }}'
+      Bucket: '{{ response.IngestionInputConfiguration.S3InputConfiguration.Bucket }}'
+      KeyPattern: '{{ response.IngestionInputConfiguration.S3InputConfiguration.KeyPattern }}'
+      Prefix: '{{ response.IngestionInputConfiguration.S3InputConfiguration.Prefix }}'
+      RoleArn: '{{ response.RoleArn }}'
+      SourceDatasetArn: '{{ response.SourceDatasetArn }}'
+      Status: '{{ response.Status }}'
+- discovery_id: aws.lookoutequipment.describe_inference_scheduler
+  for_each: aws.lookoutequipment.list_inference_schedulers
+  calls:
+  - action: describe_inference_scheduler
+    params:
+      InferenceSchedulerName: '{{ item.InferenceSchedulerName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      InferenceInputNameConfiguration: '{{ response.DataInputConfiguration.InferenceInputNameConfiguration.TimestampFormat }}'
+      InputTimeZoneOffset: '{{ response.DataInputConfiguration.InputTimeZoneOffset }}'
+      S3InputConfiguration: '{{ response.DataInputConfiguration.S3InputConfiguration.Prefix }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      DataDelayOffsetInMinutes: '{{ response.DataDelayOffsetInMinutes }}'
+      ComponentTimestampDelimiter: '{{ response.DataInputConfiguration.InferenceInputNameConfiguration.ComponentTimestampDelimiter }}'
+      TimestampFormat: '{{ response.DataInputConfiguration.InferenceInputNameConfiguration.TimestampFormat }}'
+      Bucket: '{{ response.DataInputConfiguration.S3InputConfiguration.Bucket }}'
+      Prefix: '{{ response.DataInputConfiguration.S3InputConfiguration.Prefix }}'
+      KmsKeyId: '{{ response.DataOutputConfiguration.KmsKeyId }}'
+      DataUploadFrequency: '{{ response.DataUploadFrequency }}'
+      InferenceSchedulerArn: '{{ response.InferenceSchedulerArn }}'
+      InferenceSchedulerName: '{{ response.InferenceSchedulerName }}'
+      LatestInferenceResult: '{{ response.LatestInferenceResult }}'
+      ModelArn: '{{ response.ModelArn }}'
+      ModelName: '{{ response.ModelName }}'
+      RoleArn: '{{ response.RoleArn }}'
+      ServerSideKmsKeyId: '{{ response.ServerSideKmsKeyId }}'
+      Status: '{{ response.Status }}'
+      UpdatedAt: '{{ response.UpdatedAt }}'
+- discovery_id: aws.lookoutequipment.describe_label
+  for_each: aws.lookoutequipment.list_label_groups
+  calls:
+  - action: describe_label
+    params:
+      LabelGroupName: '{{ item.LabelGroupName }}'
+      LabelId: '{{ item.LabelId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Notes: '{{ response.Notes }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      EndTime: '{{ response.EndTime }}'
+      Equipment: '{{ response.Equipment }}'
+      FaultCode: '{{ response.FaultCode }}'
+      LabelGroupArn: '{{ response.LabelGroupArn }}'
+      LabelGroupName: '{{ response.LabelGroupName }}'
+      LabelId: '{{ response.LabelId }}'
+      Rating: '{{ response.Rating }}'
+      StartTime: '{{ response.StartTime }}'
+- discovery_id: aws.lookoutequipment.describe_label_group
+  for_each: aws.lookoutequipment.list_label_groups
+  calls:
+  - action: describe_label_group
+    params:
+      LabelGroupName: '{{ item.LabelGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.FaultCodes }}'
+    item:
+      CreatedAt: '{{ response.CreatedAt }}'
+      LabelGroupArn: '{{ response.LabelGroupArn }}'
+      LabelGroupName: '{{ response.LabelGroupName }}'
+      UpdatedAt: '{{ response.UpdatedAt }}'
+- discovery_id: aws.lookoutequipment.describe_model
+  for_each: aws.lookoutequipment.list_inference_schedulers
+  calls:
+  - action: describe_model
+    params:
+      ModelName: '{{ item.ModelName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      LabelGroupName: '{{ response.LabelsInputConfiguration.LabelGroupName }}'
+      PreviousActiveModelVersion: '{{ response.LabelsInputConfiguration.PreviousActiveModelVersion }}'
+      S3InputConfiguration: '{{ response.LabelsInputConfiguration.S3InputConfiguration.Prefix }}'
+      SourceModelVersionArn: '{{ response.LabelsInputConfiguration.SourceModelVersionArn }}'
+      TrainingDataStartTime: '{{ response.LabelsInputConfiguration.TrainingDataStartTime }}'
+      TrainingExecutionStartTime: '{{ response.LabelsInputConfiguration.TrainingExecutionStartTime }}'
+      AccumulatedInferenceDataEndTime: '{{ response.AccumulatedInferenceDataEndTime }}'
+      AccumulatedInferenceDataStartTime: '{{ response.AccumulatedInferenceDataStartTime }}'
+      ActiveModelVersion: '{{ response.ActiveModelVersion }}'
+      ActiveModelVersionArn: '{{ response.ActiveModelVersionArn }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      TargetSamplingRate: '{{ response.DataPreProcessingConfiguration.TargetSamplingRate }}'
+      DatasetArn: '{{ response.DatasetArn }}'
+      DatasetName: '{{ response.DatasetName }}'
+      EvaluationDataEndTime: '{{ response.EvaluationDataEndTime }}'
+      EvaluationDataStartTime: '{{ response.EvaluationDataStartTime }}'
+      FailedReason: '{{ response.FailedReason }}'
+      ImportJobEndTime: '{{ response.ImportJobEndTime }}'
+      ImportJobStartTime: '{{ response.ImportJobStartTime }}'
+      Bucket: '{{ response.LabelsInputConfiguration.S3InputConfiguration.Bucket }}'
+      Prefix: '{{ response.LabelsInputConfiguration.S3InputConfiguration.Prefix }}'
+      LastUpdatedTime: '{{ response.LastUpdatedTime }}'
+      LatestScheduledRetrainingAvailableDataInDays: '{{ response.LatestScheduledRetrainingAvailableDataInDays }}'
+      LatestScheduledRetrainingFailedReason: '{{ response.LatestScheduledRetrainingFailedReason }}'
+      LatestScheduledRetrainingModelVersion: '{{ response.LatestScheduledRetrainingModelVersion }}'
+      LatestScheduledRetrainingStartTime: '{{ response.LatestScheduledRetrainingStartTime }}'
+      LatestScheduledRetrainingStatus: '{{ response.LatestScheduledRetrainingStatus }}'
+      ModelArn: '{{ response.ModelArn }}'
+      KmsKeyId: '{{ response.ModelDiagnosticsOutputConfiguration.KmsKeyId }}'
+      ModelMetrics: '{{ response.ModelMetrics }}'
+      ModelName: '{{ response.ModelName }}'
+      ModelQuality: '{{ response.ModelQuality }}'
+      ModelVersionActivatedAt: '{{ response.ModelVersionActivatedAt }}'
+      NextScheduledRetrainingStartDate: '{{ response.NextScheduledRetrainingStartDate }}'
+      OffCondition: '{{ response.OffCondition }}'
+      PreviousActiveModelVersionArn: '{{ response.PreviousActiveModelVersionArn }}'
+      PreviousModelVersionActivatedAt: '{{ response.PreviousModelVersionActivatedAt }}'
+      PriorModelMetrics: '{{ response.PriorModelMetrics }}'
+      RetrainingSchedulerStatus: '{{ response.RetrainingSchedulerStatus }}'
+      RoleArn: '{{ response.RoleArn }}'
+      Schema: '{{ response.Schema }}'
+      ServerSideKmsKeyId: '{{ response.ServerSideKmsKeyId }}'
+      Status: '{{ response.Status }}'
+      TrainingDataEndTime: '{{ response.TrainingDataEndTime }}'
+      TrainingExecutionEndTime: '{{ response.TrainingExecutionEndTime }}'
+- discovery_id: aws.lookoutequipment.describe_model_version
+  for_each: aws.lookoutequipment.list_inference_schedulers
+  calls:
+  - action: describe_model_version
+    params:
+      ModelName: '{{ item.ModelName }}'
+      ModelVersion: '{{ item.ModelVersion }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      LabelGroupName: '{{ response.LabelsInputConfiguration.LabelGroupName }}'
+      S3InputConfiguration: '{{ response.LabelsInputConfiguration.S3InputConfiguration.Prefix }}'
+      AutoPromotionResult: '{{ response.AutoPromotionResult }}'
+      AutoPromotionResultReason: '{{ response.AutoPromotionResultReason }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      TargetSamplingRate: '{{ response.DataPreProcessingConfiguration.TargetSamplingRate }}'
+      DatasetArn: '{{ response.DatasetArn }}'
+      DatasetName: '{{ response.DatasetName }}'
+      EvaluationDataEndTime: '{{ response.EvaluationDataEndTime }}'
+      EvaluationDataStartTime: '{{ response.EvaluationDataStartTime }}'
+      FailedReason: '{{ response.FailedReason }}'
+      ImportJobEndTime: '{{ response.ImportJobEndTime }}'
+      ImportJobStartTime: '{{ response.ImportJobStartTime }}'
+      ImportedDataSizeInBytes: '{{ response.ImportedDataSizeInBytes }}'
+      Bucket: '{{ response.LabelsInputConfiguration.S3InputConfiguration.Bucket }}'
+      Prefix: '{{ response.LabelsInputConfiguration.S3InputConfiguration.Prefix }}'
+      LastUpdatedTime: '{{ response.LastUpdatedTime }}'
+      ModelArn: '{{ response.ModelArn }}'
+      KmsKeyId: '{{ response.ModelDiagnosticsOutputConfiguration.KmsKeyId }}'
+      Key: '{{ response.ModelDiagnosticsResultsObject.Key }}'
+      ModelMetrics: '{{ response.ModelMetrics }}'
+      ModelName: '{{ response.ModelName }}'
+      ModelQuality: '{{ response.ModelQuality }}'
+      ModelVersion: '{{ response.ModelVersion }}'
+      ModelVersionArn: '{{ response.ModelVersionArn }}'
+      OffCondition: '{{ response.OffCondition }}'
+      PriorModelMetrics: '{{ response.PriorModelMetrics }}'
+      RetrainingAvailableDataInDays: '{{ response.RetrainingAvailableDataInDays }}'
+      RoleArn: '{{ response.RoleArn }}'
+      Schema: '{{ response.Schema }}'
+      ServerSideKmsKeyId: '{{ response.ServerSideKmsKeyId }}'
+      SourceModelVersionArn: '{{ response.SourceModelVersionArn }}'
+      SourceType: '{{ response.SourceType }}'
+      Status: '{{ response.Status }}'
+      TrainingDataEndTime: '{{ response.TrainingDataEndTime }}'
+      TrainingDataStartTime: '{{ response.TrainingDataStartTime }}'
+      TrainingExecutionEndTime: '{{ response.TrainingExecutionEndTime }}'
+      TrainingExecutionStartTime: '{{ response.TrainingExecutionStartTime }}'
+- discovery_id: aws.lookoutequipment.describe_resource_policy
+  calls:
+  - action: describe_resource_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+      CreationTime: '{{ response.CreationTime }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+      PolicyRevisionId: '{{ response.PolicyRevisionId }}'
+      ResourcePolicy: '{{ response.ResourcePolicy }}'
+- discovery_id: aws.lookoutequipment.describe_retraining_scheduler
+  for_each: aws.lookoutequipment.list_inference_schedulers
+  calls:
+  - action: describe_retraining_scheduler
+    params:
+      ModelName: '{{ item.ModelName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      LookbackWindow: '{{ response.LookbackWindow }}'
+      ModelArn: '{{ response.ModelArn }}'
+      ModelName: '{{ response.ModelName }}'
+      PromoteMode: '{{ response.PromoteMode }}'
+      RetrainingFrequency: '{{ response.RetrainingFrequency }}'
+      RetrainingStartDate: '{{ response.RetrainingStartDate }}'
+      UpdatedAt: '{{ response.UpdatedAt }}'
+- discovery_id: aws.lookoutequipment.list_inference_events
+  for_each: aws.lookoutequipment.list_inference_schedulers
+  calls:
+  - action: list_inference_events
+    params:
+      InferenceSchedulerName: '{{ item.InferenceSchedulerName }}'
+      IntervalStartTime: '{{ item.IntervalStartTime }}'
+      IntervalEndTime: '{{ item.IntervalEndTime }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.InferenceEventSummaries }}'
+    item:
+      Diagnostics: '{{ item.Diagnostics }}'
+      EventDurationInSeconds: '{{ item.EventDurationInSeconds }}'
+      EventEndTime: '{{ item.EventEndTime }}'
+      EventStartTime: '{{ item.EventStartTime }}'
+      InferenceSchedulerArn: '{{ item.InferenceSchedulerArn }}'
+      InferenceSchedulerName: '{{ item.InferenceSchedulerName }}'
+- discovery_id: aws.lookoutequipment.list_inference_executions
+  for_each: aws.lookoutequipment.list_inference_schedulers
+  calls:
+  - action: list_inference_executions
+    params:
+      InferenceSchedulerName: '{{ item.InferenceSchedulerName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.InferenceExecutionSummaries }}'
+    item:
+      Status: '{{ item.Status }}'
+      CustomerResultObject: '{{ item.CustomerResultObject }}'
+      DataEndTime: '{{ item.DataEndTime }}'
+      DataInputConfiguration: '{{ item.DataInputConfiguration }}'
+      DataOutputConfiguration: '{{ item.DataOutputConfiguration }}'
+      DataStartTime: '{{ item.DataStartTime }}'
+      FailedReason: '{{ item.FailedReason }}'
+      InferenceSchedulerArn: '{{ item.InferenceSchedulerArn }}'
+      InferenceSchedulerName: '{{ item.InferenceSchedulerName }}'
+      ModelArn: '{{ item.ModelArn }}'
+      ModelName: '{{ item.ModelName }}'
+      ModelVersion: '{{ item.ModelVersion }}'
+      ModelVersionArn: '{{ item.ModelVersionArn }}'
+      ScheduledStartTime: '{{ item.ScheduledStartTime }}'
+- discovery_id: aws.lookoutequipment.list_labels
+  for_each: aws.lookoutequipment.list_label_groups
+  calls:
+  - action: list_labels
+    params:
+      LabelGroupName: '{{ item.LabelGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LabelSummaries }}'
+    item:
+      CreatedAt: '{{ item.CreatedAt }}'
+      EndTime: '{{ item.EndTime }}'
+      Equipment: '{{ item.Equipment }}'
+      FaultCode: '{{ item.FaultCode }}'
+      LabelGroupArn: '{{ item.LabelGroupArn }}'
+      LabelGroupName: '{{ item.LabelGroupName }}'
+      LabelId: '{{ item.LabelId }}'
+      Rating: '{{ item.Rating }}'
+      StartTime: '{{ item.StartTime }}'
+- discovery_id: aws.lookoutequipment.list_model_versions
+  for_each: aws.lookoutequipment.list_inference_schedulers
+  calls:
+  - action: list_model_versions
+    params:
+      ModelName: '{{ item.ModelName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ModelVersionSummaries }}'
+    item:
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      ModelArn: '{{ item.ModelArn }}'
+      ModelName: '{{ item.ModelName }}'
+      ModelQuality: '{{ item.ModelQuality }}'
+      ModelVersion: '{{ item.ModelVersion }}'
+      ModelVersionArn: '{{ item.ModelVersionArn }}'
+      SourceType: '{{ item.SourceType }}'
+- discovery_id: aws.lookoutequipment.list_sensor_statistics
+  for_each: aws.lookoutequipment.list_data_ingestion_jobs
+  calls:
+  - action: list_sensor_statistics
+    params:
+      DatasetName: '{{ item.DatasetName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SensorStatisticsSummaries }}'
+    item:
+      CategoricalValues: '{{ item.CategoricalValues }}'
+      ComponentName: '{{ item.ComponentName }}'
+      DataEndTime: '{{ item.DataEndTime }}'
+      DataExists: '{{ item.DataExists }}'
+      DataStartTime: '{{ item.DataStartTime }}'
+      DuplicateTimestamps: '{{ item.DuplicateTimestamps }}'
+      InvalidDateEntries: '{{ item.InvalidDateEntries }}'
+      InvalidValues: '{{ item.InvalidValues }}'
+      LargeTimestampGaps: '{{ item.LargeTimestampGaps }}'
+      MissingValues: '{{ item.MissingValues }}'
+      MonotonicValues: '{{ item.MonotonicValues }}'
+      MultipleOperatingModes: '{{ item.MultipleOperatingModes }}'
+      SensorName: '{{ item.SensorName }}'
+- discovery_id: aws.lookoutequipment.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

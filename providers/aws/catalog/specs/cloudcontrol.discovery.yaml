@@ -1,0 +1,91 @@
+version: '1.0'
+provider: aws
+service: cloudcontrol
+services:
+  client: cloudcontrol
+  module: boto3.client
+discovery:
+- discovery_id: aws.cloudcontrol.list_resource_requests
+  calls:
+  - action: list_resource_requests
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceRequestStatusSummaries }}'
+    item:
+      ErrorCode: '{{ item.ErrorCode }}'
+      EventTime: '{{ item.EventTime }}'
+      HooksRequestToken: '{{ item.HooksRequestToken }}'
+      Identifier: '{{ item.Identifier }}'
+      Operation: '{{ item.Operation }}'
+      OperationStatus: '{{ item.OperationStatus }}'
+      Properties: '{{ item.Properties }}'
+      RequestToken: '{{ item.RequestToken }}'
+      ResourceDescription: '{{ item.ResourceDescription }}'
+      ResourceModel: '{{ item.ResourceModel }}'
+      RetryAfter: '{{ item.RetryAfter }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      TypeName: '{{ item.TypeName }}'
+- discovery_id: aws.cloudcontrol.get_resource
+  for_each: aws.cloudcontrol.list_resource_requests
+  calls:
+  - action: get_resource
+    params:
+      TypeName: '{{ item.TypeName }}'
+      Identifier: '{{ item.Identifier }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Identifier: '{{ response.ResourceDescription.Identifier }}'
+      ResourceDescription: '{{ response.ResourceDescription.ResourceDescription }}'
+      Properties: '{{ response.ResourceDescription.Properties }}'
+      TypeName: '{{ response.TypeName }}'
+- discovery_id: aws.cloudcontrol.get_resource_request_status
+  for_each: aws.cloudcontrol.list_resource_requests
+  calls:
+  - action: get_resource_request_status
+    params:
+      RequestToken: '{{ item.RequestToken }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HooksProgressEvent }}'
+    item:
+      FailureMode: '{{ item.FailureMode }}'
+      HookEventTime: '{{ item.HookEventTime }}'
+      HookStatus: '{{ item.HookStatus }}'
+      HookStatusMessage: '{{ item.HookStatusMessage }}'
+      HookTypeArn: '{{ item.HookTypeArn }}'
+      HookTypeName: '{{ item.HookTypeName }}'
+      HookTypeVersionId: '{{ item.HookTypeVersionId }}'
+      InvocationPoint: '{{ item.InvocationPoint }}'
+      ErrorCode: '{{ response.ProgressEvent.ErrorCode }}'
+      EventTime: '{{ response.ProgressEvent.EventTime }}'
+      HooksRequestToken: '{{ response.ProgressEvent.HooksRequestToken }}'
+      Identifier: '{{ response.ProgressEvent.Identifier }}'
+      Operation: '{{ response.ProgressEvent.Operation }}'
+      OperationStatus: '{{ response.ProgressEvent.OperationStatus }}'
+      RequestToken: '{{ response.ProgressEvent.RequestToken }}'
+      ResourceModel: '{{ response.ProgressEvent.ResourceModel }}'
+      RetryAfter: '{{ response.ProgressEvent.RetryAfter }}'
+      StatusMessage: '{{ response.ProgressEvent.StatusMessage }}'
+      TypeName: '{{ response.ProgressEvent.TypeName }}'
+- discovery_id: aws.cloudcontrol.list_resources
+  for_each: aws.cloudcontrol.list_resource_requests
+  calls:
+  - action: list_resources
+    params:
+      TypeName: '{{ item.TypeName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceDescriptions }}'
+    item:
+      Identifier: '{{ item.Identifier }}'
+      Properties: '{{ item.Properties }}'
+      TypeName: '{{ response.TypeName }}'

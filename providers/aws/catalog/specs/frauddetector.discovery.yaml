@@ -1,0 +1,279 @@
+version: '1.0'
+provider: aws
+service: frauddetector
+discovery:
+- calls:
+  - action: describe_model_versions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.describe_model_versions
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      externalEventsDetail: '{{ item.externalEventsDetail }}'
+      ingestedEventsDetail: '{{ item.ingestedEventsDetail }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      modelId: '{{ item.modelId }}'
+      modelType: '{{ item.modelType }}'
+      modelVersionDetails: '{{ item.modelVersionDetails[].arn }}'
+      modelVersionNumber: '{{ item.modelVersionNumber }}'
+      status: '{{ item.status }}'
+      trainingDataSchema: '{{ item.trainingDataSchema }}'
+      trainingDataSource: '{{ item.trainingDataSource }}'
+      trainingResult: '{{ item.trainingResult }}'
+      trainingResultV2: '{{ item.trainingResultV2 }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.modelVersionDetails }}'
+- calls:
+  - action: get_batch_import_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.get_batch_import_jobs
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      batchImports: '{{ item.batchImports }}'
+      completionTime: '{{ item.completionTime }}'
+      eventTypeName: '{{ item.eventTypeName }}'
+      failedRecordsCount: '{{ item.failedRecordsCount }}'
+      failureReason: '{{ item.failureReason }}'
+      iamRoleArn: '{{ item.iamRoleArn }}'
+      inputPath: '{{ item.inputPath }}'
+      jobId: '{{ item.jobId }}'
+      outputPath: '{{ item.outputPath }}'
+      processedRecordsCount: '{{ item.processedRecordsCount }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      totalRecordsCount: '{{ item.totalRecordsCount }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.batchImports }}'
+- calls:
+  - action: get_batch_prediction_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.get_batch_prediction_jobs
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      batchPredictions: '{{ item.batchPredictions }}'
+      completionTime: '{{ item.completionTime }}'
+      detectorName: '{{ item.detectorName }}'
+      detectorVersion: '{{ item.detectorVersion }}'
+      eventTypeName: '{{ item.eventTypeName }}'
+      failureReason: '{{ item.failureReason }}'
+      iamRoleArn: '{{ item.iamRoleArn }}'
+      inputPath: '{{ item.inputPath }}'
+      jobId: '{{ item.jobId }}'
+      lastHeartbeatTime: '{{ item.lastHeartbeatTime }}'
+      outputPath: '{{ item.outputPath }}'
+      processedRecordsCount: '{{ item.processedRecordsCount }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      totalRecordsCount: '{{ item.totalRecordsCount }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.batchPredictions }}'
+- calls:
+  - action: get_detectors
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.get_detectors
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      detectorId: '{{ item.detectorId }}'
+      detectors: '{{ item.detectors }}'
+      eventTypeName: '{{ item.eventTypeName }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.detectors }}'
+- calls:
+  - action: get_entity_types
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.get_entity_types
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.entityTypes }}'
+- calls:
+  - action: get_event_types
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.get_event_types
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      entityTypes: '{{ item.entityTypes }}'
+      eventIngestion: '{{ item.eventIngestion }}'
+      eventOrchestration: '{{ item.eventOrchestration }}'
+      eventTypes: '{{ item.eventTypes }}'
+      eventVariables: '{{ item.eventVariables }}'
+      ingestedEventStatistics: '{{ item.ingestedEventStatistics }}'
+      labels: '{{ item.labels }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.eventTypes }}'
+- calls:
+  - action: get_external_models
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.get_external_models
+  emit:
+    as: item
+    item:
+      Enabled: '{{ item.Enabled }}'
+      Status: '{{ item.Status }}'
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      inputConfiguration: '{{ item.inputConfiguration }}'
+      invokeModelEndpointRoleArn: '{{ item.invokeModelEndpointRoleArn }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      modelEndpoint: '{{ item.modelEndpoint }}'
+      modelEndpointStatus: '{{ item.modelEndpointStatus }}'
+      modelSource: '{{ item.modelSource }}'
+      outputConfiguration: '{{ item.outputConfiguration }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.externalModels }}'
+- calls:
+  - action: get_kms_encryption_key
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.get_kms_encryption_key
+  emit:
+    as: item
+    item:
+      kmsEncryptionKeyArn: '{{ response.kmsKey.kmsEncryptionKeyArn }}'
+      kmsKey: '{{ response.kmsKey.kmsKey }}'
+- calls:
+  - action: get_labels
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.get_labels
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.labels }}'
+- calls:
+  - action: get_lists_metadata
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.get_lists_metadata
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      lists: '{{ item.lists }}'
+      name: '{{ item.name }}'
+      updatedTime: '{{ item.updatedTime }}'
+      variableType: '{{ item.variableType }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.lists }}'
+- calls:
+  - action: get_models
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.get_models
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      eventTypeName: '{{ item.eventTypeName }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      modelId: '{{ item.modelId }}'
+      modelType: '{{ item.modelType }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.models }}'
+- calls:
+  - action: get_outcomes
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.get_outcomes
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.outcomes }}'
+- calls:
+  - action: get_variables
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.get_variables
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      dataSource: '{{ item.dataSource }}'
+      dataType: '{{ item.dataType }}'
+      defaultValue: '{{ item.defaultValue }}'
+      description: '{{ item.description }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      name: '{{ item.name }}'
+      variableType: '{{ item.variableType }}'
+      variables: '{{ item.variables }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.variables }}'
+- calls:
+  - action: list_event_predictions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.list_event_predictions
+  emit:
+    as: item
+    item:
+      currentLabel: '{{ item.currentLabel }}'
+      detectorId: '{{ item.detectorId }}'
+      detectorVersionId: '{{ item.detectorVersionId }}'
+      entities: '{{ item.entities }}'
+      event: '{{ item.event }}'
+      eventId: '{{ item.eventId }}'
+      eventTimestamp: '{{ item.eventTimestamp }}'
+      eventTypeName: '{{ item.eventTypeName }}'
+      labelTimestamp: '{{ item.labelTimestamp }}'
+      predictionTimestamp: '{{ item.predictionTimestamp }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.eventPredictionSummaries }}'
+- calls:
+  - action: list_tags_for_resource
+    on_error: continue
+    save_as: response
+  discovery_id: aws.frauddetector.list_tags_for_resource
+  emit:
+    as: item
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.tags }}'

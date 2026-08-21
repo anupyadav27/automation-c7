@@ -1,0 +1,52 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: acmpca (backed by acm-pca)
+# 1 ops (from checks)
+# Generated: 2026-04-14
+version: '1.0'
+provider: aws
+service: acmpca
+services:
+  client: acm-pca
+  module: boto3.client
+discovery:
+  - discovery_id: aws.acmpca.list_certificate_authorities
+    calls:
+    - action: list_certificate_authorities
+      save_as: response
+      on_error: continue
+      params:
+        MaxItems: 100
+    emit:
+      as: item
+      items_for: '{{ response.CertificateAuthorities }}'
+      item:
+        Arn: '{{ item.Arn }}'
+        Status: '{{ item.Status }}'
+        Enabled: '{{ item.Enabled }}'
+        Certificate: '{{ item.Certificate }}'
+        CertificateAuthorityConfiguration: '{{ item.CertificateAuthorityConfiguration }}'
+        CreatedAt: '{{ item.CreatedAt }}'
+        FailureReason: '{{ item.FailureReason }}'
+        KeyStorageSecurityStandard: '{{ item.KeyStorageSecurityStandard }}'
+        LastStateChangeAt: '{{ item.LastStateChangeAt }}'
+        NotAfter: '{{ item.NotAfter }}'
+        NotBefore: '{{ item.NotBefore }}'
+        OwnerAccount: '{{ item.OwnerAccount }}'
+        RestorableUntil: '{{ item.RestorableUntil }}'
+        RevocationConfiguration: '{{ item.RevocationConfiguration }}'
+        Serial: '{{ item.Serial }}'
+        Type: '{{ item.Type }}'
+        UsageMode: '{{ item.UsageMode }}'
+  - discovery_id: aws.acmpca.list_tags
+    for_each: aws.acmpca.list_certificate_authorities
+    calls:
+    - action: list_tags
+      save_as: response
+      on_error: continue
+      params:
+        CertificateAuthorityArn: '{{ item.Arn }}'
+    emit:
+      as: item
+      items_for: '{{ response }}'
+      item:
+        Tags: '{{ item.Tags }}'

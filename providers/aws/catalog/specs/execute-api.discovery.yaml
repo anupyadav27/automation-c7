@@ -1,0 +1,20 @@
+version: '1.0'
+provider: aws
+service: apigatewaymanagementapi
+services:
+  client: apigatewaymanagementapi
+  module: boto3.client
+discovery:
+- discovery_id: aws.apigatewaymanagementapi.get_connection
+  calls:
+  - action: get_connection
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ConnectedAt: '{{ response.ConnectedAt }}'
+      Identity: '{{ response.Identity }}'
+      LastActiveAt: '{{ response.LastActiveAt }}'
+      SourceIp: '{{ response.SourceIp }}'
+      UserAgent: '{{ response.UserAgent }}'

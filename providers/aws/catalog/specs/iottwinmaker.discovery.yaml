@@ -1,0 +1,410 @@
+version: '1.0'
+provider: aws
+service: iottwinmaker
+services:
+  client: iottwinmaker
+  module: boto3.client
+discovery:
+- discovery_id: aws.iottwinmaker.get_pricing_plan
+  calls:
+  - action: get_pricing_plan
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      billableEntityCount: '{{ response.currentPricingPlan.billableEntityCount }}'
+      bundleInformation: '{{ response.currentPricingPlan.bundleInformation.pricingTier }}'
+      currentPricingPlan: '{{ response.currentPricingPlan.currentPricingPlan }}'
+      effectiveDateTime: '{{ response.currentPricingPlan.effectiveDateTime }}'
+      pendingPricingPlan: '{{ response.currentPricingPlan.pendingPricingPlan }}'
+      pricingMode: '{{ response.currentPricingPlan.pricingMode }}'
+      updateDateTime: '{{ response.currentPricingPlan.updateDateTime }}'
+      updateReason: '{{ response.currentPricingPlan.updateReason }}'
+      pricingTier: '{{ response.currentPricingPlan.bundleInformation.pricingTier }}'
+- discovery_id: aws.iottwinmaker.list_workspaces
+  calls:
+  - action: list_workspaces
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workspaceSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      compositeComponentTypes: '{{ item.compositeComponentTypes }}'
+      creationDateTime: '{{ item.creationDateTime }}'
+      description: '{{ item.description }}'
+      entityPropertyReference: '{{ item.entityPropertyReference }}'
+      extendsFrom: '{{ item.extendsFrom }}'
+      isAbstract: '{{ item.isAbstract }}'
+      isSchemaInitialized: '{{ item.isSchemaInitialized }}'
+      isSingleton: '{{ item.isSingleton }}'
+      linkedServices: '{{ item.linkedServices }}'
+      propertyDefinitions: '{{ item.propertyDefinitions }}'
+      role: '{{ item.role }}'
+      s3Location: '{{ item.s3Location }}'
+      updateDateTime: '{{ item.updateDateTime }}'
+      values: '{{ item["values"] }}'
+      workspaceId: '{{ item.workspaceId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iottwinmaker.get_component_type
+  for_each: aws.iottwinmaker.list_workspaces
+  calls:
+  - action: get_component_type
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+      componentTypeId: '{{ item.componentTypeId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.extendsFrom }}'
+    item:
+      compositeComponentTypes: '{{ item.compositeComponentTypes }}'
+      extendsFrom: '{{ item.extendsFrom }}'
+      functions: '{{ item.functions }}'
+      isAbstract: '{{ item.isAbstract }}'
+      isSchemaInitialized: '{{ item.isSchemaInitialized }}'
+      isSingleton: '{{ item.isSingleton }}'
+      propertyDefinitions: '{{ item.propertyDefinitions }}'
+      arn: '{{ response.arn }}'
+      componentTypeId: '{{ response.componentTypeId }}'
+      componentTypeName: '{{ response.componentTypeName }}'
+      creationDateTime: '{{ response.creationDateTime }}'
+      description: '{{ response.description }}'
+      propertyGroups: '{{ response.propertyGroups }}'
+      code: '{{ response.status.error.code }}'
+      message: '{{ response.status.error.message }}'
+      state: '{{ response.status.state }}'
+      syncSource: '{{ response.syncSource }}'
+      updateDateTime: '{{ response.updateDateTime }}'
+      workspaceId: '{{ response.workspaceId }}'
+- discovery_id: aws.iottwinmaker.get_entity
+  for_each: aws.iottwinmaker.list_workspaces
+  calls:
+  - action: get_entity
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+      entityId: '{{ item.entityId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      error: '{{ response.status.error }}'
+      state: '{{ response.status.state }}'
+      areAllComponentsReturned: '{{ response.areAllComponentsReturned }}'
+      arn: '{{ response.arn }}'
+      components: '{{ response.components }}'
+      creationDateTime: '{{ response.creationDateTime }}'
+      description: '{{ response.description }}'
+      entityId: '{{ response.entityId }}'
+      entityName: '{{ response.entityName }}'
+      hasChildEntities: '{{ response.hasChildEntities }}'
+      parentEntityId: '{{ response.parentEntityId }}'
+      code: '{{ response.status.error.code }}'
+      message: '{{ response.status.error.message }}'
+      syncSource: '{{ response.syncSource }}'
+      updateDateTime: '{{ response.updateDateTime }}'
+      workspaceId: '{{ response.workspaceId }}'
+- discovery_id: aws.iottwinmaker.get_metadata_transfer_job
+  calls:
+  - action: get_metadata_transfer_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.sources }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      iotSiteWiseConfiguration: '{{ item.iotSiteWiseConfiguration }}'
+      iotTwinMakerConfiguration: '{{ item.iotTwinMakerConfiguration }}'
+      s3Configuration: '{{ item.s3Configuration }}'
+      type: '{{ item.type }}'
+      arn: '{{ response.arn }}'
+      creationDateTime: '{{ response.creationDateTime }}'
+      description: '{{ response.description }}'
+      workspace: '{{ response.destination.iotTwinMakerConfiguration.workspace }}'
+      location: '{{ response.destination.s3Configuration.location }}'
+      metadataTransferJobId: '{{ response.metadataTransferJobId }}'
+      metadataTransferJobRole: '{{ response.metadataTransferJobRole }}'
+      failedCount: '{{ response.progress.failedCount }}'
+      skippedCount: '{{ response.progress.skippedCount }}'
+      succeededCount: '{{ response.progress.succeededCount }}'
+      totalCount: '{{ response.progress.totalCount }}'
+      reportUrl: '{{ response.reportUrl }}'
+      code: '{{ response.status.error.code }}'
+      message: '{{ response.status.error.message }}'
+      queuedPosition: '{{ response.status.queuedPosition }}'
+      state: '{{ response.status.state }}'
+      updateDateTime: '{{ response.updateDateTime }}'
+- discovery_id: aws.iottwinmaker.get_property_value
+  for_each: aws.iottwinmaker.list_workspaces
+  calls:
+  - action: get_property_value
+    params:
+      selectedProperties: '{{ item.selectedProperties }}'
+      workspaceId: '{{ item.workspaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tabularPropertyValues }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+      propertyValues: '{{ response.propertyValues }}'
+- discovery_id: aws.iottwinmaker.get_property_value_history
+  for_each: aws.iottwinmaker.list_workspaces
+  calls:
+  - action: get_property_value_history
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+      selectedProperties: '{{ item.selectedProperties }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.propertyValues }}'
+    item:
+      entityPropertyReference: '{{ item.entityPropertyReference }}'
+      values: '{{ item["values"] }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iottwinmaker.get_scene
+  for_each: aws.iottwinmaker.list_workspaces
+  calls:
+  - action: get_scene
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+      sceneId: '{{ item.sceneId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.capabilities }}'
+    item:
+      capabilities: '{{ item.capabilities }}'
+      arn: '{{ response.arn }}'
+      contentLocation: '{{ response.contentLocation }}'
+      creationDateTime: '{{ response.creationDateTime }}'
+      description: '{{ response.description }}'
+      code: '{{ response.error.code }}'
+      message: '{{ response.error.message }}'
+      generatedSceneMetadata: '{{ response.generatedSceneMetadata }}'
+      sceneId: '{{ response.sceneId }}'
+      sceneMetadata: '{{ response.sceneMetadata }}'
+      updateDateTime: '{{ response.updateDateTime }}'
+      workspaceId: '{{ response.workspaceId }}'
+- discovery_id: aws.iottwinmaker.get_sync_job
+  calls:
+  - action: get_sync_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      error: '{{ response.status.error }}'
+      state: '{{ response.status.state }}'
+      arn: '{{ response.arn }}'
+      creationDateTime: '{{ response.creationDateTime }}'
+      code: '{{ response.status.error.code }}'
+      message: '{{ response.status.error.message }}'
+      syncRole: '{{ response.syncRole }}'
+      syncSource: '{{ response.syncSource }}'
+      updateDateTime: '{{ response.updateDateTime }}'
+      workspaceId: '{{ response.workspaceId }}'
+- discovery_id: aws.iottwinmaker.get_workspace
+  for_each: aws.iottwinmaker.list_workspaces
+  calls:
+  - action: get_workspace
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.linkedServices }}'
+    item:
+      role: '{{ item.role }}'
+      s3Location: '{{ item.s3Location }}'
+      arn: '{{ response.arn }}'
+      creationDateTime: '{{ response.creationDateTime }}'
+      description: '{{ response.description }}'
+      updateDateTime: '{{ response.updateDateTime }}'
+      workspaceId: '{{ response.workspaceId }}'
+- discovery_id: aws.iottwinmaker.list_component_types
+  for_each: aws.iottwinmaker.list_workspaces
+  calls:
+  - action: list_component_types
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.componentTypeSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      componentTypeId: '{{ item.componentTypeId }}'
+      componentTypeName: '{{ item.componentTypeName }}'
+      compositeComponentTypes: '{{ item.compositeComponentTypes }}'
+      creationDateTime: '{{ item.creationDateTime }}'
+      description: '{{ item.description }}'
+      extendsFrom: '{{ item.extendsFrom }}'
+      functions: '{{ item.functions }}'
+      isAbstract: '{{ item.isAbstract }}'
+      isSchemaInitialized: '{{ item.isSchemaInitialized }}'
+      isSingleton: '{{ item.isSingleton }}'
+      propertyDefinitions: '{{ item.propertyDefinitions }}'
+      status: '{{ item.status }}'
+      updateDateTime: '{{ item.updateDateTime }}'
+      maxResults: '{{ response.maxResults }}'
+      nextToken: '{{ response.nextToken }}'
+      workspaceId: '{{ response.workspaceId }}'
+- discovery_id: aws.iottwinmaker.list_components
+  for_each: aws.iottwinmaker.list_workspaces
+  calls:
+  - action: list_components
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+      entityId: '{{ item.entityId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.componentSummaries }}'
+    item:
+      componentName: '{{ item.componentName }}'
+      componentPath: '{{ item.componentPath }}'
+      componentTypeId: '{{ item.componentTypeId }}'
+      definedIn: '{{ item.definedIn }}'
+      description: '{{ item.description }}'
+      propertyGroups: '{{ item.propertyGroups }}'
+      status: '{{ item.status }}'
+      syncSource: '{{ item.syncSource }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iottwinmaker.list_entities
+  for_each: aws.iottwinmaker.list_workspaces
+  calls:
+  - action: list_entities
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.entitySummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationDateTime: '{{ item.creationDateTime }}'
+      description: '{{ item.description }}'
+      entityId: '{{ item.entityId }}'
+      entityName: '{{ item.entityName }}'
+      hasChildEntities: '{{ item.hasChildEntities }}'
+      parentEntityId: '{{ item.parentEntityId }}'
+      status: '{{ item.status }}'
+      updateDateTime: '{{ item.updateDateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iottwinmaker.list_metadata_transfer_jobs
+  calls:
+  - action: list_metadata_transfer_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.metadataTransferJobSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationDateTime: '{{ item.creationDateTime }}'
+      metadataTransferJobId: '{{ item.metadataTransferJobId }}'
+      progress: '{{ item.progress }}'
+      status: '{{ item.status }}'
+      updateDateTime: '{{ item.updateDateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iottwinmaker.list_properties
+  for_each: aws.iottwinmaker.list_workspaces
+  calls:
+  - action: list_properties
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+      entityId: '{{ item.entityId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.propertySummaries }}'
+    item:
+      areAllPropertyValuesReturned: '{{ item.areAllPropertyValuesReturned }}'
+      definition: '{{ item.definition }}'
+      propertyName: '{{ item.propertyName }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iottwinmaker.list_scenes
+  for_each: aws.iottwinmaker.list_workspaces
+  calls:
+  - action: list_scenes
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.sceneSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      capabilities: '{{ item.capabilities }}'
+      contentLocation: '{{ item.contentLocation }}'
+      creationDateTime: '{{ item.creationDateTime }}'
+      description: '{{ item.description }}'
+      sceneId: '{{ item.sceneId }}'
+      updateDateTime: '{{ item.updateDateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iottwinmaker.list_sync_jobs
+  for_each: aws.iottwinmaker.list_workspaces
+  calls:
+  - action: list_sync_jobs
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.syncJobSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationDateTime: '{{ item.creationDateTime }}'
+      status: '{{ item.status }}'
+      syncSource: '{{ item.syncSource }}'
+      updateDateTime: '{{ item.updateDateTime }}'
+      workspaceId: '{{ item.workspaceId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iottwinmaker.list_sync_resources
+  for_each: aws.iottwinmaker.list_workspaces
+  calls:
+  - action: list_sync_resources
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+      syncSource: '{{ item.syncSource }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.syncResources }}'
+    item:
+      externalId: '{{ item.externalId }}'
+      resourceId: '{{ item.resourceId }}'
+      resourceType: '{{ item.resourceType }}'
+      status: '{{ item.status }}'
+      updateDateTime: '{{ item.updateDateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iottwinmaker.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+      nextToken: '{{ response.nextToken }}'

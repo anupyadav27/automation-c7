@@ -1,0 +1,120 @@
+version: '1.0'
+provider: aws
+service: ecr
+discovery:
+- calls:
+  - action: describe_repositories
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ecr.describe_repositories
+  emit:
+    as: item
+    item:
+      createdAt: '{{ item.createdAt }}'
+      encryptionConfiguration: '{{ item.encryptionConfiguration }}'
+      imageScanningConfiguration: '{{ item.imageScanningConfiguration }}'
+      imageTagMutability: '{{ item.imageTagMutability }}'
+      imageTagMutabilityExclusionFilters: '{{ item.imageTagMutabilityExclusionFilters }}'
+      registryId: '{{ item.registryId }}'
+      repositories: '{{ item.repositories }}'
+      repositoryArn: '{{ item.repositoryArn }}'
+      repositoryName: '{{ item.repositoryName }}'
+      repositoryUri: '{{ item.repositoryUri }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.repositories }}'
+- calls:
+  - action: get_lifecycle_policy
+    on_error: continue
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+    save_as: response
+  discovery_id: aws.ecr.get_lifecycle_policy
+  emit:
+    as: item
+    item:
+      lastEvaluatedAt: '{{ response.lastEvaluatedAt }}'
+      lifecyclePolicyText: '{{ response.lifecyclePolicyText }}'
+      registryId: '{{ response.registryId }}'
+      repositoryName: '{{ response.repositoryName }}'
+  for_each: aws.ecr.describe_repositories
+- calls:
+  - action: describe_pull_through_cache_rules
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ecr.describe_pull_through_cache_rules
+  emit:
+    as: item
+    item:
+      createdAt: '{{ item.createdAt }}'
+      credentialArn: '{{ item.credentialArn }}'
+      customRoleArn: '{{ item.customRoleArn }}'
+      ecrRepositoryPrefix: '{{ item.ecrRepositoryPrefix }}'
+      pullThroughCacheRules: '{{ item.pullThroughCacheRules }}'
+      registryId: '{{ item.registryId }}'
+      updatedAt: '{{ item.updatedAt }}'
+      upstreamRegistry: '{{ item.upstreamRegistry }}'
+      upstreamRegistryUrl: '{{ item.upstreamRegistryUrl }}'
+      upstreamRepositoryPrefix: '{{ item.upstreamRepositoryPrefix }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.pullThroughCacheRules }}'
+- calls:
+  - action: get_repository_policy
+    on_error: continue
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+    save_as: response
+  discovery_id: aws.ecr.get_repository_policy
+  emit:
+    as: item
+    item:
+      policyText: '{{ response.policyText }}'
+      registryId: '{{ response.registryId }}'
+      repositoryName: '{{ response.repositoryName }}'
+  for_each: aws.ecr.describe_repositories
+- calls:
+  - action: describe_repository_creation_templates
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ecr.describe_repository_creation_templates
+  emit:
+    as: item
+    item:
+      appliedFor: '{{ item.appliedFor }}'
+      createdAt: '{{ item.createdAt }}'
+      customRoleArn: '{{ item.customRoleArn }}'
+      description: '{{ item.description }}'
+      encryptionConfiguration: '{{ item.encryptionConfiguration }}'
+      imageTagMutability: '{{ item.imageTagMutability }}'
+      imageTagMutabilityExclusionFilters: '{{ item.imageTagMutabilityExclusionFilters }}'
+      lifecyclePolicy: '{{ item.lifecyclePolicy }}'
+      prefix: '{{ item.prefix }}'
+      repositoryCreationTemplates: '{{ item.repositoryCreationTemplates[].prefix }}'
+      repositoryPolicy: '{{ item.repositoryPolicy }}'
+      resourceTags: '{{ item.resourceTags }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+      registryId: '{{ response.registryId }}'
+    items_for: '{{ response.repositoryCreationTemplates }}'
+- calls:
+  - action: describe_registry
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ecr.describe_registry
+  emit:
+    as: item
+    item:
+      replicationConfiguration: '{{ response.replicationConfiguration }}'
+      rules: '{{ response.rules }}'
+      registryId: '{{ response.registryId }}'
+- calls:
+  - action: get_registry_scanning_configuration
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ecr.get_registry_scanning_configuration
+  emit:
+    as: item
+    item:
+      rules: '{{ response.scanningConfiguration.rules }}'
+      scanType: '{{ response.scanningConfiguration.scanType }}'
+      scanningConfiguration: '{{ response.scanningConfiguration.scanningConfiguration }}'
+      registryId: '{{ response.registryId }}'

@@ -1,0 +1,96 @@
+# ============================================================
+# Discovery YAML — connectcampaigns (AWS)
+# Generated: 2026-02-21T04:56:57Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: connectcampaigns
+services:
+  client: connectcampaigns
+  module: boto3.client
+discovery:
+  # ── ListCampaigns ──
+  - discovery_id: aws.connectcampaigns.list_campaigns
+    calls:
+      - action: list_campaigns
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.campaignSummaryList }}'
+  # ── Dependent read operations (require identifiers) ──
+  # ── DescribeCampaign ──
+  - discovery_id: aws.connectcampaigns.describe_campaign
+    for_each: aws.connectcampaigns.list_campaigns
+    calls:
+      - action: describe_campaign
+        params:
+          id: '{{ item.id }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        campaign: '{{ response.campaign }}'
+  # ── GetCampaignState ──
+  - discovery_id: aws.connectcampaigns.get_campaign_state
+    for_each: aws.connectcampaigns.list_campaigns
+    calls:
+      - action: get_campaign_state
+        params:
+          id: '{{ item.id }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        state: '{{ response.state }}'
+  # ── GetCampaignStateBatch ──
+  - discovery_id: aws.connectcampaigns.get_campaign_state_batch
+    calls:
+      - action: get_campaign_state_batch
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.successfulRequests }}'
+  # ── GetConnectInstanceConfig ──
+  - discovery_id: aws.connectcampaigns.get_connect_instance_config
+    for_each: aws.connectcampaigns.list_campaigns
+    calls:
+      - action: get_connect_instance_config
+        params:
+          connectInstanceId: '{{ item.connectInstanceId }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        connectInstanceConfig: '{{ response.connectInstanceConfig }}'
+  # ── GetInstanceOnboardingJobStatus ──
+  - discovery_id: aws.connectcampaigns.get_instance_onboarding_job_status
+    for_each: aws.connectcampaigns.list_campaigns
+    calls:
+      - action: get_instance_onboarding_job_status
+        params:
+          connectInstanceId: '{{ item.connectInstanceId }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        connectInstanceOnboardingJobStatus: '{{ response.connectInstanceOnboardingJobStatus }}'
+  # ── ListTagsForResource ──
+  - discovery_id: aws.connectcampaigns.list_tags_for_resource
+    for_each: aws.connectcampaigns.list_campaigns
+    calls:
+      - action: list_tags_for_resource
+        params:
+          arn: '{{ item.arn }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        tags: '{{ response.tags }}'

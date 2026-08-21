@@ -1,0 +1,163 @@
+version: '1.0'
+provider: aws
+service: schemas
+services:
+  client: schemas
+  module: boto3.client
+discovery:
+- discovery_id: aws.schemas.get_resource_policy
+  calls:
+  - action: get_resource_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      RevisionId: '{{ response.RevisionId }}'
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.schemas.list_discoverers
+  calls:
+  - action: list_discoverers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Discoverers }}'
+    item:
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      CrossAccount: '{{ item.CrossAccount }}'
+      DiscovererArn: '{{ item.DiscovererArn }}'
+      DiscovererId: '{{ item.DiscovererId }}'
+      SourceArn: '{{ item.SourceArn }}'
+- discovery_id: aws.schemas.list_registries
+  calls:
+  - action: list_registries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Registries }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      RegistryArn: '{{ item.RegistryArn }}'
+- discovery_id: aws.schemas.describe_code_binding
+  calls:
+  - action: describe_code_binding
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ response.CreationDate }}'
+      Status: '{{ response.Status }}'
+      LastModified: '{{ response.LastModified }}'
+      SchemaVersion: '{{ response.SchemaVersion }}'
+- discovery_id: aws.schemas.describe_discoverer
+  for_each: aws.schemas.list_discoverers
+  calls:
+  - action: describe_discoverer
+    params:
+      DiscovererId: '{{ item.DiscovererId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      State: '{{ response.State }}'
+      Tags: '{{ response.Tags }}'
+      CrossAccount: '{{ response.CrossAccount }}'
+      Description: '{{ response.Description }}'
+      DiscovererArn: '{{ response.DiscovererArn }}'
+      DiscovererId: '{{ response.DiscovererId }}'
+      SourceArn: '{{ response.SourceArn }}'
+- discovery_id: aws.schemas.describe_registry
+  calls:
+  - action: describe_registry
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'
+      Description: '{{ response.Description }}'
+      RegistryArn: '{{ response.RegistryArn }}'
+      RegistryName: '{{ response.RegistryName }}'
+- discovery_id: aws.schemas.describe_schema
+  calls:
+  - action: describe_schema
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Content: '{{ response.Content }}'
+      Description: '{{ response.Description }}'
+      LastModified: '{{ response.LastModified }}'
+      SchemaArn: '{{ response.SchemaArn }}'
+      SchemaName: '{{ response.SchemaName }}'
+      SchemaVersion: '{{ response.SchemaVersion }}'
+      Tags: '{{ response.Tags }}'
+      Type: '{{ response.Type }}'
+      VersionCreatedDate: '{{ response.VersionCreatedDate }}'
+- discovery_id: aws.schemas.get_code_binding_source
+  calls:
+  - action: get_code_binding_source
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Body: '{{ response.Body }}'
+- discovery_id: aws.schemas.get_discovered_schema
+  calls:
+  - action: get_discovered_schema
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Content: '{{ response.Content }}'
+- discovery_id: aws.schemas.list_schema_versions
+  calls:
+  - action: list_schema_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SchemaVersions }}'
+    item:
+      Content: '{{ item.Content }}'
+      SchemaVersion: '{{ item.SchemaVersion }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.schemas.list_schemas
+  calls:
+  - action: list_schemas
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Schemas }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      LastModified: '{{ item.LastModified }}'
+      VersionCount: '{{ item.VersionCount }}'
+- discovery_id: aws.schemas.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.schemas.search_schemas
+  calls:
+  - action: search_schemas
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Schemas }}'

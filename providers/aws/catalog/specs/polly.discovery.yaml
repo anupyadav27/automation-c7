@@ -1,0 +1,62 @@
+# Auto-generated: minimum discoveries for check rules + inventory + engine requirements
+# Sources: polly
+# 3 ops total
+version: '1.0'
+provider: aws
+service: polly
+discovery:
+  - calls:
+    - action: describe_voices
+      on_error: continue
+      save_as: response
+    discovery_id: aws.polly.describe_voices
+    emit:
+      as: item
+      item:
+        AdditionalLanguageCodes: '{{ item.AdditionalLanguageCodes }}'
+        Gender: '{{ item.Gender }}'
+        Id: '{{ item.Id }}'
+        LanguageCode: '{{ item.LanguageCode }}'
+        LanguageName: '{{ item.LanguageName }}'
+        Name: '{{ item.Name }}'
+        SupportedEngines: '{{ item.SupportedEngines }}'
+        Voices: '{{ item.Voices }}'
+      items_for: '{{ response.Voices }}'
+  - calls:
+    - action: list_lexicons
+      on_error: continue
+      save_as: response
+    discovery_id: aws.polly.list_lexicons
+    emit:
+      as: item
+      item:
+        Attributes: '{{ item.Attributes }}'
+        Content: '{{ item.Content }}'
+        Lexicon: '{{ item.Lexicon }}'
+        LexiconAttributes: '{{ item.LexiconAttributes }}'
+        Name: '{{ item.Name }}'
+      items_for: '{{ response.Lexicons }}'
+  - calls:
+    - action: list_speech_synthesis_tasks
+      on_error: continue
+      save_as: response
+    discovery_id: aws.polly.list_speech_synthesis_tasks
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        Engine: '{{ item.Engine }}'
+        LanguageCode: '{{ item.LanguageCode }}'
+        LexiconNames: '{{ item.LexiconNames }}'
+        OutputFormat: '{{ item.OutputFormat }}'
+        OutputUri: '{{ item.OutputUri }}'
+        RequestCharacters: '{{ item.RequestCharacters }}'
+        SampleRate: '{{ item.SampleRate }}'
+        SnsTopicArn: '{{ item.SnsTopicArn }}'
+        SpeechMarkTypes: '{{ item.SpeechMarkTypes }}'
+        TaskId: '{{ item.TaskId }}'
+        TaskStatus: '{{ item.TaskStatus }}'
+        TaskStatusReason: '{{ item.TaskStatusReason }}'
+        TextType: '{{ item.TextType }}'
+        VoiceId: '{{ item.VoiceId }}'
+      items_for: '{{ response.SynthesisTasks }}'

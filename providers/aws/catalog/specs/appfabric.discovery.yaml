@@ -1,0 +1,135 @@
+version: '1.0'
+provider: aws
+service: appfabric
+services:
+  client: appfabric
+  module: boto3.client
+discovery:
+- discovery_id: aws.appfabric.list_app_bundles
+  calls:
+  - action: list_app_bundles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.appBundleSummaryList }}'
+    item:
+      appBundle: '{{ item.appBundle }}'
+      arn: '{{ item.arn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.appfabric.get_app_authorization
+  calls:
+  - action: get_app_authorization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      app: '{{ response.appAuthorization.app }}'
+      appAuthorizationArn: '{{ response.appAuthorization.appAuthorizationArn }}'
+      appBundleArn: '{{ response.appAuthorization.appBundleArn }}'
+      authType: '{{ response.appAuthorization.authType }}'
+      authUrl: '{{ response.appAuthorization.authUrl }}'
+      createdAt: '{{ response.appAuthorization.createdAt }}'
+      persona: '{{ response.appAuthorization.persona }}'
+      status: '{{ response.appAuthorization.status }}'
+      tenant: '{{ response.appAuthorization.status }}'
+      updatedAt: '{{ response.appAuthorization.updatedAt }}'
+      tenantDisplayName: '{{ response.appAuthorization.tenant.tenantDisplayName }}'
+      tenantIdentifier: '{{ response.appAuthorization.tenant.tenantIdentifier }}'
+- discovery_id: aws.appfabric.get_app_bundle
+  calls:
+  - action: get_app_bundle
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.appBundle.arn }}'
+      customerManagedKeyArn: '{{ response.appBundle.customerManagedKeyArn }}'
+- discovery_id: aws.appfabric.get_ingestion
+  calls:
+  - action: get_ingestion
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      app: '{{ response.ingestion.app }}'
+      appBundleArn: '{{ response.ingestion.appBundleArn }}'
+      arn: '{{ response.ingestion.arn }}'
+      createdAt: '{{ response.ingestion.createdAt }}'
+      ingestionType: '{{ response.ingestion.ingestionType }}'
+      state: '{{ response.ingestion.state }}'
+      tenantId: '{{ response.ingestion.tenantId }}'
+      updatedAt: '{{ response.ingestion.updatedAt }}'
+- discovery_id: aws.appfabric.get_ingestion_destination
+  calls:
+  - action: get_ingestion_destination
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.ingestionDestination.arn }}'
+      createdAt: '{{ response.ingestionDestination.createdAt }}'
+      destinationConfiguration: '{{ response.ingestionDestination.destinationConfiguration }}'
+      ingestionArn: '{{ response.ingestionDestination.ingestionArn }}'
+      processingConfiguration: '{{ response.ingestionDestination.processingConfiguration }}'
+      status: '{{ response.ingestionDestination.status }}'
+      statusReason: '{{ response.ingestionDestination.statusReason }}'
+      updatedAt: '{{ response.ingestionDestination.updatedAt }}'
+      format: '{{ response.ingestionDestination.processingConfiguration.auditLog.format }}'
+      schema: '{{ response.ingestionDestination.processingConfiguration.auditLog.schema }}'
+- discovery_id: aws.appfabric.list_app_authorizations
+  calls:
+  - action: list_app_authorizations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.appAuthorizationSummaryList }}'
+    item:
+      app: '{{ item.app }}'
+      appAuthorizationArn: '{{ item.appAuthorizationArn }}'
+      appBundleArn: '{{ item.appBundleArn }}'
+      status: '{{ item.status }}'
+      tenant: '{{ item.tenant }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.appfabric.list_ingestion_destinations
+  calls:
+  - action: list_ingestion_destinations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ingestionDestinations }}'
+    item:
+      arn: '{{ item.arn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.appfabric.list_ingestions
+  calls:
+  - action: list_ingestions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ingestions }}'
+    item:
+      app: '{{ item.app }}'
+      arn: '{{ item.arn }}'
+      state: '{{ item.state }}'
+      tenantId: '{{ item.tenantId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.appfabric.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'

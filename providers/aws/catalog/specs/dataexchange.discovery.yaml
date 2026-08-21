@@ -1,0 +1,279 @@
+version: '1.0'
+provider: aws
+service: dataexchange
+services:
+  client: dataexchange
+  module: boto3.client
+discovery:
+- discovery_id: aws.dataexchange.list_data_grants
+  calls:
+  - action: list_data_grants
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DataGrantSummaries }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      AcceptanceState: '{{ item.AcceptanceState }}'
+      AcceptedAt: '{{ item.AcceptedAt }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DataSetId: '{{ item.DataSetId }}'
+      EndsAt: '{{ item.EndsAt }}'
+      ReceiverPrincipal: '{{ item.ReceiverPrincipal }}'
+      SenderPrincipal: '{{ item.SenderPrincipal }}'
+      SourceDataSetId: '{{ item.SourceDataSetId }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.dataexchange.list_data_sets
+  calls:
+  - action: list_data_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DataSets }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      AssetType: '{{ item.AssetType }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Description: '{{ item.Description }}'
+      Origin: '{{ item.Origin }}'
+      OriginDetails: '{{ item.OriginDetails }}'
+      SourceId: '{{ item.SourceId }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.dataexchange.list_event_actions
+  calls:
+  - action: list_event_actions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EventActions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Action: '{{ item.Action }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Event: '{{ item.Event }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.dataexchange.list_jobs
+  calls:
+  - action: list_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Jobs }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      State: '{{ item.State }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Details: '{{ item.Details }}'
+      Errors: '{{ item.Errors }}'
+      Type: '{{ item.Type }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.dataexchange.list_received_data_grants
+  calls:
+  - action: list_received_data_grants
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DataGrantSummaries }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      AcceptanceState: '{{ item.AcceptanceState }}'
+      AcceptedAt: '{{ item.AcceptedAt }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DataSetId: '{{ item.DataSetId }}'
+      EndsAt: '{{ item.EndsAt }}'
+      ReceiverPrincipal: '{{ item.ReceiverPrincipal }}'
+      SenderPrincipal: '{{ item.SenderPrincipal }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.dataexchange.get_asset
+  for_each: aws.dataexchange.list_data_grants
+  calls:
+  - action: get_asset
+    params:
+      AssetId: '{{ item.AssetId }}'
+      DataSetId: '{{ item.DataSetId }}'
+      RevisionId: '{{ item.RevisionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ApiGatewayApiAsset: '{{ response.AssetDetails.ApiGatewayApiAsset }}'
+      LakeFormationDataPermissionAsset: '{{ response.AssetDetails.LakeFormationDataPermissionAsset
+        }}'
+      RedshiftDataShareAsset: '{{ response.AssetDetails.RedshiftDataShareAsset }}'
+      S3DataAccessAsset: '{{ response.AssetDetails.S3DataAccessAsset }}'
+      S3SnapshotAsset: '{{ response.AssetDetails.S3SnapshotAsset }}'
+- discovery_id: aws.dataexchange.get_data_grant
+  calls:
+  - action: get_data_grant
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      Tags: '{{ response.Tags }}'
+      AcceptanceState: '{{ response.AcceptanceState }}'
+      AcceptedAt: '{{ response.AcceptedAt }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      DataSetId: '{{ response.DataSetId }}'
+      Description: '{{ response.Description }}'
+      EndsAt: '{{ response.EndsAt }}'
+      GrantDistributionScope: '{{ response.GrantDistributionScope }}'
+      ReceiverPrincipal: '{{ response.ReceiverPrincipal }}'
+      SenderPrincipal: '{{ response.SenderPrincipal }}'
+      SourceDataSetId: '{{ response.SourceDataSetId }}'
+      UpdatedAt: '{{ response.UpdatedAt }}'
+- discovery_id: aws.dataexchange.get_data_set
+  for_each: aws.dataexchange.list_data_grants
+  calls:
+  - action: get_data_set
+    params:
+      DataSetId: '{{ item.DataSetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DataGrantId: '{{ response.OriginDetails.DataGrantId }}'
+      ProductId: '{{ response.OriginDetails.ProductId }}'
+- discovery_id: aws.dataexchange.get_event_action
+  calls:
+  - action: get_event_action
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ExportRevisionToS3: '{{ response.Action.ExportRevisionToS3 }}'
+- discovery_id: aws.dataexchange.get_job
+  calls:
+  - action: get_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Errors }}'
+    item:
+      ResourceId: '{{ item.ResourceId }}'
+      Code: '{{ item.Code }}'
+      Details: '{{ item.Details }}'
+      LimitName: '{{ item.LimitName }}'
+      LimitValue: '{{ item.LimitValue }}'
+      Message: '{{ item.Message }}'
+      ResourceType: '{{ item.ResourceType }}'
+- discovery_id: aws.dataexchange.get_received_data_grant
+  calls:
+  - action: get_received_data_grant
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      AcceptanceState: '{{ response.AcceptanceState }}'
+      AcceptedAt: '{{ response.AcceptedAt }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      DataSetId: '{{ response.DataSetId }}'
+      Description: '{{ response.Description }}'
+      EndsAt: '{{ response.EndsAt }}'
+      GrantDistributionScope: '{{ response.GrantDistributionScope }}'
+      ReceiverPrincipal: '{{ response.ReceiverPrincipal }}'
+      SenderPrincipal: '{{ response.SenderPrincipal }}'
+      UpdatedAt: '{{ response.UpdatedAt }}'
+- discovery_id: aws.dataexchange.get_revision
+  for_each: aws.dataexchange.list_data_grants
+  calls:
+  - action: get_revision
+    params:
+      DataSetId: '{{ item.DataSetId }}'
+      RevisionId: '{{ item.RevisionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Tags: '{{ response.Tags }}'
+      Comment: '{{ response.Comment }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      DataSetId: '{{ response.DataSetId }}'
+      Finalized: '{{ response.Finalized }}'
+      RevocationComment: '{{ response.RevocationComment }}'
+      Revoked: '{{ response.Revoked }}'
+      RevokedAt: '{{ response.RevokedAt }}'
+      SourceId: '{{ response.SourceId }}'
+      UpdatedAt: '{{ response.UpdatedAt }}'
+- discovery_id: aws.dataexchange.list_data_set_revisions
+  for_each: aws.dataexchange.list_data_grants
+  calls:
+  - action: list_data_set_revisions
+    params:
+      DataSetId: '{{ item.DataSetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Revisions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Comment: '{{ item.Comment }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DataSetId: '{{ item.DataSetId }}'
+      Finalized: '{{ item.Finalized }}'
+      RevocationComment: '{{ item.RevocationComment }}'
+      Revoked: '{{ item.Revoked }}'
+      RevokedAt: '{{ item.RevokedAt }}'
+      SourceId: '{{ item.SourceId }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.dataexchange.list_revision_assets
+  for_each: aws.dataexchange.list_data_grants
+  calls:
+  - action: list_revision_assets
+    params:
+      DataSetId: '{{ item.DataSetId }}'
+      RevisionId: '{{ item.RevisionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Assets }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      AssetDetails: '{{ item.AssetDetails }}'
+      AssetType: '{{ item.AssetType }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DataSetId: '{{ item.DataSetId }}'
+      RevisionId: '{{ item.RevisionId }}'
+      SourceId: '{{ item.SourceId }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.dataexchange.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

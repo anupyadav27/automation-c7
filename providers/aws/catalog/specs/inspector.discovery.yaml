@@ -1,0 +1,143 @@
+version: '1.0'
+provider: aws
+service: inspector
+discovery:
+- calls:
+  - action: list_rules_packages
+    on_error: continue
+    save_as: response
+  discovery_id: aws.inspector.list_rules_packages
+  emit:
+    as: item
+    item:
+      rulesPackages: '{{ item.rulesPackages }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.rulesPackageArns }}'
+- calls:
+  - action: list_assessment_runs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.inspector.list_assessment_runs
+  emit:
+    as: item
+    item:
+      assessmentRuns: '{{ item.assessmentRuns }}'
+      assessmentTemplateArn: '{{ item.assessmentTemplateArn }}'
+      completedAt: '{{ item.completedAt }}'
+      createdAt: '{{ item.createdAt }}'
+      dataCollected: '{{ item.dataCollected }}'
+      durationInSeconds: '{{ item.durationInSeconds }}'
+      failedItems: '{{ item.failedItems }}'
+      findingCounts: '{{ item.findingCounts }}'
+      name: '{{ item.name }}'
+      notifications: '{{ item.notifications }}'
+      rulesPackageArns: '{{ item.rulesPackageArns }}'
+      startedAt: '{{ item.startedAt }}'
+      state: '{{ item.state }}'
+      stateChangedAt: '{{ item.stateChangedAt }}'
+      stateChanges: '{{ item.stateChanges }}'
+      userAttributesForFindings: '{{ item.userAttributesForFindings }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.assessmentRunArns }}'
+- calls:
+  - action: describe_assessment_runs
+    on_error: continue
+    params:
+      assessmentRunArns: '{{ item.assessmentRunArns }}'
+    save_as: response
+  discovery_id: aws.inspector.describe_assessment_runs
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      assessmentRuns: '{{ item.assessmentRuns }}'
+      assessmentTemplateArn: '{{ item.assessmentTemplateArn }}'
+      completedAt: '{{ item.completedAt }}'
+      createdAt: '{{ item.createdAt }}'
+      dataCollected: '{{ item.dataCollected }}'
+      durationInSeconds: '{{ item.durationInSeconds }}'
+      failedItems: '{{ item.failedItems }}'
+      findingCounts: '{{ item.findingCounts }}'
+      name: '{{ item.name }}'
+      notifications: '{{ item.notifications }}'
+      rulesPackageArns: '{{ item.rulesPackageArns }}'
+      startedAt: '{{ item.startedAt }}'
+      state: '{{ item.state }}'
+      stateChangedAt: '{{ item.stateChangedAt }}'
+      stateChanges: '{{ item.stateChanges }}'
+      userAttributesForFindings: '{{ item.userAttributesForFindings }}'
+    items_for: '{{ response.assessmentRuns }}'
+  for_each: aws.inspector.list_assessment_runs
+- calls:
+  - action: describe_findings
+    on_error: continue
+    save_as: response
+  discovery_id: aws.inspector.describe_findings
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      assetAttributes: '{{ item.assetAttributes }}'
+      assetType: '{{ item.assetType }}'
+      attributes: '{{ item.attributes }}'
+      confidence: '{{ item.confidence }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      findings: '{{ item.findings }}'
+      id: '{{ item.id }}'
+      indicatorOfCompromise: '{{ item.indicatorOfCompromise }}'
+      numericSeverity: '{{ item.numericSeverity }}'
+      recommendation: '{{ item.recommendation }}'
+      schemaVersion: '{{ item.schemaVersion }}'
+      service: '{{ item.service }}'
+      serviceAttributes: '{{ item.serviceAttributes }}'
+      severity: '{{ item.severity }}'
+      title: '{{ item.title }}'
+      updatedAt: '{{ item.updatedAt }}'
+      userAttributes: '{{ item.userAttributes }}'
+      failedItems: '{{ response.failedItems }}'
+    items_for: '{{ response.findings }}'
+- calls:
+  - action: describe_cross_account_access_role
+    on_error: continue
+    save_as: response
+  discovery_id: aws.inspector.describe_cross_account_access_role
+  emit:
+    as: item
+    item:
+      registeredAt: '{{ response.registeredAt }}'
+      roleArn: '{{ response.roleArn }}'
+      valid: '{{ response.valid }}'
+- calls:
+  - action: describe_assessment_templates
+    on_error: continue
+    save_as: response
+  discovery_id: aws.inspector.describe_assessment_templates
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      assessmentRunCount: '{{ item.assessmentRunCount }}'
+      assessmentTargetArn: '{{ item.assessmentTargetArn }}'
+      assessmentTemplates: '{{ item.assessmentTemplates[].arn }}'
+      createdAt: '{{ item.createdAt }}'
+      durationInSeconds: '{{ item.durationInSeconds }}'
+      lastAssessmentRunArn: '{{ item.lastAssessmentRunArn }}'
+      name: '{{ item.name }}'
+      rulesPackageArns: '{{ item.rulesPackageArns }}'
+      userAttributesForFindings: '{{ item.userAttributesForFindings }}'
+      failedItems: '{{ response.failedItems }}'
+    items_for: '{{ response.assessmentTemplates }}'
+- calls:
+  - action: list_event_subscriptions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.inspector.list_event_subscriptions
+  emit:
+    as: item
+    item:
+      eventSubscriptions: '{{ item.eventSubscriptions }}'
+      resourceArn: '{{ item.resourceArn }}'
+      topicArn: '{{ item.topicArn }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.subscriptions }}'

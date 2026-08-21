@@ -1,0 +1,387 @@
+version: '1.0'
+provider: aws
+service: ivs-realtime
+services:
+  client: ivs-realtime
+  module: boto3.client
+discovery:
+- discovery_id: aws.ivs-realtime.list_compositions
+  calls:
+  - action: list_compositions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.compositions }}'
+    item:
+      arn: '{{ item.arn }}'
+      autoParticipantRecordingConfiguration: '{{ item.autoParticipantRecordingConfiguration }}'
+      composition: '{{ item.composition }}'
+      destinations: '{{ item.destinations }}'
+      endTime: '{{ item.endTime }}'
+      endpoints: '{{ item.endpoints }}'
+      firstJoinTime: '{{ item.firstJoinTime }}'
+      layout: '{{ item.layout }}'
+      published: '{{ item.published }}'
+      recordingState: '{{ item.recordingState }}'
+      replicationState: '{{ item.replicationState }}'
+      replicationType: '{{ item.replicationType }}'
+      stageArn: '{{ item.stageArn }}'
+      stageSession: '{{ item.stageSession }}'
+      startTime: '{{ item.startTime }}'
+      state: '{{ item.state }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs-realtime.list_encoder_configurations
+  calls:
+  - action: list_encoder_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.encoderConfigurations }}'
+    item:
+      arn: '{{ item.arn }}'
+      encoderConfiguration: '{{ item.encoderConfigurations[].arn }}'
+      name: '{{ item.name }}'
+      tags: '{{ item.tags }}'
+      video: '{{ item.video }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs-realtime.list_ingest_configurations
+  calls:
+  - action: list_ingest_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ingestConfigurations }}'
+    item:
+      arn: '{{ item.arn }}'
+      ingestProtocol: '{{ item.ingestProtocol }}'
+      name: '{{ item.name }}'
+      participantId: '{{ item.participantId }}'
+      stageArn: '{{ item.stageArn }}'
+      state: '{{ item.state }}'
+      userId: '{{ item.userId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs-realtime.list_public_keys
+  calls:
+  - action: list_public_keys
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.publicKeys }}'
+    item:
+      arn: '{{ item.arn }}'
+      name: '{{ item.name }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs-realtime.list_stages
+  calls:
+  - action: list_stages
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.stages }}'
+    item:
+      activeSessionId: '{{ item.activeSessionId }}'
+      arn: '{{ item.arn }}'
+      name: '{{ item.name }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs-realtime.list_storage_configurations
+  calls:
+  - action: list_storage_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.storageConfigurations }}'
+    item:
+      arn: '{{ item.arn }}'
+      name: '{{ item.name }}'
+      s3: '{{ item.s3 }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs-realtime.get_composition
+  for_each: aws.ivs-realtime.list_compositions
+  calls:
+  - action: get_composition
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.composition.arn }}'
+      composition: '{{ response.composition.composition }}'
+      destinations: '{{ response.composition.destinations[].id }}'
+      endTime: '{{ response.composition.endTime }}'
+      layout: '{{ response.composition.layout }}'
+      stageArn: '{{ response.composition.stageArn }}'
+      startTime: '{{ response.composition.startTime }}'
+      state: '{{ response.composition.state }}'
+      tags: '{{ response.composition.tags }}'
+      featuredParticipantAttribute: '{{ response.composition.layout.grid.featuredParticipantAttribute }}'
+      gridGap: '{{ response.composition.layout.grid.gridGap }}'
+      omitStoppedVideo: '{{ response.composition.layout.grid.omitStoppedVideo }}'
+      videoAspectRatio: '{{ response.composition.layout.grid.videoAspectRatio }}'
+      videoFillMode: '{{ response.composition.layout.grid.videoFillMode }}'
+      pipBehavior: '{{ response.composition.layout.pip.pipBehavior }}'
+      pipHeight: '{{ response.composition.layout.pip.pipHeight }}'
+      pipOffset: '{{ response.composition.layout.pip.pipOffset }}'
+      pipParticipantAttribute: '{{ response.composition.layout.pip.pipParticipantAttribute }}'
+      pipPosition: '{{ response.composition.layout.pip.pipPosition }}'
+      pipWidth: '{{ response.composition.layout.pip.pipWidth }}'
+- discovery_id: aws.ivs-realtime.get_encoder_configuration
+  for_each: aws.ivs-realtime.list_compositions
+  calls:
+  - action: get_encoder_configuration
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.encoderConfiguration.arn }}'
+      encoderConfiguration: '{{ response.encoderConfiguration.encoderConfiguration }}'
+      name: '{{ response.encoderConfiguration.name }}'
+      tags: '{{ response.encoderConfiguration.tags }}'
+      video: '{{ response.encoderConfiguration.video.width }}'
+      bitrate: '{{ response.encoderConfiguration.video.bitrate }}'
+      framerate: '{{ response.encoderConfiguration.video.framerate }}'
+      height: '{{ response.encoderConfiguration.video.height }}'
+      width: '{{ response.encoderConfiguration.video.width }}'
+- discovery_id: aws.ivs-realtime.get_ingest_configuration
+  for_each: aws.ivs-realtime.list_compositions
+  calls:
+  - action: get_ingest_configuration
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.ingestConfiguration.arn }}'
+      attributes: '{{ response.ingestConfiguration.attributes }}'
+      ingestProtocol: '{{ response.ingestConfiguration.ingestProtocol }}'
+      name: '{{ response.ingestConfiguration.name }}'
+      participantId: '{{ response.ingestConfiguration.participantId }}'
+      stageArn: '{{ response.ingestConfiguration.stageArn }}'
+      state: '{{ response.ingestConfiguration.state }}'
+      streamKey: '{{ response.ingestConfiguration.streamKey }}'
+      tags: '{{ response.ingestConfiguration.tags }}'
+      userId: '{{ response.ingestConfiguration.userId }}'
+- discovery_id: aws.ivs-realtime.get_participant
+  for_each: aws.ivs-realtime.list_compositions
+  calls:
+  - action: get_participant
+    params:
+      stageArn: '{{ item.stageArn }}'
+      sessionId: '{{ item.sessionId }}'
+      participantId: '{{ item.participantId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      attributes: '{{ response.participant.attributes }}'
+      browserName: '{{ response.participant.browserName }}'
+      browserVersion: '{{ response.participant.browserVersion }}'
+      ispName: '{{ response.participant.ispName }}'
+      osName: '{{ response.participant.osName }}'
+      osVersion: '{{ response.participant.osVersion }}'
+      participant: '{{ response.participant.participantId }}'
+      participantId: '{{ response.participant.participantId }}'
+      protocol: '{{ response.participant.protocol }}'
+      recordingS3BucketName: '{{ response.participant.recordingS3BucketName }}'
+      recordingS3Prefix: '{{ response.participant.recordingS3Prefix }}'
+      sdkVersion: '{{ response.participant.sdkVersion }}'
+      sourceSessionId: '{{ response.participant.sourceSessionId }}'
+      sourceStageArn: '{{ response.participant.sourceStageArn }}'
+      state: '{{ response.participant.state }}'
+      userId: '{{ response.participant.userId }}'
+      firstJoinTime: '{{ response.participant.firstJoinTime }}'
+      published: '{{ response.participant.published }}'
+      recordingState: '{{ response.participant.recordingState }}'
+      replicationState: '{{ response.participant.replicationState }}'
+      replicationType: '{{ response.participant.replicationType }}'
+- discovery_id: aws.ivs-realtime.get_public_key
+  for_each: aws.ivs-realtime.list_compositions
+  calls:
+  - action: get_public_key
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.publicKey.arn }}'
+      fingerprint: '{{ response.publicKey.fingerprint }}'
+      name: '{{ response.publicKey.name }}'
+      publicKeyMaterial: '{{ response.publicKey.publicKeyMaterial }}'
+      tags: '{{ response.publicKey.tags }}'
+- discovery_id: aws.ivs-realtime.get_stage
+  for_each: aws.ivs-realtime.list_compositions
+  calls:
+  - action: get_stage
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      activeSessionId: '{{ response.stage.activeSessionId }}'
+      arn: '{{ response.stage.arn }}'
+      autoParticipantRecordingConfiguration: '{{ response.stage.autoParticipantRecordingConfiguration }}'
+      endpoints: '{{ response.stage.endpoints.whip }}'
+      name: '{{ response.stage.name }}'
+      tags: '{{ response.stage.tags }}'
+      targetSegmentDurationSeconds: '{{ response.stage.autoParticipantRecordingConfiguration.hlsConfiguration.targetSegmentDurationSeconds }}'
+      recordParticipantReplicas: '{{ response.stage.autoParticipantRecordingConfiguration.recordParticipantReplicas }}'
+      recordingReconnectWindowSeconds: '{{ response.stage.autoParticipantRecordingConfiguration.recordingReconnectWindowSeconds }}'
+      storageConfigurationArn: '{{ response.stage.autoParticipantRecordingConfiguration.storageConfigurationArn }}'
+      recordingMode: '{{ response.stage.autoParticipantRecordingConfiguration.thumbnailConfiguration.recordingMode }}'
+      targetIntervalSeconds: '{{ response.stage.autoParticipantRecordingConfiguration.thumbnailConfiguration.targetIntervalSeconds }}'
+      events: '{{ response.stage.endpoints.events }}'
+      rtmp: '{{ response.stage.endpoints.rtmp }}'
+      rtmps: '{{ response.stage.endpoints.rtmps }}'
+      whip: '{{ response.stage.endpoints.whip }}'
+- discovery_id: aws.ivs-realtime.get_stage_session
+  for_each: aws.ivs-realtime.list_compositions
+  calls:
+  - action: get_stage_session
+    params:
+      stageArn: '{{ item.stageArn }}'
+      sessionId: '{{ item.sessionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      endTime: '{{ response.stageSession.endTime }}'
+      sessionId: '{{ response.stageSession.sessionId }}'
+      stageSession: '{{ response.stageSession.sessionId }}'
+      startTime: '{{ response.stageSession.startTime }}'
+- discovery_id: aws.ivs-realtime.get_storage_configuration
+  for_each: aws.ivs-realtime.list_compositions
+  calls:
+  - action: get_storage_configuration
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.storageConfiguration.arn }}'
+      name: '{{ response.storageConfiguration.name }}'
+      s3: '{{ response.storageConfiguration.tags }}'
+      tags: '{{ response.storageConfiguration.tags }}'
+      bucketName: '{{ response.storageConfiguration.s3.bucketName }}'
+- discovery_id: aws.ivs-realtime.list_participant_events
+  for_each: aws.ivs-realtime.list_compositions
+  calls:
+  - action: list_participant_events
+    params:
+      stageArn: '{{ item.stageArn }}'
+      sessionId: '{{ item.sessionId }}'
+      participantId: '{{ item.participantId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.events }}'
+    item:
+      destinationSessionId: '{{ item.destinationSessionId }}'
+      destinationStageArn: '{{ item.destinationStageArn }}'
+      errorCode: '{{ item.errorCode }}'
+      eventTime: '{{ item.eventTime }}'
+      name: '{{ item.name }}'
+      participant: '{{ item.participant }}'
+      participantId: '{{ item.participantId }}'
+      remoteParticipantId: '{{ item.remoteParticipantId }}'
+      replica: '{{ item.replica }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs-realtime.list_participant_replicas
+  for_each: aws.ivs-realtime.list_ingest_configurations
+  calls:
+  - action: list_participant_replicas
+    params:
+      sourceStageArn: '{{ item.sourceStageArn }}'
+      participantId: '{{ item.participantId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.replicas }}'
+    item:
+      destinationSessionId: '{{ item.destinationSessionId }}'
+      destinationStageArn: '{{ item.destinationStageArn }}'
+      participantId: '{{ item.participantId }}'
+      replicationState: '{{ item.replicationState }}'
+      sourceSessionId: '{{ item.sourceSessionId }}'
+      sourceStageArn: '{{ item.sourceStageArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs-realtime.list_participants
+  for_each: aws.ivs-realtime.list_compositions
+  calls:
+  - action: list_participants
+    params:
+      stageArn: '{{ item.stageArn }}'
+      sessionId: '{{ item.sessionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.participants }}'
+    item:
+      firstJoinTime: '{{ item.firstJoinTime }}'
+      participantId: '{{ item.participantId }}'
+      published: '{{ item.published }}'
+      recordingState: '{{ item.recordingState }}'
+      replicationState: '{{ item.replicationState }}'
+      replicationType: '{{ item.replicationType }}'
+      sourceSessionId: '{{ item.sourceSessionId }}'
+      sourceStageArn: '{{ item.sourceStageArn }}'
+      state: '{{ item.state }}'
+      userId: '{{ item.userId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs-realtime.list_stage_sessions
+  for_each: aws.ivs-realtime.list_compositions
+  calls:
+  - action: list_stage_sessions
+    params:
+      stageArn: '{{ item.stageArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.stageSessions }}'
+    item:
+      endTime: '{{ item.endTime }}'
+      firstJoinTime: '{{ item.firstJoinTime }}'
+      published: '{{ item.published }}'
+      recordingState: '{{ item.recordingState }}'
+      replicationState: '{{ item.replicationState }}'
+      replicationType: '{{ item.replicationType }}'
+      sessionId: '{{ item.sessionId }}'
+      stageSession: '{{ item.stageSession }}'
+      startTime: '{{ item.startTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs-realtime.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

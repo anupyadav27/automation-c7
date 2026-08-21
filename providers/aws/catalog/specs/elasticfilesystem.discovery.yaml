@@ -1,0 +1,182 @@
+version: '1.0'
+provider: aws
+service: efs
+services:
+  client: efs
+  module: boto3.client
+discovery:
+- discovery_id: aws.efs.describe_access_points
+  calls:
+  - action: describe_access_points
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AccessPoints }}'
+    item:
+      Name: '{{ item.Name }}'
+      OwnerId: '{{ item.OwnerId }}'
+      Policy: '{{ item.Policy }}'
+      Tags: '{{ item.Tags }}'
+      AccessPointArn: '{{ item.AccessPointArn }}'
+      AccessPointId: '{{ item.AccessPointId }}'
+      AccessPoints: '{{ item.AccessPoints }}'
+      ClientToken: '{{ item.ClientToken }}'
+      FileSystemId: '{{ item.FileSystemId }}'
+      LifeCycleState: '{{ item.LifeCycleState }}'
+      PosixUser: '{{ item.PosixUser }}'
+      RootDirectory: '{{ item.RootDirectory }}'
+- discovery_id: aws.efs.describe_account_preferences
+  calls:
+  - action: describe_account_preferences
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ResourceIdType: '{{ response.ResourceIdPreference.ResourceIdType }}'
+      Resources: '{{ response.ResourceIdPreference.Resources }}'
+- discovery_id: aws.efs.describe_file_systems
+  calls:
+  - action: describe_file_systems
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.FileSystems }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      Encrypted: '{{ item.Encrypted }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      Name: '{{ item.Name }}'
+      OwnerId: '{{ item.OwnerId }}'
+      Tags: '{{ item.Tags }}'
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      AvailabilityZoneName: '{{ item.AvailabilityZoneName }}'
+      CreationToken: '{{ item.CreationToken }}'
+      FileSystemArn: '{{ item.FileSystemArn }}'
+      FileSystemId: '{{ item.FileSystemId }}'
+      FileSystemProtection: '{{ item.FileSystemProtection }}'
+      FileSystems: '{{ item.FileSystems }}'
+      LifeCycleState: '{{ item.LifeCycleState }}'
+      NumberOfMountTargets: '{{ item.NumberOfMountTargets }}'
+      PerformanceMode: '{{ item.PerformanceMode }}'
+      ProvisionedThroughputInMibps: '{{ item.ProvisionedThroughputInMibps }}'
+      SizeInBytes: '{{ item.SizeInBytes }}'
+      ThroughputMode: '{{ item.ThroughputMode }}'
+- discovery_id: aws.efs.describe_mount_targets
+  calls:
+  - action: describe_mount_targets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MountTargets }}'
+    item:
+      OwnerId: '{{ item.OwnerId }}'
+      SubnetId: '{{ item.SubnetId }}'
+      VpcId: '{{ item.VpcId }}'
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      AvailabilityZoneName: '{{ item.AvailabilityZoneName }}'
+      FileSystemId: '{{ item.FileSystemId }}'
+      IpAddress: '{{ item.IpAddress }}'
+      Ipv6Address: '{{ item.Ipv6Address }}'
+      LifeCycleState: '{{ item.LifeCycleState }}'
+      MountTargetId: '{{ item.MountTargetId }}'
+      MountTargets: '{{ item.MountTargets }}'
+      NetworkInterfaceId: '{{ item.NetworkInterfaceId }}'
+- discovery_id: aws.efs.describe_replication_configurations
+  calls:
+  - action: describe_replication_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Replications }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      Destinations: '{{ item.Destinations }}'
+      OriginalSourceFileSystemArn: '{{ item.OriginalSourceFileSystemArn }}'
+      Replications: '{{ item.Replications }}'
+      SourceFileSystemArn: '{{ item.SourceFileSystemArn }}'
+      SourceFileSystemId: '{{ item.SourceFileSystemId }}'
+      SourceFileSystemOwnerId: '{{ item.SourceFileSystemOwnerId }}'
+      SourceFileSystemRegion: '{{ item.SourceFileSystemRegion }}'
+- discovery_id: aws.efs.describe_backup_policy
+  for_each: aws.efs.describe_file_systems
+  calls:
+  - action: describe_backup_policy
+    params:
+      FileSystemId: '{{ item.FileSystemId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.BackupPolicy.Status }}'
+      Statement: '{{ response.BackupPolicy.Statement }}'
+      Version: '{{ response.BackupPolicy.Version }}'
+- discovery_id: aws.efs.describe_file_system_policy
+  for_each: aws.efs.describe_file_systems
+  calls:
+  - action: describe_file_system_policy
+    params:
+      FileSystemId: '{{ item.FileSystemId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      FileSystemId: '{{ response.FileSystemId }}'
+- discovery_id: aws.efs.describe_lifecycle_configuration
+  for_each: aws.efs.describe_file_systems
+  calls:
+  - action: describe_lifecycle_configuration
+    params:
+      FileSystemId: '{{ item.FileSystemId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LifecyclePolicies }}'
+    item:
+      TransitionToArchive: '{{ item.TransitionToArchive }}'
+      TransitionToIA: '{{ item.TransitionToIA }}'
+      TransitionToPrimaryStorageClass: '{{ item.TransitionToPrimaryStorageClass }}'
+- discovery_id: aws.efs.describe_mount_target_security_groups
+  for_each: aws.efs.describe_mount_targets
+  calls:
+  - action: describe_mount_target_security_groups
+    params:
+      MountTargetId: '{{ item.MountTargetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SecurityGroups }}'
+- discovery_id: aws.efs.describe_tags
+  for_each: aws.efs.describe_file_systems
+  calls:
+  - action: describe_tags
+    params:
+      FileSystemId: '{{ item.FileSystemId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.efs.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

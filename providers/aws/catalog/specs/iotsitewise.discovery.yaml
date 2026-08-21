@@ -1,0 +1,969 @@
+version: '1.0'
+provider: aws
+service: iotsitewise
+services:
+  client: iotsitewise
+  module: boto3.client
+discovery:
+- discovery_id: aws.iotsitewise.describe_default_encryption_configuration
+  calls:
+  - action: describe_default_encryption_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+      Enabled: '{{ response.Enabled }}'
+      configurationStatus: '{{ response.configurationStatus.state }}'
+      encryptionType: '{{ response.encryptionType }}'
+      error: '{{ response.error }}'
+      kmsKeyArn: '{{ response.kmsKeyArn }}'
+      state: '{{ response.state }}'
+      code: '{{ response.configurationStatus.error.code }}'
+      message: '{{ response.configurationStatus.error.message }}'
+- discovery_id: aws.iotsitewise.describe_logging_options
+  calls:
+  - action: describe_logging_options
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      level: '{{ response.loggingOptions.level }}'
+      loggingOptions: '{{ response.loggingOptions.loggingOptions }}'
+- discovery_id: aws.iotsitewise.describe_storage_configuration
+  calls:
+  - action: describe_storage_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      customerManagedS3Storage: '{{ response.multiLayerStorage.customerManagedS3Storage.roleArn }}'
+      disallowIngestNullNaN: '{{ response.multiLayerStorage.disallowIngestNullNaN }}'
+      disassociatedDataStorage: '{{ response.multiLayerStorage.disassociatedDataStorage }}'
+      multiLayerStorage: '{{ response.multiLayerStorage.multiLayerStorage }}'
+      retentionPeriod: '{{ response.multiLayerStorage.retentionPeriod }}'
+      storageType: '{{ response.multiLayerStorage.storageType }}'
+      warmTier: '{{ response.multiLayerStorage.warmTier }}'
+      warmTierRetentionPeriod: '{{ response.multiLayerStorage.warmTierRetentionPeriod }}'
+      code: '{{ response.configurationStatus.error.code }}'
+      message: '{{ response.configurationStatus.error.message }}'
+      state: '{{ response.configurationStatus.state }}'
+      lastUpdateDate: '{{ response.lastUpdateDate }}'
+      roleArn: '{{ response.multiLayerStorage.customerManagedS3Storage.roleArn }}'
+      s3ResourceArn: '{{ response.multiLayerStorage.customerManagedS3Storage.s3ResourceArn }}'
+      numberOfDays: '{{ response.retentionPeriod.numberOfDays }}'
+      unlimited: '{{ response.retentionPeriod.unlimited }}'
+- discovery_id: aws.iotsitewise.describe_time_series
+  calls:
+  - action: describe_time_series
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      alias: '{{ response.alias }}'
+      assetId: '{{ response.assetId }}'
+      dataType: '{{ response.dataType }}'
+      dataTypeSpec: '{{ response.dataTypeSpec }}'
+      propertyId: '{{ response.propertyId }}'
+      timeSeriesArn: '{{ response.timeSeriesArn }}'
+      timeSeriesCreationDate: '{{ response.timeSeriesCreationDate }}'
+      timeSeriesId: '{{ response.timeSeriesId }}'
+      timeSeriesLastUpdateDate: '{{ response.timeSeriesLastUpdateDate }}'
+- discovery_id: aws.iotsitewise.get_asset_property_value
+  calls:
+  - action: get_asset_property_value
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      propertyValue: '{{ response.propertyValue.propertyValue }}'
+      quality: '{{ response.propertyValue.quality }}'
+      timestamp: '{{ response.propertyValue.timestamp }}'
+      value: '{{ response.propertyValue.value }}'
+      offsetInNanos: '{{ response.propertyValue.timestamp.offsetInNanos }}'
+      timeInSeconds: '{{ response.propertyValue.timestamp.timeInSeconds }}'
+      booleanValue: '{{ response.propertyValue.value.booleanValue }}'
+      doubleValue: '{{ response.propertyValue.value.doubleValue }}'
+      integerValue: '{{ response.propertyValue.value.integerValue }}'
+      valueType: '{{ response.propertyValue.value.nullValue.valueType }}'
+      stringValue: '{{ response.propertyValue.value.stringValue }}'
+- discovery_id: aws.iotsitewise.get_asset_property_value_history
+  calls:
+  - action: get_asset_property_value_history
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assetPropertyValueHistory }}'
+    item:
+      assetPropertyValueHistory: '{{ item.assetPropertyValueHistory }}'
+      quality: '{{ item.quality }}'
+      timestamp: '{{ item.timestamp }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_access_policies
+  calls:
+  - action: list_access_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.accessPolicySummaries }}'
+    item:
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+      accessPolicyCreationDate: '{{ item.accessPolicyCreationDate }}'
+      accessPolicyId: '{{ item.accessPolicyId }}'
+      accessPolicyIdentity: '{{ item.accessPolicyIdentity }}'
+      accessPolicyPermission: '{{ item.accessPolicyPermission }}'
+      accessPolicyResource: '{{ item.accessPolicyResource }}'
+      creationDate: '{{ item.creationDate }}'
+      id: '{{ item.id }}'
+      identity: '{{ item.identity }}'
+      lastUpdateDate: '{{ item.lastUpdateDate }}'
+      permission: '{{ item.permission }}'
+      resource: '{{ item.resource }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_asset_models
+  calls:
+  - action: list_asset_models
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assetModelSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      assetCompositeModelSummaries: '{{ item.assetCompositeModelSummaries }}'
+      assetDescription: '{{ item.assetDescription }}'
+      assetHierarchies: '{{ item.assetHierarchies }}'
+      assetModelCreationDate: '{{ item.assetModelCreationDate }}'
+      assetModelDescription: '{{ item.assetModelDescription }}'
+      assetModelStatus: '{{ item.assetModelStatus }}'
+      assetModelType: '{{ item.assetModelType }}'
+      assetModelVersion: '{{ item.assetModelVersion }}'
+      assetName: '{{ item.assetName }}'
+      computationModelVersion: '{{ item.computationModelVersion }}'
+      creationDate: '{{ item.creationDate }}'
+      description: '{{ item.description }}'
+      externalId: '{{ item.externalId }}'
+      id: '{{ item.id }}'
+      interfaceAssetModelId: '{{ item.interfaceAssetModelId }}'
+      lastUpdateDate: '{{ item.lastUpdateDate }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_assets
+  calls:
+  - action: list_assets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assetSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      assetArn: '{{ item.assetArn }}'
+      assetDescription: '{{ item.assetDescription }}'
+      assetHierarchies: '{{ item.assetHierarchies }}'
+      assetModelId: '{{ item.assetModelId }}'
+      assetName: '{{ item.assetName }}'
+      assetStatus: '{{ item.assetStatus }}'
+      creationDate: '{{ item.creationDate }}'
+      description: '{{ item.description }}'
+      externalId: '{{ item.externalId }}'
+      hierarchies: '{{ item.hierarchies }}'
+      id: '{{ item.id }}'
+      lastUpdateDate: '{{ item.lastUpdateDate }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_bulk_import_jobs
+  calls:
+  - action: list_bulk_import_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.jobSummaries }}'
+    item:
+      files: '{{ item.files }}'
+      id: '{{ item.id }}'
+      jobCreationDate: '{{ item.jobCreationDate }}'
+      jobId: '{{ item.jobId }}'
+      jobName: '{{ item.jobName }}'
+      jobRoleArn: '{{ item.jobRoleArn }}'
+      jobStatus: '{{ item.jobStatus }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_computation_models
+  calls:
+  - action: list_computation_models
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.computationModelSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      assetCompositeModelDescription: '{{ item.assetCompositeModelDescription }}'
+      assetCompositeModelSummaries: '{{ item.assetCompositeModelSummaries }}'
+      assetModelArn: '{{ item.assetModelArn }}'
+      assetModelCompositeModelDescription: '{{ item.assetModelCompositeModelDescription }}'
+      assetModelCreationDate: '{{ item.assetModelCreationDate }}'
+      assetModelDescription: '{{ item.assetModelDescription }}'
+      computationModelArn: '{{ item.computationModelArn }}'
+      computationModelCreationDate: '{{ item.computationModelCreationDate }}'
+      computationModelDescription: '{{ item.computationModelDescription }}'
+      computationModelStatus: '{{ item.computationModelStatus }}'
+      computationModelVersion: '{{ item.computationModelVersion }}'
+      creationDate: '{{ item.creationDate }}'
+      datasetCreationDate: '{{ item.datasetCreationDate }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      jobCreationDate: '{{ item.jobCreationDate }}'
+      lastUpdateDate: '{{ item.lastUpdateDate }}'
+      name: '{{ item.name }}'
+      portalCreationDate: '{{ item.portalCreationDate }}'
+      projectCreationDate: '{{ item.projectCreationDate }}'
+      status: '{{ item.status }}'
+      type: '{{ item.type }}'
+      version: '{{ item.version }}'
+- discovery_id: aws.iotsitewise.list_gateways
+  calls:
+  - action: list_gateways
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.gatewaySummaries }}'
+    item:
+      creationDate: '{{ item.creationDate }}'
+      gatewayArn: '{{ item.gatewayArn }}'
+      gatewayCapabilitySummaries: '{{ item.gatewayCapabilitySummaries }}'
+      gatewayId: '{{ item.gatewayId }}'
+      gatewayName: '{{ item.gatewayName }}'
+      gatewayPlatform: '{{ item.gatewayPlatform }}'
+      gatewayVersion: '{{ item.gatewayVersion }}'
+      lastUpdateDate: '{{ item.lastUpdateDate }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_portals
+  calls:
+  - action: list_portals
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.portalSummaries }}'
+    item:
+      alarms: '{{ item.alarms }}'
+      creationDate: '{{ item.creationDate }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      jobRoleArn: '{{ item.jobRoleArn }}'
+      lastUpdateDate: '{{ item.lastUpdateDate }}'
+      name: '{{ item.name }}'
+      notificationSenderEmail: '{{ item.notificationSenderEmail }}'
+      portalArn: '{{ item.portalArn }}'
+      portalAuthMode: '{{ item.portalAuthMode }}'
+      portalClientId: '{{ item.portalClientId }}'
+      portalContactEmail: '{{ item.portalContactEmail }}'
+      portalCreationDate: '{{ item.portalCreationDate }}'
+      portalDescription: '{{ item.portalDescription }}'
+      portalId: '{{ item.portalId }}'
+      portalLogoImageLocation: '{{ item.portalLogoImageLocation }}'
+      portalName: '{{ item.portalName }}'
+      portalStartUrl: '{{ item.portalStartUrl }}'
+      portalStatus: '{{ item.portalStatus }}'
+      portalType: '{{ item.portalType }}'
+      portalTypeConfiguration: '{{ item.portalTypeConfiguration }}'
+      projectDescription: '{{ item.projectDescription }}'
+      projectId: '{{ item.projectId }}'
+      projectName: '{{ item.projectName }}'
+      roleArn: '{{ item.roleArn }}'
+      startUrl: '{{ item.startUrl }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_time_series
+  calls:
+  - action: list_time_series
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TimeSeriesSummaries }}'
+    item:
+      alias: '{{ item.alias }}'
+      assetId: '{{ item.assetId }}'
+      dataType: '{{ item.dataType }}'
+      dataTypeSpec: '{{ item.dataTypeSpec }}'
+      propertyId: '{{ item.propertyId }}'
+      timeSeriesArn: '{{ item.timeSeriesArn }}'
+      timeSeriesCreationDate: '{{ item.timeSeriesCreationDate }}'
+      timeSeriesId: '{{ item.timeSeriesId }}'
+      timeSeriesLastUpdateDate: '{{ item.timeSeriesLastUpdateDate }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.describe_access_policy
+  calls:
+  - action: describe_access_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      accessPolicyCreationDate: '{{ response.accessPolicyIdentity.accessPolicyCreationDate }}'
+      accessPolicyIdentity: '{{ response.accessPolicyIdentity.accessPolicyIdentity }}'
+      accessPolicyPermission: '{{ response.accessPolicyIdentity.accessPolicyPermission }}'
+      accessPolicyResource: '{{ response.accessPolicyIdentity.accessPolicyResource }}'
+      group: '{{ response.accessPolicyIdentity.group.id }}'
+      iamRole: '{{ response.accessPolicyIdentity.iamRole.arn }}'
+      iamUser: '{{ response.accessPolicyIdentity.iamUser.arn }}'
+      user: '{{ response.accessPolicyIdentity.user.id }}'
+      accessPolicyArn: '{{ response.accessPolicyArn }}'
+      accessPolicyId: '{{ response.accessPolicyId }}'
+      id: '{{ response.accessPolicyIdentity.group.id }}'
+      arn: '{{ response.accessPolicyIdentity.iamRole.arn }}'
+      accessPolicyLastUpdateDate: '{{ response.accessPolicyLastUpdateDate }}'
+- discovery_id: aws.iotsitewise.describe_action
+  calls:
+  - action: describe_action
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      assetId: '{{ response.targetResource.assetId }}'
+      computationModelId: '{{ response.targetResource.computationModelId }}'
+      actionDefinitionId: '{{ response.actionDefinitionId }}'
+      actionId: '{{ response.actionId }}'
+      stringValue: '{{ response.actionPayload.stringValue }}'
+      executionTime: '{{ response.executionTime }}'
+- discovery_id: aws.iotsitewise.describe_asset
+  for_each: aws.iotsitewise.describe_time_series
+  calls:
+  - action: describe_asset
+    params:
+      assetId: '{{ item.assetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assetProperties }}'
+    item:
+      alias: '{{ item.alias }}'
+      assetCompositeModelSummaries: '{{ item.assetCompositeModelSummaries[].id }}'
+      assetDescription: '{{ item.assetDescription }}'
+      assetHierarchies: '{{ item.assetHierarchies[].id }}'
+      assetName: '{{ item.assetName }}'
+      dataType: '{{ item.dataType }}'
+      dataTypeSpec: '{{ item.dataTypeSpec }}'
+      externalId: '{{ item.externalId }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      notification: '{{ item.notification }}'
+      path: '{{ item.path }}'
+      unit: '{{ item.unit }}'
+      assetArn: '{{ response.assetArn }}'
+      assetCreationDate: '{{ response.assetCreationDate }}'
+      assetExternalId: '{{ response.assetExternalId }}'
+      assetId: '{{ response.assetId }}'
+      assetLastUpdateDate: '{{ response.assetLastUpdateDate }}'
+      assetModelId: '{{ response.assetModelId }}'
+      code: '{{ response.assetStatus.error.code }}'
+      message: '{{ response.assetStatus.error.message }}'
+      state: '{{ response.assetStatus.state }}'
+- discovery_id: aws.iotsitewise.describe_asset_composite_model
+  for_each: aws.iotsitewise.describe_time_series
+  calls:
+  - action: describe_asset_composite_model
+    params:
+      assetId: '{{ item.assetId }}'
+      assetCompositeModelId: '{{ item.assetCompositeModelId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assetCompositeModelPath }}'
+    item:
+      assetCompositeModelDescription: '{{ item.assetCompositeModelDescription }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      assetCompositeModelExternalId: '{{ response.assetCompositeModelExternalId }}'
+      assetCompositeModelId: '{{ response.assetCompositeModelId }}'
+      assetCompositeModelName: '{{ response.assetCompositeModelName }}'
+      assetCompositeModelType: '{{ response.assetCompositeModelType }}'
+      assetId: '{{ response.assetId }}'
+- discovery_id: aws.iotsitewise.describe_asset_model
+  for_each: aws.iotsitewise.list_assets
+  calls:
+  - action: describe_asset_model
+    params:
+      assetModelId: '{{ item.assetModelId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assetModelProperties }}'
+    item:
+      assetModelCreationDate: '{{ item.assetModelCreationDate }}'
+      assetModelDescription: '{{ item.assetModelDescription }}'
+      assetModelVersion: '{{ item.assetModelVersion }}'
+      dataType: '{{ item.dataType }}'
+      dataTypeSpec: '{{ item.dataTypeSpec }}'
+      externalId: '{{ item.externalId }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      path: '{{ item.path }}'
+      type: '{{ item.type }}'
+      unit: '{{ item.unit }}'
+      assetModelArn: '{{ response.assetModelArn }}'
+      assetModelExternalId: '{{ response.assetModelExternalId }}'
+      assetModelId: '{{ response.assetModelId }}'
+      assetModelLastUpdateDate: '{{ response.assetModelLastUpdateDate }}'
+      assetModelName: '{{ response.assetModelName }}'
+      code: '{{ response.assetModelStatus.error.code }}'
+      message: '{{ response.assetModelStatus.error.message }}'
+      state: '{{ response.assetModelStatus.state }}'
+      assetModelType: '{{ response.assetModelType }}'
+      eTag: '{{ response.eTag }}'
+- discovery_id: aws.iotsitewise.describe_asset_model_composite_model
+  for_each: aws.iotsitewise.list_assets
+  calls:
+  - action: describe_asset_model_composite_model
+    params:
+      assetModelId: '{{ item.assetModelId }}'
+      assetModelCompositeModelId: '{{ item.assetModelCompositeModelId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assetModelCompositeModelPath }}'
+    item:
+      assetModelCompositeModelDescription: '{{ item.assetModelCompositeModelDescription }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      assetModelCompositeModelExternalId: '{{ response.assetModelCompositeModelExternalId }}'
+      assetModelCompositeModelId: '{{ response.assetModelCompositeModelId }}'
+      assetModelCompositeModelName: '{{ response.assetModelCompositeModelName }}'
+      assetModelCompositeModelType: '{{ response.assetModelCompositeModelType }}'
+      assetModelId: '{{ response.assetModelId }}'
+- discovery_id: aws.iotsitewise.describe_asset_model_interface_relationship
+  for_each: aws.iotsitewise.list_assets
+  calls:
+  - action: describe_asset_model_interface_relationship
+    params:
+      assetModelId: '{{ item.assetModelId }}'
+      interfaceAssetModelId: '{{ item.interfaceAssetModelId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.propertyMappings }}'
+    item:
+      assetModelPropertyId: '{{ item.assetModelPropertyId }}'
+      interfaceAssetModelPropertyId: '{{ item.interfaceAssetModelPropertyId }}'
+- discovery_id: aws.iotsitewise.describe_asset_property
+  for_each: aws.iotsitewise.describe_time_series
+  calls:
+  - action: describe_asset_property
+    params:
+      assetId: '{{ item.assetId }}'
+      propertyId: '{{ item.propertyId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      alias: '{{ response.assetProperty.alias }}'
+      dataType: '{{ response.assetProperty.dataType }}'
+      externalId: '{{ response.assetProperty.externalId }}'
+      id: '{{ response.assetProperty.id }}'
+      name: '{{ response.assetProperty.name }}'
+      notification: '{{ response.assetProperty.notification.topic }}'
+      path: '{{ response.assetProperty.path[].id }}'
+      type: '{{ response.assetProperty.dataType }}'
+      unit: '{{ response.assetProperty.unit }}'
+      assetExternalId: '{{ response.assetExternalId }}'
+      assetId: '{{ response.assetId }}'
+      assetModelId: '{{ response.assetModelId }}'
+      assetName: '{{ response.assetName }}'
+      state: '{{ response.assetProperty.notification.state }}'
+      topic: '{{ response.assetProperty.notification.topic }}'
+      defaultValue: '{{ response.assetProperty.type.attribute.defaultValue }}'
+      expression: '{{ response.assetProperty.type.metric.expression }}'
+      computeLocation: '{{ response.assetProperty.type.metric.processingConfig.computeLocation }}'
+- discovery_id: aws.iotsitewise.describe_bulk_import_job
+  calls:
+  - action: describe_bulk_import_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.files }}'
+    item:
+      bucket: '{{ item.bucket }}'
+      files: '{{ item.files }}'
+      jobCreationDate: '{{ item.jobCreationDate }}'
+      jobRoleArn: '{{ item.jobRoleArn }}'
+      key: '{{ item.key }}'
+      versionId: '{{ item.versionId }}'
+      adaptiveIngestion: '{{ response.adaptiveIngestion }}'
+      deleteFilesAfterImport: '{{ response.deleteFilesAfterImport }}'
+      prefix: '{{ response.errorReportLocation.prefix }}'
+      jobId: '{{ response.jobId }}'
+      jobLastUpdateDate: '{{ response.jobLastUpdateDate }}'
+      jobName: '{{ response.jobName }}'
+      jobStatus: '{{ response.jobStatus }}'
+- discovery_id: aws.iotsitewise.describe_computation_model
+  calls:
+  - action: describe_computation_model
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.actionDefinitions }}'
+    item:
+      actionDefinitionId: '{{ item.actionDefinitionId }}'
+      actionName: '{{ item.actionName }}'
+      actionType: '{{ item.actionType }}'
+      computationModelCreationDate: '{{ item.computationModelCreationDate }}'
+      computationModelDescription: '{{ item.computationModelDescription }}'
+      computationModelVersion: '{{ item.computationModelVersion }}'
+- discovery_id: aws.iotsitewise.describe_computation_model_execution_summary
+  calls:
+  - action: describe_computation_model_execution_summary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      assetId: '{{ response.resolveTo.assetId }}'
+- discovery_id: aws.iotsitewise.describe_dashboard
+  calls:
+  - action: describe_dashboard
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      dashboardArn: '{{ response.dashboardArn }}'
+      dashboardCreationDate: '{{ response.dashboardCreationDate }}'
+      dashboardDefinition: '{{ response.dashboardDefinition }}'
+      dashboardDescription: '{{ response.dashboardDescription }}'
+      dashboardId: '{{ response.dashboardId }}'
+      dashboardLastUpdateDate: '{{ response.dashboardLastUpdateDate }}'
+      dashboardName: '{{ response.dashboardName }}'
+      projectId: '{{ response.projectId }}'
+- discovery_id: aws.iotsitewise.describe_dataset
+  calls:
+  - action: describe_dataset
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      datasetCreationDate: '{{ response.datasetSource.datasetCreationDate }}'
+      sourceDetail: '{{ response.datasetSource.sourceDetail }}'
+      sourceFormat: '{{ response.datasetSource.sourceFormat }}'
+      sourceType: '{{ response.datasetSource.sourceType }}'
+      datasetArn: '{{ response.datasetArn }}'
+      datasetDescription: '{{ response.datasetDescription }}'
+      datasetId: '{{ response.datasetId }}'
+      datasetLastUpdateDate: '{{ response.datasetLastUpdateDate }}'
+      datasetName: '{{ response.datasetName }}'
+      knowledgeBaseArn: '{{ response.datasetSource.sourceDetail.kendra.knowledgeBaseArn }}'
+      roleArn: '{{ response.datasetSource.sourceDetail.kendra.roleArn }}'
+      code: '{{ response.datasetStatus.error.code }}'
+      message: '{{ response.datasetStatus.error.message }}'
+      state: '{{ response.datasetStatus.state }}'
+      datasetVersion: '{{ response.datasetVersion }}'
+- discovery_id: aws.iotsitewise.describe_execution
+  calls:
+  - action: describe_execution
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      assetId: '{{ response.targetResource.assetId }}'
+      computationModelId: '{{ response.targetResource.computationModelId }}'
+- discovery_id: aws.iotsitewise.describe_gateway
+  for_each: aws.iotsitewise.list_gateways
+  calls:
+  - action: describe_gateway
+    params:
+      gatewayId: '{{ item.gatewayId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.gatewayCapabilitySummaries }}'
+    item:
+      capabilityNamespace: '{{ item.capabilityNamespace }}'
+      capabilitySyncStatus: '{{ item.capabilitySyncStatus }}'
+      gatewayArn: '{{ item.gatewayArn }}'
+      creationDate: '{{ response.creationDate }}'
+      gatewayId: '{{ response.gatewayId }}'
+      gatewayName: '{{ response.gatewayName }}'
+      coreDeviceOperatingSystem: '{{ response.gatewayPlatform.greengrassV2.coreDeviceOperatingSystem }}'
+      coreDeviceThingName: '{{ response.gatewayPlatform.greengrassV2.coreDeviceThingName }}'
+      groupArn: '{{ response.gatewayPlatform.greengrass.groupArn }}'
+      iotCoreThingName: '{{ response.gatewayPlatform.siemensIE.iotCoreThingName }}'
+      gatewayVersion: '{{ response.gatewayVersion }}'
+      lastUpdateDate: '{{ response.lastUpdateDate }}'
+- discovery_id: aws.iotsitewise.describe_gateway_capability_configuration
+  for_each: aws.iotsitewise.list_gateways
+  calls:
+  - action: describe_gateway_capability_configuration
+    params:
+      gatewayId: '{{ item.gatewayId }}'
+      capabilityNamespace: '{{ item.capabilityNamespace }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      capabilityConfiguration: '{{ response.capabilityConfiguration }}'
+      capabilityNamespace: '{{ response.capabilityNamespace }}'
+      capabilitySyncStatus: '{{ response.capabilitySyncStatus }}'
+      gatewayId: '{{ response.gatewayId }}'
+- discovery_id: aws.iotsitewise.describe_portal
+  calls:
+  - action: describe_portal
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      alarms: '{{ response.portalStatus.alarms }}'
+      error: '{{ response.portalStatus.error.code }}'
+      notificationSenderEmail: '{{ response.portalStatus.notificationSenderEmail }}'
+      portalArn: '{{ response.portalStatus.portalArn }}'
+      portalAuthMode: '{{ response.portalStatus.portalAuthMode }}'
+      portalClientId: '{{ response.portalStatus.portalClientId }}'
+      portalContactEmail: '{{ response.portalStatus.portalContactEmail }}'
+      portalCreationDate: '{{ response.portalStatus.portalCreationDate }}'
+      portalDescription: '{{ response.portalStatus.portalDescription }}'
+      portalLogoImageLocation: '{{ response.portalStatus.portalLogoImageLocation }}'
+      portalName: '{{ response.portalStatus.portalName }}'
+      portalTypeConfiguration: '{{ response.portalStatus.portalTypeConfiguration }}'
+      state: '{{ response.portalStatus.state }}'
+      alarmRoleArn: '{{ response.alarms.alarmRoleArn }}'
+      notificationLambdaArn: '{{ response.alarms.notificationLambdaArn }}'
+      portalId: '{{ response.portalId }}'
+      portalLastUpdateDate: '{{ response.portalLastUpdateDate }}'
+      id: '{{ response.portalLogoImageLocation.id }}'
+      url: '{{ response.portalLogoImageLocation.url }}'
+      portalStartUrl: '{{ response.portalStartUrl }}'
+      code: '{{ response.portalStatus.error.code }}'
+      message: '{{ response.portalStatus.error.message }}'
+      portalType: '{{ response.portalType }}'
+      roleArn: '{{ response.roleArn }}'
+- discovery_id: aws.iotsitewise.describe_project
+  calls:
+  - action: describe_project
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      projectCreationDate: '{{ response.projectCreationDate }}'
+      projectDescription: '{{ response.projectDescription }}'
+      projectName: '{{ response.projectName }}'
+      portalId: '{{ response.portalId }}'
+      projectArn: '{{ response.projectArn }}'
+      projectId: '{{ response.projectId }}'
+      projectLastUpdateDate: '{{ response.projectLastUpdateDate }}'
+- discovery_id: aws.iotsitewise.get_asset_property_aggregates
+  calls:
+  - action: get_asset_property_aggregates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.aggregatedValues }}'
+    item:
+      quality: '{{ item.quality }}'
+      timestamp: '{{ item.timestamp }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.get_interpolated_asset_property_values
+  for_each: aws.iotsitewise.get_asset_property_value
+  calls:
+  - action: get_interpolated_asset_property_values
+    params:
+      startTimeInSeconds: '{{ item.startTimeInSeconds }}'
+      endTimeInSeconds: '{{ item.endTimeInSeconds }}'
+      quality: '{{ item.quality }}'
+      intervalInSeconds: '{{ item.intervalInSeconds }}'
+      type: '{{ item.type }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.interpolatedAssetPropertyValues }}'
+    item:
+      timestamp: '{{ item.timestamp }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_actions
+  calls:
+  - action: list_actions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.actionSummaries }}'
+    item:
+      actionDefinitionId: '{{ item.actionDefinitionId }}'
+      actionId: '{{ item.actionId }}'
+      resolveTo: '{{ item.resolveTo }}'
+      targetResource: '{{ item.targetResource }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_asset_model_composite_models
+  for_each: aws.iotsitewise.list_assets
+  calls:
+  - action: list_asset_model_composite_models
+    params:
+      assetModelId: '{{ item.assetModelId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assetModelCompositeModelSummaries }}'
+    item:
+      assetModelCompositeModelDescription: '{{ item.assetModelCompositeModelDescription }}'
+      description: '{{ item.description }}'
+      externalId: '{{ item.externalId }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      path: '{{ item.path }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_asset_model_properties
+  for_each: aws.iotsitewise.list_assets
+  calls:
+  - action: list_asset_model_properties
+    params:
+      assetModelId: '{{ item.assetModelId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assetModelPropertySummaries }}'
+    item:
+      assetModelCompositeModelId: '{{ item.assetModelCompositeModelId }}'
+      dataType: '{{ item.dataType }}'
+      dataTypeSpec: '{{ item.dataTypeSpec }}'
+      externalId: '{{ item.externalId }}'
+      id: '{{ item.id }}'
+      interfaceSummaries: '{{ item.interfaceSummaries }}'
+      name: '{{ item.name }}'
+      path: '{{ item.path }}'
+      type: '{{ item.type }}'
+      unit: '{{ item.unit }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_asset_properties
+  for_each: aws.iotsitewise.describe_time_series
+  calls:
+  - action: list_asset_properties
+    params:
+      assetId: '{{ item.assetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assetPropertySummaries }}'
+    item:
+      alias: '{{ item.alias }}'
+      assetCompositeModelId: '{{ item.assetCompositeModelId }}'
+      externalId: '{{ item.externalId }}'
+      id: '{{ item.id }}'
+      notification: '{{ item.notification }}'
+      path: '{{ item.path }}'
+      unit: '{{ item.unit }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_asset_relationships
+  for_each: aws.iotsitewise.describe_time_series
+  calls:
+  - action: list_asset_relationships
+    params:
+      assetId: '{{ item.assetId }}'
+      traversalType: '{{ item.traversalType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assetRelationshipSummaries }}'
+    item:
+      hierarchyInfo: '{{ item.hierarchyInfo }}'
+      relationshipType: '{{ item.relationshipType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_associated_assets
+  for_each: aws.iotsitewise.describe_time_series
+  calls:
+  - action: list_associated_assets
+    params:
+      assetId: '{{ item.assetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assetSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      assetModelId: '{{ item.assetModelId }}'
+      creationDate: '{{ item.creationDate }}'
+      description: '{{ item.description }}'
+      externalId: '{{ item.externalId }}'
+      hierarchies: '{{ item.hierarchies }}'
+      id: '{{ item.id }}'
+      lastUpdateDate: '{{ item.lastUpdateDate }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_composition_relationships
+  for_each: aws.iotsitewise.list_assets
+  calls:
+  - action: list_composition_relationships
+    params:
+      assetModelId: '{{ item.assetModelId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.compositionRelationshipSummaries }}'
+    item:
+      assetModelCompositeModelId: '{{ item.assetModelCompositeModelId }}'
+      assetModelCompositeModelType: '{{ item.assetModelCompositeModelType }}'
+      assetModelId: '{{ item.assetModelId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_computation_model_data_binding_usages
+  calls:
+  - action: list_computation_model_data_binding_usages
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dataBindingUsageSummaries }}'
+    item:
+      computationModelIds: '{{ item.computationModelIds }}'
+      matchedDataBinding: '{{ item.matchedDataBinding }}'
+- discovery_id: aws.iotsitewise.list_computation_model_resolve_to_resources
+  calls:
+  - action: list_computation_model_resolve_to_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.computationModelResolveToResourceSummaries }}'
+    item:
+      resolveTo: '{{ item.resolveTo }}'
+- discovery_id: aws.iotsitewise.list_dashboards
+  calls:
+  - action: list_dashboards
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dashboardSummaries }}'
+    item:
+      creationDate: '{{ item.creationDate }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      lastUpdateDate: '{{ item.lastUpdateDate }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_datasets
+  calls:
+  - action: list_datasets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.datasetSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationDate: '{{ item.creationDate }}'
+      datasetCreationDate: '{{ item.datasetCreationDate }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      lastUpdateDate: '{{ item.lastUpdateDate }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_executions
+  calls:
+  - action: list_executions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.executionSummaries }}'
+    item:
+      actionType: '{{ item.actionType }}'
+      executionEndTime: '{{ item.executionEndTime }}'
+      executionEntityVersion: '{{ item.executionEntityVersion }}'
+      executionId: '{{ item.executionId }}'
+      executionStartTime: '{{ item.executionStartTime }}'
+      executionStatus: '{{ item.executionStatus }}'
+      resolveTo: '{{ item.resolveTo }}'
+      targetResource: '{{ item.targetResource }}'
+      targetResourceVersion: '{{ item.targetResourceVersion }}'
+- discovery_id: aws.iotsitewise.list_interface_relationships
+  calls:
+  - action: list_interface_relationships
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.interfaceRelationshipSummaries }}'
+    item:
+      id: '{{ item.id }}'
+- discovery_id: aws.iotsitewise.list_project_assets
+  calls:
+  - action: list_project_assets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assetIds }}'
+    item:
+      projectCreationDate: '{{ item.projectCreationDate }}'
+      projectDescription: '{{ item.projectDescription }}'
+      projectName: '{{ item.projectName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_projects
+  calls:
+  - action: list_projects
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.projectSummaries }}'
+    item:
+      creationDate: '{{ item.creationDate }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      lastUpdateDate: '{{ item.lastUpdateDate }}'
+      name: '{{ item.name }}'
+      projectDescription: '{{ item.projectDescription }}'
+      projectId: '{{ item.projectId }}'
+      projectName: '{{ item.projectName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotsitewise.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

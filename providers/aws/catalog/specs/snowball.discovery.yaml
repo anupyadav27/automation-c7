@@ -1,0 +1,312 @@
+version: '1.0'
+provider: aws
+service: snowball
+services:
+  client: snowball
+  module: boto3.client
+discovery:
+- discovery_id: aws.snowball.describe_addresses
+  calls:
+  - action: describe_addresses
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Addresses }}'
+    item:
+      AddressId: '{{ item.AddressId }}'
+      Addresses: '{{ item.Addresses }}'
+- discovery_id: aws.snowball.get_snowball_usage
+  calls:
+  - action: get_snowball_usage
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      SnowballLimit: '{{ response.SnowballLimit }}'
+      SnowballsInUse: '{{ response.SnowballsInUse }}'
+- discovery_id: aws.snowball.list_clusters
+  calls:
+  - action: list_clusters
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ClusterListEntries }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      ClusterId: '{{ item.ClusterId }}'
+      ClusterState: '{{ item.ClusterState }}'
+      Description: '{{ item.Description }}'
+- discovery_id: aws.snowball.list_compatible_images
+  calls:
+  - action: list_compatible_images
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CompatibleImages }}'
+    item:
+      Name: '{{ item.Name }}'
+      AmiId: '{{ item.AmiId }}'
+- discovery_id: aws.snowball.list_jobs
+  calls:
+  - action: list_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.JobListEntries }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      Description: '{{ item.Description }}'
+      IsMaster: '{{ item.IsMaster }}'
+      JobId: '{{ item.JobId }}'
+      JobState: '{{ item.JobState }}'
+      JobType: '{{ item.JobType }}'
+      SnowballType: '{{ item.SnowballType }}'
+- discovery_id: aws.snowball.list_long_term_pricing
+  calls:
+  - action: list_long_term_pricing
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LongTermPricingEntries }}'
+    item:
+      CurrentActiveJob: '{{ item.CurrentActiveJob }}'
+      IsLongTermPricingAutoRenew: '{{ item.IsLongTermPricingAutoRenew }}'
+      JobIds: '{{ item.JobIds }}'
+      LongTermPricingEndDate: '{{ item.LongTermPricingEndDate }}'
+      LongTermPricingId: '{{ item.LongTermPricingId }}'
+      LongTermPricingStartDate: '{{ item.LongTermPricingStartDate }}'
+      LongTermPricingStatus: '{{ item.LongTermPricingStatus }}'
+      LongTermPricingType: '{{ item.LongTermPricingType }}'
+      ReplacementJob: '{{ item.ReplacementJob }}'
+      SnowballType: '{{ item.SnowballType }}'
+- discovery_id: aws.snowball.list_pickup_locations
+  calls:
+  - action: list_pickup_locations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Addresses }}'
+    item:
+      Name: '{{ item.Name }}'
+      AddressId: '{{ item.AddressId }}'
+      City: '{{ item.City }}'
+      Company: '{{ item.Company }}'
+      Country: '{{ item.Country }}'
+      IsRestricted: '{{ item.IsRestricted }}'
+      Landmark: '{{ item.Landmark }}'
+      PhoneNumber: '{{ item.PhoneNumber }}'
+      PostalCode: '{{ item.PostalCode }}'
+      PrefectureOrDistrict: '{{ item.PrefectureOrDistrict }}'
+      StateOrProvince: '{{ item.StateOrProvince }}'
+      Street1: '{{ item.Street1 }}'
+      Street2: '{{ item.Street2 }}'
+      Street3: '{{ item.Street3 }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.snowball.describe_address
+  for_each: aws.snowball.describe_addresses
+  calls:
+  - action: describe_address
+    params:
+      AddressId: '{{ item.AddressId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.Address.Name }}'
+      Address: '{{ response.Address.AddressId }}'
+      AddressId: '{{ response.Address.AddressId }}'
+      City: '{{ response.Address.City }}'
+      Company: '{{ response.Address.Company }}'
+      Country: '{{ response.Address.Country }}'
+      IsRestricted: '{{ response.Address.IsRestricted }}'
+      Landmark: '{{ response.Address.Landmark }}'
+      PhoneNumber: '{{ response.Address.PhoneNumber }}'
+      PostalCode: '{{ response.Address.PostalCode }}'
+      PrefectureOrDistrict: '{{ response.Address.PrefectureOrDistrict }}'
+      StateOrProvince: '{{ response.Address.StateOrProvince }}'
+      Street1: '{{ response.Address.Street1 }}'
+      Street2: '{{ response.Address.Street2 }}'
+      Street3: '{{ response.Address.Street3 }}'
+      Type: '{{ response.Address.Type }}'
+- discovery_id: aws.snowball.describe_cluster
+  for_each: aws.snowball.list_clusters
+  calls:
+  - action: describe_cluster
+    params:
+      ClusterId: '{{ item.ClusterId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ response.ClusterMetadata.CreationDate }}'
+      Status: '{{ response.ClusterMetadata.Status }}'
+      AddressId: '{{ response.ClusterMetadata.AddressId }}'
+      ClusterId: '{{ response.ClusterMetadata.ClusterId }}'
+      ClusterState: '{{ response.ClusterMetadata.ClusterState }}'
+      Description: '{{ response.ClusterMetadata.Description }}'
+      Enabled: '{{ response.ClusterMetadata.Enabled }}'
+      ForwardingAddressId: '{{ response.ClusterMetadata.ForwardingAddressId }}'
+      JobType: '{{ response.ClusterMetadata.JobType }}'
+      KmsKeyARN: '{{ response.ClusterMetadata.KmsKeyARN }}'
+      Notification: '{{ response.ClusterMetadata.Notification }}'
+      OnDeviceServiceConfiguration: '{{ response.ClusterMetadata.OnDeviceServiceConfiguration }}'
+      Resources: '{{ response.ClusterMetadata.Resources }}'
+      RoleARN: '{{ response.ClusterMetadata.RoleARN }}'
+      ShippingOption: '{{ response.ClusterMetadata.ShippingOption }}'
+      SnowballType: '{{ response.ClusterMetadata.SnowballType }}'
+      TaxDocuments: '{{ response.ClusterMetadata.TaxDocuments }}'
+      DevicePickupSnsTopicARN: '{{ response.ClusterMetadata.Notification.DevicePickupSnsTopicARN }}'
+      NotifyAll: '{{ response.ClusterMetadata.Notification.NotifyAll }}'
+      SnsTopicARN: '{{ response.ClusterMetadata.Notification.SnsTopicARN }}'
+      EKSAnywhereVersion: '{{ response.ClusterMetadata.OnDeviceServiceConfiguration.EKSOnDeviceService.EKSAnywhereVersion }}'
+      KubernetesVersion: '{{ response.ClusterMetadata.OnDeviceServiceConfiguration.EKSOnDeviceService.KubernetesVersion }}'
+      StorageLimit: '{{ response.ClusterMetadata.OnDeviceServiceConfiguration.NFSOnDeviceService.StorageLimit }}'
+      StorageUnit: '{{ response.ClusterMetadata.OnDeviceServiceConfiguration.NFSOnDeviceService.StorageUnit }}'
+      FaultTolerance: '{{ response.ClusterMetadata.OnDeviceServiceConfiguration.S3OnDeviceService.FaultTolerance }}'
+      ServiceSize: '{{ response.ClusterMetadata.OnDeviceServiceConfiguration.S3OnDeviceService.ServiceSize }}'
+      GSTIN: '{{ response.ClusterMetadata.TaxDocuments.IND.GSTIN }}'
+- discovery_id: aws.snowball.describe_job
+  for_each: aws.snowball.list_jobs
+  calls:
+  - action: describe_job
+    params:
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SubJobMetadata }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      AddressId: '{{ item.AddressId }}'
+      ClusterId: '{{ item.ClusterId }}'
+      DataTransferProgress: '{{ item.DataTransferProgress }}'
+      Description: '{{ item.Description }}'
+      DeviceConfiguration: '{{ item.DeviceConfiguration }}'
+      ForwardingAddressId: '{{ item.ForwardingAddressId }}'
+      ImpactLevel: '{{ item.ImpactLevel }}'
+      JobId: '{{ item.JobId }}'
+      JobLogInfo: '{{ item.JobLogInfo }}'
+      JobState: '{{ item.JobState }}'
+      JobType: '{{ item.JobType }}'
+      KmsKeyARN: '{{ item.KmsKeyARN }}'
+      LongTermPricingId: '{{ item.LongTermPricingId }}'
+      Notification: '{{ item.Notification }}'
+      OnDeviceServiceConfiguration: '{{ item.OnDeviceServiceConfiguration }}'
+      PickupDetails: '{{ item.PickupDetails }}'
+      RemoteManagement: '{{ item.RemoteManagement }}'
+      Resources: '{{ item.Resources }}'
+      RoleARN: '{{ item.RoleARN }}'
+      ShippingDetails: '{{ item.ShippingDetails }}'
+      SnowballCapacityPreference: '{{ item.SnowballCapacityPreference }}'
+      SnowballId: '{{ item.SnowballId }}'
+      SnowballType: '{{ item.SnowballType }}'
+      TaxDocuments: '{{ item.TaxDocuments }}'
+      BytesTransferred: '{{ response.JobMetadata.DataTransferProgress.BytesTransferred }}'
+      ObjectsTransferred: '{{ response.JobMetadata.DataTransferProgress.ObjectsTransferred }}'
+      TotalBytes: '{{ response.JobMetadata.DataTransferProgress.TotalBytes }}'
+      TotalObjects: '{{ response.JobMetadata.DataTransferProgress.TotalObjects }}'
+      IsWifiEnabled: '{{ response.JobMetadata.DeviceConfiguration.SnowconeDeviceConfiguration.WirelessConnection.IsWifiEnabled }}'
+      JobCompletionReportURI: '{{ response.JobMetadata.JobLogInfo.JobCompletionReportURI }}'
+      JobFailureLogURI: '{{ response.JobMetadata.JobLogInfo.JobFailureLogURI }}'
+      JobSuccessLogURI: '{{ response.JobMetadata.JobLogInfo.JobSuccessLogURI }}'
+      DevicePickupSnsTopicARN: '{{ response.JobMetadata.Notification.DevicePickupSnsTopicARN }}'
+      NotifyAll: '{{ response.JobMetadata.Notification.NotifyAll }}'
+      SnsTopicARN: '{{ response.JobMetadata.Notification.SnsTopicARN }}'
+      EKSAnywhereVersion: '{{ response.JobMetadata.OnDeviceServiceConfiguration.EKSOnDeviceService.EKSAnywhereVersion }}'
+      KubernetesVersion: '{{ response.JobMetadata.OnDeviceServiceConfiguration.EKSOnDeviceService.KubernetesVersion }}'
+      StorageLimit: '{{ response.JobMetadata.OnDeviceServiceConfiguration.NFSOnDeviceService.StorageLimit }}'
+      StorageUnit: '{{ response.JobMetadata.OnDeviceServiceConfiguration.NFSOnDeviceService.StorageUnit }}'
+      FaultTolerance: '{{ response.JobMetadata.OnDeviceServiceConfiguration.S3OnDeviceService.FaultTolerance }}'
+      ServiceSize: '{{ response.JobMetadata.OnDeviceServiceConfiguration.S3OnDeviceService.ServiceSize }}'
+      DevicePickupId: '{{ response.JobMetadata.PickupDetails.DevicePickupId }}'
+      Email: '{{ response.JobMetadata.PickupDetails.Email }}'
+      IdentificationExpirationDate: '{{ response.JobMetadata.PickupDetails.IdentificationExpirationDate }}'
+      IdentificationIssuingOrg: '{{ response.JobMetadata.PickupDetails.IdentificationIssuingOrg }}'
+      IdentificationNumber: '{{ response.JobMetadata.PickupDetails.IdentificationNumber }}'
+      Name: '{{ response.JobMetadata.PickupDetails.Name }}'
+      PhoneNumber: '{{ response.JobMetadata.PickupDetails.PhoneNumber }}'
+      Status: '{{ response.JobMetadata.ShippingDetails.InboundShipment.Status }}'
+      TrackingNumber: '{{ response.JobMetadata.ShippingDetails.InboundShipment.TrackingNumber }}'
+      ShippingOption: '{{ response.JobMetadata.ShippingDetails.ShippingOption }}'
+      GSTIN: '{{ response.JobMetadata.TaxDocuments.IND.GSTIN }}'
+- discovery_id: aws.snowball.describe_return_shipping_label
+  for_each: aws.snowball.list_jobs
+  calls:
+  - action: describe_return_shipping_label
+    params:
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+      ExpirationDate: '{{ response.ExpirationDate }}'
+      ReturnShippingLabelURI: '{{ response.ReturnShippingLabelURI }}'
+- discovery_id: aws.snowball.get_job_manifest
+  calls:
+  - action: get_job_manifest
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ManifestURI: '{{ response.ManifestURI }}'
+- discovery_id: aws.snowball.get_job_unlock_code
+  calls:
+  - action: get_job_unlock_code
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      UnlockCode: '{{ response.UnlockCode }}'
+- discovery_id: aws.snowball.get_software_updates
+  calls:
+  - action: get_software_updates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      UpdatesURI: '{{ response.UpdatesURI }}'
+- discovery_id: aws.snowball.list_cluster_jobs
+  for_each: aws.snowball.list_clusters
+  calls:
+  - action: list_cluster_jobs
+    params:
+      ClusterId: '{{ item.ClusterId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.JobListEntries }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      Description: '{{ item.Description }}'
+      IsMaster: '{{ item.IsMaster }}'
+      JobId: '{{ item.JobId }}'
+      JobState: '{{ item.JobState }}'
+      JobType: '{{ item.JobType }}'
+      SnowballType: '{{ item.SnowballType }}'
+- discovery_id: aws.snowball.list_service_versions
+  calls:
+  - action: list_service_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ServiceVersions }}'
+    item:
+      Version: '{{ item.Version }}'
+      ServiceName: '{{ response.ServiceName }}'

@@ -1,0 +1,71 @@
+version: '1.0'
+provider: aws
+service: datapipeline
+services:
+  client: datapipeline
+  module: boto3.client
+discovery:
+- discovery_id: aws.datapipeline.list_pipelines
+  calls:
+  - action: list_pipelines
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.pipelineIdList }}'
+    item:
+      hasMoreResults: '{{ item.hasMoreResults }}'
+      id: '{{ item.id }}'
+      marker: '{{ item.marker }}'
+      name: '{{ item.name }}'
+- discovery_id: aws.datapipeline.describe_objects
+  calls:
+  - action: describe_objects
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.pipelineObjects }}'
+    item:
+      fields: '{{ item.fields }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      hasMoreResults: '{{ response.hasMoreResults }}'
+      marker: '{{ response.marker }}'
+- discovery_id: aws.datapipeline.describe_pipelines
+  calls:
+  - action: describe_pipelines
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.pipelineDescriptionList }}'
+    item:
+      description: '{{ item.description }}'
+      fields: '{{ item.fields }}'
+      name: '{{ item.name }}'
+      pipelineId: '{{ item.pipelineId }}'
+      tags: '{{ item.tags }}'
+- discovery_id: aws.datapipeline.get_pipeline_definition
+  calls:
+  - action: get_pipeline_definition
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.pipelineObjects }}'
+    item:
+      fields: '{{ item.fields }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+- discovery_id: aws.datapipeline.query_objects
+  calls:
+  - action: query_objects
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ids }}'
+    item:
+      hasMoreResults: '{{ response.hasMoreResults }}'
+      marker: '{{ response.marker }}'

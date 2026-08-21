@@ -1,0 +1,13 @@
+layer_id,name,kind,order,parent_layer,default_overlay,purpose
+G0,global,spatial,0,,identity,"Services with no region at all - IAM, Route 53, CloudFront, Organizations, WAF. Drawn OUTSIDE the region box, which is where AWS's own architecture diagrams put them. Being global is a fact about the resource, not a rendering choice."
+L0,account,spatial,1,,,The account boundary. One synthetic node from STS; filtering here scopes the whole diagram.
+L1,region,spatial,2,L0,,"A physical region. Contains VPCs and, beside them, every regional service that lives outside a VPC."
+L2,vpc,spatial,3,L1,,The network boundary and outermost drawn box inside the region. Regional and spans zones - it is NOT inside an AZ. Filtering here cascades to every subnet and workload beneath it.
+L3,az,spatial,4,L2,,Availability-zone columns drawn inside each VPC. Synthetic nodes keyed per-VPC because a diagram renders one column set per VPC.
+L4,subnet,spatial,5,L3,,The join of an AZ and a VPC - a subnet belongs to exactly one of each. Where the spatial hierarchy stops being a tree.
+L5,workload,spatial,6,L4,,"Compute and data inside a subnet: instances, databases, VPC-attached functions and tasks."
+L6,attached,spatial,7,L5,,"Bound to a workload rather than to the network: volumes and network interfaces. Nests inside its workload, so an attachment reads as containment rather than as a stray arrow."
+R1,regional,spatial,8,L1,,"Regional services that sit in the region but in NO VPC: S3, DynamoDB, SQS, SNS, KMS, ECR, and Lambda functions with no VpcConfig. Drawn as a band beside the VPC, not floating outside the diagram - they really are in the region."
+R2,network,spatial,9,L2,network,"Security groups, NACLs and route tables. VPC-scoped, so they belong in the VPC box - but one security group spans subnets and AZs, so they are grouped rather than nested and default to hidden."
+R3,image,spatial,10,L1,image,"AMIs, snapshots and launch templates. Regional, but provenance rather than position, so hidden unless asked for."
+X0,uncollectable,none,99,,,"Types with no read API - mostly CloudFormation deploy-time-only resources. They can never appear in an inventory, so landing here means 'cannot be collected', not 'not yet classified'."

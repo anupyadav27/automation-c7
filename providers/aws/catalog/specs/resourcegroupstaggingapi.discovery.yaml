@@ -1,0 +1,79 @@
+enabled: false
+version: '1.0'
+provider: aws
+service: resourcegroupstaggingapi
+services:
+  client: resourcegroupstaggingapi
+  module: boto3.client
+discovery:
+- discovery_id: aws.resourcegroupstaggingapi.describe_report_creation
+  calls:
+  - action: describe_report_creation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+      ErrorMessage: '{{ response.ErrorMessage }}'
+      S3Location: '{{ response.S3Location }}'
+- discovery_id: aws.resourcegroupstaggingapi.get_compliance_summary
+  calls:
+  - action: get_compliance_summary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SummaryList }}'
+    item:
+      Region: '{{ item.Region }}'
+      LastUpdated: '{{ item.LastUpdated }}'
+      NonCompliantResources: '{{ item.NonCompliantResources }}'
+      PaginationToken: '{{ item.PaginationToken }}'
+      ResourceType: '{{ item.ResourceType }}'
+      SummaryList: '{{ item.SummaryList }}'
+      TargetId: '{{ item.TargetId }}'
+      TargetIdType: '{{ item.TargetIdType }}'
+- discovery_id: aws.resourcegroupstaggingapi.get_resources
+  calls:
+  - action: get_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceTagMappingList }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      ComplianceDetails: '{{ item.ComplianceDetails }}'
+      ResourceARN: '{{ item.ResourceARN }}'
+      ResourceTagMappingList: '{{ item.ResourceTagMappingList }}'
+- discovery_id: aws.resourcegroupstaggingapi.get_tag_keys
+  calls:
+  - action: get_tag_keys
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TagKeys }}'
+    item:
+      TagKeys: '{{ item.TagKeys }}'
+- discovery_id: aws.resourcegroupstaggingapi.list_required_tags
+  calls:
+  - action: list_required_tags
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RequiredTags }}'
+    item:
+      CloudFormationResourceTypes: '{{ item.CloudFormationResourceTypes }}'
+      ReportingTagKeys: '{{ item.ReportingTagKeys }}'
+      ResourceType: '{{ item.ResourceType }}'
+- discovery_id: aws.resourcegroupstaggingapi.get_tag_values
+  calls:
+  - action: get_tag_values
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TagValues }}'

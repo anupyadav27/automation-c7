@@ -1,0 +1,470 @@
+version: '1.0'
+provider: aws
+service: waf-regional
+services:
+  client: waf-regional
+  module: boto3.client
+discovery:
+- discovery_id: aws.waf-regional.get_change_token
+  calls:
+  - action: get_change_token
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ChangeToken: '{{ response.ChangeToken }}'
+      ChangeTokenStatus: '{{ response.ChangeTokenStatus }}'
+- discovery_id: aws.waf-regional.list_activated_rules_in_rule_group
+  calls:
+  - action: list_activated_rules_in_rule_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ActivatedRules }}'
+    item:
+      Action: '{{ item.Action }}'
+      ExcludedRules: '{{ item.ExcludedRules }}'
+      OverrideAction: '{{ item.OverrideAction }}'
+      Priority: '{{ item.Priority }}'
+      RuleId: '{{ item.RuleId }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.waf-regional.list_byte_match_sets
+  calls:
+  - action: list_byte_match_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ByteMatchSets }}'
+    item:
+      Name: '{{ item.Name }}'
+      ByteMatchSetId: '{{ item.ByteMatchSetId }}'
+- discovery_id: aws.waf-regional.list_geo_match_sets
+  calls:
+  - action: list_geo_match_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.GeoMatchSets }}'
+    item:
+      Name: '{{ item.Name }}'
+      GeoMatchSetId: '{{ item.GeoMatchSetId }}'
+- discovery_id: aws.waf-regional.list_ip_sets
+  calls:
+  - action: list_ip_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.IPSets }}'
+    item:
+      Name: '{{ item.Name }}'
+      IPSetId: '{{ item.IPSetId }}'
+- discovery_id: aws.waf-regional.list_logging_configurations
+  calls:
+  - action: list_logging_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LoggingConfigurations }}'
+    item:
+      ResourceArn: '{{ item.ResourceArn }}'
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      LogDestinationConfigs: '{{ item.LogDestinationConfigs }}'
+      RedactedFields: '{{ item.RedactedFields }}'
+- discovery_id: aws.waf-regional.list_rate_based_rules
+  calls:
+  - action: list_rate_based_rules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Rules }}'
+    item:
+      Name: '{{ item.Name }}'
+      RuleId: '{{ item.RuleId }}'
+- discovery_id: aws.waf-regional.list_regex_match_sets
+  calls:
+  - action: list_regex_match_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RegexMatchSets }}'
+    item:
+      Name: '{{ item.Name }}'
+      RegexMatchSetId: '{{ item.RegexMatchSetId }}'
+- discovery_id: aws.waf-regional.list_regex_pattern_sets
+  calls:
+  - action: list_regex_pattern_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RegexPatternSets }}'
+    item:
+      Name: '{{ item.Name }}'
+      RegexPatternSetId: '{{ item.RegexPatternSetId }}'
+- discovery_id: aws.waf-regional.list_rule_groups
+  calls:
+  - action: list_rule_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RuleGroups }}'
+    item:
+      Name: '{{ item.Name }}'
+      RuleGroupId: '{{ item.RuleGroupId }}'
+- discovery_id: aws.waf-regional.list_rules
+  calls:
+  - action: list_rules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Rules }}'
+    item:
+      Name: '{{ item.Name }}'
+      RuleId: '{{ item.RuleId }}'
+- discovery_id: aws.waf-regional.list_size_constraint_sets
+  calls:
+  - action: list_size_constraint_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SizeConstraintSets }}'
+    item:
+      Name: '{{ item.Name }}'
+      SizeConstraintSetId: '{{ item.SizeConstraintSetId }}'
+- discovery_id: aws.waf-regional.list_sql_injection_match_sets
+  calls:
+  - action: list_sql_injection_match_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SqlInjectionMatchSets }}'
+    item:
+      Name: '{{ item.Name }}'
+      SqlInjectionMatchSetId: '{{ item.SqlInjectionMatchSetId }}'
+- discovery_id: aws.waf-regional.list_subscribed_rule_groups
+  calls:
+  - action: list_subscribed_rule_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RuleGroups }}'
+    item:
+      Name: '{{ item.Name }}'
+      MetricName: '{{ item.MetricName }}'
+      RuleGroupId: '{{ item.RuleGroupId }}'
+- discovery_id: aws.waf-regional.list_web_ac_ls
+  calls:
+  - action: list_web_ac_ls
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.WebACLs }}'
+    item:
+      Name: '{{ item.Name }}'
+      WebACLId: '{{ item.WebACLId }}'
+- discovery_id: aws.waf-regional.list_xss_match_sets
+  calls:
+  - action: list_xss_match_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.XssMatchSets }}'
+    item:
+      Name: '{{ item.Name }}'
+      XssMatchSetId: '{{ item.XssMatchSetId }}'
+- discovery_id: aws.waf-regional.get_byte_match_set
+  for_each: aws.waf-regional.list_byte_match_sets
+  calls:
+  - action: get_byte_match_set
+    params:
+      ByteMatchSetId: '{{ item.ByteMatchSetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.ByteMatchSet.Name }}'
+      ByteMatchSetId: '{{ response.ByteMatchSet.ByteMatchSetId }}'
+      ByteMatchTuples: '{{ response.ByteMatchSet.ByteMatchTuples }}'
+- discovery_id: aws.waf-regional.get_change_token_status
+  for_each: aws.waf-regional.get_change_token
+  calls:
+  - action: get_change_token_status
+    params:
+      ChangeToken: '{{ item.ChangeToken }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ChangeTokenStatus: '{{ response.ChangeTokenStatus }}'
+- discovery_id: aws.waf-regional.get_geo_match_set
+  for_each: aws.waf-regional.list_geo_match_sets
+  calls:
+  - action: get_geo_match_set
+    params:
+      GeoMatchSetId: '{{ item.GeoMatchSetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.GeoMatchSet.Name }}'
+      GeoMatchConstraints: '{{ response.GeoMatchSet.GeoMatchConstraints[].Type }}'
+      GeoMatchSetId: '{{ response.GeoMatchSet.GeoMatchSetId }}'
+- discovery_id: aws.waf-regional.get_ip_set
+  for_each: aws.waf-regional.list_ip_sets
+  calls:
+  - action: get_ip_set
+    params:
+      IPSetId: '{{ item.IPSetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.IPSet.Name }}'
+      IPSetDescriptors: '{{ response.IPSet.IPSetDescriptors }}'
+      IPSetId: '{{ response.IPSet.IPSetId }}'
+- discovery_id: aws.waf-regional.get_logging_configuration
+  for_each: aws.waf-regional.list_logging_configurations
+  calls:
+  - action: get_logging_configuration
+    params:
+      ResourceArn: '{{ item.ResourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ResourceArn: '{{ response.LoggingConfiguration.ResourceArn }}'
+      LogDestinationConfigs: '{{ response.LoggingConfiguration.LogDestinationConfigs }}'
+      RedactedFields: '{{ response.LoggingConfiguration.RedactedFields[].Type }}'
+- discovery_id: aws.waf-regional.get_permission_policy
+  for_each: aws.waf-regional.list_logging_configurations
+  calls:
+  - action: get_permission_policy
+    params:
+      ResourceArn: '{{ item.ResourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.waf-regional.get_rate_based_rule
+  for_each: aws.waf-regional.list_activated_rules_in_rule_group
+  calls:
+  - action: get_rate_based_rule
+    params:
+      RuleId: '{{ item.RuleId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.Rule.Name }}'
+      MatchPredicates: '{{ response.Rule.MatchPredicates[].Type }}'
+      MetricName: '{{ response.Rule.MetricName }}'
+      RateKey: '{{ response.Rule.RateKey }}'
+      RateLimit: '{{ response.Rule.RateLimit }}'
+      RuleId: '{{ response.Rule.RuleId }}'
+- discovery_id: aws.waf-regional.get_rate_based_rule_managed_keys
+  for_each: aws.waf-regional.list_activated_rules_in_rule_group
+  calls:
+  - action: get_rate_based_rule_managed_keys
+    params:
+      RuleId: '{{ item.RuleId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ManagedKeys }}'
+- discovery_id: aws.waf-regional.get_regex_match_set
+  for_each: aws.waf-regional.list_regex_match_sets
+  calls:
+  - action: get_regex_match_set
+    params:
+      RegexMatchSetId: '{{ item.RegexMatchSetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.RegexMatchSet.Name }}'
+      RegexMatchSetId: '{{ response.RegexMatchSet.RegexMatchSetId }}'
+      RegexMatchTuples: '{{ response.RegexMatchSet.RegexMatchTuples }}'
+- discovery_id: aws.waf-regional.get_regex_pattern_set
+  for_each: aws.waf-regional.list_regex_pattern_sets
+  calls:
+  - action: get_regex_pattern_set
+    params:
+      RegexPatternSetId: '{{ item.RegexPatternSetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.RegexPatternSet.Name }}'
+      RegexPatternSetId: '{{ response.RegexPatternSet.RegexPatternSetId }}'
+      RegexPatternStrings: '{{ response.RegexPatternSet.RegexPatternSetId }}'
+- discovery_id: aws.waf-regional.get_rule
+  for_each: aws.waf-regional.list_activated_rules_in_rule_group
+  calls:
+  - action: get_rule
+    params:
+      RuleId: '{{ item.RuleId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.Rule.Name }}'
+      MetricName: '{{ response.Rule.MetricName }}'
+      Predicates: '{{ response.Rule.Predicates }}'
+      RuleId: '{{ response.Rule.RuleId }}'
+- discovery_id: aws.waf-regional.get_rule_group
+  for_each: aws.waf-regional.list_rule_groups
+  calls:
+  - action: get_rule_group
+    params:
+      RuleGroupId: '{{ item.RuleGroupId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.RuleGroup.Name }}'
+      MetricName: '{{ response.RuleGroup.MetricName }}'
+      RuleGroupId: '{{ response.RuleGroup.RuleGroupId }}'
+- discovery_id: aws.waf-regional.get_sampled_requests
+  for_each: aws.waf-regional.list_activated_rules_in_rule_group
+  calls:
+  - action: get_sampled_requests
+    params:
+      WebAclId: '{{ item.WebAclId }}'
+      RuleId: '{{ item.RuleId }}'
+      TimeWindow: '{{ item.TimeWindow }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SampledRequests }}'
+    item:
+      Action: '{{ item.Action }}'
+      Request: '{{ item.Request }}'
+      RuleWithinRuleGroup: '{{ item.RuleWithinRuleGroup }}'
+      Timestamp: '{{ item.Timestamp }}'
+      Weight: '{{ item.Weight }}'
+      PopulationSize: '{{ response.PopulationSize }}'
+      EndTime: '{{ response.TimeWindow.EndTime }}'
+      StartTime: '{{ response.TimeWindow.StartTime }}'
+- discovery_id: aws.waf-regional.get_size_constraint_set
+  for_each: aws.waf-regional.list_size_constraint_sets
+  calls:
+  - action: get_size_constraint_set
+    params:
+      SizeConstraintSetId: '{{ item.SizeConstraintSetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.SizeConstraintSet.Name }}'
+      SizeConstraintSetId: '{{ response.SizeConstraintSet.SizeConstraintSetId }}'
+      SizeConstraints: '{{ response.SizeConstraintSet.SizeConstraintSetId }}'
+- discovery_id: aws.waf-regional.get_sql_injection_match_set
+  for_each: aws.waf-regional.list_sql_injection_match_sets
+  calls:
+  - action: get_sql_injection_match_set
+    params:
+      SqlInjectionMatchSetId: '{{ item.SqlInjectionMatchSetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.SqlInjectionMatchSet.Name }}'
+      SqlInjectionMatchSetId: '{{ response.SqlInjectionMatchSet.SqlInjectionMatchSetId }}'
+      SqlInjectionMatchTuples: '{{ response.SqlInjectionMatchSet.SqlInjectionMatchSetId }}'
+- discovery_id: aws.waf-regional.get_web_acl
+  for_each: aws.waf-regional.list_web_ac_ls
+  calls:
+  - action: get_web_acl
+    params:
+      WebACLId: '{{ item.WebACLId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.WebACL.Name }}'
+      DefaultAction: '{{ response.WebACL.DefaultAction }}'
+      MetricName: '{{ response.WebACL.MetricName }}'
+      Rules: '{{ response.WebACL.Rules }}'
+      WebACLArn: '{{ response.WebACL.WebACLArn }}'
+      WebACLId: '{{ response.WebACL.WebACLId }}'
+- discovery_id: aws.waf-regional.get_web_acl_for_resource
+  for_each: aws.waf-regional.list_logging_configurations
+  calls:
+  - action: get_web_acl_for_resource
+    params:
+      ResourceArn: '{{ item.ResourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.WebACLSummary.Name }}'
+      WebACLId: '{{ response.WebACLSummary.WebACLId }}'
+      WebACLSummary: '{{ response.WebACLSummary.WebACLSummary }}'
+- discovery_id: aws.waf-regional.get_xss_match_set
+  for_each: aws.waf-regional.list_xss_match_sets
+  calls:
+  - action: get_xss_match_set
+    params:
+      XssMatchSetId: '{{ item.XssMatchSetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.XssMatchSet.Name }}'
+      XssMatchSetId: '{{ response.XssMatchSet.XssMatchSetId }}'
+      XssMatchTuples: '{{ response.XssMatchSet.XssMatchTuples }}'
+- discovery_id: aws.waf-regional.list_resources_for_web_acl
+  calls:
+  - action: list_resources_for_web_acl
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceArns }}'
+- discovery_id: aws.waf-regional.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ResourceARN: '{{ response.TagInfoForResource.ResourceARN }}'
+      TagList: '{{ response.TagInfoForResource.TagList[].Key }}'

@@ -1,0 +1,704 @@
+resource_key,field,label,type,source,reason
+acm.certificate,CreatedAt,created_at,str,list,1/1 carry it
+acm.certificate,Exported,exported,bool,list,1/1 carry it
+acm.certificate,HasAdditionalSubjectAlternativeNames,has_additional_subject_alternative_names,bool,list,1/1 carry it
+acm.certificate,InUse,in_use,bool,list,1/1 carry it
+acm.certificate,IssuedAt,issued_at,str,list,1/1 carry it
+acm.certificate,KeyAlgorithm,key_algorithm,str,list,1/1 carry it
+acm.certificate,NotAfter,not_after,str,list,1/1 carry it
+acm.certificate,NotBefore,not_before,str,list,1/1 carry it
+acm.certificate,RenewalEligibility,renewal_eligibility,str,list,1/1 carry it
+acm.certificate,Status,status,str,list,1/1 carry it
+acm.certificate,Type,type,str,list,1/1 carry it
+apigatewayv2.api,ApiEndpoint,api_endpoint,str,list,2/2 carry it
+apigatewayv2.api,ApiKeySelectionExpression,api_key_selection_expression,str,list,2/2 carry it
+apigatewayv2.api,CreatedDate,created_date,str,list,2/2 carry it
+apigatewayv2.api,DisableExecuteApiEndpoint,disable_execute_api_endpoint,bool,list,2/2 carry it
+apigatewayv2.api,CorsConfiguration.MaxAge,max_age,num,list,1/1 carry it
+apigatewayv2.api,ProtocolType,protocol_type,str,list,2/2 carry it
+apigatewayv2.api,RouteSelectionExpression,route_selection_expression,str,list,2/2 carry it
+apigatewayv2.stage,AutoDeploy,auto_deploy,bool,list,2/2 carry it
+apigatewayv2.stage,CreatedDate,created_date,str,list,2/2 carry it
+apigatewayv2.stage,DeploymentId,deployment_id,str,list,2/2 carry it
+apigatewayv2.stage,DefaultRouteSettings.DetailedMetricsEnabled,detailed_metrics_enabled,bool,list,2/2 carry it
+apigatewayv2.stage,LastDeploymentStatusMessage,last_deployment_status_message,str,list,2/2 carry it
+apigatewayv2.stage,LastUpdatedDate,last_updated_date,str,list,2/2 carry it
+appconfig.deployment_strategy,DeploymentDurationInMinutes,deployment_duration_in_minutes,num,list,4/4 carry it
+appconfig.deployment_strategy,FinalBakeTimeInMinutes,final_bake_time_in_minutes,num,list,4/4 carry it
+appconfig.deployment_strategy,GrowthFactor,growth_factor,num,list,4/4 carry it
+appconfig.deployment_strategy,GrowthType,growth_type,str,list,4/4 carry it
+appconfig.deployment_strategy,ReplicateTo,replicate_to,str,list,4/4 carry it
+appconfig.extension,VersionNumber,version_number,num,list,5/5 carry it
+apprunner.auto_scaling_configuration,AutoScalingConfigurationRevision,auto_scaling_configuration_revision,num,list,1/1 carry it
+apprunner.auto_scaling_configuration,CreatedAt,created_at,str,list,1/1 carry it
+apprunner.auto_scaling_configuration,HasAssociatedService,has_associated_service,bool,list,1/1 carry it
+apprunner.auto_scaling_configuration,IsDefault,is_default,bool,list,1/1 carry it
+apprunner.auto_scaling_configuration,Status,status,str,list,1/1 carry it
+apprunner.observability_configuration,ObservabilityConfigurationRevision,observability_configuration_revision,num,list,1/1 carry it
+athena.data_catalog,Type,type,str,list,1/1 carry it
+athena.work_group,CreationTime,creation_time,str,list,1/1 carry it
+athena.work_group,EngineVersion.EffectiveEngineVersion,effective_engine_version,str,list,1/1 carry it
+athena.work_group,EngineVersion.SelectedEngineVersion,selected_engine_version,str,list,1/1 carry it
+athena.work_group,State,state,str,list,1/1 carry it
+autoscaling.auto_scaling_group,CapacityRebalance,capacity_rebalance,bool,list,2/2 carry it
+autoscaling.auto_scaling_group,CreatedTime,created_time,str,list,3/3 carry it
+autoscaling.auto_scaling_group,DefaultCooldown,default_cooldown,num,list,3/3 carry it
+autoscaling.auto_scaling_group,DesiredCapacity,desired,num,list,
+autoscaling.auto_scaling_group,HealthCheckGracePeriod,health_check_grace_period,num,list,3/3 carry it
+autoscaling.auto_scaling_group,HealthCheckType,health_check_type,str,list,3/3 carry it
+autoscaling.auto_scaling_group,LaunchTemplate.Version,launch_template_version,str,list,1/1 carry it
+autoscaling.auto_scaling_group,MaxSize,max,num,list,
+autoscaling.auto_scaling_group,MinSize,min,num,list,the three numbers that ARE the scaling decision
+autoscaling.auto_scaling_group,NewInstancesProtectedFromScaleIn,new_instances_protected_from_scale_in,bool,list,3/3 carry it
+autoscaling.auto_scaling_group,ServiceLinkedRoleARN,service_linked_role_arn,str,list,3/3 carry it
+autoscaling.auto_scaling_group,VPCZoneIdentifier,vpc_zone_identifier,str,list,3/3 carry it
+autoscaling.launch_configuration,CreatedTime,created_time,str,list,1/1 carry it
+autoscaling.launch_configuration,EbsOptimized,ebs_optimized,bool,list,1/1 carry it
+autoscaling.launch_configuration,IamInstanceProfile,iam_instance_profile,str,list,1/1 carry it
+autoscaling.launch_configuration,ImageId,image_id,str,list,1/1 carry it
+autoscaling.launch_configuration,InstanceMonitoring.Enabled,instance_monitoring_enabled,bool,list,1/1 carry it
+autoscaling.launch_configuration,InstanceType,instance_type,str,list,1/1 carry it
+autoscaling.launch_configuration,KeyName,key_name,str,list,1/1 carry it
+batch.job_definition,containerOrchestrationType,container_orchestration_type,str,list,1/1 carry it
+batch.job_definition,tags.Disposable,disposable,str,list,1/1 carry it
+batch.job_definition,containerProperties.executionRoleArn,execution_role_arn,str,list,1/1 carry it
+batch.job_definition,containerProperties.image,image,str,list,1/1 carry it
+batch.job_definition,containerProperties.jobRoleArn,job_role_arn,str,list,1/1 carry it
+batch.job_definition,tags.Purpose,purpose,str,list,1/1 carry it
+batch.job_definition,revision,revision,num,list,1/1 carry it
+batch.job_definition,status,status,str,list,1/1 carry it
+batch.job_definition,type,type,str,list,1/1 carry it
+cloudformation.stack,ChangeSetId,change_set_id,str,list,1/1 carry it
+cloudformation.stack,CreationTime,creation_time,str,list,4/4 carry it
+cloudformation.stack,DeletionTime,deletion_time,str,list,1/1 carry it
+cloudformation.stack,DisableRollback,disable_rollback,bool,list,4/4 carry it
+cloudformation.stack,EnableTerminationProtection,enable_termination_protection,bool,list,4/4 carry it
+cloudformation.stack,LastUpdatedTime,last_updated_time,str,list,2/2 carry it
+cloudformation.stack,DriftInformation.StackDriftStatus,stack_drift_status,str,list,4/4 carry it
+cloudformation.stack,StackStatus,stack_status,str,list,4/4 carry it
+cloudformation.stack,StackStatusReason,stack_status_reason,str,list,1/1 carry it
+cloudfront.cloud_front_origin_access_identity,Comment,comment,str,list,2/2 carry it
+cloudfront.cloud_front_origin_access_identity,S3CanonicalUserId,s3_canonical_user_id,str,list,2/2 carry it
+cloudfront.distribution,Aliases.Quantity,aliases_quantity,num,list,2/2 carry it
+cloudfront.distribution,CacheBehaviors.Quantity,cache_behaviors_quantity,num,list,2/2 carry it
+cloudfront.distribution,CustomErrorResponses.Quantity,custom_error_responses_quantity,num,list,2/2 carry it
+cloudfront.distribution,Enabled,enabled,bool,list,2/2 carry it
+cloudfront.distribution,HttpVersion,http_version,str,list,2/2 carry it
+cloudfront.distribution,IsIPV6Enabled,is_ipv6_enabled,bool,list,2/2 carry it
+cloudfront.distribution,LastModifiedTime,last_modified_time,str,list,2/2 carry it
+cloudfront.distribution,OriginGroups.Quantity,origin_groups_quantity,num,list,2/2 carry it
+cloudfront.distribution,Origins.Quantity,origins_quantity,num,list,2/2 carry it
+cloudfront.distribution,PriceClass,price_class,str,list,2/2 carry it
+cloudfront.distribution,Staging,staging,bool,list,2/2 carry it
+cloudfront.distribution,Status,status,str,list,2/2 carry it
+cloudfront.streaming_distribution,Aliases.Quantity,aliases_quantity,num,list,1/1 carry it
+cloudfront.streaming_distribution,S3Origin.DomainName,domain_name,str,list,1/1 carry it
+cloudfront.streaming_distribution,Enabled,enabled,bool,list,1/1 carry it
+cloudfront.streaming_distribution,LastModifiedTime,last_modified_time,str,list,1/1 carry it
+cloudfront.streaming_distribution,S3Origin.OriginAccessIdentity,origin_access_identity,str,list,1/1 carry it
+cloudfront.streaming_distribution,PriceClass,price_class,str,list,1/1 carry it
+cloudfront.streaming_distribution,Status,status,str,list,1/1 carry it
+cloudfront.streaming_distribution,TrustedSigners.Enabled,trusted_signers_enabled,bool,list,1/1 carry it
+cloudfront.streaming_distribution,TrustedSigners.Quantity,trusted_signers_quantity,num,list,1/1 carry it
+cloudtrail.trail,HasCustomEventSelectors,has_custom_event_selectors,bool,list,1/1 carry it
+cloudtrail.trail,HasInsightSelectors,has_insight_selectors,bool,list,1/1 carry it
+cloudtrail.trail,HomeRegion,home_region,str,list,1/1 carry it
+cloudtrail.trail,IncludeGlobalServiceEvents,include_global_service_events,bool,list,1/1 carry it
+cloudtrail.trail,IsMultiRegionTrail,is_multi_region_trail,bool,list,1/1 carry it
+cloudtrail.trail,IsOrganizationTrail,is_organization_trail,bool,list,1/1 carry it
+cloudtrail.trail,LogFileValidationEnabled,log_file_validation_enabled,bool,list,1/1 carry it
+cloudtrail.trail,S3BucketName,s3_bucket_name,str,list,1/1 carry it
+cloudwatch.alarm,ActionsEnabled,actions_enabled,bool,list,1/1 carry it
+cloudwatch.alarm,ComparisonOperator,comparison_operator,str,list,1/1 carry it
+cloudwatch.alarm,DatapointsToAlarm,datapoints_to_alarm,num,list,1/1 carry it
+cloudwatch.alarm,EvaluationPeriods,evaluation_periods,num,list,1/1 carry it
+cloudwatch.alarm,MetricName,metric_name,str,list,1/1 carry it
+cloudwatch.alarm,Namespace,namespace,str,list,1/1 carry it
+cloudwatch.alarm,Period,period,num,list,1/1 carry it
+cloudwatch.alarm,StateReason,state_reason,str,list,1/1 carry it
+cloudwatch.alarm,StateValue,state_value,str,list,1/1 carry it
+cloudwatch.alarm,Statistic,statistic,str,list,1/1 carry it
+cloudwatch.alarm,Threshold,threshold,num,list,1/1 carry it
+cloudwatch.alarm,TreatMissingData,treat_missing_data,str,list,1/1 carry it
+cloudwatch.dashboard,LastModified,last_modified,str,list,1/1 carry it
+cloudwatch.dashboard,Size,size,num,list,1/1 carry it
+codeartifact.domain,createdTime,created_time,str,list,1/1 carry it
+codeartifact.domain,encryptionKey,encryption_key,str,list,1/1 carry it
+codeartifact.domain,status,status,str,list,1/1 carry it
+config.config_rule,ConfigRuleId,config_rule_id,str,list,1/1 carry it
+config.config_rule,ConfigRuleState,config_rule_state,str,list,1/1 carry it
+config.config_rule,InputParameters,input_parameters,str,list,1/1 carry it
+config.config_rule,MaximumExecutionFrequency,maximum_execution_frequency,str,list,1/1 carry it
+config.config_rule,Source.SourceIdentifier,source_identifier,str,list,1/1 carry it
+config.configuration_recorder,recordingGroup.allSupported,all_supported,bool,list,1/1 carry it
+config.configuration_recorder,recordingGroup.includeGlobalResourceTypes,include_global_resource_types,bool,list,1/1 carry it
+config.configuration_recorder,recordingMode.recordingFrequency,recording_frequency,str,list,1/1 carry it
+config.configuration_recorder,roleARN,role_arn,str,list,1/1 carry it
+config.configuration_recorder_status,lastStartTime,last_start_time,str,list,1/1 carry it
+config.configuration_recorder_status,lastStatus,last_status,str,list,1/1 carry it
+config.configuration_recorder_status,lastStatusChangeTime,last_status_change_time,str,list,1/1 carry it
+config.configuration_recorder_status,lastStopTime,last_stop_time,str,list,1/1 carry it
+config.configuration_recorder_status,recording,recording,bool,list,1/1 carry it
+config.delivery_channel,configSnapshotDeliveryProperties.deliveryFrequency,delivery_frequency,str,list,1/1 carry it
+config.delivery_channel,s3BucketName,s3_bucket_name,str,list,1/1 carry it
+dax.parameter,AllowedValues,allowed_values,str,list,2/2 carry it
+dax.parameter,ChangeType,change_type,str,list,2/2 carry it
+dax.parameter,DataType,data_type,str,list,2/2 carry it
+dax.parameter,IsModifiable,is_modifiable,str,list,2/2 carry it
+dax.parameter,ParameterType,parameter_type,str,list,2/2 carry it
+dax.parameter,ParameterValue,parameter_value,str,list,2/2 carry it
+dax.parameter,Source,source,str,list,2/2 carry it
+directconnect.direct_connect_gateway,amazonSideAsn,amazon_side_asn,num,list,1/1 carry it
+directconnect.direct_connect_gateway,directConnectGatewayName,direct_connect_gateway_name,str,list,1/1 carry it
+directconnect.direct_connect_gateway,directConnectGatewayState,direct_connect_gateway_state,str,list,1/1 carry it
+directconnect.direct_connect_gateway,ownerAccount,owner_account,str,list,1/1 carry it
+dynamodb.table,BillingModeSummary.BillingMode,billing_mode,str,enrich:describe_table,provisioned versus on-demand is the largest single cost lever on a table
+dynamodb.table,CreationDateTime,creation_date_time,str,enrich:describe_table,7/7 carry it
+dynamodb.table,DeletionProtectionEnabled,deletion_protection_enabled,bool,enrich:describe_table,7/7 carry it
+dynamodb.table,SSEDescription.Status,encryption,str,enrich:describe_table,
+dynamodb.table,ItemCount,item_count,num,enrich:describe_table,"what the table holds, and the only size signal DynamoDB gives cheaply"
+dynamodb.table,BillingModeSummary.LastUpdateToPayPerRequestDateTime,last_update_to_pay_per_request_date_time,str,enrich:describe_table,7/7 carry it
+dynamodb.table,ProvisionedThroughput.NumberOfDecreasesToday,number_of_decreases_today,num,enrich:describe_table,7/7 carry it
+dynamodb.table,ProvisionedThroughput.ReadCapacityUnits,read_capacity_units,num,enrich:describe_table,7/7 carry it
+dynamodb.table,TableSizeBytes,size_gb,bytes_gb,enrich:describe_table,what it is billed on
+dynamodb.table,TableStatus,state,str,enrich:describe_table,
+dynamodb.table,TableId,table_id,str,enrich:describe_table,7/7 carry it
+dynamodb.table,ProvisionedThroughput.WriteCapacityUnits,write_capacity_units,num,enrich:describe_table,7/7 carry it
+ec2.ami,Architecture,architecture,str,list,1/1 carry it
+ec2.ami,BootMode,boot_mode,str,list,1/1 carry it
+ec2.ami,CreationDate,creation_date,str,list,age drives the orphaned-image rules
+ec2.ami,EnaSupport,ena_support,bool,list,1/1 carry it
+ec2.ami,Hypervisor,hypervisor,str,list,1/1 carry it
+ec2.ami,ImageLocation,image_location,str,list,1/1 carry it
+ec2.ami,ImageType,image_type,str,list,1/1 carry it
+ec2.ami,ImdsSupport,imds_support,str,list,1/1 carry it
+ec2.ami,Public,public,bool,list,a publicly shared image is a finding rather than a cost
+ec2.ami,RootDeviceName,root_device_name,str,list,1/1 carry it
+ec2.ami,RootDeviceType,root_device_type,str,list,1/1 carry it
+ec2.ami,State,state,str,list,
+ec2.ebs_snapshot,Encrypted,encrypted,bool,list,
+ec2.ebs_snapshot,Progress,progress,str,list,1/1 carry it
+ec2.ebs_snapshot,VolumeSize,size_gb,num,list,what the snapshot is billed on
+ec2.ebs_snapshot,StartTime,start_time,str,list,age drives every snapshot-retention rule
+ec2.ebs_snapshot,State,state,str,list,
+ec2.ebs_snapshot,StorageTier,storage_tier,str,list,archive tier is a fraction of standard
+ec2.ebs_snapshot,VolumeId,volume_id,str,list,"the volume it came from, which may no longer exist"
+ec2.elastic_ip,AssociationId,attached,present,list,an unassociated elastic IP is billed hourly for nothing
+ec2.elastic_ip,Domain,domain,str,list,vpc or the retired ec2-classic
+ec2.elastic_ip,PublicIp,public_ip,str,list,
+ec2.flow_log,CreationTime,creation_time,str,list,1/1 carry it
+ec2.flow_log,DeliverLogsStatus,deliver_logs_status,str,list,1/1 carry it
+ec2.flow_log,DestinationOptions.FileFormat,file_format,str,list,1/1 carry it
+ec2.flow_log,FlowLogStatus,flow_log_status,str,list,1/1 carry it
+ec2.flow_log,DestinationOptions.HiveCompatiblePartitions,hive_compatible_partitions,bool,list,1/1 carry it
+ec2.flow_log,LogDestination,log_destination,str,list,1/1 carry it
+ec2.flow_log,LogDestinationType,log_destination_type,str,list,1/1 carry it
+ec2.flow_log,MaxAggregationInterval,max_aggregation_interval,num,list,1/1 carry it
+ec2.flow_log,DestinationOptions.PerHourPartition,per_hour_partition,bool,list,1/1 carry it
+ec2.flow_log,ResourceId,resource_id,str,list,1/1 carry it
+ec2.flow_log,TrafficType,traffic_type,str,list,1/1 carry it
+ec2.instance,AmiLaunchIndex,ami_launch_index,num,list,3/3 carry it
+ec2.instance,Architecture,architecture,str,list,3/3 carry it
+ec2.instance,BootMode,boot_mode,str,list,3/3 carry it
+ec2.instance,EbsOptimized,ebs_optimized,bool,list,3/3 carry it
+ec2.instance,EnaSupport,ena_support,bool,list,3/3 carry it
+ec2.instance,Hypervisor,hypervisor,str,list,3/3 carry it
+ec2.instance,ImageId,image_id,str,list,3/3 carry it
+ec2.instance,InstanceType,instance_type,str,list,the size
+ec2.instance,LaunchTime,launch_time,str,list,age drives the stale-instance rules
+ec2.instance,PlatformDetails,platform,str,list,which OS family is billed - the licence cost differs by an order of magnitude
+ec2.instance,PrivateIpAddress,private_ip,str,list,
+ec2.instance,PublicIpAddress,public_ip,str,list,a public address is half of what makes an instance reachable from outside
+ec2.instance,State.Name,state,str,list,running or stopped changes what every other fact about it means
+ec2.instance,SubnetId,subnet_id,str,list,3/3 carry it
+ec2.instance,Placement.Tenancy,tenancy,str,list,dedicated tenancy is a multiple of shared price
+ec2.instance,VpcId,vpc_id,str,list,3/3 carry it
+ec2.key_pair,CreateTime,create_time,str,list,7/7 carry it
+ec2.key_pair,KeyFingerprint,key_fingerprint,str,list,7/7 carry it
+ec2.key_pair,KeyPairId,key_pair_id,str,list,7/7 carry it
+ec2.key_pair,KeyType,key_type,str,list,7/7 carry it
+ec2.launch_template,CreateTime,create_time,str,list,3/3 carry it
+ec2.launch_template,CreatedBy,created_by,str,list,3/3 carry it
+ec2.launch_template,DefaultVersionNumber,default_version_number,num,list,3/3 carry it
+ec2.launch_template,LatestVersionNumber,latest_version_number,num,list,3/3 carry it
+ec2.network_acl,IsDefault,is_default,bool,list,1/1 carry it
+ec2.network_acl,VpcId,vpc_id,str,list,1/1 carry it
+ec2.network_insights_access_scope,CreatedDate,created_date,str,list,1/1 carry it
+ec2.network_insights_access_scope,UpdatedDate,updated_date,str,list,1/1 carry it
+ec2.network_interface,Attachment.InstanceId,attached_instance,str,list,
+ec2.network_interface,Attachment.AttachmentId,attachment_id,str,list,16/16 carry it
+ec2.network_interface,Attachment.InstanceOwnerId,attachment_owner,str,list,"amazon-elb / amazon-rds / amazon-aws mean a managed service owns this interface, not an instance — which is why it has no host and is not missing one"
+ec2.network_interface,Attachment.Status,attachment_status,str,list,16/16 carry it
+ec2.network_interface,Description,description,str,list,names the service and often the exact load balancer
+ec2.network_interface,Attachment.DeviceIndex,device_index,num,list,16/16 carry it
+ec2.network_interface,InterfaceType,interface_type,str,list,which managed service owns it
+ec2.network_interface,MacAddress,mac_address,str,list,17/17 carry it
+ec2.network_interface,PrivateDnsName,private_dns_name,str,list,17/17 carry it
+ec2.network_interface,PrivateIpAddress,private_ip,str,list,
+ec2.network_interface,RequesterId,requester,bool,list,
+ec2.network_interface,RequesterManaged,requester_managed,bool,list,17/17 carry it
+ec2.network_interface,SourceDestCheck,source_dest_check,bool,list,17/17 carry it
+ec2.network_interface,Status,status,str,list,available means attached to nothing — a placement question and a cost finding at once
+ec2.network_interface,SubnetId,subnet_id,str,list,17/17 carry it
+ec2.network_interface,VpcId,vpc_id,str,list,17/17 carry it
+ec2.prefix_list,AddressFamily,address_family,str,list,16/16 carry it
+ec2.prefix_list,PrefixListArn,prefix_list_arn,str,list,16/16 carry it
+ec2.prefix_list,State,state,str,list,16/16 carry it
+ec2.route_table,VpcId,vpc_id,str,list,1/1 carry it
+ec2.security_group,VpcId,vpc_id,str,list,31/31 carry it
+ec2.security_group_rule,CidrIpv4,cidr_v4,str,list,the address range allowed
+ec2.security_group_rule,CidrIpv6,cidr_v6,str,list,the address range allowed
+ec2.security_group_rule,IsEgress,egress,bool,list,inbound or outbound; the only thing that decides which half of the table a rule lands in
+ec2.security_group_rule,FromPort,from_port,num,list,-1 means every port
+ec2.security_group_rule,GroupId,group,str,list,the group this rule belongs to — a rule names its group rather than the group listing its rules
+ec2.security_group_rule,GroupOwnerId,group_owner_id,str,list,228/228 carry it
+ec2.security_group_rule,ReferencedGroupInfo.GroupId,peer_group,str,list,a rule can name another security group instead of a range
+ec2.security_group_rule,PrefixListId,prefix_list,str,list,a rule can name a managed prefix list instead of a range
+ec2.security_group_rule,IpProtocol,protocol,str,list,-1 means every protocol
+ec2.security_group_rule,ToPort,to_port,num,list,-1 means every port
+ec2.security_group_rule,ReferencedGroupInfo.UserId,user_id,str,list,128/128 carry it
+ec2.snapshot,VolumeSize,size_gb,num,list,
+ec2.snapshot,StartTime,start_time,str,list,
+ec2.snapshot,State,state,str,list,
+ec2.spot_instance_request,CreateTime,create_time,str,list,1/1 carry it
+ec2.spot_instance_request,LaunchSpecification.ImageId,image_id,str,list,1/1 carry it
+ec2.spot_instance_request,InstanceId,instance_id,str,list,1/1 carry it
+ec2.spot_instance_request,InstanceInterruptionBehavior,instance_interruption_behavior,str,list,1/1 carry it
+ec2.spot_instance_request,LaunchSpecification.InstanceType,instance_type,str,list,1/1 carry it
+ec2.spot_instance_request,LaunchedAvailabilityZone,launched_availability_zone,str,list,1/1 carry it
+ec2.spot_instance_request,Status.Message,message,str,list,1/1 carry it
+ec2.spot_instance_request,SpotPrice,spot_price,str,list,1/1 carry it
+ec2.spot_instance_request,State,state,str,list,1/1 carry it
+ec2.spot_instance_request,Status.Code,status_code,str,list,1/1 carry it
+ec2.spot_instance_request,Type,type,str,list,1/1 carry it
+ec2.spot_instance_request,Status.UpdateTime,update_time,str,list,1/1 carry it
+ec2.subnet,AssignIpv6AddressOnCreation,assign_ipv6_address_on_creation,bool,list,4/4 carry it
+ec2.subnet,MapPublicIpOnLaunch,auto_public_ip,bool,list,a subnet that hands out public addresses is public whatever it is named
+ec2.subnet,AvailabilityZoneId,availability_zone_id,str,list,4/4 carry it
+ec2.subnet,AvailableIpAddressCount,available_ip_address_count,num,list,4/4 carry it
+ec2.subnet,CidrBlock,cidr_block,str,list,4/4 carry it
+ec2.subnet,DefaultForAz,default_for_az,bool,list,4/4 carry it
+ec2.subnet,EnableDns64,enable_dns64,bool,list,4/4 carry it
+ec2.subnet,PrivateDnsNameOptionsOnLaunch.HostnameType,hostname_type,str,list,4/4 carry it
+ec2.subnet,Ipv6Native,ipv6_native,bool,list,4/4 carry it
+ec2.subnet,MapCustomerOwnedIpOnLaunch,map_customer_owned_ip_on_launch,bool,list,4/4 carry it
+ec2.subnet,State,state,str,list,4/4 carry it
+ec2.subnet,VpcId,vpc_id,str,list,4/4 carry it
+ec2.transit_gateway,Options.AmazonSideAsn,amazon_side_asn,num,list,1/1 carry it
+ec2.transit_gateway,Options.AssociationDefaultRouteTableId,association_default_route_table_id,str,list,1/1 carry it
+ec2.transit_gateway,Options.AutoAcceptSharedAttachments,auto_accept_shared_attachments,str,list,1/1 carry it
+ec2.transit_gateway,CreationTime,creation_time,str,list,1/1 carry it
+ec2.transit_gateway,Options.DefaultRouteTableAssociation,default_route_table_association,str,list,1/1 carry it
+ec2.transit_gateway,Options.DefaultRouteTablePropagation,default_route_table_propagation,str,list,1/1 carry it
+ec2.transit_gateway,Options.DnsSupport,dns_support,str,list,1/1 carry it
+ec2.transit_gateway,Options.MulticastSupport,multicast_support,str,list,1/1 carry it
+ec2.transit_gateway,Options.PropagationDefaultRouteTableId,propagation_default_route_table_id,str,list,1/1 carry it
+ec2.transit_gateway,Options.SecurityGroupReferencingSupport,security_group_referencing_support,str,list,1/1 carry it
+ec2.transit_gateway,State,state,str,list,1/1 carry it
+ec2.transit_gateway,Options.VpnEcmpSupport,vpn_ecmp_support,str,list,1/1 carry it
+ec2.transit_gateway_route_table,CreationTime,creation_time,str,list,1/1 carry it
+ec2.transit_gateway_route_table,DefaultAssociationRouteTable,default_association_route_table,bool,list,1/1 carry it
+ec2.transit_gateway_route_table,DefaultPropagationRouteTable,default_propagation_route_table,bool,list,1/1 carry it
+ec2.transit_gateway_route_table,State,state,str,list,1/1 carry it
+ec2.transit_gateway_route_table,TransitGatewayId,transit_gateway_id,str,list,1/1 carry it
+ec2.verified_access_instance,CreationTime,creation_time,str,list,1/1 carry it
+ec2.verified_access_instance,FipsEnabled,fips_enabled,bool,list,1/1 carry it
+ec2.verified_access_instance,LastUpdatedTime,last_updated_time,str,list,1/1 carry it
+ec2.volume,Attachments,attached,present,list,attached to anything at all - the unattached-volume rule turns on this
+ec2.volume,Attachments[0].InstanceId,attached_instance,str,list,
+ec2.volume,CreateTime,create_time,str,list,"age, for the stale-volume rules"
+ec2.volume,Encrypted,encrypted,bool,list,
+ec2.volume,Iops,iops,num,list,provisioned IOPS bill separately from capacity
+ec2.volume,KmsKeyId,kms_key_id,str,list,3/3 carry it
+ec2.volume,MultiAttachEnabled,multi_attach_enabled,bool,list,3/3 carry it
+ec2.volume,Size,size_gb,num,list,"what the volume is billed on. Named size_gb, not size_gib: the cost rules reference this name and AWS bills GiB as GB"
+ec2.volume,SnapshotId,snapshot_id,str,list,3/3 carry it
+ec2.volume,State,state,str,list,available means attached to nothing and still billed
+ec2.volume,Throughput,throughput,num,list,3/3 carry it
+ec2.volume,VolumeType,volume_type,str,list,
+ec2.vpc,CidrBlock,cidr_block,str,list,1/1 carry it
+ec2.vpc,DhcpOptionsId,dhcp_options_id,str,list,1/1 carry it
+ec2.vpc,InstanceTenancy,instance_tenancy,str,list,1/1 carry it
+ec2.vpc,IsDefault,is_default,bool,list,1/1 carry it
+ec2.vpc,State,state,str,list,1/1 carry it
+ec2.vpc_endpoint,CreationTimestamp,creation_timestamp,str,list,1/1 carry it
+ec2.vpc_endpoint,DnsOptions.DnsRecordIpType,dns_record_ip_type,str,list,1/1 carry it
+ec2.vpc_endpoint,IpAddressType,ip_address_type,str,list,1/1 carry it
+ec2.vpc_endpoint,PrivateDnsEnabled,private_dns_enabled,bool,list,1/1 carry it
+ec2.vpc_endpoint,RequesterManaged,requester_managed,bool,list,1/1 carry it
+ec2.vpc_endpoint,ServiceName,service_name,str,list,1/1 carry it
+ec2.vpc_endpoint,State,state,str,list,1/1 carry it
+ec2.vpc_endpoint,VpcEndpointType,vpc_endpoint_type,str,list,1/1 carry it
+ec2.vpc_endpoint,VpcId,vpc_id,str,list,1/1 carry it
+ecr.repository,createdAt,created_at,str,list,16/16 carry it
+ecr.repository,encryptionConfiguration.encryptionType,encryption_type,str,list,16/16 carry it
+ecr.repository,registryId,registry_id,str,list,16/16 carry it
+ecr.repository,repositoryUri,repository_uri,str,list,16/16 carry it
+ecr.repository,imageScanningConfiguration.scanOnPush,scan_on_push,bool,list,16/16 carry it
+ecs.capacity_provider,status,status,str,list,2/2 carry it
+ecs.cluster,activeServicesCount,active_services_count,num,list,1/1 carry it
+ecs.cluster,pendingTasksCount,pending_tasks_count,num,list,1/1 carry it
+ecs.cluster,registeredContainerInstancesCount,registered_container_instances_count,num,list,1/1 carry it
+ecs.cluster,runningTasksCount,running_tasks_count,num,list,1/1 carry it
+ecs.cluster,status,status,str,list,1/1 carry it
+ecs.task_definition,name,name,str,list,1/1 carry it
+efs.file_system,CreationTime,creation_time,str,list,1/1 carry it
+efs.file_system,CreationToken,creation_token,str,list,1/1 carry it
+efs.file_system,Encrypted,encrypted,bool,list,1/1 carry it
+efs.file_system,LifeCycleState,life_cycle_state,str,list,1/1 carry it
+efs.file_system,NumberOfMountTargets,number_of_mount_targets,num,list,1/1 carry it
+efs.file_system,PerformanceMode,performance_mode,str,list,1/1 carry it
+efs.file_system,FileSystemProtection.ReplicationOverwriteProtection,replication_overwrite_protection,str,list,1/1 carry it
+efs.file_system,SizeInBytes.Value,size_in_bytes_value,num,list,1/1 carry it
+efs.file_system,ThroughputMode,throughput_mode,str,list,1/1 carry it
+efs.file_system,SizeInBytes.ValueInArchive,value_in_archive,num,list,1/1 carry it
+efs.file_system,SizeInBytes.ValueInIA,value_in_ia,num,list,1/1 carry it
+efs.file_system,SizeInBytes.ValueInStandard,value_in_standard,num,list,1/1 carry it
+eks.cluster,accessConfig.authenticationMode,authentication_mode,str,enrich:describe_cluster,1/1 carry it
+eks.cluster,createdAt,created_at,str,enrich:describe_cluster,1/1 carry it
+eks.cluster,endpoint,endpoint,str,enrich:describe_cluster,1/1 carry it
+eks.cluster,resourcesVpcConfig.endpointPrivateAccess,endpoint_private_access,bool,enrich:describe_cluster,1/1 carry it
+eks.cluster,resourcesVpcConfig.endpointPublicAccess,endpoint_public_access,bool,enrich:describe_cluster,1/1 carry it
+eks.cluster,kubernetesNetworkConfig.ipFamily,ip_family,str,enrich:describe_cluster,1/1 carry it
+eks.cluster,version,k8s_version,str,enrich:describe_cluster,
+eks.cluster,platformVersion,platform_version,str,enrich:describe_cluster,1/1 carry it
+eks.cluster,roleArn,role_arn,str,enrich:describe_cluster,1/1 carry it
+eks.cluster,kubernetesNetworkConfig.serviceIpv4Cidr,service_ipv4_cidr,str,enrich:describe_cluster,1/1 carry it
+eks.cluster,status,status,str,enrich:describe_cluster,1/1 carry it
+eks.cluster,resourcesVpcConfig.vpcId,vpc_id,str,enrich:describe_cluster,1/1 carry it
+eks.nodegroup,amiType,ami_type,str,enrich:describe_nodegroup,2/2 carry it
+eks.nodegroup,capacityType,capacity_type,str,enrich:describe_nodegroup,spot or on-demand changes both the cost and the failure model
+eks.nodegroup,clusterName,cluster_name,str,enrich:describe_nodegroup,2/2 carry it
+eks.nodegroup,createdAt,created_at,str,enrich:describe_nodegroup,2/2 carry it
+eks.nodegroup,diskSize,disk_size,num,enrich:describe_nodegroup,2/2 carry it
+eks.nodegroup,instanceTypes,instance_types,str,enrich:describe_nodegroup,
+eks.nodegroup,scalingConfig.maxSize,max_size,num,enrich:describe_nodegroup,2/2 carry it
+eks.nodegroup,scalingConfig.minSize,min_size,num,enrich:describe_nodegroup,2/2 carry it
+eks.nodegroup,modifiedAt,modified_at,str,enrich:describe_nodegroup,2/2 carry it
+eks.nodegroup,nodeRole,node_role,str,enrich:describe_nodegroup,2/2 carry it
+eks.nodegroup,releaseVersion,release_version,str,enrich:describe_nodegroup,2/2 carry it
+eks.nodegroup,status,status,str,enrich:describe_nodegroup,
+eks.nodegroup,version,version,str,enrich:describe_nodegroup,2/2 carry it
+elasticache.cache_parameter_group,CacheParameterGroupFamily,cache_parameter_group_family,str,list,20/20 carry it
+elasticache.cache_parameter_group,IsGlobal,is_global,bool,list,20/20 carry it
+elasticache.user,AccessString,access_string,str,list,1/1 carry it
+elasticache.user,ARN,arn,str,list,1/1 carry it
+elasticache.user,Authentication.Type,authentication_type,str,list,1/1 carry it
+elasticache.user,Engine,engine,str,list,1/1 carry it
+elasticache.user,MinimumEngineVersion,minimum_engine_version,str,list,1/1 carry it
+elasticache.user,Status,status,str,list,1/1 carry it
+elb.load_balancer,CanonicalHostedZoneNameID,canonical_hosted_zone_name_id,str,list,1/1 carry it
+elb.load_balancer,CreatedTime,created_time,str,list,1/1 carry it
+elb.load_balancer,SourceSecurityGroup.GroupName,group_name,str,list,1/1 carry it
+elb.load_balancer,HealthCheck.HealthyThreshold,healthy_threshold,num,list,1/1 carry it
+elb.load_balancer,HealthCheck.Interval,interval,num,list,1/1 carry it
+elb.load_balancer,SourceSecurityGroup.OwnerAlias,owner_alias,str,list,1/1 carry it
+elb.load_balancer,Scheme,scheme,str,list,1/1 carry it
+elb.load_balancer,HealthCheck.Target,target,str,list,1/1 carry it
+elb.load_balancer,HealthCheck.Timeout,timeout,num,list,1/1 carry it
+elb.load_balancer,HealthCheck.UnhealthyThreshold,unhealthy_threshold,num,list,1/1 carry it
+elb.load_balancer,VPCId,vpc_id,str,list,1/1 carry it
+elbv2.listener,LoadBalancerArn,load_balancer_arn,str,list,2/2 carry it
+elbv2.listener,Port,port,num,list,2/2 carry it
+elbv2.listener,Protocol,protocol,str,list,2/2 carry it
+elbv2.listener,SslPolicy,ssl_policy,str,list,1/1 carry it
+elbv2.load_balancer,CanonicalHostedZoneId,canonical_hosted_zone_id,str,list,1/1 carry it
+elbv2.load_balancer,CreatedTime,created_time,str,list,1/1 carry it
+elbv2.load_balancer,DNSName,dns_name,str,list,1/1 carry it
+elbv2.load_balancer,IpAddressType,ip_address_type,str,list,1/1 carry it
+elbv2.load_balancer,Type,lb_type,str,list,
+elbv2.load_balancer,Scheme,scheme,str,list,internet-facing or internal — this is the exposure level in one field
+elbv2.load_balancer,State.Code,state_code,str,list,1/1 carry it
+elbv2.load_balancer,VpcId,vpc_id,str,list,1/1 carry it
+elbv2.target_group,HealthCheckEnabled,health_check_enabled,bool,list,2/2 carry it
+elbv2.target_group,HealthCheckIntervalSeconds,health_check_interval_seconds,num,list,2/2 carry it
+elbv2.target_group,HealthCheckPort,health_check_port,str,list,2/2 carry it
+elbv2.target_group,HealthCheckProtocol,health_check_protocol,str,list,2/2 carry it
+elbv2.target_group,HealthCheckTimeoutSeconds,health_check_timeout_seconds,num,list,2/2 carry it
+elbv2.target_group,HealthyThresholdCount,healthy_threshold_count,num,list,2/2 carry it
+elbv2.target_group,IpAddressType,ip_address_type,str,list,2/2 carry it
+elbv2.target_group,Port,port,num,list,2/2 carry it
+elbv2.target_group,Protocol,protocol,str,list,2/2 carry it
+elbv2.target_group,TargetType,target_type,str,list,2/2 carry it
+elbv2.target_group,UnhealthyThresholdCount,unhealthy_threshold_count,num,list,2/2 carry it
+elbv2.target_group,VpcId,vpc_id,str,list,2/2 carry it
+events.rule,EventBusName,event_bus_name,str,list,4/4 carry it
+events.rule,ManagedBy,managed_by,str,list,2/2 carry it
+events.rule,ScheduleExpression,schedule_expression,str,list,1/1 carry it
+events.rule,State,state,str,list,4/4 carry it
+greengrass.connector_definition,CreationTimestamp,creation_timestamp,str,list,1/1 carry it
+greengrass.connector_definition,LastUpdatedTimestamp,last_updated_timestamp,str,list,1/1 carry it
+greengrass.core_definition,CreationTimestamp,creation_timestamp,str,list,1/1 carry it
+greengrass.core_definition,LastUpdatedTimestamp,last_updated_timestamp,str,list,1/1 carry it
+greengrass.device_definition,CreationTimestamp,creation_timestamp,str,list,1/1 carry it
+greengrass.device_definition,LastUpdatedTimestamp,last_updated_timestamp,str,list,1/1 carry it
+greengrass.function_definition,CreationTimestamp,creation_timestamp,str,list,1/1 carry it
+greengrass.function_definition,LastUpdatedTimestamp,last_updated_timestamp,str,list,1/1 carry it
+greengrass.logger_definition,CreationTimestamp,creation_timestamp,str,list,1/1 carry it
+greengrass.logger_definition,LastUpdatedTimestamp,last_updated_timestamp,str,list,1/1 carry it
+greengrass.resource_definition,CreationTimestamp,creation_timestamp,str,list,1/1 carry it
+greengrass.resource_definition,LastUpdatedTimestamp,last_updated_timestamp,str,list,1/1 carry it
+greengrass.subscription_definition,CreationTimestamp,creation_timestamp,str,list,1/1 carry it
+greengrass.subscription_definition,LastUpdatedTimestamp,last_updated_timestamp,str,list,1/1 carry it
+iam.access_key,CreateDate,create_date,str,list,1/1 carry it
+iam.access_key,Status,status,str,list,1/1 carry it
+iam.access_key,UserName,user_name,str,list,1/1 carry it
+iam.account_authorization_detail,CreateDate,create_date,str,list,5/5 carry it
+iam.account_authorization_detail,Path,path,str,list,5/5 carry it
+iam.account_authorization_detail,PermissionsBoundary.PermissionsBoundaryArn,permissions_boundary_arn,str,list,1/1 carry it
+iam.account_authorization_detail,PermissionsBoundary.PermissionsBoundaryType,permissions_boundary_type,str,list,1/1 carry it
+iam.account_authorization_detail,UserId,user_id,str,list,5/5 carry it
+iam.account_authorization_detail,UserName,user_name,str,list,5/5 carry it
+iam.attached_role_policy,PolicyName,policy_name,str,list,59/59 carry it
+iam.attached_user_policy,PolicyName,policy_name,str,list,1/1 carry it
+iam.group,CreateDate,create_date,str,list,1/1 carry it
+iam.group,GroupId,group_id,str,list,1/1 carry it
+iam.group,Path,path,str,list,1/1 carry it
+iam.instance_profile,CreateDate,create_date,str,list,20/20 carry it
+iam.instance_profile,InstanceProfileId,instance_profile_id,str,list,20/20 carry it
+iam.instance_profile,Path,path,str,list,20/20 carry it
+iam.policy,AttachmentCount,attachment_count,num,list,44/44 carry it
+iam.policy,CreateDate,create_date,str,list,44/44 carry it
+iam.policy,DefaultVersionId,default_version_id,str,list,44/44 carry it
+iam.policy,IsAttachable,is_attachable,bool,list,44/44 carry it
+iam.policy,Path,path,str,list,44/44 carry it
+iam.policy,PermissionsBoundaryUsageCount,permissions_boundary_usage_count,num,list,44/44 carry it
+iam.policy,UpdateDate,update_date,str,list,44/44 carry it
+iam.role,AssumeRolePolicyDocument.Version,assume_role_policy_document_version,str,list,116/116 carry it
+iam.role,CreateDate,create_date,str,list,116/116 carry it
+iam.role,MaxSessionDuration,max_session_duration,num,list,116/116 carry it
+iam.role,Path,path,str,list,116/116 carry it
+iam.role,RoleId,role_id,str,list,116/116 carry it
+iam.virtual_mfa_device,User.CreateDate,create_date,str,list,1/1 carry it
+iam.virtual_mfa_device,EnableDate,enable_date,str,list,1/1 carry it
+iam.virtual_mfa_device,User.PasswordLastUsed,password_last_used,str,list,1/1 carry it
+iam.virtual_mfa_device,User.Arn,user_arn,str,list,1/1 carry it
+iam.virtual_mfa_device,User.UserId,user_id,str,list,1/1 carry it
+iot.certificate,creationDate,creation_date,str,list,1/1 carry it
+iot.certificate,status,status,str,list,1/1 carry it
+iot.domain_configuration,serviceType,service_type,str,list,3/3 carry it
+ivs.channel,authorized,authorized,bool,list,1/1 carry it
+ivs.channel,insecureIngest,insecure_ingest,bool,list,1/1 carry it
+ivs.channel,latencyMode,latency_mode,str,list,1/1 carry it
+ivs.channel,type,type,str,list,1/1 carry it
+ivs.playback_restriction_policy,enableStrictOriginEnforcement,enable_strict_origin_enforcement,bool,list,1/1 carry it
+ivschat.room,createTime,create_time,str,list,1/1 carry it
+ivschat.room,updateTime,update_time,str,list,1/1 carry it
+kms.alias,CreationDate,creation_date,str,list,11/11 carry it
+kms.alias,LastUpdatedDate,last_updated_date,str,list,11/11 carry it
+kms.alias,TargetKeyId,target_key_id,str,list,11/11 carry it
+kms.grant,CreationDate,creation_date,str,list,16/16 carry it
+kms.grant,IssuingAccount,issuing_account,str,list,16/16 carry it
+kms.grant,KeyId,key_id,str,list,16/16 carry it
+kms.grant,RetiringPrincipal,retiring_principal,str,list,16/16 carry it
+kms.key,KeyState,key_state,str,list,
+lambda.function,SnapStart.ApplyOn,apply_on,str,list,4/4 carry it
+lambda.function,CodeSize,code_size,num,list,4/4 carry it
+lambda.function,EphemeralStorage.Size,ephemeral_storage_size,num,list,4/4 carry it
+lambda.function,LastModified,last_modified,str,list,"age, for the unused-function rules"
+lambda.function,LoggingConfig.LogFormat,log_format,str,list,4/4 carry it
+lambda.function,LoggingConfig.LogGroup,log_group,str,list,4/4 carry it
+lambda.function,MemorySize,memory_mb,num,list,
+lambda.function,PackageType,package_type,str,list,4/4 carry it
+lambda.function,Role,role,str,list,4/4 carry it
+lambda.function,Runtime,runtime,str,list,
+lambda.function,Timeout,timeout_s,num,list,
+lambda.function,TracingConfig.Mode,tracing_config_mode,str,list,4/4 carry it
+lambda.function,Version,version,str,list,4/4 carry it
+lambda.version,SnapStart.ApplyOn,apply_on,str,list,10/10 carry it
+lambda.version,CodeSize,code_size,num,list,10/10 carry it
+lambda.version,EphemeralStorage.Size,ephemeral_storage_size,num,list,10/10 carry it
+lambda.version,FunctionName,function_name,str,list,10/10 carry it
+lambda.version,LastModified,last_modified,str,list,10/10 carry it
+lambda.version,LoggingConfig.LogGroup,log_group,str,list,10/10 carry it
+lambda.version,MemorySize,memory_size,num,list,10/10 carry it
+lambda.version,PackageType,package_type,str,list,10/10 carry it
+lambda.version,Role,role,str,list,10/10 carry it
+lambda.version,Timeout,timeout,num,list,10/10 carry it
+lambda.version,TracingConfig.Mode,tracing_config_mode,str,list,10/10 carry it
+lambda.version,Version,version,str,list,10/10 carry it
+logs.log_group,creationTime,creation_time,num,list,9/9 carry it
+logs.log_group,logGroupArn,log_group_arn,str,list,9/9 carry it
+logs.log_group,logGroupClass,log_group_class,str,list,9/9 carry it
+logs.log_group,metricFilterCount,metric_filter_count,num,list,9/9 carry it
+logs.log_group,retentionInDays,retention_in_days,num,list,3/3 carry it
+logs.log_group,storedBytes,stored_bytes,num,list,9/9 carry it
+mediaconvert.queue,CreatedAt,created_at,str,list,1/1 carry it
+mediaconvert.queue,LastUpdated,last_updated,str,list,1/1 carry it
+mediaconvert.queue,PricingPlan,pricing_plan,str,list,1/1 carry it
+mediaconvert.queue,ProgressingJobsCount,progressing_jobs_count,num,list,1/1 carry it
+mediaconvert.queue,Status,status,str,list,1/1 carry it
+mediaconvert.queue,SubmittedJobsCount,submitted_jobs_count,num,list,1/1 carry it
+mediaconvert.queue,Type,type,str,list,1/1 carry it
+memorydb.parameter_group,Family,family,str,list,5/5 carry it
+memorydb.user,AccessString,access_string,str,list,1/1 carry it
+memorydb.user,Authentication.Type,authentication_type,str,list,1/1 carry it
+memorydb.user,MinimumEngineVersion,minimum_engine_version,str,list,1/1 carry it
+memorydb.user,Status,status,str,list,1/1 carry it
+networkmanager.global_network,CreatedAt,created_at,str,list,1/1 carry it
+networkmanager.global_network,State,state,str,list,1/1 carry it
+organizations.account,Email,email,str,list,5/5 carry it
+organizations.account,Id,id,str,list,5/5 carry it
+organizations.account,JoinedMethod,joined_method,str,list,5/5 carry it
+organizations.account,JoinedTimestamp,joined_timestamp,str,list,5/5 carry it
+organizations.account,Status,status,str,list,5/5 carry it
+organizations.organization,FeatureSet,feature_set,str,list,1/1 carry it
+organizations.organization,MasterAccountArn,master_account_arn,str,list,1/1 carry it
+organizations.organization,MasterAccountEmail,master_account_email,str,list,1/1 carry it
+organizations.organization,MasterAccountId,master_account_id,str,list,1/1 carry it
+organizations.root,Id,id,str,list,1/1 carry it
+pinpoint-sms-voice-v2.opt_out_list,CreatedTimestamp,created_timestamp,str,list,1/1 carry it
+pinpoint-sms-voice-v2.opt_out_list,OptOutListName,opt_out_list_name,str,list,1/1 carry it
+rds.certificate,CertificateIdentifier,certificate_identifier,str,list,3/3 carry it
+rds.certificate,CertificateType,certificate_type,str,list,3/3 carry it
+rds.certificate,CustomerOverride,customer_override,bool,list,3/3 carry it
+rds.certificate,Thumbprint,thumbprint,str,list,3/3 carry it
+rds.certificate,ValidFrom,valid_from,str,list,3/3 carry it
+rds.certificate,ValidTill,valid_till,str,list,3/3 carry it
+rds.db_instance,AllocatedStorage,allocated_storage_gb,num,list,storage bills separately from the instance class
+rds.db_instance,BackupTarget,backup_target,str,list,1/1 carry it
+rds.db_instance,DbInstancePort,db_instance_port,num,list,1/1 carry it
+rds.db_instance,DBName,db_name,str,list,1/1 carry it
+rds.db_instance,DbiResourceId,dbi_resource_id,str,list,1/1 carry it
+rds.db_instance,StorageEncrypted,encrypted,bool,list,
+rds.db_instance,Engine,engine,str,list,
+rds.db_instance,EngineVersion,engine_version,str,list,1/1 carry it
+rds.db_instance,DBInstanceClass,instance_class,str,list,
+rds.db_instance,KmsKeyId,kms_key_id,str,list,1/1 carry it
+rds.db_instance,LicenseModel,license_model,str,list,1/1 carry it
+rds.db_instance,MultiAZ,multi_az,bool,list,multi-AZ doubles the instance cost
+rds.db_instance,NetworkType,network_type,str,list,1/1 carry it
+rds.db_instance,Endpoint.Port,port,num,list,1/1 carry it
+rds.db_instance,PubliclyAccessible,publicly_accessible,bool,list,the single most consequential fact about a database
+rds.db_instance,DBInstanceStatus,state,str,list,
+rds.db_instance,StorageType,storage_type,str,list,1/1 carry it
+rds.db_parameter_group,DBParameterGroupFamily,db_parameter_group_family,str,list,4/4 carry it
+rds.db_subnet_group,SubnetGroupStatus,subnet_group_status,str,list,2/2 carry it
+rds.db_subnet_group,VpcId,vpc_id,str,list,2/2 carry it
+rds.option_group,AllowsVpcAndNonVpcInstanceMemberships,allows_vpc_and_non_vpc_instance_memberships,bool,list,3/3 carry it
+rds.option_group,EngineName,engine_name,str,list,3/3 carry it
+rds.option_group,MajorEngineVersion,major_engine_version,str,list,3/3 carry it
+rds.rds_snapshot,DbiResourceId,dbi_resource_id,str,list,12/12 carry it
+rds.rds_snapshot,Encrypted,encrypted,bool,list,12/12 carry it
+rds.rds_snapshot,Engine,engine,str,list,12/12 carry it
+rds.rds_snapshot,EngineVersion,engine_version,str,list,12/12 carry it
+rds.rds_snapshot,KmsKeyId,kms_key_id,str,list,12/12 carry it
+rds.rds_snapshot,LicenseModel,license_model,str,list,12/12 carry it
+rds.rds_snapshot,MultiTenant,multi_tenant,bool,list,12/12 carry it
+rds.rds_snapshot,Port,port,num,list,12/12 carry it
+rds.rds_snapshot,SnapshotType,snapshot_type,str,list,12/12 carry it
+rds.rds_snapshot,Status,status,str,list,12/12 carry it
+rds.rds_snapshot,StorageType,storage_type,str,list,12/12 carry it
+rds.rds_snapshot,VpcId,vpc_id,str,list,12/12 carry it
+redshift.cluster_parameter_group,ParameterGroupFamily,parameter_group_family,str,list,1/1 carry it
+route53.hosted_zone,CallerReference,caller_reference,str,list,3/3 carry it
+route53.hosted_zone,Config.Comment,comment,str,list,2/2 carry it
+route53.hosted_zone,Config.PrivateZone,private_zone,bool,list,3/3 carry it
+route53.hosted_zone,ResourceRecordSetCount,resource_record_set_count,num,list,3/3 carry it
+route53resolver.firewall_domain_list,ManagedOwnerName,managed_owner_name,str,list,4/4 carry it
+route53resolver.resolver_config,AutodefinedReverse,autodefined_reverse,str,list,1/1 carry it
+route53resolver.resolver_config,Id,id,str,list,1/1 carry it
+route53resolver.resolver_rule,DomainName,domain_name,str,list,1/1 carry it
+route53resolver.resolver_rule,Id,id,str,list,1/1 carry it
+route53resolver.resolver_rule,RuleType,rule_type,str,list,1/1 carry it
+route53resolver.resolver_rule,ShareStatus,share_status,str,list,1/1 carry it
+route53resolver.resolver_rule,Status,status,str,list,1/1 carry it
+route53resolver.resolver_rule_association,ResolverRuleId,resolver_rule_id,str,list,1/1 carry it
+route53resolver.resolver_rule_association,Status,status,str,list,1/1 carry it
+route53resolver.resolver_rule_association,VPCId,vpc_id,str,list,1/1 carry it
+s3.bucket,PublicAccessBlockConfiguration.BlockPublicAcls,block_public_acls,bool,enrich:get_public_access_block,
+s3.bucket,PublicAccessBlockConfiguration.BlockPublicPolicy,block_public_policy,bool,enrich:get_public_access_block,
+s3.bucket,Region,bucket_region,str,enrich:get_bucket_location,
+s3.bucket,CreationDate,creation_date,str,list,
+s3.bucket,ServerSideEncryptionConfiguration,encrypted,present,enrich:get_bucket_encryption,"the call raises when a bucket has none, so presence IS the answer"
+s3.bucket,PublicAccessBlockConfiguration.IgnorePublicAcls,ignore_public_acls,bool,enrich:get_public_access_block,
+s3.bucket,LocationConstraint,location_constraint,str,enrich:get_bucket_location,46/55 carry it
+s3.bucket,PublicAccessBlockConfiguration.RestrictPublicBuckets,restrict_public_buckets,bool,enrich:get_public_access_block,
+s3.bucket,SizeBytes,size_gb,bytes_gb,enrich:metrics,CloudWatch BucketSizeBytes via enrich.metrics - list_buckets returns no size
+s3.bucket,StorageClass,storage_class,str,list,the class decides the rate
+s3.bucket,Status,versioning,str,enrich:get_bucket_versioning,"Enabled, Suspended, or absent for never-versioned"
+sagemaker.hub,CreationTime,creation_time,str,list,1/1 carry it
+sagemaker.hub,HubDisplayName,hub_display_name,str,list,1/1 carry it
+sagemaker.hub,HubStatus,hub_status,str,list,1/1 carry it
+sagemaker.hub,LastModifiedTime,last_modified_time,str,list,1/1 carry it
+scheduler.schedule_group,State,state,str,list,1/1 carry it
+secretsmanager.secret,CreatedDate,created_date,str,list,77/77 carry it
+secretsmanager.secret,KmsKeyId,kms_key_id,str,list,5/5 carry it
+secretsmanager.secret,LastAccessedDate,last_accessed_date,str,list,77/77 carry it
+secretsmanager.secret,LastChangedDate,last_changed_date,str,list,77/77 carry it
+securityhub.standard,StandardsManagedBy.Company,company,str,list,13/13 carry it
+securityhub.standard,EnabledByDefault,enabled_by_default,bool,list,13/13 carry it
+securityhub.standard,StandardsManagedBy.Product,product,str,list,13/13 carry it
+service-quotas.service_quota_request,CaseId,case_id,str,list,2/2 carry it
+service-quotas.service_quota_request,Created,created,str,list,2/2 carry it
+service-quotas.service_quota_request,GlobalQuota,global_quota,bool,list,2/2 carry it
+service-quotas.service_quota_request,LastUpdated,last_updated,str,list,2/2 carry it
+service-quotas.service_quota_request,QuotaArn,quota_arn,str,list,2/2 carry it
+service-quotas.service_quota_request,QuotaCode,quota_code,str,list,2/2 carry it
+service-quotas.service_quota_request,QuotaName,quota_name,str,list,2/2 carry it
+service-quotas.service_quota_request,Requester,requester,str,list,2/2 carry it
+service-quotas.service_quota_request,ServiceCode,service_code,str,list,2/2 carry it
+service-quotas.service_quota_request,ServiceName,service_name,str,list,2/2 carry it
+service-quotas.service_quota_request,Status,status,str,list,2/2 carry it
+service-quotas.service_quota_request,Unit,unit,str,list,2/2 carry it
+servicecatalog.accepted_portfolio_share,CreatedTime,created_time,str,list,1/1 carry it
+servicecatalog.accepted_portfolio_share,Id,id,str,list,1/1 carry it
+servicecatalog.accepted_portfolio_share,ProviderName,provider_name,str,list,1/1 carry it
+snowball.compatible_image,AmiId,ami_id,str,list,2/2 carry it
+sns.topic,SubscriptionsConfirmed,subscriptions_confirmed,str,enrich:get_topic_attributes,1/1 carry it
+sns.topic,SubscriptionsDeleted,subscriptions_deleted,str,enrich:get_topic_attributes,1/1 carry it
+sns.topic,SubscriptionsPending,subscriptions_pending,str,enrich:get_topic_attributes,1/1 carry it
+sqs.queue,ApproximateNumberOfMessages,approximate_number_of_messages,str,enrich:get_queue_attributes,1/1 carry it
+sqs.queue,ApproximateNumberOfMessagesDelayed,approximate_number_of_messages_delayed,str,enrich:get_queue_attributes,1/1 carry it
+sqs.queue,ApproximateNumberOfMessagesNotVisible,approximate_number_of_messages_not_visible,str,enrich:get_queue_attributes,1/1 carry it
+sqs.queue,CreatedTimestamp,created_timestamp,str,enrich:get_queue_attributes,1/1 carry it
+sqs.queue,DelaySeconds,delay_seconds,str,enrich:get_queue_attributes,1/1 carry it
+sqs.queue,LastModifiedTimestamp,last_modified_timestamp,str,enrich:get_queue_attributes,1/1 carry it
+sqs.queue,MaximumMessageSize,maximum_message_size,str,enrich:get_queue_attributes,1/1 carry it
+sqs.queue,MessageRetentionPeriod,message_retention_period,str,enrich:get_queue_attributes,1/1 carry it
+sqs.queue,ReceiveMessageWaitTimeSeconds,receive_message_wait_time_seconds,str,enrich:get_queue_attributes,1/1 carry it
+sqs.queue,SqsManagedSseEnabled,sqs_managed_sse_enabled,str,enrich:get_queue_attributes,1/1 carry it
+sqs.queue,VisibilityTimeout,visibility_timeout,str,enrich:get_queue_attributes,1/1 carry it
+ssm.document,CreatedDate,created_date,str,list,1/1 carry it
+ssm.document,DocumentFormat,document_format,str,list,1/1 carry it
+ssm.document,DocumentType,document_type,str,list,1/1 carry it
+ssm.document,DocumentVersion,document_version,str,list,1/1 carry it
+ssm.document,SchemaVersion,schema_version,str,list,1/1 carry it
+ssm.document_version,CreatedDate,created_date,str,list,1/1 carry it
+ssm.document_version,DocumentFormat,document_format,str,list,1/1 carry it
+ssm.document_version,DocumentVersion,document_version,str,list,1/1 carry it
+ssm.document_version,IsDefaultVersion,is_default_version,bool,list,1/1 carry it
+ssm.document_version,Status,status,str,list,1/1 carry it
+ssm.patch_baseline,BaselineName,baseline_name,str,list,17/17 carry it
+ssm.patch_baseline,DefaultBaseline,default_baseline,bool,list,17/17 carry it
+ssm.patch_baseline,OperatingSystem,operating_system,str,list,17/17 carry it
+ssm.ssm_managed_instance,AgentVersion,agent_version,str,list,3/3 carry it
+ssm.ssm_managed_instance,ComputerName,computer_name,str,list,3/3 carry it
+ssm.ssm_managed_instance,IPAddress,ip_address,str,list,3/3 carry it
+ssm.ssm_managed_instance,IsLatestVersion,is_latest_version,bool,list,3/3 carry it
+ssm.ssm_managed_instance,LastPingDateTime,last_ping_date_time,str,list,3/3 carry it
+ssm.ssm_managed_instance,PingStatus,ping_status,str,list,3/3 carry it
+ssm.ssm_managed_instance,PlatformName,platform_name,str,list,3/3 carry it
+ssm.ssm_managed_instance,PlatformType,platform_type,str,list,3/3 carry it
+ssm.ssm_managed_instance,PlatformVersion,platform_version,str,list,3/3 carry it
+ssm.ssm_managed_instance,ResourceType,resource_type,str,list,3/3 carry it
+ssm.ssm_managed_instance,SourceType,source_type,str,list,3/3 carry it
+stepfunctions.state_machine,creationDate,creation_date,str,list,1/1 carry it
+stepfunctions.state_machine,loggingConfiguration.includeExecutionData,include_execution_data,bool,enrich:describe_state_machine,1/1 carry it
+stepfunctions.state_machine,loggingConfiguration.level,level,str,enrich:describe_state_machine,1/1 carry it
+stepfunctions.state_machine,roleArn,role_arn,str,enrich:describe_state_machine,1/1 carry it
+stepfunctions.state_machine,status,status,str,enrich:describe_state_machine,1/1 carry it
+stepfunctions.state_machine,tracingConfiguration.enabled,tracing_configuration_enabled,bool,enrich:describe_state_machine,1/1 carry it
+stepfunctions.state_machine,type,type,str,list,1/1 carry it
+xray.sampling_rule,CreatedAt,created_at,str,list,1/1 carry it
+xray.sampling_rule,SamplingRule.FixedRate,fixed_rate,num,list,1/1 carry it
+xray.sampling_rule,SamplingRule.Host,host,str,list,1/1 carry it
+xray.sampling_rule,SamplingRule.HTTPMethod,http_method,str,list,1/1 carry it
+xray.sampling_rule,ModifiedAt,modified_at,str,list,1/1 carry it
+xray.sampling_rule,SamplingRule.Priority,priority,num,list,1/1 carry it
+xray.sampling_rule,SamplingRule.ResourceARN,resource_arn,str,list,1/1 carry it
+xray.sampling_rule,SamplingRule.RuleARN,rule_arn,str,list,1/1 carry it
+xray.sampling_rule,SamplingRule.Version,sampling_rule_version,num,list,1/1 carry it
+xray.sampling_rule,SamplingRule.ServiceName,service_name,str,list,1/1 carry it
+xray.sampling_rule,SamplingRule.ServiceType,service_type,str,list,1/1 carry it
+xray.sampling_rule,SamplingRule.URLPath,url_path,str,list,1/1 carry it

@@ -1,0 +1,247 @@
+version: '1.0'
+provider: aws
+service: managedblockchain
+services:
+  client: managedblockchain
+  module: boto3.client
+discovery:
+- discovery_id: aws.managedblockchain.list_accessors
+  calls:
+  - action: list_accessors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Accessors }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationDate: '{{ item.CreationDate }}'
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      Accessor: '{{ item.Accessor }}'
+      BillingToken: '{{ item.BillingToken }}'
+      NetworkType: '{{ item.NetworkType }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.managedblockchain.list_invitations
+  calls:
+  - action: list_invitations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Invitations }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationDate: '{{ item.CreationDate }}'
+      Status: '{{ item.Status }}'
+      ExpirationDate: '{{ item.ExpirationDate }}'
+      InvitationId: '{{ item.InvitationId }}'
+      NetworkSummary: '{{ item.NetworkSummary }}'
+- discovery_id: aws.managedblockchain.list_networks
+  calls:
+  - action: list_networks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Networks }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationDate: '{{ item.CreationDate }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      Description: '{{ item.Description }}'
+      Framework: '{{ item.Framework }}'
+      FrameworkVersion: '{{ item.FrameworkVersion }}'
+      Network: '{{ item.Network }}'
+- discovery_id: aws.managedblockchain.get_accessor
+  for_each: aws.managedblockchain.list_accessors
+  calls:
+  - action: get_accessor
+    params:
+      AccessorId: '{{ item.AccessorId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Accessor.Arn }}'
+      CreationDate: '{{ response.Accessor.CreationDate }}'
+      Id: '{{ response.Accessor.Id }}'
+      Status: '{{ response.Accessor.Status }}'
+      Tags: '{{ response.Accessor.Tags }}'
+      Accessor: '{{ response.Accessor.Accessor }}'
+      BillingToken: '{{ response.Accessor.BillingToken }}'
+      NetworkType: '{{ response.Accessor.NetworkType }}'
+      Type: '{{ response.Accessor.Type }}'
+- discovery_id: aws.managedblockchain.get_member
+  calls:
+  - action: get_member
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Member.Arn }}'
+      CreationDate: '{{ response.Member.CreationDate }}'
+      Id: '{{ response.Member.Id }}'
+      Name: '{{ response.Member.Name }}'
+      Status: '{{ response.Member.Status }}'
+      Tags: '{{ response.Member.Tags }}'
+      Description: '{{ response.Member.Description }}'
+      Enabled: '{{ response.Member.Enabled }}'
+      FrameworkAttributes: '{{ response.Member.FrameworkAttributes }}'
+      KmsKeyArn: '{{ response.Member.KmsKeyArn }}'
+      LogPublishingConfiguration: '{{ response.Member.LogPublishingConfiguration }}'
+      NetworkId: '{{ response.Member.NetworkId }}'
+      AdminUsername: '{{ response.Member.FrameworkAttributes.Fabric.AdminUsername }}'
+      CaEndpoint: '{{ response.Member.FrameworkAttributes.Fabric.CaEndpoint }}'
+- discovery_id: aws.managedblockchain.get_network
+  calls:
+  - action: get_network
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Network.Arn }}'
+      CreationDate: '{{ response.Network.CreationDate }}'
+      Id: '{{ response.Network.Id }}'
+      Name: '{{ response.Network.Name }}'
+      Status: '{{ response.Network.Status }}'
+      Tags: '{{ response.Network.Tags }}'
+      Description: '{{ response.Network.Description }}'
+      Framework: '{{ response.Network.Framework }}'
+      FrameworkAttributes: '{{ response.Network.FrameworkAttributes }}'
+      FrameworkVersion: '{{ response.Network.FrameworkVersion }}'
+      Network: '{{ response.Network.Network }}'
+      Statement: '{{ response.Network.Statement }}'
+      Version: '{{ response.Network.Version }}'
+      VotingPolicy: '{{ response.Network.VotingPolicy }}'
+      VpcEndpointServiceName: '{{ response.Network.VpcEndpointServiceName }}'
+      ChainId: '{{ response.Network.FrameworkAttributes.Ethereum.ChainId }}'
+      Edition: '{{ response.Network.FrameworkAttributes.Fabric.Edition }}'
+      OrderingServiceEndpoint: '{{ response.Network.FrameworkAttributes.Fabric.OrderingServiceEndpoint }}'
+      ProposalDurationInHours: '{{ response.Network.VotingPolicy.ApprovalThresholdPolicy.ProposalDurationInHours }}'
+      ThresholdComparator: '{{ response.Network.VotingPolicy.ApprovalThresholdPolicy.ThresholdComparator }}'
+      ThresholdPercentage: '{{ response.Network.VotingPolicy.ApprovalThresholdPolicy.ThresholdPercentage }}'
+- discovery_id: aws.managedblockchain.get_node
+  calls:
+  - action: get_node
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Node.Arn }}'
+      CreationDate: '{{ response.Node.CreationDate }}'
+      Id: '{{ response.Node.Id }}'
+      Status: '{{ response.Node.Status }}'
+      Tags: '{{ response.Node.Tags }}'
+      AvailabilityZone: '{{ response.Node.AvailabilityZone }}'
+      FrameworkAttributes: '{{ response.Node.FrameworkAttributes }}'
+      InstanceType: '{{ response.Node.InstanceType }}'
+      KmsKeyArn: '{{ response.Node.KmsKeyArn }}'
+      LogPublishingConfiguration: '{{ response.Node.LogPublishingConfiguration }}'
+      MemberId: '{{ response.Node.MemberId }}'
+      NetworkId: '{{ response.Node.NetworkId }}'
+      StateDB: '{{ response.Node.StateDB }}'
+      HttpEndpoint: '{{ response.Node.FrameworkAttributes.Ethereum.HttpEndpoint }}'
+      WebSocketEndpoint: '{{ response.Node.FrameworkAttributes.Ethereum.WebSocketEndpoint }}'
+      PeerEndpoint: '{{ response.Node.FrameworkAttributes.Fabric.PeerEndpoint }}'
+      PeerEventEndpoint: '{{ response.Node.FrameworkAttributes.Fabric.PeerEventEndpoint }}'
+- discovery_id: aws.managedblockchain.get_proposal
+  calls:
+  - action: get_proposal
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Proposal.Arn }}'
+      CreationDate: '{{ response.Proposal.CreationDate }}'
+      Status: '{{ response.Proposal.Status }}'
+      Tags: '{{ response.Proposal.Tags }}'
+      Actions: '{{ response.Proposal.Actions }}'
+      Description: '{{ response.Proposal.Description }}'
+      ExpirationDate: '{{ response.Proposal.ExpirationDate }}'
+      NetworkId: '{{ response.Proposal.NetworkId }}'
+      NoVoteCount: '{{ response.Proposal.NoVoteCount }}'
+      OutstandingVoteCount: '{{ response.Proposal.OutstandingVoteCount }}'
+      Proposal: '{{ response.Proposal.ProposalId }}'
+      ProposalId: '{{ response.Proposal.ProposalId }}'
+      ProposedByMemberId: '{{ response.Proposal.ProposedByMemberId }}'
+      ProposedByMemberName: '{{ response.Proposal.ProposedByMemberName }}'
+      YesVoteCount: '{{ response.Proposal.YesVoteCount }}'
+- discovery_id: aws.managedblockchain.list_members
+  calls:
+  - action: list_members
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Members }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationDate: '{{ item.CreationDate }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      Description: '{{ item.Description }}'
+      IsOwned: '{{ item.IsOwned }}'
+- discovery_id: aws.managedblockchain.list_nodes
+  calls:
+  - action: list_nodes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Nodes }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationDate: '{{ item.CreationDate }}'
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      InstanceType: '{{ item.InstanceType }}'
+- discovery_id: aws.managedblockchain.list_proposal_votes
+  calls:
+  - action: list_proposal_votes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ProposalVotes }}'
+    item:
+      MemberId: '{{ item.MemberId }}'
+      MemberName: '{{ item.MemberName }}'
+      Proposal: '{{ item.Proposal }}'
+      Vote: '{{ item.Vote }}'
+- discovery_id: aws.managedblockchain.list_proposals
+  calls:
+  - action: list_proposals
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Proposals }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationDate: '{{ item.CreationDate }}'
+      Status: '{{ item.Status }}'
+      Description: '{{ item.Description }}'
+      ExpirationDate: '{{ item.ExpirationDate }}'
+      ProposalId: '{{ item.ProposalId }}'
+      ProposedByMemberId: '{{ item.ProposedByMemberId }}'
+      ProposedByMemberName: '{{ item.ProposedByMemberName }}'
+- discovery_id: aws.managedblockchain.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

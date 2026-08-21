@@ -1,0 +1,182 @@
+version: '1.0'
+provider: aws
+service: organizations
+discovery:
+- calls:
+  - action: describe_organization
+    on_error: continue
+    save_as: response
+  discovery_id: aws.organizations.describe_organization
+  emit:
+    as: item
+    item:
+      Account: '{{ response.Organization.Account }}'
+      Arn: '{{ response.Organization.Arn }}'
+      AvailablePolicyTypes: '{{ response.Organization.AvailablePolicyTypes[].Type }}'
+      FeatureSet: '{{ response.Organization.FeatureSet }}'
+      Id: '{{ response.Organization.Id }}'
+      MasterAccountArn: '{{ response.Organization.MasterAccountArn }}'
+      MasterAccountEmail: '{{ response.Organization.MasterAccountEmail }}'
+      MasterAccountId: '{{ response.Organization.MasterAccountId }}'
+      Organization: '{{ response.Organization.Organization }}'
+- calls:
+  - action: describe_responsibility_transfer
+    on_error: continue
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+  discovery_id: aws.organizations.describe_responsibility_transfer
+  emit:
+    as: item
+    item:
+      ActiveHandshakeId: '{{ response.ResponsibilityTransfer.ActiveHandshakeId }}'
+      Arn: '{{ response.ResponsibilityTransfer.Arn }}'
+      EndTimestamp: '{{ response.ResponsibilityTransfer.EndTimestamp }}'
+      Id: '{{ response.ResponsibilityTransfer.Id }}'
+      Name: '{{ response.ResponsibilityTransfer.Name }}'
+      Source: '{{ response.ResponsibilityTransfer.Source }}'
+      StartTimestamp: '{{ response.ResponsibilityTransfer.StartTimestamp }}'
+      Status: '{{ response.ResponsibilityTransfer.Status }}'
+      Target: '{{ response.ResponsibilityTransfer.Target }}'
+      Type: '{{ response.ResponsibilityTransfer.Type }}'
+  for_each: aws.organizations.describe_organization
+- calls:
+  - action: list_delegated_administrators
+    on_error: continue
+    save_as: response
+  discovery_id: aws.organizations.list_delegated_administrators
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      DelegationEnabledDate: '{{ item.DelegationEnabledDate }}'
+      Email: '{{ item.Email }}'
+      Id: '{{ item.Id }}'
+      JoinedMethod: '{{ item.JoinedMethod }}'
+      JoinedTimestamp: '{{ item.JoinedTimestamp }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.DelegatedAdministrators }}'
+- calls:
+  - action: list_accounts_with_invalid_effective_policy
+    on_error: continue
+    save_as: response
+  discovery_id: aws.organizations.list_accounts_with_invalid_effective_policy
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      Email: '{{ item.Email }}'
+      Id: '{{ item.Id }}'
+      JoinedMethod: '{{ item.JoinedMethod }}'
+      JoinedTimestamp: '{{ item.JoinedTimestamp }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.Accounts }}'
+- calls:
+  - action: list_roots
+    on_error: continue
+    save_as: response
+  discovery_id: aws.organizations.list_roots
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      PolicyTypes: '{{ item.PolicyTypes }}'
+    items_for: '{{ response.Roots }}'
+- calls:
+  - action: list_accounts
+    on_error: continue
+    save_as: response
+  discovery_id: aws.organizations.list_accounts
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      Email: '{{ item.Email }}'
+      Id: '{{ item.Id }}'
+      JoinedMethod: '{{ item.JoinedMethod }}'
+      JoinedTimestamp: '{{ item.JoinedTimestamp }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.Accounts }}'
+- calls:
+  - action: describe_effective_policy
+    on_error: continue
+    save_as: response
+  discovery_id: aws.organizations.describe_effective_policy
+  emit:
+    as: item
+    item:
+      EffectivePolicy: '{{ response.EffectivePolicy.EffectivePolicy }}'
+      LastUpdatedTimestamp: '{{ response.EffectivePolicy.LastUpdatedTimestamp }}'
+      PolicyContent: '{{ response.EffectivePolicy.PolicyContent }}'
+      PolicyType: '{{ response.EffectivePolicy.PolicyType }}'
+      TargetId: '{{ response.EffectivePolicy.TargetId }}'
+- calls:
+  - action: list_outbound_responsibility_transfers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.organizations.list_outbound_responsibility_transfers
+  emit:
+    as: item
+    item:
+      ActiveHandshakeId: '{{ item.ActiveHandshakeId }}'
+      Arn: '{{ item.Arn }}'
+      EndTimestamp: '{{ item.EndTimestamp }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Source: '{{ item.Source }}'
+      StartTimestamp: '{{ item.StartTimestamp }}'
+      Status: '{{ item.Status }}'
+      Target: '{{ item.Target }}'
+      Type: '{{ item.Type }}'
+    items_for: '{{ response.ResponsibilityTransfers }}'
+- calls:
+  - action: list_targets_for_policy
+    on_error: continue
+    save_as: response
+  discovery_id: aws.organizations.list_targets_for_policy
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      Name: '{{ item.Name }}'
+      TargetId: '{{ item.TargetId }}'
+      Type: '{{ item.Type }}'
+    items_for: '{{ response.Targets }}'
+- calls:
+  - action: list_policies_for_target
+    on_error: continue
+    save_as: response
+  discovery_id: aws.organizations.list_policies_for_target
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      AwsManaged: '{{ item.AwsManaged }}'
+      Description: '{{ item.Description }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Type: '{{ item.Type }}'
+    items_for: '{{ response.Policies }}'
+- calls:
+  - action: list_policies
+    on_error: continue
+    save_as: response
+  discovery_id: aws.organizations.list_policies
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      AwsManaged: '{{ item.AwsManaged }}'
+      Description: '{{ item.Description }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Type: '{{ item.Type }}'
+    items_for: '{{ response.Policies }}'

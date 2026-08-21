@@ -1,0 +1,424 @@
+version: '1.0'
+provider: aws
+service: pinpoint-sms-voice-v2
+services:
+  client: pinpoint-sms-voice-v2
+  module: boto3.client
+discovery:
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_account_attributes
+  calls:
+  - action: describe_account_attributes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AccountAttributes }}'
+    item:
+      Name: '{{ item.Name }}'
+      AccountAttributes: '{{ item.AccountAttributes }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_account_limits
+  calls:
+  - action: describe_account_limits
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AccountLimits }}'
+    item:
+      Name: '{{ item.Name }}'
+      AccountLimits: '{{ item.AccountLimits }}'
+      Max: '{{ item.Max }}'
+      Used: '{{ item.Used }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_configuration_sets
+  calls:
+  - action: describe_configuration_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ConfigurationSets }}'
+    item:
+      ConfigurationSetArn: '{{ item.ConfigurationSetArn }}'
+      ConfigurationSetName: '{{ item.ConfigurationSetName }}'
+      ConfigurationSets: '{{ item.ConfigurationSets }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      DefaultMessageFeedbackEnabled: '{{ item.DefaultMessageFeedbackEnabled }}'
+      DefaultMessageType: '{{ item.DefaultMessageType }}'
+      DefaultSenderId: '{{ item.DefaultSenderId }}'
+      EventDestinations: '{{ item.EventDestinations }}'
+      ProtectConfigurationId: '{{ item.ProtectConfigurationId }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_opt_out_lists
+  calls:
+  - action: describe_opt_out_lists
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.OptOutLists }}'
+    item:
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      OptOutListArn: '{{ item.OptOutListArn }}'
+      OptOutListName: '{{ item.OptOutListName }}'
+      OptOutLists: '{{ item.OptOutLists }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_phone_numbers
+  calls:
+  - action: describe_phone_numbers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PhoneNumbers }}'
+    item:
+      Status: '{{ item.Status }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      DeletionProtectionEnabled: '{{ item.DeletionProtectionEnabled }}'
+      InternationalSendingEnabled: '{{ item.InternationalSendingEnabled }}'
+      IsoCountryCode: '{{ item.IsoCountryCode }}'
+      MessageType: '{{ item.MessageType }}'
+      MonthlyLeasingPrice: '{{ item.MonthlyLeasingPrice }}'
+      NumberCapabilities: '{{ item.NumberCapabilities }}'
+      NumberType: '{{ item.NumberType }}'
+      OptOutListName: '{{ item.OptOutListName }}'
+      PhoneNumber: '{{ item.PhoneNumber }}'
+      PhoneNumberArn: '{{ item.PhoneNumberArn }}'
+      PhoneNumberId: '{{ item.PhoneNumberId }}'
+      PhoneNumbers: '{{ item.PhoneNumbers }}'
+      PoolId: '{{ item.PoolId }}'
+      RegistrationId: '{{ item.RegistrationId }}'
+      SelfManagedOptOutsEnabled: '{{ item.SelfManagedOptOutsEnabled }}'
+      TwoWayChannelArn: '{{ item.TwoWayChannelArn }}'
+      TwoWayChannelRole: '{{ item.TwoWayChannelRole }}'
+      TwoWayEnabled: '{{ item.TwoWayEnabled }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_pools
+  calls:
+  - action: describe_pools
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Pools }}'
+    item:
+      Status: '{{ item.Status }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      DeletionProtectionEnabled: '{{ item.Pools[].DeletionProtectionEnabled }}'
+      MessageType: '{{ item.MessageType }}'
+      OptOutListName: '{{ item.OptOutListName }}'
+      PoolArn: '{{ item.PoolArn }}'
+      PoolId: '{{ item.PoolId }}'
+      Pools: '{{ item.Pools }}'
+      SelfManagedOptOutsEnabled: '{{ item.Pools[].SelfManagedOptOutsEnabled }}'
+      SharedRoutesEnabled: '{{ item.SharedRoutesEnabled }}'
+      TwoWayChannelArn: '{{ item.TwoWayChannelArn }}'
+      TwoWayChannelRole: '{{ item.TwoWayChannelRole }}'
+      TwoWayEnabled: '{{ item.TwoWayEnabled }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_protect_configurations
+  calls:
+  - action: describe_protect_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ProtectConfigurations }}'
+    item:
+      AccountDefault: '{{ item.AccountDefault }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      DeletionProtectionEnabled: '{{ item.DeletionProtectionEnabled }}'
+      ProtectConfigurationArn: '{{ item.ProtectConfigurationArn }}'
+      ProtectConfigurationId: '{{ item.ProtectConfigurationId }}'
+      ProtectConfigurations: '{{ item.ProtectConfigurations }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_registration_attachments
+  calls:
+  - action: describe_registration_attachments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RegistrationAttachments }}'
+    item:
+      AttachmentStatus: '{{ item.AttachmentStatus }}'
+      AttachmentUploadErrorReason: '{{ item.AttachmentUploadErrorReason }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      RegistrationAttachmentArn: '{{ item.RegistrationAttachmentArn }}'
+      RegistrationAttachmentId: '{{ item.RegistrationAttachmentId }}'
+      RegistrationAttachments: '{{ item.RegistrationAttachments }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_registration_type_definitions
+  calls:
+  - action: describe_registration_type_definitions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RegistrationTypeDefinitions }}'
+    item:
+      DisplayHints: '{{ item.DisplayHints }}'
+      RegistrationType: '{{ item.RegistrationType }}'
+      RegistrationTypeDefinitions: '{{ item.RegistrationTypeDefinitions }}'
+      SupportedAssociations: '{{ item.SupportedAssociations }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_registrations
+  calls:
+  - action: describe_registrations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Registrations }}'
+    item:
+      AdditionalAttributes: '{{ item.AdditionalAttributes }}'
+      ApprovedVersionNumber: '{{ item.ApprovedVersionNumber }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      CurrentVersionNumber: '{{ item.CurrentVersionNumber }}'
+      LatestDeniedVersionNumber: '{{ item.LatestDeniedVersionNumber }}'
+      RegistrationArn: '{{ item.RegistrationArn }}'
+      RegistrationId: '{{ item.RegistrationId }}'
+      RegistrationStatus: '{{ item.RegistrationStatus }}'
+      RegistrationType: '{{ item.RegistrationType }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_sender_ids
+  calls:
+  - action: describe_sender_ids
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SenderIds }}'
+    item:
+      DeletionProtectionEnabled: '{{ item.DeletionProtectionEnabled }}'
+      IsoCountryCode: '{{ item.IsoCountryCode }}'
+      MessageTypes: '{{ item.MessageTypes }}'
+      MonthlyLeasingPrice: '{{ item.MonthlyLeasingPrice }}'
+      Registered: '{{ item.Registered }}'
+      RegistrationId: '{{ item.RegistrationId }}'
+      SenderId: '{{ item.SenderId }}'
+      SenderIdArn: '{{ item.SenderIdArn }}'
+      SenderIds: '{{ item.SenderIds }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_spend_limits
+  calls:
+  - action: describe_spend_limits
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SpendLimits }}'
+    item:
+      Name: '{{ item.Name }}'
+      EnforcedLimit: '{{ item.EnforcedLimit }}'
+      MaxLimit: '{{ item.MaxLimit }}'
+      Overridden: '{{ item.Overridden }}'
+      SpendLimits: '{{ item.SpendLimits }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_verified_destination_numbers
+  calls:
+  - action: describe_verified_destination_numbers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VerifiedDestinationNumbers }}'
+    item:
+      Status: '{{ item.Status }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      DestinationPhoneNumber: '{{ item.DestinationPhoneNumber }}'
+      VerifiedDestinationNumberArn: '{{ item.VerifiedDestinationNumberArn }}'
+      VerifiedDestinationNumberId: '{{ item.VerifiedDestinationNumberId }}'
+      VerifiedDestinationNumbers: '{{ item.VerifiedDestinationNumbers[].Status }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_keywords
+  calls:
+  - action: describe_keywords
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Keywords }}'
+    item:
+      Keyword: '{{ item.Keyword }}'
+      KeywordAction: '{{ item.KeywordAction }}'
+      KeywordMessage: '{{ item.KeywordMessage }}'
+      Keywords: '{{ item.Keywords }}'
+      OriginationIdentity: '{{ response.OriginationIdentity }}'
+      OriginationIdentityArn: '{{ response.OriginationIdentityArn }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_opted_out_numbers
+  for_each: aws.pinpoint-sms-voice-v2.describe_opt_out_lists
+  calls:
+  - action: describe_opted_out_numbers
+    params:
+      OptOutListName: '{{ item.OptOutListName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.OptedOutNumbers }}'
+    item:
+      EndUserOptedOut: '{{ item.EndUserOptedOut }}'
+      OptedOutNumber: '{{ item.OptedOutNumber }}'
+      OptedOutTimestamp: '{{ item.OptedOutTimestamp }}'
+      OptOutListArn: '{{ response.OptOutListArn }}'
+      OptOutListName: '{{ response.OptOutListName }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_registration_field_definitions
+  for_each: aws.pinpoint-sms-voice-v2.describe_registration_type_definitions
+  calls:
+  - action: describe_registration_field_definitions
+    params:
+      RegistrationType: '{{ item.RegistrationType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RegistrationFieldDefinitions }}'
+    item:
+      DisplayHints: '{{ item.DisplayHints }}'
+      FieldPath: '{{ item.FieldPath }}'
+      FieldRequirement: '{{ item.FieldRequirement }}'
+      FieldType: '{{ item.FieldType }}'
+      SectionPath: '{{ item.SectionPath }}'
+      SelectValidation: '{{ item.SelectValidation }}'
+      TextValidation: '{{ item.TextValidation }}'
+      RegistrationType: '{{ response.RegistrationType }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_registration_field_values
+  for_each: aws.pinpoint-sms-voice-v2.describe_phone_numbers
+  calls:
+  - action: describe_registration_field_values
+    params:
+      RegistrationId: '{{ item.RegistrationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RegistrationFieldValues }}'
+    item:
+      DeniedReason: '{{ item.DeniedReason }}'
+      FieldPath: '{{ item.FieldPath }}'
+      RegistrationAttachmentId: '{{ item.RegistrationAttachmentId }}'
+      SelectChoices: '{{ item.SelectChoices }}'
+      TextValue: '{{ item.TextValue }}'
+      RegistrationArn: '{{ response.RegistrationArn }}'
+      RegistrationId: '{{ response.RegistrationId }}'
+      VersionNumber: '{{ response.VersionNumber }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_registration_section_definitions
+  for_each: aws.pinpoint-sms-voice-v2.describe_registration_type_definitions
+  calls:
+  - action: describe_registration_section_definitions
+    params:
+      RegistrationType: '{{ item.RegistrationType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RegistrationSectionDefinitions }}'
+    item:
+      DisplayHints: '{{ item.DisplayHints }}'
+      SectionPath: '{{ item.SectionPath }}'
+      RegistrationType: '{{ response.RegistrationType }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.describe_registration_versions
+  for_each: aws.pinpoint-sms-voice-v2.describe_phone_numbers
+  calls:
+  - action: describe_registration_versions
+    params:
+      RegistrationId: '{{ item.RegistrationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RegistrationVersions }}'
+    item:
+      DeniedReasons: '{{ item.DeniedReasons }}'
+      RegistrationVersionStatus: '{{ item.RegistrationVersionStatus }}'
+      RegistrationVersionStatusHistory: '{{ item.RegistrationVersionStatusHistory }}'
+      VersionNumber: '{{ item.VersionNumber }}'
+      RegistrationArn: '{{ response.RegistrationArn }}'
+      RegistrationId: '{{ response.RegistrationId }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.get_protect_configuration_country_rule_set
+  for_each: aws.pinpoint-sms-voice-v2.describe_configuration_sets
+  calls:
+  - action: get_protect_configuration_country_rule_set
+    params:
+      ProtectConfigurationId: '{{ item.ProtectConfigurationId }}'
+      NumberCapability: '{{ item.NumberCapability }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CountryRuleSet: '{{ response.CountryRuleSet }}'
+      NumberCapability: '{{ response.NumberCapability }}'
+      ProtectConfigurationArn: '{{ response.ProtectConfigurationArn }}'
+      ProtectConfigurationId: '{{ response.ProtectConfigurationId }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.get_resource_policy
+  calls:
+  - action: get_resource_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      ResourceArn: '{{ response.ResourceArn }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.list_pool_origination_identities
+  for_each: aws.pinpoint-sms-voice-v2.describe_phone_numbers
+  calls:
+  - action: list_pool_origination_identities
+    params:
+      PoolId: '{{ item.PoolId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.OriginationIdentities }}'
+    item:
+      IsoCountryCode: '{{ item.IsoCountryCode }}'
+      NumberCapabilities: '{{ item.NumberCapabilities }}'
+      OriginationIdentity: '{{ item.OriginationIdentity }}'
+      OriginationIdentityArn: '{{ item.OriginationIdentityArn }}'
+      PhoneNumber: '{{ item.PhoneNumber }}'
+      PoolArn: '{{ response.PoolArn }}'
+      PoolId: '{{ response.PoolId }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.list_protect_configuration_rule_set_number_overrides
+  for_each: aws.pinpoint-sms-voice-v2.describe_configuration_sets
+  calls:
+  - action: list_protect_configuration_rule_set_number_overrides
+    params:
+      ProtectConfigurationId: '{{ item.ProtectConfigurationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RuleSetNumberOverrides }}'
+    item:
+      Action: '{{ item.Action }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      DestinationPhoneNumber: '{{ item.DestinationPhoneNumber }}'
+      ExpirationTimestamp: '{{ item.ExpirationTimestamp }}'
+      IsoCountryCode: '{{ item.IsoCountryCode }}'
+      ProtectConfigurationArn: '{{ response.ProtectConfigurationArn }}'
+      ProtectConfigurationId: '{{ response.ProtectConfigurationId }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.list_registration_associations
+  for_each: aws.pinpoint-sms-voice-v2.describe_phone_numbers
+  calls:
+  - action: list_registration_associations
+    params:
+      RegistrationId: '{{ item.RegistrationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RegistrationAssociations }}'
+    item:
+      ResourceArn: '{{ item.ResourceArn }}'
+      ResourceId: '{{ item.ResourceId }}'
+      IsoCountryCode: '{{ item.IsoCountryCode }}'
+      PhoneNumber: '{{ item.PhoneNumber }}'
+      ResourceType: '{{ item.ResourceType }}'
+      RegistrationArn: '{{ response.RegistrationArn }}'
+      RegistrationId: '{{ response.RegistrationId }}'
+      RegistrationType: '{{ response.RegistrationType }}'
+- discovery_id: aws.pinpoint-sms-voice-v2.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+      ResourceArn: '{{ response.ResourceArn }}'

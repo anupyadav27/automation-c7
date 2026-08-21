@@ -1,0 +1,66 @@
+version: '1.0'
+provider: aws
+service: connectparticipant
+services:
+  client: connectparticipant
+  module: boto3.client
+discovery:
+- discovery_id: aws.connectparticipant.describe_view
+  calls:
+  - action: describe_view
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.View.Arn }}'
+      Id: '{{ response.View.Id }}'
+      Name: '{{ response.View.Name }}'
+      Content: '{{ response.View.Content }}'
+      Version: '{{ response.View.Version }}'
+      View: '{{ response.View.View }}'
+      InputSchema: '{{ response.View.Content.InputSchema }}'
+      Template: '{{ response.View.Content.Template }}'
+- discovery_id: aws.connectparticipant.get_attachment
+  calls:
+  - action: get_attachment
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AttachmentSizeInBytes: '{{ response.AttachmentSizeInBytes }}'
+      Url: '{{ response.Url }}'
+      UrlExpiry: '{{ response.UrlExpiry }}'
+- discovery_id: aws.connectparticipant.get_authentication_url
+  calls:
+  - action: get_authentication_url
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AuthenticationUrl: '{{ response.AuthenticationUrl }}'
+- discovery_id: aws.connectparticipant.get_transcript
+  calls:
+  - action: get_transcript
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Transcript }}'
+    item:
+      Id: '{{ item.Id }}'
+      AbsoluteTime: '{{ item.AbsoluteTime }}'
+      Attachments: '{{ item.Attachments }}'
+      ContactId: '{{ item.ContactId }}'
+      Content: '{{ item.Content }}'
+      ContentType: '{{ item.ContentType }}'
+      DisplayName: '{{ item.DisplayName }}'
+      InitialContactId: '{{ item.InitialContactId }}'
+      MessageMetadata: '{{ item.MessageMetadata }}'
+      ParticipantId: '{{ item.ParticipantId }}'
+      ParticipantRole: '{{ item.ParticipantRole }}'
+      RelatedContactId: '{{ item.RelatedContactId }}'
+      Transcript: '{{ item.Transcript }}'
+      Type: '{{ item.Type }}'

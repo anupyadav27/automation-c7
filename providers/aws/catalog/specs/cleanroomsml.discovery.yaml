@@ -1,0 +1,651 @@
+version: '1.0'
+provider: aws
+service: cleanroomsml
+services:
+  client: cleanroomsml
+  module: boto3.client
+discovery:
+- discovery_id: aws.cleanroomsml.list_audience_export_jobs
+  calls:
+  - action: list_audience_export_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.audienceExportJobs }}'
+    item:
+      audienceGenerationJobArn: '{{ item.audienceGenerationJobArn }}'
+      audienceSize: '{{ item.audienceSize }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      outputLocation: '{{ item.outputLocation }}'
+      status: '{{ item.status }}'
+      statusDetails: '{{ item.statusDetails }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanroomsml.list_audience_generation_jobs
+  calls:
+  - action: list_audience_generation_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.audienceGenerationJobs }}'
+    item:
+      audienceGenerationJobArn: '{{ item.audienceGenerationJobArn }}'
+      collaborationId: '{{ item.collaborationId }}'
+      configuredAudienceModelArn: '{{ item.configuredAudienceModelArn }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      startedBy: '{{ item.startedBy }}'
+      status: '{{ item.status }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanroomsml.list_audience_models
+  calls:
+  - action: list_audience_models
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.audienceModels }}'
+    item:
+      audienceModelArn: '{{ item.audienceModelArn }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      trainingDatasetArn: '{{ item.trainingDatasetArn }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanroomsml.list_configured_audience_models
+  calls:
+  - action: list_configured_audience_models
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.configuredAudienceModels }}'
+    item:
+      audienceModelArn: '{{ item.audienceModelArn }}'
+      configuredAudienceModelArn: '{{ item.configuredAudienceModelArn }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      outputConfig: '{{ item.outputConfig }}'
+      status: '{{ item.status }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanroomsml.list_configured_model_algorithms
+  calls:
+  - action: list_configured_model_algorithms
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.configuredModelAlgorithms }}'
+    item:
+      configuredModelAlgorithmArn: '{{ item.configuredModelAlgorithmArn }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanroomsml.list_training_datasets
+  calls:
+  - action: list_training_datasets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.trainingDatasets }}'
+    item:
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      trainingDatasetArn: '{{ item.trainingDatasetArn }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanroomsml.get_audience_generation_job
+  for_each: aws.cleanroomsml.list_audience_export_jobs
+  calls:
+  - action: get_audience_generation_job
+    params:
+      audienceGenerationJobArn: '{{ item.audienceGenerationJobArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      message: '{{ response.statusDetails.message }}'
+      statusCode: '{{ response.statusDetails.statusCode }}'
+      audienceGenerationJobArn: '{{ response.audienceGenerationJobArn }}'
+      collaborationId: '{{ response.collaborationId }}'
+      configuredAudienceModelArn: '{{ response.configuredAudienceModelArn }}'
+      createTime: '{{ response.createTime }}'
+      description: '{{ response.description }}'
+      includeSeedInOutput: '{{ response.includeSeedInOutput }}'
+      recallMetric: '{{ response.metrics.recallMetric }}'
+      name: '{{ response.name }}'
+      protectedQueryIdentifier: '{{ response.protectedQueryIdentifier }}'
+      s3Uri: '{{ response.seedAudience.dataSource.s3Uri }}'
+      roleArn: '{{ response.seedAudience.roleArn }}'
+      number: '{{ response.seedAudience.sqlComputeConfiguration.worker.number }}'
+      type: '{{ response.seedAudience.sqlComputeConfiguration.worker.type }}'
+      analysisTemplateArn: '{{ response.seedAudience.sqlParameters.analysisTemplateArn }}'
+      parameters: '{{ response.seedAudience.sqlParameters.parameters }}'
+      queryString: '{{ response.seedAudience.sqlParameters.queryString }}'
+      startedBy: '{{ response.startedBy }}'
+      status: '{{ response.status }}'
+      tags: '{{ response.tags }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.cleanroomsml.get_audience_model
+  for_each: aws.cleanroomsml.list_audience_models
+  calls:
+  - action: get_audience_model
+    params:
+      audienceModelArn: '{{ item.audienceModelArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      message: '{{ response.statusDetails.message }}'
+      statusCode: '{{ response.statusDetails.statusCode }}'
+      audienceModelArn: '{{ response.audienceModelArn }}'
+      createTime: '{{ response.createTime }}'
+      description: '{{ response.description }}'
+      kmsKeyArn: '{{ response.kmsKeyArn }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+      tags: '{{ response.tags }}'
+      trainingDataEndTime: '{{ response.trainingDataEndTime }}'
+      trainingDataStartTime: '{{ response.trainingDataStartTime }}'
+      trainingDatasetArn: '{{ response.trainingDatasetArn }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.cleanroomsml.get_collaboration_configured_model_algorithm_association
+  calls:
+  - action: get_collaboration_configured_model_algorithm_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.privacyConfiguration.Status }}'
+      Enabled: '{{ response.privacyConfiguration.Enabled }}'
+      policies: '{{ response.privacyConfiguration.policies }}'
+      collaborationIdentifier: '{{ response.collaborationIdentifier }}'
+      configuredModelAlgorithmArn: '{{ response.configuredModelAlgorithmArn }}'
+      configuredModelAlgorithmAssociationArn: '{{ response.configuredModelAlgorithmAssociationArn }}'
+      createTime: '{{ response.createTime }}'
+      creatorAccountId: '{{ response.creatorAccountId }}'
+      description: '{{ response.description }}'
+      membershipIdentifier: '{{ response.membershipIdentifier }}'
+      name: '{{ response.name }}'
+      unit: '{{ response.privacyConfiguration.policies.trainedModelExports.maxSize.unit }}'
+      value: '{{ response.privacyConfiguration.policies.trainedModelExports.maxSize.value }}'
+      noiseLevel: '{{ response.privacyConfiguration.policies.trainedModels.containerMetrics.noiseLevel }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.cleanroomsml.get_collaboration_ml_input_channel
+  calls:
+  - action: get_collaboration_ml_input_channel
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.configuredModelAlgorithmAssociations }}'
+- discovery_id: aws.cleanroomsml.get_collaboration_trained_model
+  calls:
+  - action: get_collaboration_trained_model
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.incrementalTrainingDataChannels }}'
+    item:
+      channelName: '{{ item.channelName }}'
+      environment: '{{ item.environment }}'
+      hyperparameters: '{{ item.hyperparameters }}'
+      modelName: '{{ item.modelName }}'
+      versionIdentifier: '{{ item.versionIdentifier }}'
+      collaborationIdentifier: '{{ response.collaborationIdentifier }}'
+      configuredModelAlgorithmAssociationArn: '{{ response.configuredModelAlgorithmAssociationArn }}'
+      createTime: '{{ response.createTime }}'
+      creatorAccountId: '{{ response.creatorAccountId }}'
+      description: '{{ response.description }}'
+      logsStatus: '{{ response.logsStatus }}'
+      logsStatusDetails: '{{ response.logsStatusDetails }}'
+      membershipIdentifier: '{{ response.membershipIdentifier }}'
+      metricsStatus: '{{ response.metricsStatus }}'
+      metricsStatusDetails: '{{ response.metricsStatusDetails }}'
+      name: '{{ response.name }}'
+      instanceCount: '{{ response.resourceConfig.instanceCount }}'
+      instanceType: '{{ response.resourceConfig.instanceType }}'
+      volumeSizeInGB: '{{ response.resourceConfig.volumeSizeInGB }}'
+      status: '{{ response.status }}'
+      message: '{{ response.statusDetails.message }}'
+      statusCode: '{{ response.statusDetails.statusCode }}'
+      maxRuntimeInSeconds: '{{ response.stoppingCondition.maxRuntimeInSeconds }}'
+      trainedModelArn: '{{ response.trainedModelArn }}'
+      trainingContainerImageDigest: '{{ response.trainingContainerImageDigest }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.cleanroomsml.get_configured_audience_model
+  for_each: aws.cleanroomsml.list_audience_generation_jobs
+  calls:
+  - action: get_configured_audience_model
+    params:
+      configuredAudienceModelArn: '{{ item.configuredAudienceModelArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.sharedAudienceMetrics }}'
+    item:
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+      audienceModelArn: '{{ response.audienceModelArn }}'
+      audienceSizeType: '{{ response.audienceSizeConfig.audienceSizeType }}'
+      childResourceTagOnCreatePolicy: '{{ response.childResourceTagOnCreatePolicy }}'
+      configuredAudienceModelArn: '{{ response.configuredAudienceModelArn }}'
+      createTime: '{{ response.createTime }}'
+      description: '{{ response.description }}'
+      minMatchingSeedSize: '{{ response.minMatchingSeedSize }}'
+      name: '{{ response.name }}'
+      s3Uri: '{{ response.outputConfig.destination.s3Destination.s3Uri }}'
+      roleArn: '{{ response.outputConfig.roleArn }}'
+      status: '{{ response.status }}'
+      tags: '{{ response.tags }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.cleanroomsml.get_configured_audience_model_policy
+  for_each: aws.cleanroomsml.list_audience_generation_jobs
+  calls:
+  - action: get_configured_audience_model_policy
+    params:
+      configuredAudienceModelArn: '{{ item.configuredAudienceModelArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      configuredAudienceModelArn: '{{ response.configuredAudienceModelArn }}'
+      configuredAudienceModelPolicy: '{{ response.configuredAudienceModelPolicy }}'
+      policyHash: '{{ response.policyHash }}'
+- discovery_id: aws.cleanroomsml.get_configured_model_algorithm
+  for_each: aws.cleanroomsml.list_configured_model_algorithms
+  calls:
+  - action: get_configured_model_algorithm
+    params:
+      configuredModelAlgorithmArn: '{{ item.configuredModelAlgorithmArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arguments: '{{ response.trainingContainerConfig.arguments }}'
+      entrypoint: '{{ response.trainingContainerConfig.entrypoint }}'
+      imageUri: '{{ response.trainingContainerConfig.imageUri }}'
+      metricDefinitions: '{{ response.trainingContainerConfig.metricDefinitions[].name }}'
+      configuredModelAlgorithmArn: '{{ response.configuredModelAlgorithmArn }}'
+      createTime: '{{ response.createTime }}'
+      description: '{{ response.description }}'
+      kmsKeyArn: '{{ response.kmsKeyArn }}'
+      name: '{{ response.name }}'
+      roleArn: '{{ response.roleArn }}'
+      tags: '{{ response.tags }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.cleanroomsml.get_configured_model_algorithm_association
+  calls:
+  - action: get_configured_model_algorithm_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      policies: '{{ response.privacyConfiguration.policies }}'
+      collaborationIdentifier: '{{ response.collaborationIdentifier }}'
+      configuredModelAlgorithmArn: '{{ response.configuredModelAlgorithmArn }}'
+      configuredModelAlgorithmAssociationArn: '{{ response.configuredModelAlgorithmAssociationArn }}'
+      createTime: '{{ response.createTime }}'
+      description: '{{ response.description }}'
+      membershipIdentifier: '{{ response.membershipIdentifier }}'
+      name: '{{ response.name }}'
+      unit: '{{ response.privacyConfiguration.policies.trainedModelExports.maxSize.unit }}'
+      value: '{{ response.privacyConfiguration.policies.trainedModelExports.maxSize.value }}'
+      noiseLevel: '{{ response.privacyConfiguration.policies.trainedModels.containerMetrics.noiseLevel }}'
+      tags: '{{ response.tags }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.cleanroomsml.get_ml_configuration
+  calls:
+  - action: get_ml_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      destination: '{{ response.defaultOutputLocation.destination }}'
+      roleArn: '{{ response.defaultOutputLocation.roleArn }}'
+- discovery_id: aws.cleanroomsml.get_ml_input_channel
+  calls:
+  - action: get_ml_input_channel
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.configuredModelAlgorithmAssociations }}'
+- discovery_id: aws.cleanroomsml.get_trained_model
+  calls:
+  - action: get_trained_model
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.incrementalTrainingDataChannels }}'
+    item:
+      channelName: '{{ item.channelName }}'
+      environment: '{{ item.environment }}'
+      hyperparameters: '{{ item.hyperparameters }}'
+      modelName: '{{ item.modelName }}'
+      versionIdentifier: '{{ item.versionIdentifier }}'
+      collaborationIdentifier: '{{ response.collaborationIdentifier }}'
+      configuredModelAlgorithmAssociationArn: '{{ response.configuredModelAlgorithmAssociationArn }}'
+      createTime: '{{ response.createTime }}'
+      description: '{{ response.description }}'
+      kmsKeyArn: '{{ response.kmsKeyArn }}'
+      logsStatus: '{{ response.logsStatus }}'
+      logsStatusDetails: '{{ response.logsStatusDetails }}'
+      membershipIdentifier: '{{ response.membershipIdentifier }}'
+      metricsStatus: '{{ response.metricsStatus }}'
+      metricsStatusDetails: '{{ response.metricsStatusDetails }}'
+      name: '{{ response.name }}'
+      instanceCount: '{{ response.resourceConfig.instanceCount }}'
+      instanceType: '{{ response.resourceConfig.instanceType }}'
+      volumeSizeInGB: '{{ response.resourceConfig.volumeSizeInGB }}'
+      status: '{{ response.status }}'
+      message: '{{ response.statusDetails.message }}'
+      statusCode: '{{ response.statusDetails.statusCode }}'
+      maxRuntimeInSeconds: '{{ response.stoppingCondition.maxRuntimeInSeconds }}'
+      tags: '{{ response.tags }}'
+      trainedModelArn: '{{ response.trainedModelArn }}'
+      trainingContainerImageDigest: '{{ response.trainingContainerImageDigest }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.cleanroomsml.get_trained_model_inference_job
+  calls:
+  - action: get_trained_model_inference_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      instanceCount: '{{ response.resourceConfig.instanceCount }}'
+      instanceType: '{{ response.resourceConfig.instanceType }}'
+      configuredModelAlgorithmAssociationArn: '{{ response.configuredModelAlgorithmAssociationArn }}'
+      maxPayloadInMB: '{{ response.containerExecutionParameters.maxPayloadInMB }}'
+      createTime: '{{ response.createTime }}'
+      mlInputChannelArn: '{{ response.dataSource.mlInputChannelArn }}'
+      description: '{{ response.description }}'
+      environment: '{{ response.environment }}'
+      inferenceContainerImageDigest: '{{ response.inferenceContainerImageDigest }}'
+      kmsKeyArn: '{{ response.kmsKeyArn }}'
+      logsStatus: '{{ response.logsStatus }}'
+      logsStatusDetails: '{{ response.logsStatusDetails }}'
+      membershipIdentifier: '{{ response.membershipIdentifier }}'
+      metricsStatus: '{{ response.metricsStatus }}'
+      metricsStatusDetails: '{{ response.metricsStatusDetails }}'
+      name: '{{ response.name }}'
+      accept: '{{ response.outputConfiguration.accept }}'
+      status: '{{ response.status }}'
+      message: '{{ response.statusDetails.message }}'
+      statusCode: '{{ response.statusDetails.statusCode }}'
+      tags: '{{ response.tags }}'
+      trainedModelArn: '{{ response.trainedModelArn }}'
+      trainedModelInferenceJobArn: '{{ response.trainedModelInferenceJobArn }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.cleanroomsml.get_training_dataset
+  for_each: aws.cleanroomsml.list_audience_models
+  calls:
+  - action: get_training_dataset
+    params:
+      trainingDatasetArn: '{{ item.trainingDatasetArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.trainingData }}'
+    item:
+      inputConfig: '{{ item.inputConfig }}'
+      type: '{{ item.type }}'
+      createTime: '{{ response.createTime }}'
+      description: '{{ response.description }}'
+      name: '{{ response.name }}'
+      roleArn: '{{ response.roleArn }}'
+      status: '{{ response.status }}'
+      tags: '{{ response.tags }}'
+      trainingDatasetArn: '{{ response.trainingDatasetArn }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.cleanroomsml.list_collaboration_configured_model_algorithm_associations
+  calls:
+  - action: list_collaboration_configured_model_algorithm_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.collaborationConfiguredModelAlgorithmAssociations }}'
+    item:
+      collaborationIdentifier: '{{ item.collaborationIdentifier }}'
+      configuredModelAlgorithmArn: '{{ item.configuredModelAlgorithmArn }}'
+      configuredModelAlgorithmAssociationArn: '{{ item.configuredModelAlgorithmAssociationArn }}'
+      createTime: '{{ item.createTime }}'
+      creatorAccountId: '{{ item.creatorAccountId }}'
+      description: '{{ item.description }}'
+      membershipIdentifier: '{{ item.membershipIdentifier }}'
+      name: '{{ item.name }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanroomsml.list_collaboration_ml_input_channels
+  calls:
+  - action: list_collaboration_ml_input_channels
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.collaborationMLInputChannelsList }}'
+    item:
+      collaborationIdentifier: '{{ item.collaborationIdentifier }}'
+      configuredModelAlgorithmAssociations: '{{ item.configuredModelAlgorithmAssociations }}'
+      createTime: '{{ item.createTime }}'
+      creatorAccountId: '{{ item.creatorAccountId }}'
+      description: '{{ item.description }}'
+      membershipIdentifier: '{{ item.membershipIdentifier }}'
+      mlInputChannelArn: '{{ item.mlInputChannelArn }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      updateTime: '{{ item.updateTime }}'
+- discovery_id: aws.cleanroomsml.list_collaboration_trained_model_export_jobs
+  calls:
+  - action: list_collaboration_trained_model_export_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.collaborationTrainedModelExportJobs }}'
+    item:
+      collaborationIdentifier: '{{ item.collaborationIdentifier }}'
+      createTime: '{{ item.createTime }}'
+      creatorAccountId: '{{ item.creatorAccountId }}'
+      description: '{{ item.description }}'
+      environment: '{{ item.environment }}'
+      hyperparameters: '{{ item.hyperparameters }}'
+      membershipIdentifier: '{{ item.membershipIdentifier }}'
+      name: '{{ item.name }}'
+      outputConfiguration: '{{ item.outputConfiguration }}'
+      status: '{{ item.status }}'
+      statusDetails: '{{ item.statusDetails }}'
+      trainedModelArn: '{{ item.trainedModelArn }}'
+      trainedModelVersionIdentifier: '{{ item.trainedModelVersionIdentifier }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanroomsml.list_collaboration_trained_model_inference_jobs
+  calls:
+  - action: list_collaboration_trained_model_inference_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.collaborationTrainedModelInferenceJobs }}'
+    item:
+      collaborationIdentifier: '{{ item.collaborationIdentifier }}'
+      configuredModelAlgorithmAssociationArn: '{{ item.configuredModelAlgorithmAssociationArn }}'
+      createTime: '{{ item.createTime }}'
+      creatorAccountId: '{{ item.creatorAccountId }}'
+      description: '{{ item.description }}'
+      logsStatus: '{{ item.logsStatus }}'
+      logsStatusDetails: '{{ item.logsStatusDetails }}'
+      membershipIdentifier: '{{ item.membershipIdentifier }}'
+      metricsStatus: '{{ item.metricsStatus }}'
+      metricsStatusDetails: '{{ item.metricsStatusDetails }}'
+      name: '{{ item.name }}'
+      outputConfiguration: '{{ item.outputConfiguration }}'
+      status: '{{ item.status }}'
+      trainedModelArn: '{{ item.trainedModelArn }}'
+      trainedModelInferenceJobArn: '{{ item.trainedModelInferenceJobArn }}'
+      trainedModelVersionIdentifier: '{{ item.trainedModelVersionIdentifier }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanroomsml.list_collaboration_trained_models
+  calls:
+  - action: list_collaboration_trained_models
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.collaborationTrainedModels }}'
+    item:
+      collaborationIdentifier: '{{ item.collaborationIdentifier }}'
+      configuredModelAlgorithmAssociationArn: '{{ item.configuredModelAlgorithmAssociationArn }}'
+      createTime: '{{ item.createTime }}'
+      creatorAccountId: '{{ item.creatorAccountId }}'
+      description: '{{ item.description }}'
+      incrementalTrainingDataChannels: '{{ item.incrementalTrainingDataChannels }}'
+      membershipIdentifier: '{{ item.membershipIdentifier }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      trainedModelArn: '{{ item.trainedModelArn }}'
+      updateTime: '{{ item.updateTime }}'
+      versionIdentifier: '{{ item.versionIdentifier }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanroomsml.list_configured_model_algorithm_associations
+  calls:
+  - action: list_configured_model_algorithm_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.configuredModelAlgorithmAssociations }}'
+    item:
+      collaborationIdentifier: '{{ item.collaborationIdentifier }}'
+      configuredModelAlgorithmArn: '{{ item.configuredModelAlgorithmArn }}'
+      configuredModelAlgorithmAssociationArn: '{{ item.configuredModelAlgorithmAssociations[].name }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      membershipIdentifier: '{{ item.membershipIdentifier }}'
+      name: '{{ item.name }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanroomsml.list_ml_input_channels
+  calls:
+  - action: list_ml_input_channels
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.mlInputChannelsList }}'
+    item:
+      collaborationIdentifier: '{{ item.collaborationIdentifier }}'
+      configuredModelAlgorithmAssociations: '{{ item.configuredModelAlgorithmAssociations }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      membershipIdentifier: '{{ item.membershipIdentifier }}'
+      mlInputChannelArn: '{{ item.mlInputChannelArn }}'
+      name: '{{ item.name }}'
+      protectedQueryIdentifier: '{{ item.protectedQueryIdentifier }}'
+      status: '{{ item.status }}'
+      updateTime: '{{ item.updateTime }}'
+- discovery_id: aws.cleanroomsml.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.cleanroomsml.list_trained_model_inference_jobs
+  calls:
+  - action: list_trained_model_inference_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.trainedModelInferenceJobs }}'
+    item:
+      collaborationIdentifier: '{{ item.collaborationIdentifier }}'
+      configuredModelAlgorithmAssociationArn: '{{ item.configuredModelAlgorithmAssociationArn }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      logsStatus: '{{ item.logsStatus }}'
+      logsStatusDetails: '{{ item.logsStatusDetails }}'
+      membershipIdentifier: '{{ item.membershipIdentifier }}'
+      metricsStatus: '{{ item.metricsStatus }}'
+      metricsStatusDetails: '{{ item.metricsStatusDetails }}'
+      name: '{{ item.name }}'
+      outputConfiguration: '{{ item.outputConfiguration }}'
+      status: '{{ item.status }}'
+      trainedModelArn: '{{ item.trainedModelArn }}'
+      trainedModelInferenceJobArn: '{{ item.trainedModelInferenceJobArn }}'
+      trainedModelVersionIdentifier: '{{ item.trainedModelVersionIdentifier }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanroomsml.list_trained_model_versions
+  calls:
+  - action: list_trained_model_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.trainedModels }}'
+    item:
+      collaborationIdentifier: '{{ item.collaborationIdentifier }}'
+      configuredModelAlgorithmAssociationArn: '{{ item.configuredModelAlgorithmAssociationArn }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      incrementalTrainingDataChannels: '{{ item.incrementalTrainingDataChannels }}'
+      membershipIdentifier: '{{ item.membershipIdentifier }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      trainedModelArn: '{{ item.trainedModelArn }}'
+      updateTime: '{{ item.updateTime }}'
+      versionIdentifier: '{{ item.versionIdentifier }}'
+- discovery_id: aws.cleanroomsml.list_trained_models
+  calls:
+  - action: list_trained_models
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.trainedModels }}'
+    item:
+      collaborationIdentifier: '{{ item.collaborationIdentifier }}'
+      configuredModelAlgorithmAssociationArn: '{{ item.configuredModelAlgorithmAssociationArn }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      incrementalTrainingDataChannels: '{{ item.incrementalTrainingDataChannels }}'
+      membershipIdentifier: '{{ item.membershipIdentifier }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      trainedModelArn: '{{ item.trainedModelArn }}'
+      updateTime: '{{ item.updateTime }}'
+      versionIdentifier: '{{ item.versionIdentifier }}'
+      nextToken: '{{ response.nextToken }}'

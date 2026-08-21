@@ -1,0 +1,331 @@
+version: '1.0'
+provider: aws
+service: ivs
+services:
+  client: ivs
+  module: boto3.client
+discovery:
+- discovery_id: aws.ivs.list_channels
+  calls:
+  - action: list_channels
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.channels }}'
+    item:
+      arn: '{{ item.arn }}'
+      authorized: '{{ item.authorized }}'
+      channel: '{{ item.channel }}'
+      containerFormat: '{{ item.containerFormat }}'
+      endTime: '{{ item.endTime }}'
+      hasErrorEvent: '{{ item.hasErrorEvent }}'
+      ingestConfiguration: '{{ item.ingestConfiguration }}'
+      ingestConfigurations: '{{ item.ingestConfigurations }}'
+      ingestEndpoint: '{{ item.ingestEndpoint }}'
+      insecureIngest: '{{ item.insecureIngest }}'
+      latencyMode: '{{ item.latencyMode }}'
+      multitrackInputConfiguration: '{{ item.multitrackInputConfiguration }}'
+      name: '{{ item.name }}'
+      playbackRestrictionPolicy: '{{ item.playbackRestrictionPolicy }}'
+      playbackRestrictionPolicyArn: '{{ item.playbackRestrictionPolicyArn }}'
+      playbackUrl: '{{ item.playbackUrl }}'
+      preset: '{{ item.preset }}'
+      recordingConfiguration: '{{ item.recordingConfiguration }}'
+      recordingConfigurationArn: '{{ item.recordingConfigurationArn }}'
+      recordingReconnectWindowSeconds: '{{ item.recordingReconnectWindowSeconds }}'
+      renditionConfiguration: '{{ item.renditionConfiguration }}'
+      srt: '{{ item.srt }}'
+      streamSession: '{{ item.streamSession }}'
+      tags: '{{ item.tags }}'
+      thumbnailConfiguration: '{{ item.thumbnailConfiguration }}'
+      truncatedEvents: '{{ item.truncatedEvents }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs.list_playback_key_pairs
+  calls:
+  - action: list_playback_key_pairs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.keyPairs }}'
+    item:
+      arn: '{{ item.arn }}'
+      fingerprint: '{{ item.fingerprint }}'
+      keyPair: '{{ item.keyPair }}'
+      name: '{{ item.name }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs.list_playback_restriction_policies
+  calls:
+  - action: list_playback_restriction_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.playbackRestrictionPolicies }}'
+    item:
+      allowedCountries: '{{ item.allowedCountries }}'
+      allowedOrigins: '{{ item.allowedOrigins }}'
+      arn: '{{ item.arn }}'
+      enableStrictOriginEnforcement: '{{ item.enableStrictOriginEnforcement }}'
+      name: '{{ item.name }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs.list_recording_configurations
+  calls:
+  - action: list_recording_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recordingConfigurations }}'
+    item:
+      arn: '{{ item.arn }}'
+      destinationConfiguration: '{{ item.destinationConfiguration }}'
+      name: '{{ item.name }}'
+      state: '{{ item.state }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs.list_streams
+  calls:
+  - action: list_streams
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.streams }}'
+    item:
+      channelArn: '{{ item.channelArn }}'
+      health: '{{ item.health }}'
+      startTime: '{{ item.startTime }}'
+      state: '{{ item.state }}'
+      stream: '{{ item.stream }}'
+      streamId: '{{ item.streamId }}'
+      viewerCount: '{{ item.viewerCount }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs.get_channel
+  for_each: aws.ivs.list_channels
+  calls:
+  - action: get_channel
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.channel.arn }}'
+      authorized: '{{ response.channel.authorized }}'
+      containerFormat: '{{ response.channel.containerFormat }}'
+      ingestEndpoint: '{{ response.channel.ingestEndpoint }}'
+      insecureIngest: '{{ response.channel.insecureIngest }}'
+      latencyMode: '{{ response.channel.latencyMode }}'
+      multitrackInputConfiguration: '{{ response.channel.multitrackInputConfiguration.policy }}'
+      name: '{{ response.channel.name }}'
+      playbackRestrictionPolicyArn: '{{ response.channel.playbackRestrictionPolicyArn }}'
+      playbackUrl: '{{ response.channel.playbackUrl }}'
+      preset: '{{ response.channel.preset }}'
+      recordingConfigurationArn: '{{ response.channel.recordingConfigurationArn }}'
+      srt: '{{ response.channel.srt }}'
+      tags: '{{ response.channel.tags }}'
+      type: '{{ response.channel.type }}'
+      enabled: '{{ response.channel.multitrackInputConfiguration.enabled }}'
+      maximumResolution: '{{ response.channel.multitrackInputConfiguration.maximumResolution }}'
+      policy: '{{ response.channel.multitrackInputConfiguration.policy }}'
+      endpoint: '{{ response.channel.srt.endpoint }}'
+      passphrase: '{{ response.channel.srt.passphrase }}'
+- discovery_id: aws.ivs.get_playback_key_pair
+  for_each: aws.ivs.list_channels
+  calls:
+  - action: get_playback_key_pair
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.keyPair.arn }}'
+      fingerprint: '{{ response.keyPair.fingerprint }}'
+      keyPair: '{{ response.keyPair.keyPair }}'
+      name: '{{ response.keyPair.name }}'
+      tags: '{{ response.keyPair.tags }}'
+- discovery_id: aws.ivs.get_playback_restriction_policy
+  for_each: aws.ivs.list_channels
+  calls:
+  - action: get_playback_restriction_policy
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      allowedCountries: '{{ response.playbackRestrictionPolicy.allowedCountries }}'
+      allowedOrigins: '{{ response.playbackRestrictionPolicy.allowedOrigins }}'
+      arn: '{{ response.playbackRestrictionPolicy.arn }}'
+      enableStrictOriginEnforcement: '{{ response.playbackRestrictionPolicy.enableStrictOriginEnforcement }}'
+      name: '{{ response.playbackRestrictionPolicy.name }}'
+      playbackRestrictionPolicy: '{{ response.playbackRestrictionPolicy.playbackRestrictionPolicy }}'
+      tags: '{{ response.playbackRestrictionPolicy.tags }}'
+- discovery_id: aws.ivs.get_recording_configuration
+  for_each: aws.ivs.list_channels
+  calls:
+  - action: get_recording_configuration
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.recordingConfiguration.arn }}'
+      destinationConfiguration: '{{ response.recordingConfiguration.destinationConfiguration.s3.bucketName }}'
+      name: '{{ response.recordingConfiguration.name }}'
+      recordingReconnectWindowSeconds: '{{ response.recordingConfiguration.recordingReconnectWindowSeconds }}'
+      renditionConfiguration: '{{ response.recordingConfiguration.renditionConfiguration }}'
+      state: '{{ response.recordingConfiguration.state }}'
+      tags: '{{ response.recordingConfiguration.tags }}'
+      thumbnailConfiguration: '{{ response.recordingConfiguration.thumbnailConfiguration.resolution }}'
+      bucketName: '{{ response.recordingConfiguration.destinationConfiguration.s3.bucketName }}'
+      renditionSelection: '{{ response.recordingConfiguration.renditionConfiguration.renditionSelection }}'
+      recordingMode: '{{ response.recordingConfiguration.thumbnailConfiguration.recordingMode }}'
+      resolution: '{{ response.recordingConfiguration.thumbnailConfiguration.resolution }}'
+      targetIntervalSeconds: '{{ response.recordingConfiguration.thumbnailConfiguration.targetIntervalSeconds }}'
+- discovery_id: aws.ivs.get_stream
+  for_each: aws.ivs.list_channels
+  calls:
+  - action: get_stream
+    params:
+      channelArn: '{{ item.channelArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      channelArn: '{{ response.stream.channelArn }}'
+      health: '{{ response.stream.health }}'
+      playbackUrl: '{{ response.stream.playbackUrl }}'
+      startTime: '{{ response.stream.startTime }}'
+      state: '{{ response.stream.state }}'
+      stream: '{{ response.stream.streamId }}'
+      streamId: '{{ response.stream.streamId }}'
+      viewerCount: '{{ response.stream.viewerCount }}'
+- discovery_id: aws.ivs.get_stream_key
+  for_each: aws.ivs.list_channels
+  calls:
+  - action: get_stream_key
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.streamKey.arn }}'
+      channelArn: '{{ response.streamKey.channelArn }}'
+      tags: '{{ response.streamKey.tags }}'
+      value: '{{ response.streamKey.value }}'
+- discovery_id: aws.ivs.get_stream_session
+  for_each: aws.ivs.list_channels
+  calls:
+  - action: get_stream_session
+    params:
+      channelArn: '{{ item.channelArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      channel: '{{ response.streamSession.channel.arn }}'
+      ingestConfiguration: '{{ response.streamSession.ingestConfiguration }}'
+      ingestConfigurations: '{{ response.streamSession.ingestConfigurations }}'
+      recordingConfiguration: '{{ response.streamSession.recordingConfiguration.arn }}'
+      startTime: '{{ response.streamSession.startTime }}'
+      streamId: '{{ response.streamSession.streamId }}'
+      streamSession: '{{ response.streamSession.streamSession }}'
+      truncatedEvents: '{{ response.streamSession.truncatedEvents[].type }}'
+      arn: '{{ response.streamSession.channel.arn }}'
+      authorized: '{{ response.streamSession.channel.authorized }}'
+      containerFormat: '{{ response.streamSession.channel.containerFormat }}'
+      ingestEndpoint: '{{ response.streamSession.channel.ingestEndpoint }}'
+      insecureIngest: '{{ response.streamSession.channel.insecureIngest }}'
+      latencyMode: '{{ response.streamSession.channel.latencyMode }}'
+      enabled: '{{ response.streamSession.channel.multitrackInputConfiguration.enabled }}'
+      maximumResolution: '{{ response.streamSession.channel.multitrackInputConfiguration.maximumResolution }}'
+      policy: '{{ response.streamSession.channel.multitrackInputConfiguration.policy }}'
+      name: '{{ response.streamSession.channel.name }}'
+      playbackRestrictionPolicyArn: '{{ response.streamSession.channel.playbackRestrictionPolicyArn }}'
+      playbackUrl: '{{ response.streamSession.channel.playbackUrl }}'
+      preset: '{{ response.streamSession.channel.preset }}'
+      recordingConfigurationArn: '{{ response.streamSession.channel.recordingConfigurationArn }}'
+      endpoint: '{{ response.streamSession.channel.srt.endpoint }}'
+      passphrase: '{{ response.streamSession.channel.srt.passphrase }}'
+      tags: '{{ response.streamSession.channel.tags }}'
+      type: '{{ response.streamSession.channel.type }}'
+      endTime: '{{ response.streamSession.endTime }}'
+      channels: '{{ response.streamSession.ingestConfiguration.audio.channels }}'
+      codec: '{{ response.streamSession.ingestConfiguration.audio.codec }}'
+      sampleRate: '{{ response.streamSession.ingestConfiguration.audio.sampleRate }}'
+      targetBitrate: '{{ response.streamSession.ingestConfiguration.audio.targetBitrate }}'
+      track: '{{ response.streamSession.ingestConfiguration.audio.track }}'
+      avcLevel: '{{ response.streamSession.ingestConfiguration.video.avcLevel }}'
+      avcProfile: '{{ response.streamSession.ingestConfiguration.video.avcProfile }}'
+      encoder: '{{ response.streamSession.ingestConfiguration.video.encoder }}'
+      level: '{{ response.streamSession.ingestConfiguration.video.level }}'
+      profile: '{{ response.streamSession.ingestConfiguration.video.profile }}'
+      targetFramerate: '{{ response.streamSession.ingestConfiguration.video.targetFramerate }}'
+      videoHeight: '{{ response.streamSession.ingestConfiguration.video.videoHeight }}'
+      videoWidth: '{{ response.streamSession.ingestConfiguration.video.videoWidth }}'
+      bucketName: '{{ response.streamSession.recordingConfiguration.destinationConfiguration.s3.bucketName }}'
+      recordingReconnectWindowSeconds: '{{ response.streamSession.recordingConfiguration.recordingReconnectWindowSeconds }}'
+      renditionSelection: '{{ response.streamSession.recordingConfiguration.renditionConfiguration.renditionSelection }}'
+      state: '{{ response.streamSession.recordingConfiguration.state }}'
+      recordingMode: '{{ response.streamSession.recordingConfiguration.thumbnailConfiguration.recordingMode }}'
+      resolution: '{{ response.streamSession.recordingConfiguration.thumbnailConfiguration.resolution }}'
+      targetIntervalSeconds: '{{ response.streamSession.recordingConfiguration.thumbnailConfiguration.targetIntervalSeconds }}'
+- discovery_id: aws.ivs.list_stream_keys
+  for_each: aws.ivs.list_channels
+  calls:
+  - action: list_stream_keys
+    params:
+      channelArn: '{{ item.channelArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.streamKeys }}'
+    item:
+      arn: '{{ item.arn }}'
+      channelArn: '{{ item.channelArn }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs.list_stream_sessions
+  for_each: aws.ivs.list_channels
+  calls:
+  - action: list_stream_sessions
+    params:
+      channelArn: '{{ item.channelArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.streamSessions }}'
+    item:
+      endTime: '{{ item.endTime }}'
+      hasErrorEvent: '{{ item.hasErrorEvent }}'
+      startTime: '{{ item.startTime }}'
+      streamId: '{{ item.streamId }}'
+      streamSession: '{{ item.streamSession }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ivs.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

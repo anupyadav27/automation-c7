@@ -1,0 +1,106 @@
+version: '1.0'
+provider: aws
+service: appstream
+discovery:
+- calls:
+  - action: describe_app_blocks
+    on_error: continue
+    save_as: response
+  discovery_id: aws.appstream.describe_app_blocks
+  emit:
+    as: item
+    item:
+      AppBlockErrors: '{{ item.AppBlockErrors }}'
+      AppBlocks: '{{ item.AppBlocks }}'
+      Arn: '{{ item.Arn }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      Description: '{{ item.Description }}'
+      DisplayName: '{{ item.DisplayName }}'
+      Name: '{{ item.Name }}'
+      PackagingType: '{{ item.PackagingType }}'
+      PostSetupScriptDetails: '{{ item.PostSetupScriptDetails }}'
+      SetupScriptDetails: '{{ item.SetupScriptDetails }}'
+      SourceS3Location: '{{ item.SourceS3Location }}'
+      State: '{{ item.State }}'
+    items_for: '{{ response.AppBlocks }}'
+- calls:
+  - action: describe_application_fleet_associations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.appstream.describe_application_fleet_associations
+  emit:
+    as: item
+    item:
+      ApplicationArn: '{{ item.ApplicationArn }}'
+      ApplicationFleetAssociations: '{{ item.ApplicationFleetAssociations }}'
+      FleetName: '{{ item.FleetName }}'
+    items_for: '{{ response.ApplicationFleetAssociations }}'
+- calls:
+  - action: describe_images
+    on_error: continue
+    save_as: response
+  discovery_id: aws.appstream.describe_images
+  emit:
+    as: item
+    item:
+      Applications: '{{ item.Applications }}'
+      AppstreamAgentVersion: '{{ item.AppstreamAgentVersion }}'
+      Arn: '{{ item.Arn }}'
+      BaseImageArn: '{{ item.BaseImageArn }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      Description: '{{ item.Description }}'
+      DisplayName: '{{ item.DisplayName }}'
+      DynamicAppProvidersEnabled: '{{ item.Images[].DynamicAppProvidersEnabled }}'
+      ImageBuilderName: '{{ item.ImageBuilderName }}'
+      ImageBuilderSupported: '{{ item.ImageBuilderSupported }}'
+      ImageErrors: '{{ item.ImageErrors }}'
+      ImagePermissions: '{{ item.ImagePermissions }}'
+      ImageSharedWithOthers: '{{ item.ImageSharedWithOthers }}'
+      ImageType: '{{ item.ImageType }}'
+      Images: '{{ item.Images }}'
+      LatestAppstreamAgentVersion: '{{ item.Images[].LatestAppstreamAgentVersion }}'
+      ManagedSoftwareIncluded: '{{ item.ManagedSoftwareIncluded }}'
+      Name: '{{ item.Name }}'
+      Platform: '{{ item.Platform }}'
+      PublicBaseImageReleasedDate: '{{ item.Images[].PublicBaseImageReleasedDate }}'
+      State: '{{ item.State }}'
+      StateChangeReason: '{{ item.StateChangeReason }}'
+      SupportedInstanceFamilies: '{{ item.SupportedInstanceFamilies }}'
+      Visibility: '{{ item.Visibility }}'
+    items_for: '{{ response.Images }}'
+- calls:
+  - action: describe_fleets
+    on_error: continue
+    save_as: response
+  discovery_id: aws.appstream.describe_fleets
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      ComputeCapacityStatus: '{{ item.ComputeCapacityStatus }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      Description: '{{ item.Description }}'
+      DisconnectTimeoutInSeconds: '{{ item.Fleets[].DisconnectTimeoutInSeconds }}'
+      DisplayName: '{{ item.DisplayName }}'
+      DomainJoinInfo: '{{ item.DomainJoinInfo }}'
+      EnableDefaultInternetAccess: '{{ item.Fleets[].EnableDefaultInternetAccess }}'
+      FleetErrors: '{{ item.FleetErrors }}'
+      FleetType: '{{ item.FleetType }}'
+      Fleets: '{{ item.Fleets }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      IdleDisconnectTimeoutInSeconds: '{{ item.Fleets[].IdleDisconnectTimeoutInSeconds }}'
+      ImageArn: '{{ item.ImageArn }}'
+      ImageName: '{{ item.ImageName }}'
+      InstanceType: '{{ item.InstanceType }}'
+      MaxConcurrentSessions: '{{ item.MaxConcurrentSessions }}'
+      MaxSessionsPerInstance: '{{ item.MaxSessionsPerInstance }}'
+      MaxUserDurationInSeconds: '{{ item.MaxUserDurationInSeconds }}'
+      Name: '{{ item.Name }}'
+      Platform: '{{ item.Platform }}'
+      RootVolumeConfig: '{{ item.RootVolumeConfig }}'
+      SessionScriptS3Location: '{{ item.SessionScriptS3Location }}'
+      State: '{{ item.State }}'
+      StreamView: '{{ item.StreamView }}'
+      UsbDeviceFilterStrings: '{{ item.UsbDeviceFilterStrings }}'
+      VpcConfig: '{{ item.VpcConfig }}'
+    items_for: '{{ response.Fleets }}'

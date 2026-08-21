@@ -1,0 +1,269 @@
+version: '1.0'
+provider: aws
+service: fis
+services:
+  client: fis
+  module: boto3.client
+discovery:
+- discovery_id: aws.fis.list_actions
+  calls:
+  - action: list_actions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.actions }}'
+    item:
+      action: '{{ item.action }}'
+      arn: '{{ item.arn }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      parameters: '{{ item.parameters }}'
+      tags: '{{ item.tags }}'
+      targets: '{{ item.targets }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.fis.list_experiment_templates
+  calls:
+  - action: list_experiment_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.experimentTemplates }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.fis.list_experiments
+  calls:
+  - action: list_experiments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.experiments }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      experimentOptions: '{{ item.experimentOptions }}'
+      experimentTemplateId: '{{ item.experimentTemplateId }}'
+      id: '{{ item.id }}'
+      state: '{{ item.state }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.fis.list_target_resource_types
+  calls:
+  - action: list_target_resource_types
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.targetResourceTypes }}'
+    item:
+      description: '{{ item.description }}'
+      resourceType: '{{ item.resourceType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.fis.get_action
+  for_each: aws.fis.list_actions
+  calls:
+  - action: get_action
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      action: '{{ response.action.action }}'
+      arn: '{{ response.action.arn }}'
+      description: '{{ response.action.description }}'
+      id: '{{ response.action.id }}'
+      parameters: '{{ response.action.parameters }}'
+      tags: '{{ response.action.tags }}'
+      targets: '{{ response.action.targets }}'
+- discovery_id: aws.fis.get_experiment
+  for_each: aws.fis.list_actions
+  calls:
+  - action: get_experiment
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      actions: '{{ response.experiment.actions }}'
+      arn: '{{ response.experiment.arn }}'
+      creationTime: '{{ response.experiment.creationTime }}'
+      endTime: '{{ response.experiment.endTime }}'
+      experimentOptions: '{{ response.experiment.experimentOptions }}'
+      experimentReport: '{{ response.experiment.experimentReport }}'
+      experimentReportConfiguration: '{{ response.experiment.experimentReportConfiguration }}'
+      experimentTemplateId: '{{ response.experiment.experimentTemplateId }}'
+      id: '{{ response.experiment.id }}'
+      logConfiguration: '{{ response.experiment.logConfiguration }}'
+      roleArn: '{{ response.experiment.roleArn }}'
+      startTime: '{{ response.experiment.startTime }}'
+      state: '{{ response.experiment.startTime }}'
+      stopConditions: '{{ response.experiment.stopConditions[].value }}'
+      tags: '{{ response.experiment.tags }}'
+      targetAccountConfigurationsCount: '{{ response.experiment.targetAccountConfigurationsCount }}'
+      targets: '{{ response.experiment.targets }}'
+      accountTargeting: '{{ response.experiment.experimentOptions.accountTargeting }}'
+      actionsMode: '{{ response.experiment.experimentOptions.actionsMode }}'
+      emptyTargetResolutionMode: '{{ response.experiment.experimentOptions.emptyTargetResolutionMode }}'
+      bucketName: '{{ response.experiment.experimentReportConfiguration.outputs.s3Configuration.bucketName }}'
+      prefix: '{{ response.experiment.experimentReportConfiguration.outputs.s3Configuration.prefix }}'
+      postExperimentDuration: '{{ response.experiment.experimentReportConfiguration.postExperimentDuration }}'
+      preExperimentDuration: '{{ response.experiment.experimentReportConfiguration.preExperimentDuration }}'
+      code: '{{ response.experiment.experimentReport.state.error.code }}'
+      reason: '{{ response.experiment.experimentReport.state.reason }}'
+      status: '{{ response.experiment.experimentReport.state.status }}'
+      logGroupArn: '{{ response.experiment.logConfiguration.cloudWatchLogsConfiguration.logGroupArn }}'
+      logSchemaVersion: '{{ response.experiment.logConfiguration.logSchemaVersion }}'
+      accountId: '{{ response.experiment.state.error.accountId }}'
+      location: '{{ response.experiment.state.error.location }}'
+- discovery_id: aws.fis.get_experiment_target_account_configuration
+  calls:
+  - action: get_experiment_target_account_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      accountId: '{{ response.targetAccountConfiguration.accountId }}'
+      description: '{{ response.targetAccountConfiguration.description }}'
+      roleArn: '{{ response.targetAccountConfiguration.roleArn }}'
+- discovery_id: aws.fis.get_experiment_template
+  for_each: aws.fis.list_actions
+  calls:
+  - action: get_experiment_template
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      actions: '{{ response.experimentTemplate.actions }}'
+      arn: '{{ response.experimentTemplate.arn }}'
+      creationTime: '{{ response.experimentTemplate.creationTime }}'
+      description: '{{ response.experimentTemplate.description }}'
+      experimentOptions: '{{ response.experimentTemplate.experimentOptions }}'
+      experimentReportConfiguration: '{{ response.experimentTemplate.experimentReportConfiguration }}'
+      id: '{{ response.experimentTemplate.id }}'
+      lastUpdateTime: '{{ response.experimentTemplate.lastUpdateTime }}'
+      logConfiguration: '{{ response.experimentTemplate.logConfiguration }}'
+      roleArn: '{{ response.experimentTemplate.roleArn }}'
+      stopConditions: '{{ response.experimentTemplate.stopConditions[].value }}'
+      tags: '{{ response.experimentTemplate.tags }}'
+      targetAccountConfigurationsCount: '{{ response.experimentTemplate.targetAccountConfigurationsCount }}'
+      targets: '{{ response.experimentTemplate.targets }}'
+      accountTargeting: '{{ response.experimentTemplate.experimentOptions.accountTargeting }}'
+      emptyTargetResolutionMode: '{{ response.experimentTemplate.experimentOptions.emptyTargetResolutionMode }}'
+      bucketName: '{{ response.experimentTemplate.experimentReportConfiguration.outputs.s3Configuration.bucketName }}'
+      prefix: '{{ response.experimentTemplate.experimentReportConfiguration.outputs.s3Configuration.prefix }}'
+      postExperimentDuration: '{{ response.experimentTemplate.experimentReportConfiguration.postExperimentDuration }}'
+      preExperimentDuration: '{{ response.experimentTemplate.experimentReportConfiguration.preExperimentDuration }}'
+      logGroupArn: '{{ response.experimentTemplate.logConfiguration.cloudWatchLogsConfiguration.logGroupArn }}'
+      logSchemaVersion: '{{ response.experimentTemplate.logConfiguration.logSchemaVersion }}'
+- discovery_id: aws.fis.get_safety_lever
+  for_each: aws.fis.list_actions
+  calls:
+  - action: get_safety_lever
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.safetyLever.arn }}'
+      id: '{{ response.safetyLever.id }}'
+      state: '{{ response.safetyLever.state }}'
+      reason: '{{ response.safetyLever.state.reason }}'
+      status: '{{ response.safetyLever.state.status }}'
+- discovery_id: aws.fis.get_target_account_configuration
+  for_each: aws.fis.list_experiments
+  calls:
+  - action: get_target_account_configuration
+    params:
+      experimentTemplateId: '{{ item.experimentTemplateId }}'
+      accountId: '{{ item.accountId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      accountId: '{{ response.targetAccountConfiguration.accountId }}'
+      description: '{{ response.targetAccountConfiguration.description }}'
+      roleArn: '{{ response.targetAccountConfiguration.roleArn }}'
+- discovery_id: aws.fis.get_target_resource_type
+  for_each: aws.fis.list_target_resource_types
+  calls:
+  - action: get_target_resource_type
+    params:
+      resourceType: '{{ item.resourceType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      description: '{{ response.targetResourceType.description }}'
+      parameters: '{{ response.targetResourceType.parameters }}'
+      resourceType: '{{ response.targetResourceType.resourceType }}'
+- discovery_id: aws.fis.list_experiment_resolved_targets
+  calls:
+  - action: list_experiment_resolved_targets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.resolvedTargets }}'
+    item:
+      resourceType: '{{ item.resourceType }}'
+      targetInformation: '{{ item.targetInformation }}'
+      targetName: '{{ item.targetName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.fis.list_experiment_target_account_configurations
+  calls:
+  - action: list_experiment_target_account_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.targetAccountConfigurations }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      description: '{{ item.description }}'
+      roleArn: '{{ item.roleArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.fis.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.fis.list_target_account_configurations
+  for_each: aws.fis.list_experiments
+  calls:
+  - action: list_target_account_configurations
+    params:
+      experimentTemplateId: '{{ item.experimentTemplateId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.targetAccountConfigurations }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      description: '{{ item.description }}'
+      roleArn: '{{ item.roleArn }}'
+      nextToken: '{{ response.nextToken }}'

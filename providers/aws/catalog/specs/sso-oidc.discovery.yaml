@@ -1,0 +1,8 @@
+version: '1.0'
+provider: aws
+service: sso-oidc
+services:
+  client: sso-oidc
+  module: boto3.client
+discovery:
+checks: []

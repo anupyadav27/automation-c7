@@ -1,0 +1,175 @@
+version: '1.0'
+provider: aws
+service: cost-optimization-hub
+services:
+  client: cost-optimization-hub
+  module: boto3.client
+discovery:
+- discovery_id: aws.cost-optimization-hub.get_preferences
+  calls:
+  - action: get_preferences
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      memberAccountDiscountVisibility: '{{ response.memberAccountDiscountVisibility }}'
+      paymentOption: '{{ response.paymentOption }}'
+      preferredCommitment: '{{ response.preferredCommitment.term }}'
+      savingsEstimationMode: '{{ response.savingsEstimationMode }}'
+      term: '{{ response.term }}'
+- discovery_id: aws.cost-optimization-hub.list_enrollment_statuses
+  calls:
+  - action: list_enrollment_statuses
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      createdTimestamp: '{{ item.createdTimestamp }}'
+      lastUpdatedTimestamp: '{{ item.lastUpdatedTimestamp }}'
+      status: '{{ item.status }}'
+      includeMemberAccounts: '{{ response.includeMemberAccounts }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cost-optimization-hub.list_recommendations
+  calls:
+  - action: list_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      actionType: '{{ item.actionType }}'
+      currencyCode: '{{ item.currencyCode }}'
+      currentResourceSummary: '{{ item.currentResourceSummary }}'
+      currentResourceType: '{{ item.currentResourceType }}'
+      estimatedMonthlyCost: '{{ item.estimatedMonthlyCost }}'
+      estimatedMonthlySavings: '{{ item.items[].estimatedMonthlySavings }}'
+      estimatedSavingsPercentage: '{{ item.items[].estimatedSavingsPercentage }}'
+      implementationEffort: '{{ item.implementationEffort }}'
+      lastRefreshTimestamp: '{{ item.lastRefreshTimestamp }}'
+      recommendationId: '{{ item.recommendationId }}'
+      recommendationLookbackPeriodInDays: '{{ item.items[].recommendationLookbackPeriodInDays }}'
+      recommendedResourceSummary: '{{ item.items[].recommendedResourceSummary }}'
+      recommendedResourceType: '{{ item.items[].recommendedResourceType }}'
+      region: '{{ item.region }}'
+      resourceArn: '{{ item.resourceArn }}'
+      resourceId: '{{ item.resourceId }}'
+      restartNeeded: '{{ item.restartNeeded }}'
+      rollbackPossible: '{{ item.rollbackPossible }}'
+      source: '{{ item.source }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cost-optimization-hub.get_recommendation
+  for_each: aws.cost-optimization-hub.list_recommendations
+  calls:
+  - action: get_recommendation
+    params:
+      recommendationId: '{{ item.recommendationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'
+      accountId: '{{ response.accountId }}'
+      actionType: '{{ response.actionType }}'
+      costCalculationLookbackPeriodInDays: '{{ response.costCalculationLookbackPeriodInDays }}'
+      currencyCode: '{{ response.currencyCode }}'
+      storageType: '{{ response.currentResourceDetails.auroraDbClusterStorage.configuration.storageType }}'
+      estimatedCostAfterDiscounts: '{{ response.currentResourceDetails.auroraDbClusterStorage.costCalculation.pricing.estimatedCostAfterDiscounts }}'
+      estimatedCostBeforeDiscounts: '{{ response.currentResourceDetails.auroraDbClusterStorage.costCalculation.pricing.estimatedCostBeforeDiscounts }}'
+      estimatedNetUnusedAmortizedCommitments: '{{ response.currentResourceDetails.auroraDbClusterStorage.costCalculation.pricing.estimatedNetUnusedAmortizedCommitments }}'
+      accountScope: '{{ response.currentResourceDetails.computeSavingsPlans.configuration.accountScope }}'
+      hourlyCommitment: '{{ response.currentResourceDetails.computeSavingsPlans.configuration.hourlyCommitment }}'
+      paymentOption: '{{ response.currentResourceDetails.computeSavingsPlans.configuration.paymentOption }}'
+      term: '{{ response.currentResourceDetails.computeSavingsPlans.configuration.term }}'
+      estimatedMonthlyCommitment: '{{ response.currentResourceDetails.computeSavingsPlans.costCalculation.pricing.estimatedMonthlyCommitment }}'
+      estimatedOnDemandCost: '{{ response.currentResourceDetails.computeSavingsPlans.costCalculation.pricing.estimatedOnDemandCost }}'
+      monthlySavingsPlansEligibleCost: '{{ response.currentResourceDetails.computeSavingsPlans.costCalculation.pricing.monthlySavingsPlansEligibleCost }}'
+      savingsPercentage: '{{ response.currentResourceDetails.computeSavingsPlans.costCalculation.pricing.savingsPercentage }}'
+      capacityUnits: '{{ response.currentResourceDetails.dynamoDbReservedCapacity.configuration.capacityUnits }}'
+      monthlyRecurringCost: '{{ response.currentResourceDetails.dynamoDbReservedCapacity.configuration.monthlyRecurringCost }}'
+      numberOfCapacityUnitsToPurchase: '{{ response.currentResourceDetails.dynamoDbReservedCapacity.configuration.numberOfCapacityUnitsToPurchase }}'
+      reservedInstancesRegion: '{{ response.currentResourceDetails.dynamoDbReservedCapacity.configuration.reservedInstancesRegion }}'
+      service: '{{ response.currentResourceDetails.dynamoDbReservedCapacity.configuration.service }}'
+      upfrontCost: '{{ response.currentResourceDetails.dynamoDbReservedCapacity.configuration.upfrontCost }}'
+      estimatedMonthlyAmortizedReservationCost: '{{ response.currentResourceDetails.dynamoDbReservedCapacity.costCalculation.pricing.estimatedMonthlyAmortizedReservationCost }}'
+      monthlyReservationEligibleCost: '{{ response.currentResourceDetails.dynamoDbReservedCapacity.costCalculation.pricing.monthlyReservationEligibleCost }}'
+      attachmentState: '{{ response.currentResourceDetails.ebsVolume.configuration.attachmentState }}'
+      iops: '{{ response.currentResourceDetails.ebsVolume.configuration.performance.iops }}'
+      throughput: '{{ response.currentResourceDetails.ebsVolume.configuration.performance.throughput }}'
+      sizeInGb: '{{ response.currentResourceDetails.ebsVolume.configuration.storage.sizeInGb }}'
+      type: '{{ response.currentResourceDetails.ebsVolume.configuration.storage.type }}'
+      allocationStrategy: '{{ response.currentResourceDetails.ec2AutoScalingGroup.configuration.allocationStrategy }}'
+      instanceFamily: '{{ response.currentResourceDetails.ec2InstanceSavingsPlans.configuration.instanceFamily }}'
+      savingsPlansRegion: '{{ response.currentResourceDetails.ec2InstanceSavingsPlans.configuration.savingsPlansRegion }}'
+      currentGeneration: '{{ response.currentResourceDetails.ec2ReservedInstances.configuration.currentGeneration }}'
+      instanceType: '{{ response.currentResourceDetails.ec2ReservedInstances.configuration.instanceType }}'
+      normalizedUnitsToPurchase: '{{ response.currentResourceDetails.ec2ReservedInstances.configuration.normalizedUnitsToPurchase }}'
+      numberOfInstancesToPurchase: '{{ response.currentResourceDetails.ec2ReservedInstances.configuration.numberOfInstancesToPurchase }}'
+      offeringClass: '{{ response.currentResourceDetails.ec2ReservedInstances.configuration.offeringClass }}'
+      platform: '{{ response.currentResourceDetails.ec2ReservedInstances.configuration.platform }}'
+      sizeFlexEligible: '{{ response.currentResourceDetails.ec2ReservedInstances.configuration.sizeFlexEligible }}'
+      tenancy: '{{ response.currentResourceDetails.ec2ReservedInstances.configuration.tenancy }}'
+      architecture: '{{ response.currentResourceDetails.ecsService.configuration.compute.architecture }}'
+      memorySizeInMB: '{{ response.currentResourceDetails.ecsService.configuration.compute.memorySizeInMB }}'
+      vCpu: '{{ response.currentResourceDetails.ecsService.configuration.compute.vCpu }}'
+      allocatedStorageInGb: '{{ response.currentResourceDetails.rdsDbInstanceStorage.configuration.allocatedStorageInGb }}'
+      storageThroughput: '{{ response.currentResourceDetails.rdsDbInstanceStorage.configuration.storageThroughput }}'
+      dbInstanceClass: '{{ response.currentResourceDetails.rdsDbInstance.configuration.instance.dbInstanceClass }}'
+      databaseEdition: '{{ response.currentResourceDetails.rdsReservedInstances.configuration.databaseEdition }}'
+      databaseEngine: '{{ response.currentResourceDetails.rdsReservedInstances.configuration.databaseEngine }}'
+      deploymentOption: '{{ response.currentResourceDetails.rdsReservedInstances.configuration.deploymentOption }}'
+      licenseModel: '{{ response.currentResourceDetails.rdsReservedInstances.configuration.licenseModel }}'
+      currentResourceType: '{{ response.currentResourceType }}'
+      estimatedMonthlyCost: '{{ response.estimatedMonthlyCost }}'
+      estimatedMonthlySavings: '{{ response.estimatedMonthlySavings }}'
+      estimatedSavingsOverCostCalculationLookbackPeriod: '{{ response.estimatedSavingsOverCostCalculationLookbackPeriod }}'
+      estimatedSavingsPercentage: '{{ response.estimatedSavingsPercentage }}'
+      implementationEffort: '{{ response.implementationEffort }}'
+      lastRefreshTimestamp: '{{ response.lastRefreshTimestamp }}'
+      recommendationId: '{{ response.recommendationId }}'
+      recommendationLookbackPeriodInDays: '{{ response.recommendationLookbackPeriodInDays }}'
+      recommendedResourceType: '{{ response.recommendedResourceType }}'
+      region: '{{ response.region }}'
+      resourceArn: '{{ response.resourceArn }}'
+      resourceId: '{{ response.resourceId }}'
+      restartNeeded: '{{ response.restartNeeded }}'
+      rollbackPossible: '{{ response.rollbackPossible }}'
+      source: '{{ response.source }}'
+- discovery_id: aws.cost-optimization-hub.list_efficiency_metrics
+  calls:
+  - action: list_efficiency_metrics
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.efficiencyMetricsByGroup }}'
+    item:
+      group: '{{ item.group }}'
+      message: '{{ item.message }}'
+      metricsByTime: '{{ item.metricsByTime }}'
+- discovery_id: aws.cost-optimization-hub.list_recommendation_summaries
+  calls:
+  - action: list_recommendation_summaries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      estimatedMonthlySavings: '{{ item.items[].estimatedMonthlySavings }}'
+      group: '{{ item.group }}'
+      recommendationCount: '{{ item.recommendationCount }}'
+      currencyCode: '{{ response.currencyCode }}'
+      estimatedTotalDedupedSavings: '{{ response.estimatedTotalDedupedSavings }}'
+      groupBy: '{{ response.groupBy }}'
+      savingsPercentage: '{{ response.metrics.savingsPercentage }}'
+      nextToken: '{{ response.nextToken }}'

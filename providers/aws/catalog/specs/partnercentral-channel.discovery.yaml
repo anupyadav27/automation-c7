@@ -1,0 +1,103 @@
+version: '1.0'
+provider: aws
+service: partnercentral-channel
+services:
+  client: partnercentral-channel
+  module: boto3.client
+discovery:
+- discovery_id: aws.partnercentral-channel.get_relationship
+  calls:
+  - action: get_relationship
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.relationshipDetail.arn }}'
+      associatedAccountId: '{{ response.relationshipDetail.associatedAccountId }}'
+      associationType: '{{ response.relationshipDetail.associationType }}'
+      catalog: '{{ response.relationshipDetail.catalog }}'
+      createdAt: '{{ response.relationshipDetail.createdAt }}'
+      displayName: '{{ response.relationshipDetail.displayName }}'
+      id: '{{ response.relationshipDetail.id }}'
+      programManagementAccountId: '{{ response.relationshipDetail.programManagementAccountId
+        }}'
+      resaleAccountModel: '{{ response.relationshipDetail.resaleAccountModel }}'
+      revision: '{{ response.relationshipDetail.revision }}'
+      sector: '{{ response.relationshipDetail.sector }}'
+      startDate: '{{ response.relationshipDetail.startDate }}'
+      updatedAt: '{{ response.relationshipDetail.updatedAt }}'
+- discovery_id: aws.partnercentral-channel.list_channel_handshakes
+  calls:
+  - action: list_channel_handshakes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      associatedResourceId: '{{ item.associatedResourceId }}'
+      catalog: '{{ item.catalog }}'
+      createdAt: '{{ item.createdAt }}'
+      detail: '{{ item.detail }}'
+      handshakeType: '{{ item.handshakeType }}'
+      id: '{{ item.id }}'
+      ownerAccountId: '{{ item.ownerAccountId }}'
+      receiverAccountId: '{{ item.receiverAccountId }}'
+      senderAccountId: '{{ item.senderAccountId }}'
+      senderDisplayName: '{{ item.senderDisplayName }}'
+      status: '{{ item.status }}'
+      updatedAt: '{{ item.updatedAt }}'
+- discovery_id: aws.partnercentral-channel.list_program_management_accounts
+  calls:
+  - action: list_program_management_accounts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      arn: '{{ item.arn }}'
+      catalog: '{{ item.catalog }}'
+      createdAt: '{{ item.createdAt }}'
+      displayName: '{{ item.displayName }}'
+      id: '{{ item.id }}'
+      program: '{{ item.program }}'
+      revision: '{{ item.revision }}'
+      startDate: '{{ item.startDate }}'
+      status: '{{ item.status }}'
+      updatedAt: '{{ item.updatedAt }}'
+- discovery_id: aws.partnercentral-channel.list_relationships
+  calls:
+  - action: list_relationships
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      associatedAccountId: '{{ item.associatedAccountId }}'
+      associationType: '{{ item.associationType }}'
+      catalog: '{{ item.catalog }}'
+      createdAt: '{{ item.createdAt }}'
+      displayName: '{{ item.displayName }}'
+      id: '{{ item.id }}'
+      programManagementAccountId: '{{ item.programManagementAccountId }}'
+      revision: '{{ item.revision }}'
+      sector: '{{ item.sector }}'
+      startDate: '{{ item.startDate }}'
+      updatedAt: '{{ item.updatedAt }}'
+- discovery_id: aws.partnercentral-channel.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'

@@ -1,0 +1,133 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: ce, costexplorer
+# 7 ops (5 from checks, +2 for inventory)
+version: '1.0'
+provider: aws
+service: costexplorer
+discovery:
+  - calls:
+    - action: get_anomaly_subscriptions
+      on_error: continue
+      save_as: response
+    discovery_id: aws.costexplorer.get_anomaly_subscriptions
+    emit:
+      as: item
+      item:
+        AccountId: '{{ response.AccountId }}'
+        AnomalySubscriptions: '{{ response.AnomalySubscriptions }}'
+        Frequency: '{{ response.Frequency }}'
+        MonitorArnList: '{{ response.MonitorArnList }}'
+        Subscribers: '{{ response.Subscribers }}'
+        SubscriptionArn: '{{ response.SubscriptionArn }}'
+        SubscriptionName: '{{ response.SubscriptionName }}'
+        Threshold: '{{ response.Threshold }}'
+        ThresholdExpression: '{{ response.ThresholdExpression }}'
+  - calls:
+    - action: get_anomaly_monitors
+      on_error: continue
+      save_as: response
+    discovery_id: aws.costexplorer.get_anomaly_monitors
+    emit:
+      as: item
+      item:
+        AnomalyMonitors: '{{ response.AnomalyMonitors }}'
+        CreationDate: '{{ response.CreationDate }}'
+        DimensionalValueCount: '{{ response.DimensionalValueCount }}'
+        LastEvaluatedDate: '{{ response.LastEvaluatedDate }}'
+        LastUpdatedDate: '{{ response.LastUpdatedDate }}'
+        MonitorArn: '{{ response.MonitorArn }}'
+        MonitorDimension: '{{ response.MonitorDimension }}'
+        MonitorName: '{{ response.MonitorName }}'
+        MonitorSpecification: '{{ response.MonitorSpecification }}'
+        MonitorType: '{{ response.MonitorType }}'
+        NextPageToken: '{{ response.NextPageToken }}'
+  - calls:
+    - action: list_cost_allocation_tags
+      on_error: continue
+      save_as: response
+    discovery_id: aws.ce.list_cost_allocation_tags
+    emit:
+      as: item
+      item:
+        LastUpdatedDate: '{{ item.LastUpdatedDate }}'
+        LastUsedDate: '{{ item.LastUsedDate }}'
+        Status: '{{ item.Status }}'
+        TagKey: '{{ item.TagKey }}'
+        Tags: '{{ item.Tags }}'
+        Type: '{{ item.Type }}'
+      items_for: '{{ response.CostAllocationTags }}'
+  - calls:
+    - action: list_cost_category_definitions
+      on_error: continue
+      save_as: response
+    discovery_id: aws.ce.list_cost_category_definitions
+    emit:
+      as: item
+      item:
+        CostCategoryArn: '{{ item.CostCategoryArn }}'
+        DefaultValue: '{{ item.DefaultValue }}'
+        EffectiveEnd: '{{ item.EffectiveEnd }}'
+        EffectiveStart: '{{ item.EffectiveStart }}'
+        Name: '{{ item.Name }}'
+        NumberOfRules: '{{ item.NumberOfRules }}'
+        ProcessingStatus: '{{ item.ProcessingStatus }}'
+        Values: '{{ item.Values }}'
+      items_for: '{{ response.CostCategoryReferences }}'
+  - calls:
+    - action: describe_cost_category_definition
+      on_error: continue
+      params:
+        CostCategoryArn: '{{ item.CostCategoryArn }}'
+      save_as: response
+    discovery_id: aws.ce.describe_cost_category_definition
+    emit:
+      as: item
+      item:
+        CostCategoryArn: '{{ response.CostCategory.CostCategoryArn }}'
+        DefaultValue: '{{ response.CostCategory.DefaultValue }}'
+        EffectiveEnd: '{{ response.CostCategory.EffectiveEnd }}'
+        EffectiveStart: '{{ response.CostCategory.EffectiveStart }}'
+        Name: '{{ response.CostCategory.Name }}'
+        ProcessingStatus: '{{ response.CostCategory.ProcessingStatus }}'
+        RuleVersion: '{{ response.CostCategory.RuleVersion }}'
+        Rules: '{{ response.CostCategory.Rules }}'
+        SplitChargeRules: '{{ response.CostCategory.SplitChargeRules }}'
+    for_each: aws.ce.list_cost_category_definitions
+  - calls:
+    - action: get_anomaly_subscriptions
+      on_error: continue
+      save_as: response
+    discovery_id: aws.ce.get_anomaly_subscriptions
+    emit:
+      as: item
+      item:
+        AccountId: '{{ item.AccountId }}'
+        AnomalySubscriptions: '{{ item.AnomalySubscriptions }}'
+        Frequency: '{{ item.Frequency }}'
+        MonitorArnList: '{{ item.MonitorArnList }}'
+        Subscribers: '{{ item.Subscribers }}'
+        SubscriptionArn: '{{ item.SubscriptionArn }}'
+        SubscriptionName: '{{ item.SubscriptionName }}'
+        Threshold: '{{ item.Threshold }}'
+        ThresholdExpression: '{{ item.ThresholdExpression }}'
+      items_for: '{{ response.AnomalySubscriptions }}'
+  - calls:
+    - action: get_anomaly_monitors
+      on_error: continue
+      save_as: response
+    discovery_id: aws.ce.get_anomaly_monitors
+    emit:
+      as: item
+      item:
+        AnomalyMonitors: '{{ item.AnomalyMonitors }}'
+        CreationDate: '{{ item.CreationDate }}'
+        DimensionalValueCount: '{{ item.DimensionalValueCount }}'
+        LastEvaluatedDate: '{{ item.LastEvaluatedDate }}'
+        LastUpdatedDate: '{{ item.LastUpdatedDate }}'
+        MonitorArn: '{{ item.MonitorArn }}'
+        MonitorDimension: '{{ item.MonitorDimension }}'
+        MonitorName: '{{ item.MonitorName }}'
+        MonitorSpecification: '{{ item.MonitorSpecification }}'
+        MonitorType: '{{ item.MonitorType }}'
+        NextPageToken: '{{ item.NextPageToken }}'
+      items_for: '{{ response.AnomalyMonitors }}'

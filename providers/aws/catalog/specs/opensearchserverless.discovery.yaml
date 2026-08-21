@@ -1,0 +1,224 @@
+version: '1.0'
+provider: aws
+service: opensearchserverless
+services:
+  client: opensearchserverless
+  module: boto3.client
+discovery:
+- discovery_id: aws.opensearchserverless.get_account_settings
+  calls:
+  - action: get_account_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DestinationArn: '{{ response.accountSettingsDetail.DestinationArn }}'
+      Enabled: '{{ response.accountSettingsDetail.Enabled }}'
+      Format: '{{ response.accountSettingsDetail.Format }}'
+      Level: '{{ response.accountSettingsDetail.Level }}'
+      accountSettingsDetail: '{{ response.accountSettingsDetail.accountSettingsDetail }}'
+      capacityLimits: '{{ response.accountSettingsDetail.capacityLimits }}'
+      maxIndexingCapacityInOCU: '{{ response.accountSettingsDetail.capacityLimits.maxIndexingCapacityInOCU }}'
+      maxSearchCapacityInOCU: '{{ response.accountSettingsDetail.capacityLimits.maxSearchCapacityInOCU }}'
+- discovery_id: aws.opensearchserverless.get_policies_stats
+  calls:
+  - action: get_policies_stats
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccessPolicyStats: '{{ response.AccessPolicyStats.AccessPolicyStats }}'
+      DataPolicyCount: '{{ response.AccessPolicyStats.DataPolicyCount }}'
+      LifecyclePolicyStats: '{{ response.AccessPolicyStats.LifecyclePolicyStats }}'
+      SecurityConfigStats: '{{ response.AccessPolicyStats.SecurityConfigStats }}'
+      SecurityPolicyStats: '{{ response.AccessPolicyStats.SecurityPolicyStats }}'
+      Statement: '{{ response.AccessPolicyStats.Statement }}'
+      TotalPolicyCount: '{{ response.AccessPolicyStats.DataPolicyCount }}'
+      Version: '{{ response.AccessPolicyStats.Version }}'
+      RetentionPolicyCount: '{{ response.LifecyclePolicyStats.RetentionPolicyCount }}'
+      SamlConfigCount: '{{ response.SecurityConfigStats.SamlConfigCount }}'
+      EncryptionPolicyCount: '{{ response.SecurityPolicyStats.EncryptionPolicyCount }}'
+      NetworkPolicyCount: '{{ response.SecurityPolicyStats.NetworkPolicyCount }}'
+- discovery_id: aws.opensearchserverless.list_collections
+  calls:
+  - action: list_collections
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.collectionSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.opensearchserverless.list_vpc_endpoints
+  calls:
+  - action: list_vpc_endpoints
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.vpcEndpointSummaries }}'
+    item:
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.opensearchserverless.get_access_policy
+  for_each: aws.opensearchserverless.list_collections
+  calls:
+  - action: get_access_policy
+    params:
+      type: '{{ item.type }}'
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdDate: '{{ response.accessPolicyDetail.createdDate }}'
+      description: '{{ response.accessPolicyDetail.description }}'
+      lastModifiedDate: '{{ response.accessPolicyDetail.lastModifiedDate }}'
+      name: '{{ response.accessPolicyDetail.name }}'
+      policy: '{{ response.accessPolicyDetail.policyVersion }}'
+      policyVersion: '{{ response.accessPolicyDetail.policyVersion }}'
+      type: '{{ response.accessPolicyDetail.type }}'
+      accessPolicyDetail: '{{ response.accessPolicyDetail.type }}'
+- discovery_id: aws.opensearchserverless.get_index
+  calls:
+  - action: get_index
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      indexSchema: '{{ response.indexSchema }}'
+- discovery_id: aws.opensearchserverless.get_security_config
+  for_each: aws.opensearchserverless.list_collections
+  calls:
+  - action: get_security_config
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      configVersion: '{{ response.securityConfigDetail.configVersion }}'
+      createdDate: '{{ response.securityConfigDetail.createdDate }}'
+      description: '{{ response.securityConfigDetail.description }}'
+      iamFederationOptions: '{{ response.securityConfigDetail.iamFederationOptions }}'
+      iamIdentityCenterOptions: '{{ response.securityConfigDetail.iamIdentityCenterOptions.instanceArn }}'
+      id: '{{ response.securityConfigDetail.id }}'
+      lastModifiedDate: '{{ response.securityConfigDetail.lastModifiedDate }}'
+      samlOptions: '{{ response.securityConfigDetail.samlOptions.metadata }}'
+      type: '{{ response.securityConfigDetail.type }}'
+      securityConfigDetail: '{{ response.securityConfigDetail.id }}'
+      applicationArn: '{{ response.securityConfigDetail.iamIdentityCenterOptions.applicationArn }}'
+      applicationDescription: '{{ response.securityConfigDetail.iamIdentityCenterOptions.applicationDescription }}'
+      applicationName: '{{ response.securityConfigDetail.iamIdentityCenterOptions.applicationName }}'
+      groupAttribute: '{{ response.securityConfigDetail.iamIdentityCenterOptions.groupAttribute }}'
+      instanceArn: '{{ response.securityConfigDetail.iamIdentityCenterOptions.instanceArn }}'
+      userAttribute: '{{ response.securityConfigDetail.iamIdentityCenterOptions.userAttribute }}'
+      metadata: '{{ response.securityConfigDetail.samlOptions.metadata }}'
+      openSearchServerlessEntityId: '{{ response.securityConfigDetail.samlOptions.openSearchServerlessEntityId }}'
+      sessionTimeout: '{{ response.securityConfigDetail.samlOptions.sessionTimeout }}'
+- discovery_id: aws.opensearchserverless.get_security_policy
+  for_each: aws.opensearchserverless.list_collections
+  calls:
+  - action: get_security_policy
+    params:
+      type: '{{ item.type }}'
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdDate: '{{ response.securityPolicyDetail.createdDate }}'
+      description: '{{ response.securityPolicyDetail.description }}'
+      lastModifiedDate: '{{ response.securityPolicyDetail.lastModifiedDate }}'
+      name: '{{ response.securityPolicyDetail.name }}'
+      policy: '{{ response.securityPolicyDetail.policyVersion }}'
+      policyVersion: '{{ response.securityPolicyDetail.policyVersion }}'
+      type: '{{ response.securityPolicyDetail.type }}'
+      securityPolicyDetail: '{{ response.securityPolicyDetail.type }}'
+- discovery_id: aws.opensearchserverless.list_access_policies
+  calls:
+  - action: list_access_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.accessPolicySummaries }}'
+    item:
+      createdDate: '{{ item.createdDate }}'
+      description: '{{ item.description }}'
+      lastModifiedDate: '{{ item.lastModifiedDate }}'
+      name: '{{ item.name }}'
+      policyVersion: '{{ item.policyVersion }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.opensearchserverless.list_lifecycle_policies
+  calls:
+  - action: list_lifecycle_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.lifecyclePolicySummaries }}'
+    item:
+      createdDate: '{{ item.createdDate }}'
+      description: '{{ item.description }}'
+      lastModifiedDate: '{{ item.lastModifiedDate }}'
+      name: '{{ item.name }}'
+      policyVersion: '{{ item.policyVersion }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.opensearchserverless.list_security_configs
+  calls:
+  - action: list_security_configs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.securityConfigSummaries }}'
+    item:
+      configVersion: '{{ item.configVersion }}'
+      createdDate: '{{ item.createdDate }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      lastModifiedDate: '{{ item.lastModifiedDate }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.opensearchserverless.list_security_policies
+  calls:
+  - action: list_security_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.securityPolicySummaries }}'
+    item:
+      createdDate: '{{ item.createdDate }}'
+      description: '{{ item.description }}'
+      lastModifiedDate: '{{ item.lastModifiedDate }}'
+      name: '{{ item.name }}'
+      policyVersion: '{{ item.policyVersion }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.opensearchserverless.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'

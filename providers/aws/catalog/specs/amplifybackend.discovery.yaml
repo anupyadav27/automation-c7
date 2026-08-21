@@ -1,0 +1,144 @@
+version: '1.0'
+provider: aws
+service: amplifybackend
+services:
+  client: amplifybackend
+  module: boto3.client
+discovery:
+- discovery_id: aws.amplifybackend.list_s3_buckets
+  calls:
+  - action: list_s3_buckets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Buckets }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      Name: '{{ item.Name }}'
+- discovery_id: aws.amplifybackend.get_backend
+  calls:
+  - action: get_backend
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.BackendEnvironmentList }}'
+    item:
+      AmplifyFeatureFlags: '{{ response.AmplifyFeatureFlags }}'
+      AmplifyMetaConfig: '{{ response.AmplifyMetaConfig }}'
+      AppId: '{{ response.AppId }}'
+      AppName: '{{ response.AppName }}'
+      BackendEnvironmentName: '{{ response.BackendEnvironmentName }}'
+      Error: '{{ response.Error }}'
+- discovery_id: aws.amplifybackend.get_backend_api
+  calls:
+  - action: get_backend_api
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AdditionalAuthTypes: '{{ response.ResourceConfig.AdditionalAuthTypes }}'
+      ApiName: '{{ response.ResourceConfig.ApiName }}'
+      ConflictResolution: '{{ response.ResourceConfig.ConflictResolution }}'
+      DefaultAuthType: '{{ response.ResourceConfig.DefaultAuthType }}'
+      Service: '{{ response.ResourceConfig.Service }}'
+      TransformSchema: '{{ response.ResourceConfig.TransformSchema }}'
+- discovery_id: aws.amplifybackend.get_backend_api_models
+  calls:
+  - action: get_backend_api_models
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Models: '{{ response.Models }}'
+- discovery_id: aws.amplifybackend.get_backend_auth
+  calls:
+  - action: get_backend_auth
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AuthResources: '{{ response.ResourceConfig.AuthResources }}'
+      IdentityPoolConfigs: '{{ response.ResourceConfig.IdentityPoolConfigs }}'
+      Service: '{{ response.ResourceConfig.Service }}'
+      UserPoolConfigs: '{{ response.ResourceConfig.UserPoolConfigs }}'
+      AppId: '{{ response.AppId }}'
+      BackendEnvironmentName: '{{ response.BackendEnvironmentName }}'
+      Error: '{{ response.Error }}'
+      IdentityPoolName: '{{ response.ResourceConfig.IdentityPoolConfigs.IdentityPoolName }}'
+      UnauthenticatedLogin: '{{ response.ResourceConfig.IdentityPoolConfigs.UnauthenticatedLogin }}'
+      DeliveryMethod: '{{ response.ResourceConfig.UserPoolConfigs.ForgotPassword.DeliveryMethod }}'
+      EmailMessage: '{{ response.ResourceConfig.UserPoolConfigs.ForgotPassword.EmailSettings.EmailMessage }}'
+      EmailSubject: '{{ response.ResourceConfig.UserPoolConfigs.ForgotPassword.EmailSettings.EmailSubject }}'
+      SmsMessage: '{{ response.ResourceConfig.UserPoolConfigs.ForgotPassword.SmsSettings.SmsMessage }}'
+      MFAMode: '{{ response.ResourceConfig.UserPoolConfigs.Mfa.MFAMode }}'
+      DomainPrefix: '{{ response.ResourceConfig.UserPoolConfigs.OAuth.DomainPrefix }}'
+      OAuthGrantType: '{{ response.ResourceConfig.UserPoolConfigs.OAuth.OAuthGrantType }}'
+      MinimumLength: '{{ response.ResourceConfig.UserPoolConfigs.PasswordPolicy.MinimumLength }}'
+      SignInMethod: '{{ response.ResourceConfig.UserPoolConfigs.SignInMethod }}'
+      UserPoolName: '{{ response.ResourceConfig.UserPoolConfigs.UserPoolName }}'
+      ResourceName: '{{ response.ResourceName }}'
+- discovery_id: aws.amplifybackend.get_backend_job
+  calls:
+  - action: get_backend_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreateTime: '{{ response.CreateTime }}'
+      Status: '{{ response.Status }}'
+      AppId: '{{ response.AppId }}'
+      BackendEnvironmentName: '{{ response.BackendEnvironmentName }}'
+      Error: '{{ response.Error }}'
+      JobId: '{{ response.JobId }}'
+      Operation: '{{ response.Operation }}'
+      UpdateTime: '{{ response.UpdateTime }}'
+- discovery_id: aws.amplifybackend.get_backend_storage
+  calls:
+  - action: get_backend_storage
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      BucketName: '{{ response.ResourceConfig.BucketName }}'
+      Imported: '{{ response.ResourceConfig.Imported }}'
+      Permissions: '{{ response.ResourceConfig.Permissions }}'
+      ServiceName: '{{ response.ResourceConfig.ServiceName }}'
+      AppId: '{{ response.AppId }}'
+      BackendEnvironmentName: '{{ response.BackendEnvironmentName }}'
+      ResourceName: '{{ response.ResourceName }}'
+- discovery_id: aws.amplifybackend.get_token
+  calls:
+  - action: get_token
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AppId: '{{ response.AppId }}'
+      ChallengeCode: '{{ response.ChallengeCode }}'
+      SessionId: '{{ response.SessionId }}'
+      Ttl: '{{ response.Ttl }}'
+- discovery_id: aws.amplifybackend.list_backend_jobs
+  calls:
+  - action: list_backend_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Jobs }}'
+    item:
+      CreateTime: '{{ item.CreateTime }}'
+      Status: '{{ item.Status }}'
+      AppId: '{{ item.AppId }}'
+      BackendEnvironmentName: '{{ item.Jobs[].BackendEnvironmentName }}'
+      Error: '{{ item.Error }}'
+      JobId: '{{ item.JobId }}'
+      Operation: '{{ item.Operation }}'
+      UpdateTime: '{{ item.UpdateTime }}'

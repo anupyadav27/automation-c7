@@ -1,0 +1,229 @@
+version: '1.0'
+provider: aws
+service: iotthingsgraph
+services:
+  client: iotthingsgraph
+  module: boto3.client
+discovery:
+- discovery_id: aws.iotthingsgraph.describe_namespace
+  calls:
+  - action: describe_namespace
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      namespaceArn: '{{ response.namespaceArn }}'
+      namespaceName: '{{ response.namespaceName }}'
+      namespaceVersion: '{{ response.namespaceVersion }}'
+      trackingNamespaceName: '{{ response.trackingNamespaceName }}'
+      trackingNamespaceVersion: '{{ response.trackingNamespaceVersion }}'
+- discovery_id: aws.iotthingsgraph.get_namespace_deletion_status
+  calls:
+  - action: get_namespace_deletion_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      errorCode: '{{ response.errorCode }}'
+      errorMessage: '{{ response.errorMessage }}'
+      namespaceArn: '{{ response.namespaceArn }}'
+      namespaceName: '{{ response.namespaceName }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.iotthingsgraph.search_flow_templates
+  calls:
+  - action: search_flow_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.summaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotthingsgraph.search_system_instances
+  calls:
+  - action: search_system_instances
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.summaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotthingsgraph.search_system_templates
+  calls:
+  - action: search_system_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.summaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotthingsgraph.get_entities
+  calls:
+  - action: get_entities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.descriptions }}'
+    item:
+      description: '{{ item.description }}'
+      descriptions: '{{ item.descriptions }}'
+- discovery_id: aws.iotthingsgraph.get_flow_template
+  calls:
+  - action: get_flow_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      description: '{{ response.description.description }}'
+      namespaceVersion: '{{ response.description.namespaceVersion }}'
+      summary: '{{ response.description.summary.id }}'
+      trackingNamespaceVersion: '{{ response.description.trackingNamespaceVersion }}'
+      validatedNamespaceVersion: '{{ response.description.validatedNamespaceVersion }}'
+      language: '{{ response.description.definition.language }}'
+      text: '{{ response.description.definition.text }}'
+      arn: '{{ response.description.summary.arn }}'
+      createdAt: '{{ response.description.summary.createdAt }}'
+      id: '{{ response.description.summary.id }}'
+      revisionNumber: '{{ response.description.summary.revisionNumber }}'
+- discovery_id: aws.iotthingsgraph.get_flow_template_revisions
+  calls:
+  - action: get_flow_template_revisions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.summaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotthingsgraph.get_system_instance
+  calls:
+  - action: get_system_instance
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.description.Status }}'
+      Enabled: '{{ response.description.Enabled }}'
+      flowActionsRoleArn: '{{ response.description.flowActionsRoleArn }}'
+      metricsConfiguration: '{{ response.description.metricsConfiguration }}'
+      s3BucketName: '{{ response.description.s3BucketName }}'
+      summary: '{{ response.description.summary.id }}'
+      validatedDependencyRevisions: '{{ response.description.validatedDependencyRevisions[].id }}'
+      validatedNamespaceVersion: '{{ response.description.validatedNamespaceVersion }}'
+      language: '{{ response.description.definition.language }}'
+      text: '{{ response.description.definition.text }}'
+      cloudMetricEnabled: '{{ response.description.metricsConfiguration.cloudMetricEnabled }}'
+      metricRuleRoleArn: '{{ response.description.metricsConfiguration.metricRuleRoleArn }}'
+      arn: '{{ response.description.summary.arn }}'
+      createdAt: '{{ response.description.summary.createdAt }}'
+      greengrassGroupId: '{{ response.description.summary.greengrassGroupId }}'
+      greengrassGroupName: '{{ response.description.summary.greengrassGroupName }}'
+      greengrassGroupVersionId: '{{ response.description.summary.greengrassGroupVersionId }}'
+      id: '{{ response.description.summary.id }}'
+      status: '{{ response.description.summary.status }}'
+      target: '{{ response.description.summary.target }}'
+      updatedAt: '{{ response.description.summary.updatedAt }}'
+- discovery_id: aws.iotthingsgraph.get_system_template
+  calls:
+  - action: get_system_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      summary: '{{ response.description.summary.id }}'
+      validatedNamespaceVersion: '{{ response.description.validatedNamespaceVersion }}'
+      language: '{{ response.description.definition.language }}'
+      text: '{{ response.description.definition.text }}'
+      arn: '{{ response.description.summary.arn }}'
+      createdAt: '{{ response.description.summary.createdAt }}'
+      id: '{{ response.description.summary.id }}'
+      revisionNumber: '{{ response.description.summary.revisionNumber }}'
+- discovery_id: aws.iotthingsgraph.get_system_template_revisions
+  calls:
+  - action: get_system_template_revisions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.summaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotthingsgraph.get_upload_status
+  calls:
+  - action: get_upload_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.failureReason }}'
+    item:
+      createdDate: '{{ response.createdDate }}'
+      namespaceArn: '{{ response.namespaceArn }}'
+      namespaceName: '{{ response.namespaceName }}'
+      namespaceVersion: '{{ response.namespaceVersion }}'
+      uploadId: '{{ response.uploadId }}'
+      uploadStatus: '{{ response.uploadStatus }}'
+- discovery_id: aws.iotthingsgraph.list_flow_execution_messages
+  calls:
+  - action: list_flow_execution_messages
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.messages }}'
+    item:
+      eventType: '{{ item.eventType }}'
+      messageId: '{{ item.messageId }}'
+      payload: '{{ item.payload }}'
+      timestamp: '{{ item.timestamp }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotthingsgraph.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotthingsgraph.search_entities
+  calls:
+  - action: search_entities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.descriptions }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotthingsgraph.search_flow_executions
+  calls:
+  - action: search_flow_executions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.summaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotthingsgraph.search_things
+  calls:
+  - action: search_things
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.things }}'
+    item:
+      nextToken: '{{ response.nextToken }}'

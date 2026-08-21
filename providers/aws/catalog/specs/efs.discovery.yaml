@@ -1,0 +1,125 @@
+version: '1.0'
+provider: aws
+service: efs
+discovery:
+- calls:
+  - action: describe_access_points
+    on_error: continue
+    save_as: response
+  discovery_id: aws.efs.describe_access_points
+  emit:
+    as: item
+    item:
+      AccessPointArn: '{{ item.AccessPointArn }}'
+      AccessPointId: '{{ item.AccessPointId }}'
+      AccessPoints: '{{ item.AccessPoints }}'
+      ClientToken: '{{ item.ClientToken }}'
+      FileSystemId: '{{ item.FileSystemId }}'
+      LifeCycleState: '{{ item.LifeCycleState }}'
+      Name: '{{ item.Name }}'
+      OwnerId: '{{ item.OwnerId }}'
+      Policy: '{{ item.Policy }}'
+      PosixUser: '{{ item.PosixUser }}'
+      RootDirectory: '{{ item.RootDirectory }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.AccessPoints }}'
+  resource_type: efs_access_point
+- calls:
+  - action: describe_backup_policy
+    on_error: continue
+    params:
+      FileSystemId: '{{ item.FileSystemId }}'
+    save_as: response
+  discovery_id: aws.efs.describe_backup_policy
+  emit:
+    as: item
+    item:
+      BackupPolicy: '{{ response.BackupPolicy.BackupPolicy }}'
+      Statement: '{{ response.BackupPolicy.Statement }}'
+      Status: '{{ response.BackupPolicy.Status }}'
+      Version: '{{ response.BackupPolicy.Version }}'
+  for_each: aws.efs.describe_access_points
+  resource_type: efs_backup_policy
+- calls:
+  - action: describe_file_systems
+    on_error: continue
+    save_as: response
+  discovery_id: aws.efs.describe_file_systems
+  emit:
+    as: item
+    item:
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      AvailabilityZoneName: '{{ item.AvailabilityZoneName }}'
+      CreationTime: '{{ item.CreationTime }}'
+      CreationToken: '{{ item.CreationToken }}'
+      Encrypted: '{{ item.Encrypted }}'
+      FileSystemArn: '{{ item.FileSystemArn }}'
+      FileSystemId: '{{ item.FileSystemId }}'
+      FileSystemProtection: '{{ item.FileSystemProtection }}'
+      FileSystems: '{{ item.FileSystems }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      LifeCycleState: '{{ item.LifeCycleState }}'
+      Name: '{{ item.Name }}'
+      NumberOfMountTargets: '{{ item.NumberOfMountTargets }}'
+      OwnerId: '{{ item.OwnerId }}'
+      PerformanceMode: '{{ item.PerformanceMode }}'
+      ProvisionedThroughputInMibps: '{{ item.ProvisionedThroughputInMibps }}'
+      SizeInBytes: '{{ item.SizeInBytes }}'
+      Tags: '{{ item.Tags }}'
+      ThroughputMode: '{{ item.ThroughputMode }}'
+    items_for: '{{ response.FileSystems }}'
+  resource_type: efs_file_system
+- calls:
+  - action: describe_mount_targets
+    on_error: continue
+    save_as: response
+  discovery_id: aws.efs.describe_mount_targets
+  emit:
+    as: item
+    item:
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      AvailabilityZoneName: '{{ item.AvailabilityZoneName }}'
+      FileSystemId: '{{ item.FileSystemId }}'
+      IpAddress: '{{ item.IpAddress }}'
+      Ipv6Address: '{{ item.Ipv6Address }}'
+      LifeCycleState: '{{ item.LifeCycleState }}'
+      MountTargetId: '{{ item.MountTargetId }}'
+      MountTargets: '{{ item.MountTargets }}'
+      NetworkInterfaceId: '{{ item.NetworkInterfaceId }}'
+      OwnerId: '{{ item.OwnerId }}'
+      SubnetId: '{{ item.SubnetId }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.MountTargets }}'
+  resource_type: efs_mount_target
+- calls:
+  - action: describe_replication_configurations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.efs.describe_replication_configurations
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      Destinations: '{{ item.Destinations }}'
+      OriginalSourceFileSystemArn: '{{ item.OriginalSourceFileSystemArn }}'
+      Replications: '{{ item.Replications }}'
+      SourceFileSystemArn: '{{ item.SourceFileSystemArn }}'
+      SourceFileSystemId: '{{ item.SourceFileSystemId }}'
+      SourceFileSystemOwnerId: '{{ item.SourceFileSystemOwnerId }}'
+      SourceFileSystemRegion: '{{ item.SourceFileSystemRegion }}'
+    items_for: '{{ response.Replications }}'
+  resource_type: efs_replication_configuration
+- calls:
+  - action: describe_file_system_policy
+    on_error: continue
+    params:
+      FileSystemId: '{{ item.FileSystemId }}'
+    save_as: response
+  discovery_id: aws.efs.describe_file_system_policy
+  resource_type: efs_file_system
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      FileSystemId: '{{ response.FileSystemId }}'
+  for_each: aws.efs.describe_file_systems

@@ -1,0 +1,19 @@
+version: '1.0'
+provider: aws
+service: ssm-guiconnect
+services:
+  client: ssm-guiconnect
+  module: boto3.client
+discovery:
+- discovery_id: aws.ssm-guiconnect.get_connection_recording_preferences
+  calls:
+  - action: get_connection_recording_preferences
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ClientToken: '{{ response.ClientToken }}'
+      ConnectionRecordingPreferences: '{{ response.ConnectionRecordingPreferences.KMSKeyArn }}'
+      KMSKeyArn: '{{ response.KMSKeyArn }}'
+      RecordingDestinations: '{{ response.RecordingDestinations }}'

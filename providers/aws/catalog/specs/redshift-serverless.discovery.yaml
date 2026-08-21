@@ -1,0 +1,580 @@
+version: '1.0'
+provider: aws
+service: redshift-serverless
+services:
+  client: redshift-serverless
+  module: boto3.client
+discovery:
+- discovery_id: aws.redshift-serverless.get_credentials
+  calls:
+  - action: get_credentials
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      dbPassword: '{{ response.dbPassword }}'
+      dbUser: '{{ response.dbUser }}'
+      expiration: '{{ response.expiration }}'
+      nextRefreshTime: '{{ response.nextRefreshTime }}'
+- discovery_id: aws.redshift-serverless.get_snapshot
+  calls:
+  - action: get_snapshot
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      snapshot: '{{ response.snapshot.snapshot }}'
+      snapshotArn: '{{ response.snapshot.snapshotArn }}'
+      snapshotCreateTime: '{{ response.snapshot.snapshotCreateTime }}'
+      snapshotName: '{{ response.snapshot.snapshotName }}'
+      snapshotRemainingDays: '{{ response.snapshot.snapshotRemainingDays }}'
+      snapshotRetentionPeriod: '{{ response.snapshot.snapshotRetentionPeriod }}'
+      snapshotRetentionStartTime: '{{ response.snapshot.snapshotRetentionStartTime
+        }}'
+- discovery_id: aws.redshift-serverless.list_custom_domain_associations
+  calls:
+  - action: list_custom_domain_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.associations }}'
+    item:
+      customDomainCertificateArn: '{{ item.customDomainCertificateArn }}'
+      customDomainCertificateExpiryTime: '{{ item.customDomainCertificateExpiryTime
+        }}'
+      customDomainName: '{{ item.customDomainName }}'
+      workgroupName: '{{ item.workgroupName }}'
+- discovery_id: aws.redshift-serverless.list_endpoint_access
+  calls:
+  - action: list_endpoint_access
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.endpoints }}'
+    item:
+      address: '{{ item.address }}'
+      endpointArn: '{{ item.endpointArn }}'
+      endpointCreateTime: '{{ item.endpointCreateTime }}'
+      endpointName: '{{ item.endpointName }}'
+      endpointStatus: '{{ item.endpointStatus }}'
+      port: '{{ item.port }}'
+      subnetIds: '{{ item.subnetIds }}'
+      vpcEndpoint: '{{ item.vpcEndpoint }}'
+      vpcSecurityGroups: '{{ item.vpcSecurityGroups }}'
+      workgroupName: '{{ item.workgroupName }}'
+- discovery_id: aws.redshift-serverless.list_managed_workgroups
+  calls:
+  - action: list_managed_workgroups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.managedWorkgroups }}'
+    item:
+      creationDate: '{{ item.creationDate }}'
+      managedWorkgroupId: '{{ item.managedWorkgroupId }}'
+      managedWorkgroupName: '{{ item.managedWorkgroupName }}'
+      sourceArn: '{{ item.sourceArn }}'
+      status: '{{ item.status }}'
+- discovery_id: aws.redshift-serverless.list_namespaces
+  calls:
+  - action: list_namespaces
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.namespaces }}'
+    item:
+      adminPasswordSecretArn: '{{ item.adminPasswordSecretArn }}'
+      adminPasswordSecretKmsKeyId: '{{ item.adminPasswordSecretKmsKeyId }}'
+      adminUsername: '{{ item.adminUsername }}'
+      catalogArn: '{{ item.catalogArn }}'
+      creationDate: '{{ item.creationDate }}'
+      dbName: '{{ item.dbName }}'
+      defaultIamRoleArn: '{{ item.defaultIamRoleArn }}'
+      iamRoles: '{{ item.iamRoles }}'
+      kmsKeyId: '{{ item.kmsKeyId }}'
+      lakehouseRegistrationStatus: '{{ item.lakehouseRegistrationStatus }}'
+      logExports: '{{ item.logExports }}'
+      namespaceArn: '{{ item.namespaceArn }}'
+      namespaceId: '{{ item.namespaceId }}'
+      namespaceName: '{{ item.namespaceName }}'
+      status: '{{ item.status }}'
+- discovery_id: aws.redshift-serverless.list_recovery_points
+  calls:
+  - action: list_recovery_points
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recoveryPoints }}'
+    item:
+      namespaceArn: '{{ item.namespaceArn }}'
+      namespaceName: '{{ item.namespaceName }}'
+      recoveryPointCreateTime: '{{ item.recoveryPointCreateTime }}'
+      recoveryPointId: '{{ item.recoveryPointId }}'
+      totalSizeInMegaBytes: '{{ item.totalSizeInMegaBytes }}'
+      workgroupName: '{{ item.workgroupName }}'
+- discovery_id: aws.redshift-serverless.list_reservation_offerings
+  calls:
+  - action: list_reservation_offerings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.reservationOfferingsList }}'
+    item:
+      currencyCode: '{{ item.currencyCode }}'
+      duration: '{{ item.duration }}'
+      hourlyCharge: '{{ item.hourlyCharge }}'
+      offeringId: '{{ item.offeringId }}'
+      offeringType: '{{ item.offeringType }}'
+      upfrontCharge: '{{ item.upfrontCharge }}'
+- discovery_id: aws.redshift-serverless.list_reservations
+  calls:
+  - action: list_reservations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.reservationsList }}'
+    item:
+      capacity: '{{ item.capacity }}'
+      endDate: '{{ item.endDate }}'
+      offering: '{{ item.offering }}'
+      reservationArn: '{{ item.reservationArn }}'
+      reservationId: '{{ item.reservationId }}'
+      startDate: '{{ item.startDate }}'
+      status: '{{ item.status }}'
+- discovery_id: aws.redshift-serverless.list_scheduled_actions
+  calls:
+  - action: list_scheduled_actions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.scheduledActions }}'
+    item:
+      namespaceName: '{{ item.namespaceName }}'
+      scheduledActionName: '{{ item.scheduledActionName }}'
+- discovery_id: aws.redshift-serverless.list_snapshot_copy_configurations
+  calls:
+  - action: list_snapshot_copy_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.snapshotCopyConfigurations }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      destinationKmsKeyId: '{{ item.destinationKmsKeyId }}'
+      destinationRegion: '{{ item.destinationRegion }}'
+      namespaceName: '{{ item.namespaceName }}'
+      snapshot: '{{ item.snapshot }}'
+      snapshotCopyConfigurationArn: '{{ item.snapshotCopyConfigurationArn }}'
+      snapshotCopyConfigurationId: '{{ item.snapshotCopyConfigurationId }}'
+      snapshotRetentionPeriod: '{{ item.snapshotRetentionPeriod }}'
+- discovery_id: aws.redshift-serverless.list_snapshots
+  calls:
+  - action: list_snapshots
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.snapshots }}'
+    item:
+      accountsWithProvisionedRestoreAccess: '{{ item.accountsWithProvisionedRestoreAccess
+        }}'
+      accountsWithRestoreAccess: '{{ item.accountsWithRestoreAccess }}'
+      actualIncrementalBackupSizeInMegaBytes: '{{ item.actualIncrementalBackupSizeInMegaBytes
+        }}'
+      adminPasswordSecretArn: '{{ item.adminPasswordSecretArn }}'
+      adminPasswordSecretKmsKeyId: '{{ item.adminPasswordSecretKmsKeyId }}'
+      adminUsername: '{{ item.adminUsername }}'
+      backupProgressInMegaBytes: '{{ item.backupProgressInMegaBytes }}'
+      currentBackupRateInMegaBytesPerSecond: '{{ item.currentBackupRateInMegaBytesPerSecond
+        }}'
+      elapsedTimeInSeconds: '{{ item.elapsedTimeInSeconds }}'
+      estimatedSecondsToCompletion: '{{ item.estimatedSecondsToCompletion }}'
+      kmsKeyId: '{{ item.kmsKeyId }}'
+      namespaceArn: '{{ item.namespaceArn }}'
+      namespaceName: '{{ item.namespaceName }}'
+      ownerAccount: '{{ item.ownerAccount }}'
+      snapshot: '{{ item.snapshot }}'
+      snapshotArn: '{{ item.snapshotArn }}'
+      snapshotCreateTime: '{{ item.snapshotCreateTime }}'
+      snapshotName: '{{ item.snapshotName }}'
+      snapshotRemainingDays: '{{ item.snapshotRemainingDays }}'
+      snapshotRetentionPeriod: '{{ item.snapshotRetentionPeriod }}'
+      snapshotRetentionStartTime: '{{ item.snapshotRetentionStartTime }}'
+      status: '{{ item.status }}'
+      totalBackupSizeInMegaBytes: '{{ item.totalBackupSizeInMegaBytes }}'
+- discovery_id: aws.redshift-serverless.list_table_restore_status
+  calls:
+  - action: list_table_restore_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tableRestoreStatuses }}'
+    item:
+      message: '{{ item.message }}'
+      namespaceName: '{{ item.namespaceName }}'
+      newTableName: '{{ item.newTableName }}'
+      progressInMegaBytes: '{{ item.progressInMegaBytes }}'
+      recoveryPointId: '{{ item.recoveryPointId }}'
+      requestTime: '{{ item.requestTime }}'
+      snapshotName: '{{ item.snapshotName }}'
+      sourceDatabaseName: '{{ item.sourceDatabaseName }}'
+      sourceSchemaName: '{{ item.sourceSchemaName }}'
+      sourceTableName: '{{ item.sourceTableName }}'
+      status: '{{ item.status }}'
+      tableRestoreRequestId: '{{ item.tableRestoreRequestId }}'
+      targetDatabaseName: '{{ item.targetDatabaseName }}'
+      targetSchemaName: '{{ item.targetSchemaName }}'
+      totalDataInMegaBytes: '{{ item.totalDataInMegaBytes }}'
+      workgroupName: '{{ item.workgroupName }}'
+- discovery_id: aws.redshift-serverless.list_tracks
+  calls:
+  - action: list_tracks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tracks }}'
+    item:
+      track: '{{ item.track }}'
+      trackName: '{{ item.trackName }}'
+      updateTargets: '{{ item.updateTargets }}'
+      workgroupVersion: '{{ item.workgroupVersion }}'
+- discovery_id: aws.redshift-serverless.list_usage_limits
+  calls:
+  - action: list_usage_limits
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.usageLimits }}'
+    item:
+      amount: '{{ item.amount }}'
+      breachAction: '{{ item.breachAction }}'
+      key: '{{ item.key }}'
+      period: '{{ item.period }}'
+      policy: '{{ item.policy }}'
+      resourceArn: '{{ item.resourceArn }}'
+      resourcePolicy: '{{ item.resourcePolicy }}'
+      usageLimitArn: '{{ item.usageLimitArn }}'
+      usageLimitId: '{{ item.usageLimitId }}'
+      usageType: '{{ item.usageType }}'
+      value: '{{ item.value }}'
+- discovery_id: aws.redshift-serverless.list_workgroups
+  calls:
+  - action: list_workgroups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workgroups }}'
+    item:
+      baseCapacity: '{{ item.baseCapacity }}'
+      configParameters: '{{ item.configParameters }}'
+      creationDate: '{{ item.creationDate }}'
+      crossAccountVpcs: '{{ item.crossAccountVpcs }}'
+      customDomainCertificateArn: '{{ item.customDomainCertificateArn }}'
+      customDomainCertificateExpiryTime: '{{ item.customDomainCertificateExpiryTime
+        }}'
+      customDomainName: '{{ item.customDomainName }}'
+      endpoint: '{{ item.endpoint }}'
+      enhancedVpcRouting: '{{ item.enhancedVpcRouting }}'
+      ipAddressType: '{{ item.ipAddressType }}'
+      maxCapacity: '{{ item.maxCapacity }}'
+      namespaceName: '{{ item.namespaceName }}'
+      patchVersion: '{{ item.patchVersion }}'
+      pendingTrackName: '{{ item.pendingTrackName }}'
+      port: '{{ item.port }}'
+      pricePerformanceTarget: '{{ item.pricePerformanceTarget }}'
+      publiclyAccessible: '{{ item.publiclyAccessible }}'
+      securityGroupIds: '{{ item.securityGroupIds }}'
+      status: '{{ item.status }}'
+      subnetIds: '{{ item.subnetIds }}'
+      trackName: '{{ item.trackName }}'
+      workgroupArn: '{{ item.workgroupArn }}'
+      workgroupId: '{{ item.workgroupId }}'
+      workgroupName: '{{ item.workgroupName }}'
+      workgroupVersion: '{{ item.workgroupVersion }}'
+- discovery_id: aws.redshift-serverless.get_custom_domain_association
+  for_each: aws.redshift-serverless.list_custom_domain_associations
+  calls:
+  - action: get_custom_domain_association
+    params:
+      customDomainName: '{{ item.customDomainName }}'
+      workgroupName: '{{ item.workgroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      customDomainCertificateArn: '{{ response.customDomainCertificateArn }}'
+      customDomainCertificateExpiryTime: '{{ response.customDomainCertificateExpiryTime
+        }}'
+      customDomainName: '{{ response.customDomainName }}'
+      workgroupName: '{{ response.workgroupName }}'
+- discovery_id: aws.redshift-serverless.get_endpoint_access
+  for_each: aws.redshift-serverless.list_endpoint_access
+  calls:
+  - action: get_endpoint_access
+    params:
+      endpointName: '{{ item.endpointName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      address: '{{ response.endpoint.address }}'
+      endpointArn: '{{ response.endpoint.endpointArn }}'
+      endpointCreateTime: '{{ response.endpoint.endpointCreateTime }}'
+      endpointName: '{{ response.endpoint.endpointName }}'
+      endpointStatus: '{{ response.endpoint.endpointStatus }}'
+      port: '{{ response.endpoint.port }}'
+      subnetIds: '{{ response.endpoint.subnetIds }}'
+      vpcEndpoint: '{{ response.endpoint.vpcEndpoint }}'
+      vpcSecurityGroups: '{{ response.endpoint.vpcSecurityGroups }}'
+      workgroupName: '{{ response.endpoint.workgroupName }}'
+- discovery_id: aws.redshift-serverless.get_namespace
+  for_each: aws.redshift-serverless.get_snapshot
+  calls:
+  - action: get_namespace
+    params:
+      namespaceName: '{{ item.namespaceName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      adminPasswordSecretArn: '{{ response.namespace.adminPasswordSecretArn }}'
+      adminPasswordSecretKmsKeyId: '{{ response.namespace.adminPasswordSecretKmsKeyId
+        }}'
+      adminUsername: '{{ response.namespace.adminUsername }}'
+      catalogArn: '{{ response.namespace.catalogArn }}'
+      creationDate: '{{ response.namespace.creationDate }}'
+      dbName: '{{ response.namespace.dbName }}'
+      defaultIamRoleArn: '{{ response.namespace.defaultIamRoleArn }}'
+      iamRoles: '{{ response.namespace.iamRoles }}'
+      kmsKeyId: '{{ response.namespace.kmsKeyId }}'
+      lakehouseRegistrationStatus: '{{ response.namespace.lakehouseRegistrationStatus
+        }}'
+      logExports: '{{ response.namespace.logExports }}'
+      namespaceArn: '{{ response.namespace.namespaceArn }}'
+      namespaceId: '{{ response.namespace.namespaceId }}'
+      namespaceName: '{{ response.namespace.namespaceName }}'
+      status: '{{ response.namespace.status }}'
+- discovery_id: aws.redshift-serverless.get_recovery_point
+  for_each: aws.redshift-serverless.list_recovery_points
+  calls:
+  - action: get_recovery_point
+    params:
+      recoveryPointId: '{{ item.recoveryPointId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      namespaceArn: '{{ response.recoveryPoint.namespaceArn }}'
+      namespaceName: '{{ response.recoveryPoint.namespaceName }}'
+      recoveryPointCreateTime: '{{ response.recoveryPoint.recoveryPointCreateTime
+        }}'
+      recoveryPointId: '{{ response.recoveryPoint.recoveryPointId }}'
+      totalSizeInMegaBytes: '{{ response.recoveryPoint.totalSizeInMegaBytes }}'
+      workgroupName: '{{ response.recoveryPoint.workgroupName }}'
+- discovery_id: aws.redshift-serverless.get_reservation
+  for_each: aws.redshift-serverless.list_reservations
+  calls:
+  - action: get_reservation
+    params:
+      reservationId: '{{ item.reservationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      capacity: '{{ response.reservation.capacity }}'
+      endDate: '{{ response.reservation.endDate }}'
+      offering: '{{ response.reservation.offering }}'
+      reservationArn: '{{ response.reservation.reservationArn }}'
+      reservationId: '{{ response.reservation.reservationId }}'
+      startDate: '{{ response.reservation.startDate }}'
+      status: '{{ response.reservation.status }}'
+- discovery_id: aws.redshift-serverless.get_reservation_offering
+  for_each: aws.redshift-serverless.list_reservation_offerings
+  calls:
+  - action: get_reservation_offering
+    params:
+      offeringId: '{{ item.offeringId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      currencyCode: '{{ response.reservationOffering.currencyCode }}'
+      duration: '{{ response.reservationOffering.duration }}'
+      hourlyCharge: '{{ response.reservationOffering.hourlyCharge }}'
+      offeringId: '{{ response.reservationOffering.offeringId }}'
+      offeringType: '{{ response.reservationOffering.offeringType }}'
+      upfrontCharge: '{{ response.reservationOffering.upfrontCharge }}'
+- discovery_id: aws.redshift-serverless.get_resource_policy
+  for_each: aws.redshift-serverless.list_usage_limits
+  calls:
+  - action: get_resource_policy
+    params:
+      resourceArn: '{{ item.resourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Statement: '{{ response.resourcePolicy.Statement }}'
+      Version: '{{ response.resourcePolicy.Version }}'
+      policy: '{{ response.resourcePolicy.policy }}'
+      resourceArn: '{{ response.resourcePolicy.resourceArn }}'
+      resourcePolicy: '{{ response.resourcePolicy.resourcePolicy }}'
+- discovery_id: aws.redshift-serverless.get_scheduled_action
+  for_each: aws.redshift-serverless.list_scheduled_actions
+  calls:
+  - action: get_scheduled_action
+    params:
+      scheduledActionName: '{{ item.scheduledActionName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      endTime: '{{ response.scheduledAction.endTime }}'
+      namespaceName: '{{ response.scheduledAction.namespaceName }}'
+      nextInvocations: '{{ response.scheduledAction.nextInvocations }}'
+      roleArn: '{{ response.scheduledAction.roleArn }}'
+      schedule: '{{ response.scheduledAction.schedule }}'
+      scheduledActionDescription: '{{ response.scheduledAction.scheduledActionDescription
+        }}'
+      scheduledActionName: '{{ response.scheduledAction.scheduledActionName }}'
+      scheduledActionUuid: '{{ response.scheduledAction.scheduledActionUuid }}'
+      startTime: '{{ response.scheduledAction.startTime }}'
+      state: '{{ response.scheduledAction.state }}'
+      targetAction: '{{ response.scheduledAction.targetAction }}'
+- discovery_id: aws.redshift-serverless.get_table_restore_status
+  for_each: aws.redshift-serverless.list_table_restore_status
+  calls:
+  - action: get_table_restore_status
+    params:
+      tableRestoreRequestId: '{{ item.tableRestoreRequestId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      message: '{{ response.tableRestoreStatus.message }}'
+      namespaceName: '{{ response.tableRestoreStatus.namespaceName }}'
+      newTableName: '{{ response.tableRestoreStatus.newTableName }}'
+      progressInMegaBytes: '{{ response.tableRestoreStatus.progressInMegaBytes }}'
+      recoveryPointId: '{{ response.tableRestoreStatus.recoveryPointId }}'
+      requestTime: '{{ response.tableRestoreStatus.requestTime }}'
+      snapshotName: '{{ response.tableRestoreStatus.snapshotName }}'
+      sourceDatabaseName: '{{ response.tableRestoreStatus.sourceDatabaseName }}'
+      sourceSchemaName: '{{ response.tableRestoreStatus.sourceSchemaName }}'
+      sourceTableName: '{{ response.tableRestoreStatus.sourceTableName }}'
+      status: '{{ response.tableRestoreStatus.status }}'
+      tableRestoreRequestId: '{{ response.tableRestoreStatus.tableRestoreRequestId
+        }}'
+      targetDatabaseName: '{{ response.tableRestoreStatus.targetDatabaseName }}'
+      targetSchemaName: '{{ response.tableRestoreStatus.targetSchemaName }}'
+      totalDataInMegaBytes: '{{ response.tableRestoreStatus.totalDataInMegaBytes }}'
+      workgroupName: '{{ response.tableRestoreStatus.workgroupName }}'
+- discovery_id: aws.redshift-serverless.get_track
+  for_each: aws.redshift-serverless.list_tracks
+  calls:
+  - action: get_track
+    params:
+      trackName: '{{ item.trackName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      track: '{{ response.track.track }}'
+      trackName: '{{ response.track.trackName }}'
+      updateTargets: '{{ response.track.updateTargets }}'
+      workgroupVersion: '{{ response.track.workgroupVersion }}'
+- discovery_id: aws.redshift-serverless.get_usage_limit
+  for_each: aws.redshift-serverless.list_usage_limits
+  calls:
+  - action: get_usage_limit
+    params:
+      usageLimitId: '{{ item.usageLimitId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      amount: '{{ response.usageLimit.amount }}'
+      breachAction: '{{ response.usageLimit.breachAction }}'
+      period: '{{ response.usageLimit.period }}'
+      resourceArn: '{{ response.usageLimit.resourceArn }}'
+      usageLimitArn: '{{ response.usageLimit.usageLimitArn }}'
+      usageLimitId: '{{ response.usageLimit.usageLimitId }}'
+      usageType: '{{ response.usageLimit.usageType }}'
+- discovery_id: aws.redshift-serverless.get_workgroup
+  for_each: aws.redshift-serverless.list_custom_domain_associations
+  calls:
+  - action: get_workgroup
+    params:
+      workgroupName: '{{ item.workgroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      baseCapacity: '{{ response.workgroup.baseCapacity }}'
+      configParameters: '{{ response.workgroup.configParameters }}'
+      creationDate: '{{ response.workgroup.creationDate }}'
+      crossAccountVpcs: '{{ response.workgroup.crossAccountVpcs }}'
+      customDomainCertificateArn: '{{ response.workgroup.customDomainCertificateArn
+        }}'
+      customDomainCertificateExpiryTime: '{{ response.workgroup.customDomainCertificateExpiryTime
+        }}'
+      customDomainName: '{{ response.workgroup.customDomainName }}'
+      endpoint: '{{ response.workgroup.endpoint }}'
+      enhancedVpcRouting: '{{ response.workgroup.enhancedVpcRouting }}'
+      ipAddressType: '{{ response.workgroup.ipAddressType }}'
+      maxCapacity: '{{ response.workgroup.maxCapacity }}'
+      namespaceName: '{{ response.workgroup.namespaceName }}'
+      patchVersion: '{{ response.workgroup.patchVersion }}'
+      pendingTrackName: '{{ response.workgroup.pendingTrackName }}'
+      port: '{{ response.workgroup.port }}'
+      pricePerformanceTarget: '{{ response.workgroup.pricePerformanceTarget }}'
+      publiclyAccessible: '{{ response.workgroup.publiclyAccessible }}'
+      securityGroupIds: '{{ response.workgroup.securityGroupIds }}'
+      status: '{{ response.workgroup.status }}'
+      subnetIds: '{{ response.workgroup.subnetIds }}'
+      trackName: '{{ response.workgroup.trackName }}'
+      workgroupArn: '{{ response.workgroup.workgroupArn }}'
+      workgroupId: '{{ response.workgroup.workgroupId }}'
+      workgroupName: '{{ response.workgroup.workgroupName }}'
+      workgroupVersion: '{{ response.workgroup.workgroupVersion }}'
+- discovery_id: aws.redshift-serverless.list_tags_for_resource
+  for_each: aws.redshift-serverless.list_usage_limits
+  calls:
+  - action: list_tags_for_resource
+    params:
+      resourceArn: '{{ item.resourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'

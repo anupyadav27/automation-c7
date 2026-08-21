@@ -1,0 +1,164 @@
+version: '1.0'
+provider: aws
+service: route53-recovery-control-config
+services:
+  client: route53-recovery-control-config
+  module: boto3.client
+discovery:
+- discovery_id: aws.route53-recovery-control-config.list_clusters
+  calls:
+  - action: list_clusters
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Clusters }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      ClusterArn: '{{ item.ClusterArn }}'
+      ClusterEndpoints: '{{ item.ClusterEndpoints }}'
+      NetworkType: '{{ item.NetworkType }}'
+      Owner: '{{ item.Owner }}'
+- discovery_id: aws.route53-recovery-control-config.list_control_panels
+  calls:
+  - action: list_control_panels
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ControlPanels }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      ClusterArn: '{{ item.ClusterArn }}'
+      ControlPanelArn: '{{ item.ControlPanelArn }}'
+      DefaultControlPanel: '{{ item.DefaultControlPanel }}'
+      Owner: '{{ item.Owner }}'
+      RoutingControlCount: '{{ item.RoutingControlCount }}'
+- discovery_id: aws.route53-recovery-control-config.describe_cluster
+  for_each: aws.route53-recovery-control-config.list_clusters
+  calls:
+  - action: describe_cluster
+    params:
+      ClusterArn: '{{ item.ClusterArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.Cluster.Name }}'
+      Status: '{{ response.Cluster.Status }}'
+      ClusterArn: '{{ response.Cluster.ClusterArn }}'
+      ClusterEndpoints: '{{ response.Cluster.ClusterEndpoints }}'
+      NetworkType: '{{ response.Cluster.NetworkType }}'
+      Owner: '{{ response.Cluster.Owner }}'
+- discovery_id: aws.route53-recovery-control-config.describe_control_panel
+  for_each: aws.route53-recovery-control-config.list_control_panels
+  calls:
+  - action: describe_control_panel
+    params:
+      ControlPanelArn: '{{ item.ControlPanelArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.ControlPanel.Name }}'
+      Status: '{{ response.ControlPanel.Status }}'
+      ClusterArn: '{{ response.ControlPanel.ClusterArn }}'
+      ControlPanelArn: '{{ response.ControlPanel.ControlPanelArn }}'
+      DefaultControlPanel: '{{ response.ControlPanel.DefaultControlPanel }}'
+      Owner: '{{ response.ControlPanel.Owner }}'
+      RoutingControlCount: '{{ response.ControlPanel.RoutingControlCount }}'
+- discovery_id: aws.route53-recovery-control-config.describe_routing_control
+  calls:
+  - action: describe_routing_control
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.RoutingControl.Name }}'
+      Status: '{{ response.RoutingControl.Status }}'
+      ControlPanelArn: '{{ response.RoutingControl.ControlPanelArn }}'
+      Owner: '{{ response.RoutingControl.Owner }}'
+      RoutingControlArn: '{{ response.RoutingControl.RoutingControlArn }}'
+- discovery_id: aws.route53-recovery-control-config.describe_safety_rule
+  calls:
+  - action: describe_safety_rule
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.AssertionRule.Name }}'
+      Status: '{{ response.AssertionRule.Status }}'
+      AssertedControls: '{{ response.AssertionRule.AssertedControls }}'
+      ControlPanelArn: '{{ response.AssertionRule.ControlPanelArn }}'
+      Owner: '{{ response.AssertionRule.Owner }}'
+      RuleConfig: '{{ response.AssertionRule.RuleConfig.Type }}'
+      SafetyRuleArn: '{{ response.AssertionRule.SafetyRuleArn }}'
+      WaitPeriodMs: '{{ response.AssertionRule.WaitPeriodMs }}'
+      Inverted: '{{ response.AssertionRule.RuleConfig.Inverted }}'
+      Threshold: '{{ response.AssertionRule.RuleConfig.Threshold }}'
+      Type: '{{ response.AssertionRule.RuleConfig.Type }}'
+- discovery_id: aws.route53-recovery-control-config.get_resource_policy
+  calls:
+  - action: get_resource_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.route53-recovery-control-config.list_associated_route53_health_checks
+  calls:
+  - action: list_associated_route53_health_checks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HealthCheckIds }}'
+- discovery_id: aws.route53-recovery-control-config.list_routing_controls
+  for_each: aws.route53-recovery-control-config.list_control_panels
+  calls:
+  - action: list_routing_controls
+    params:
+      ControlPanelArn: '{{ item.ControlPanelArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RoutingControls }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      ControlPanelArn: '{{ item.ControlPanelArn }}'
+      Owner: '{{ item.Owner }}'
+      RoutingControlArn: '{{ item.RoutingControlArn }}'
+- discovery_id: aws.route53-recovery-control-config.list_safety_rules
+  for_each: aws.route53-recovery-control-config.list_control_panels
+  calls:
+  - action: list_safety_rules
+    params:
+      ControlPanelArn: '{{ item.ControlPanelArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SafetyRules }}'
+    item:
+      ASSERTION: '{{ item.ASSERTION }}'
+      GATING: '{{ item.GATING }}'
+- discovery_id: aws.route53-recovery-control-config.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

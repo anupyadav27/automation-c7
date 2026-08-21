@@ -1,0 +1,144 @@
+version: '1.0'
+provider: aws
+service: cloudformation
+discovery:
+- calls:
+  - action: describe_stacks
+    on_error: continue
+    save_as: response
+  discovery_id: aws.cloudformation.describe_stacks
+  emit:
+    as: item
+    item:
+      Capabilities: '{{ item.Capabilities }}'
+      ChangeSetId: '{{ item.ChangeSetId }}'
+      DeletionMode: '{{ item.DeletionMode }}'
+      Description: '{{ item.Description }}'
+      DetailedStatus: '{{ item.DetailedStatus }}'
+      DisableRollback: '{{ item.DisableRollback }}'
+      DriftInformation: '{{ item.DriftInformation }}'
+      EnableTerminationProtection: '{{ item.Stacks[].EnableTerminationProtection }}'
+      Enabled: '{{ item.Enabled }}'
+      NotificationARNs: '{{ item.NotificationARNs }}'
+      Outputs: '{{ item.Outputs }}'
+      Parameters: '{{ item.Parameters }}'
+      RetainExceptOnCreate: '{{ item.RetainExceptOnCreate }}'
+      RoleARN: '{{ item.RoleARN }}'
+      RollbackConfiguration: '{{ item.RollbackConfiguration }}'
+      StackId: '{{ item.StackId }}'
+      StackName: '{{ item.StackName }}'
+      StackStatus: '{{ item.StackStatus }}'
+      StackStatusReason: '{{ item.StackStatusReason }}'
+      Stacks: '{{ item.Stacks }}'
+      Tags: '{{ item.Tags }}'
+      TimeoutInMinutes: '{{ item.TimeoutInMinutes }}'
+    items_for: '{{ response.Stacks }}'
+- calls:
+  - action: get_hook_result
+    on_error: continue
+    save_as: response
+  discovery_id: aws.cloudformation.get_hook_result
+  emit:
+    as: item
+    item:
+      AnnotationName: '{{ item.AnnotationName }}'
+      Annotations: '{{ item.Annotations }}'
+      RemediationLink: '{{ item.RemediationLink }}'
+      RemediationMessage: '{{ item.RemediationMessage }}'
+      SeverityLevel: '{{ item.SeverityLevel }}'
+      Status: '{{ item.Status }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      Target: '{{ item.Target }}'
+    items_for: '{{ response.Annotations }}'
+- calls:
+  - action: describe_stack_resources
+    on_error: continue
+    save_as: response
+  discovery_id: aws.cloudformation.describe_stack_resources
+  emit:
+    as: item
+    item:
+      Description: '{{ item.Description }}'
+      DriftInformation: '{{ item.DriftInformation }}'
+      LogicalResourceId: '{{ item.LogicalResourceId }}'
+      ModuleInfo: '{{ item.ModuleInfo }}'
+      PhysicalResourceId: '{{ item.PhysicalResourceId }}'
+      ResourceStatus: '{{ item.ResourceStatus }}'
+      ResourceStatusReason: '{{ item.ResourceStatusReason }}'
+      ResourceType: '{{ item.ResourceType }}'
+      StackId: '{{ item.StackId }}'
+      StackName: '{{ item.StackName }}'
+      StackResources: '{{ item.StackResources }}'
+      Timestamp: '{{ item.Timestamp }}'
+    items_for: '{{ response.StackResources }}'
+- calls:
+  - action: describe_stack_events
+    on_error: continue
+    params:
+      StackName: '{{ item.StackName }}'
+    save_as: response
+  discovery_id: aws.cloudformation.describe_stack_events
+  emit:
+    as: item
+    item:
+      ClientRequestToken: '{{ item.ClientRequestToken }}'
+      DetailedStatus: '{{ item.DetailedStatus }}'
+      EventId: '{{ item.EventId }}'
+      HookFailureMode: '{{ item.HookFailureMode }}'
+      HookInvocationId: '{{ item.HookInvocationId }}'
+      HookInvocationPoint: '{{ item.HookInvocationPoint }}'
+      HookStatus: '{{ item.HookStatus }}'
+      HookStatusReason: '{{ item.HookStatusReason }}'
+      HookType: '{{ item.HookType }}'
+      LogicalResourceId: '{{ item.LogicalResourceId }}'
+      OperationId: '{{ item.OperationId }}'
+      PhysicalResourceId: '{{ item.PhysicalResourceId }}'
+      ResourceProperties: '{{ item.ResourceProperties }}'
+      ResourceStatus: '{{ item.ResourceStatus }}'
+      ResourceStatusReason: '{{ item.ResourceStatusReason }}'
+      ResourceType: '{{ item.ResourceType }}'
+      StackId: '{{ item.StackId }}'
+      StackName: '{{ item.StackName }}'
+      Timestamp: '{{ item.Timestamp }}'
+    items_for: '{{ response.StackEvents }}'
+  for_each: aws.cloudformation.describe_stack_resources
+- calls:
+  - action: describe_type
+    on_error: continue
+    save_as: response
+  discovery_id: aws.cloudformation.describe_type
+  emit:
+    as: item
+    item:
+      AutoUpdate: '{{ item.AutoUpdate }}'
+      ConfigurationSchema: '{{ item.ConfigurationSchema }}'
+      DeprecatedStatus: '{{ item.DeprecatedStatus }}'
+      DocumentationUrl: '{{ item.DocumentationUrl }}'
+      ExecutionRoleArn: '{{ item.ExecutionRoleArn }}'
+      LoggingConfig: '{{ item.LoggingConfig }}'
+      OriginalTypeArn: '{{ item.OriginalTypeArn }}'
+      OriginalTypeName: '{{ item.OriginalTypeName }}'
+      ProvisioningType: '{{ item.ProvisioningType }}'
+      PublisherId: '{{ item.PublisherId }}'
+      RequiredActivatedTypes: '{{ item.RequiredActivatedTypes }}'
+      Schema: '{{ item.Schema }}'
+      SourceUrl: '{{ item.SourceUrl }}'
+      SupportedMajorVersions: '{{ item.SupportedMajorVersions }}'
+      TypeNameAlias: '{{ item.TypeNameAlias }}'
+      TypeTestsStatus: '{{ item.TypeTestsStatus }}'
+      TypeTestsStatusDescription: '{{ item.TypeTestsStatusDescription }}'
+      Visibility: '{{ item.Visibility }}'
+      Arn: '{{ response.Arn }}'
+      DefaultVersionId: '{{ response.DefaultVersionId }}'
+      Description: '{{ response.Description }}'
+      IsActivated: '{{ response.IsActivated }}'
+      IsDefaultVersion: '{{ response.IsDefaultVersion }}'
+      LastUpdated: '{{ response.LastUpdated }}'
+      LatestPublicVersion: '{{ response.LatestPublicVersion }}'
+      LogGroupName: '{{ response.LoggingConfig.LogGroupName }}'
+      LogRoleArn: '{{ response.LoggingConfig.LogRoleArn }}'
+      PublicVersionNumber: '{{ response.PublicVersionNumber }}'
+      TimeCreated: '{{ response.TimeCreated }}'
+      Type: '{{ response.Type }}'
+      TypeName: '{{ response.TypeName }}'
+    items_for: '{{ response.RequiredActivatedTypes }}'

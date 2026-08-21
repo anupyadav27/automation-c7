@@ -1,0 +1,619 @@
+version: '1.0'
+provider: aws
+service: chime-sdk-voice
+services:
+  client: chime-sdk-voice
+  module: boto3.client
+discovery:
+- discovery_id: aws.chime-sdk-voice.get_global_settings
+  calls:
+  - action: get_global_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CdrBucket: '{{ response.VoiceConnector.CdrBucket }}'
+      VoiceConnector: '{{ response.VoiceConnector.VoiceConnector }}'
+- discovery_id: aws.chime-sdk-voice.get_phone_number_settings
+  calls:
+  - action: get_phone_number_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CallingName: '{{ response.CallingName }}'
+      CallingNameUpdatedTimestamp: '{{ response.CallingNameUpdatedTimestamp }}'
+- discovery_id: aws.chime-sdk-voice.list_available_voice_connector_regions
+  calls:
+  - action: list_available_voice_connector_regions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VoiceConnectorRegions }}'
+- discovery_id: aws.chime-sdk-voice.list_phone_number_orders
+  calls:
+  - action: list_phone_number_orders
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PhoneNumberOrders }}'
+    item:
+      Status: '{{ item.Status }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      FocDate: '{{ item.FocDate }}'
+      OrderId: '{{ item.OrderId }}'
+      OrderType: '{{ item.OrderType }}'
+      OrderedPhoneNumbers: '{{ item.OrderedPhoneNumbers }}'
+      PhoneNumber: '{{ item.PhoneNumber }}'
+      PhoneNumberOrderId: '{{ item.PhoneNumberOrderId }}'
+      ProductType: '{{ item.ProductType }}'
+      UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+- discovery_id: aws.chime-sdk-voice.list_phone_numbers
+  calls:
+  - action: list_phone_numbers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PhoneNumbers }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      Associations: '{{ item.Associations }}'
+      CallingName: '{{ item.CallingName }}'
+      CallingNameStatus: '{{ item.CallingNameStatus }}'
+      Capabilities: '{{ item.Capabilities }}'
+      Country: '{{ item.Country }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      DeletionTimestamp: '{{ item.DeletionTimestamp }}'
+      E164PhoneNumber: '{{ item.E164PhoneNumber }}'
+      PhoneNumber: '{{ item.PhoneNumber }}'
+      PhoneNumberId: '{{ item.PhoneNumberId }}'
+      ProductType: '{{ item.ProductType }}'
+      Type: '{{ item.Type }}'
+      UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+- discovery_id: aws.chime-sdk-voice.list_sip_media_applications
+  calls:
+  - action: list_sip_media_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SipMediaApplications }}'
+    item:
+      Name: '{{ item.Name }}'
+      AwsRegion: '{{ item.AwsRegion }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      Endpoints: '{{ item.Endpoints }}'
+      SipMediaApplicationArn: '{{ item.SipMediaApplicationArn }}'
+      SipMediaApplicationId: '{{ item.SipMediaApplicationId }}'
+      UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+- discovery_id: aws.chime-sdk-voice.list_sip_rules
+  calls:
+  - action: list_sip_rules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SipRules }}'
+    item:
+      Name: '{{ item.Name }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      Disabled: '{{ item.Disabled }}'
+      SipRuleId: '{{ item.SipRuleId }}'
+      TargetApplications: '{{ item.TargetApplications }}'
+      TriggerType: '{{ item.TriggerType }}'
+      TriggerValue: '{{ item.TriggerValue }}'
+      UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+- discovery_id: aws.chime-sdk-voice.list_voice_connector_groups
+  calls:
+  - action: list_voice_connector_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VoiceConnectorGroups }}'
+    item:
+      Name: '{{ item.Name }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+      VoiceConnectorGroupArn: '{{ item.VoiceConnectorGroupArn }}'
+      VoiceConnectorGroupId: '{{ item.VoiceConnectorGroupId }}'
+      VoiceConnectorItems: '{{ item.VoiceConnectorItems }}'
+- discovery_id: aws.chime-sdk-voice.list_voice_connectors
+  calls:
+  - action: list_voice_connectors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VoiceConnectors }}'
+    item:
+      Name: '{{ item.Name }}'
+      AwsRegion: '{{ item.AwsRegion }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      IntegrationType: '{{ item.IntegrationType }}'
+      NetworkType: '{{ item.NetworkType }}'
+      OutboundHostName: '{{ item.OutboundHostName }}'
+      RequireEncryption: '{{ item.RequireEncryption }}'
+      UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+      VoiceConnectorArn: '{{ item.VoiceConnectorArn }}'
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+- discovery_id: aws.chime-sdk-voice.list_voice_profile_domains
+  calls:
+  - action: list_voice_profile_domains
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VoiceProfileDomains }}'
+    item:
+      Name: '{{ item.Name }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      Description: '{{ item.Description }}'
+      UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+      VoiceProfileDomainArn: '{{ item.VoiceProfileDomainArn }}'
+      VoiceProfileDomainId: '{{ item.VoiceProfileDomainId }}'
+- discovery_id: aws.chime-sdk-voice.search_available_phone_numbers
+  calls:
+  - action: search_available_phone_numbers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.E164PhoneNumbers }}'
+- discovery_id: aws.chime-sdk-voice.get_phone_number
+  for_each: aws.chime-sdk-voice.list_phone_numbers
+  calls:
+  - action: get_phone_number
+    params:
+      PhoneNumberId: '{{ item.PhoneNumberId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.PhoneNumber.Name }}'
+      Status: '{{ response.PhoneNumber.Status }}'
+      Associations: '{{ response.PhoneNumber.Associations[].Name }}'
+      CallingName: '{{ response.PhoneNumber.CallingName }}'
+      CallingNameStatus: '{{ response.PhoneNumber.CallingNameStatus }}'
+      Capabilities: '{{ response.PhoneNumber.Capabilities }}'
+      Country: '{{ response.PhoneNumber.Country }}'
+      CreatedTimestamp: '{{ response.PhoneNumber.CreatedTimestamp }}'
+      DeletionTimestamp: '{{ response.PhoneNumber.DeletionTimestamp }}'
+      E164PhoneNumber: '{{ response.PhoneNumber.E164PhoneNumber }}'
+      OrderId: '{{ response.PhoneNumber.OrderId }}'
+      PhoneNumber: '{{ response.PhoneNumber.PhoneNumberId }}'
+      PhoneNumberId: '{{ response.PhoneNumber.PhoneNumberId }}'
+      ProductType: '{{ response.PhoneNumber.ProductType }}'
+      Type: '{{ response.PhoneNumber.Type }}'
+      UpdatedTimestamp: '{{ response.PhoneNumber.UpdatedTimestamp }}'
+      InboundCall: '{{ response.PhoneNumber.Capabilities.InboundCall }}'
+      InboundMMS: '{{ response.PhoneNumber.Capabilities.InboundMMS }}'
+      InboundSMS: '{{ response.PhoneNumber.Capabilities.InboundSMS }}'
+      OutboundCall: '{{ response.PhoneNumber.Capabilities.OutboundCall }}'
+      OutboundMMS: '{{ response.PhoneNumber.Capabilities.OutboundMMS }}'
+      OutboundSMS: '{{ response.PhoneNumber.Capabilities.OutboundSMS }}'
+- discovery_id: aws.chime-sdk-voice.get_phone_number_order
+  for_each: aws.chime-sdk-voice.list_phone_numbers
+  calls:
+  - action: get_phone_number_order
+    params:
+      PhoneNumberOrderId: '{{ item.PhoneNumberOrderId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.PhoneNumberOrder.Status }}'
+      CreatedTimestamp: '{{ response.PhoneNumberOrder.CreatedTimestamp }}'
+      FocDate: '{{ response.PhoneNumberOrder.FocDate }}'
+      OrderType: '{{ response.PhoneNumberOrder.OrderType }}'
+      OrderedPhoneNumbers: '{{ response.PhoneNumberOrder.OrderedPhoneNumbers[].Status }}'
+      PhoneNumberOrderId: '{{ response.PhoneNumberOrder.PhoneNumberOrderId }}'
+      ProductType: '{{ response.PhoneNumberOrder.ProductType }}'
+      UpdatedTimestamp: '{{ response.PhoneNumberOrder.UpdatedTimestamp }}'
+- discovery_id: aws.chime-sdk-voice.get_proxy_session
+  for_each: aws.chime-sdk-voice.list_voice_connectors
+  calls:
+  - action: get_proxy_session
+    params:
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+      ProxySessionId: '{{ item.ProxySessionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.ProxySession.Name }}'
+      Status: '{{ response.ProxySession.Status }}'
+      Capabilities: '{{ response.ProxySession.Capabilities }}'
+      CreatedTimestamp: '{{ response.ProxySession.CreatedTimestamp }}'
+      EndedTimestamp: '{{ response.ProxySession.EndedTimestamp }}'
+      ExpiryMinutes: '{{ response.ProxySession.ExpiryMinutes }}'
+      GeoMatchLevel: '{{ response.ProxySession.GeoMatchLevel }}'
+      GeoMatchParams: '{{ response.ProxySession.GeoMatchParams.Country }}'
+      NumberSelectionBehavior: '{{ response.ProxySession.NumberSelectionBehavior }}'
+      Participants: '{{ response.ProxySession.Participants }}'
+      ProxySessionId: '{{ response.ProxySession.ProxySessionId }}'
+      UpdatedTimestamp: '{{ response.ProxySession.UpdatedTimestamp }}'
+      VoiceConnectorId: '{{ response.ProxySession.VoiceConnectorId }}'
+      AreaCode: '{{ response.ProxySession.GeoMatchParams.AreaCode }}'
+      Country: '{{ response.ProxySession.GeoMatchParams.Country }}'
+- discovery_id: aws.chime-sdk-voice.get_sip_media_application
+  for_each: aws.chime-sdk-voice.list_sip_media_applications
+  calls:
+  - action: get_sip_media_application
+    params:
+      SipMediaApplicationId: '{{ item.SipMediaApplicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.SipMediaApplication.Name }}'
+      AwsRegion: '{{ response.SipMediaApplication.AwsRegion }}'
+      CreatedTimestamp: '{{ response.SipMediaApplication.CreatedTimestamp }}'
+      Endpoints: '{{ response.SipMediaApplication.Endpoints }}'
+      SipMediaApplicationArn: '{{ response.SipMediaApplication.SipMediaApplicationArn }}'
+      SipMediaApplicationId: '{{ response.SipMediaApplication.SipMediaApplicationId }}'
+      UpdatedTimestamp: '{{ response.SipMediaApplication.UpdatedTimestamp }}'
+- discovery_id: aws.chime-sdk-voice.get_sip_media_application_alexa_skill_configuration
+  for_each: aws.chime-sdk-voice.list_sip_media_applications
+  calls:
+  - action: get_sip_media_application_alexa_skill_configuration
+    params:
+      SipMediaApplicationId: '{{ item.SipMediaApplicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AlexaSkillIds: '{{ response.SipMediaApplicationAlexaSkillConfiguration.AlexaSkillStatus }}'
+      AlexaSkillStatus: '{{ response.SipMediaApplicationAlexaSkillConfiguration.AlexaSkillStatus }}'
+- discovery_id: aws.chime-sdk-voice.get_sip_media_application_logging_configuration
+  for_each: aws.chime-sdk-voice.list_sip_media_applications
+  calls:
+  - action: get_sip_media_application_logging_configuration
+    params:
+      SipMediaApplicationId: '{{ item.SipMediaApplicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      EnableSipMediaApplicationMessageLogs: '{{ response.SipMediaApplicationLoggingConfiguration.EnableSipMediaApplicationMessageLogs }}'
+- discovery_id: aws.chime-sdk-voice.get_sip_rule
+  for_each: aws.chime-sdk-voice.list_sip_rules
+  calls:
+  - action: get_sip_rule
+    params:
+      SipRuleId: '{{ item.SipRuleId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.SipRule.Name }}'
+      CreatedTimestamp: '{{ response.SipRule.CreatedTimestamp }}'
+      Disabled: '{{ response.SipRule.Disabled }}'
+      SipRuleId: '{{ response.SipRule.SipRuleId }}'
+      TargetApplications: '{{ response.SipRule.TargetApplications }}'
+      TriggerType: '{{ response.SipRule.TriggerType }}'
+      TriggerValue: '{{ response.SipRule.TriggerValue }}'
+      UpdatedTimestamp: '{{ response.SipRule.UpdatedTimestamp }}'
+- discovery_id: aws.chime-sdk-voice.get_speaker_search_task
+  for_each: aws.chime-sdk-voice.list_voice_connectors
+  calls:
+  - action: get_speaker_search_task
+    params:
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+      SpeakerSearchTaskId: '{{ item.SpeakerSearchTaskId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CallDetails: '{{ response.SpeakerSearchTask.CallDetails.IsCaller }}'
+      CreatedTimestamp: '{{ response.SpeakerSearchTask.CreatedTimestamp }}'
+      SpeakerSearchDetails: '{{ response.SpeakerSearchTask.SpeakerSearchTaskId }}'
+      SpeakerSearchTaskId: '{{ response.SpeakerSearchTask.SpeakerSearchTaskId }}'
+      SpeakerSearchTaskStatus: '{{ response.SpeakerSearchTask.SpeakerSearchTaskStatus }}'
+      StartedTimestamp: '{{ response.SpeakerSearchTask.StartedTimestamp }}'
+      StatusMessage: '{{ response.SpeakerSearchTask.StatusMessage }}'
+      UpdatedTimestamp: '{{ response.SpeakerSearchTask.UpdatedTimestamp }}'
+      IsCaller: '{{ response.SpeakerSearchTask.CallDetails.IsCaller }}'
+      TransactionId: '{{ response.SpeakerSearchTask.CallDetails.TransactionId }}'
+      VoiceConnectorId: '{{ response.SpeakerSearchTask.CallDetails.VoiceConnectorId }}'
+      VoiceprintGenerationStatus: '{{ response.SpeakerSearchTask.SpeakerSearchDetails.VoiceprintGenerationStatus }}'
+- discovery_id: aws.chime-sdk-voice.get_voice_connector
+  for_each: aws.chime-sdk-voice.list_voice_connectors
+  calls:
+  - action: get_voice_connector
+    params:
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.VoiceConnector.Name }}'
+      AwsRegion: '{{ response.VoiceConnector.AwsRegion }}'
+      CreatedTimestamp: '{{ response.VoiceConnector.CreatedTimestamp }}'
+      IntegrationType: '{{ response.VoiceConnector.IntegrationType }}'
+      NetworkType: '{{ response.VoiceConnector.NetworkType }}'
+      OutboundHostName: '{{ response.VoiceConnector.OutboundHostName }}'
+      RequireEncryption: '{{ response.VoiceConnector.RequireEncryption }}'
+      UpdatedTimestamp: '{{ response.VoiceConnector.UpdatedTimestamp }}'
+      VoiceConnectorArn: '{{ response.VoiceConnector.VoiceConnectorArn }}'
+      VoiceConnectorId: '{{ response.VoiceConnector.VoiceConnectorId }}'
+- discovery_id: aws.chime-sdk-voice.get_voice_connector_emergency_calling_configuration
+  for_each: aws.chime-sdk-voice.list_voice_connectors
+  calls:
+  - action: get_voice_connector_emergency_calling_configuration
+    params:
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DNIS: '{{ response.EmergencyCallingConfiguration.DNIS }}'
+- discovery_id: aws.chime-sdk-voice.get_voice_connector_external_systems_configuration
+  for_each: aws.chime-sdk-voice.list_voice_connectors
+  calls:
+  - action: get_voice_connector_external_systems_configuration
+    params:
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ContactCenterSystemTypes: '{{ response.ExternalSystemsConfiguration.ContactCenterSystemTypes }}'
+      SessionBorderControllerTypes: '{{ response.ExternalSystemsConfiguration.SessionBorderControllerTypes }}'
+- discovery_id: aws.chime-sdk-voice.get_voice_connector_group
+  for_each: aws.chime-sdk-voice.list_voice_connector_groups
+  calls:
+  - action: get_voice_connector_group
+    params:
+      VoiceConnectorGroupId: '{{ item.VoiceConnectorGroupId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.VoiceConnectorGroup.Name }}'
+      CreatedTimestamp: '{{ response.VoiceConnectorGroup.CreatedTimestamp }}'
+      UpdatedTimestamp: '{{ response.VoiceConnectorGroup.UpdatedTimestamp }}'
+      VoiceConnectorGroupArn: '{{ response.VoiceConnectorGroup.VoiceConnectorGroupArn }}'
+      VoiceConnectorGroupId: '{{ response.VoiceConnectorGroup.VoiceConnectorGroupId }}'
+      VoiceConnectorItems: '{{ response.VoiceConnectorGroup.VoiceConnectorItems[].Priority }}'
+- discovery_id: aws.chime-sdk-voice.get_voice_connector_logging_configuration
+  for_each: aws.chime-sdk-voice.list_voice_connectors
+  calls:
+  - action: get_voice_connector_logging_configuration
+    params:
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      EnableMediaMetricLogs: '{{ response.LoggingConfiguration.EnableMediaMetricLogs }}'
+      EnableSIPLogs: '{{ response.LoggingConfiguration.EnableSIPLogs }}'
+- discovery_id: aws.chime-sdk-voice.get_voice_connector_origination
+  for_each: aws.chime-sdk-voice.list_voice_connectors
+  calls:
+  - action: get_voice_connector_origination
+    params:
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Disabled: '{{ response.Origination.Disabled }}'
+      Origination: '{{ response.Origination.Origination }}'
+      Routes: '{{ response.Origination.Routes }}'
+- discovery_id: aws.chime-sdk-voice.get_voice_connector_proxy
+  for_each: aws.chime-sdk-voice.list_voice_connectors
+  calls:
+  - action: get_voice_connector_proxy
+    params:
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DefaultSessionExpiryMinutes: '{{ response.Proxy.DefaultSessionExpiryMinutes }}'
+      Disabled: '{{ response.Proxy.Disabled }}'
+      FallBackPhoneNumber: '{{ response.Proxy.FallBackPhoneNumber }}'
+      PhoneNumberCountries: '{{ response.Proxy.PhoneNumberCountries }}'
+      Proxy: '{{ response.Proxy.Proxy }}'
+- discovery_id: aws.chime-sdk-voice.get_voice_connector_streaming_configuration
+  for_each: aws.chime-sdk-voice.list_voice_connectors
+  calls:
+  - action: get_voice_connector_streaming_configuration
+    params:
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DataRetentionInHours: '{{ response.StreamingConfiguration.DataRetentionInHours }}'
+      Disabled: '{{ response.StreamingConfiguration.Disabled }}'
+      MediaInsightsConfiguration: '{{ response.StreamingConfiguration.MediaInsightsConfiguration.Disabled }}'
+      StreamingNotificationTargets: '{{ response.StreamingConfiguration.StreamingNotificationTargets }}'
+      ConfigurationArn: '{{ response.StreamingConfiguration.MediaInsightsConfiguration.ConfigurationArn }}'
+- discovery_id: aws.chime-sdk-voice.get_voice_connector_termination
+  for_each: aws.chime-sdk-voice.list_voice_connectors
+  calls:
+  - action: get_voice_connector_termination
+    params:
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CallingRegions: '{{ response.Termination.CallingRegions }}'
+      CidrAllowedList: '{{ response.Termination.CidrAllowedList }}'
+      CpsLimit: '{{ response.Termination.CpsLimit }}'
+      DefaultPhoneNumber: '{{ response.Termination.DefaultPhoneNumber }}'
+      Disabled: '{{ response.Termination.Disabled }}'
+      Termination: '{{ response.Termination.Termination }}'
+- discovery_id: aws.chime-sdk-voice.get_voice_connector_termination_health
+  for_each: aws.chime-sdk-voice.list_voice_connectors
+  calls:
+  - action: get_voice_connector_termination_health
+    params:
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Source: '{{ response.TerminationHealth.Source }}'
+      Timestamp: '{{ response.TerminationHealth.Timestamp }}'
+- discovery_id: aws.chime-sdk-voice.get_voice_profile
+  calls:
+  - action: get_voice_profile
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedTimestamp: '{{ response.VoiceProfile.CreatedTimestamp }}'
+      ExpirationTimestamp: '{{ response.VoiceProfile.ExpirationTimestamp }}'
+      UpdatedTimestamp: '{{ response.VoiceProfile.UpdatedTimestamp }}'
+      VoiceProfileArn: '{{ response.VoiceProfile.VoiceProfileArn }}'
+      VoiceProfileDomainId: '{{ response.VoiceProfile.VoiceProfileDomainId }}'
+      VoiceProfileId: '{{ response.VoiceProfile.VoiceProfileId }}'
+- discovery_id: aws.chime-sdk-voice.get_voice_profile_domain
+  for_each: aws.chime-sdk-voice.list_voice_profile_domains
+  calls:
+  - action: get_voice_profile_domain
+    params:
+      VoiceProfileDomainId: '{{ item.VoiceProfileDomainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.VoiceProfileDomain.Name }}'
+      CreatedTimestamp: '{{ response.VoiceProfileDomain.CreatedTimestamp }}'
+      Description: '{{ response.VoiceProfileDomain.Description }}'
+      ServerSideEncryptionConfiguration: '{{ response.VoiceProfileDomain.ServerSideEncryptionConfiguration.KmsKeyArn }}'
+      UpdatedTimestamp: '{{ response.VoiceProfileDomain.UpdatedTimestamp }}'
+      VoiceProfileDomainArn: '{{ response.VoiceProfileDomain.VoiceProfileDomainArn }}'
+      VoiceProfileDomainId: '{{ response.VoiceProfileDomain.VoiceProfileDomainId }}'
+      KmsKeyArn: '{{ response.VoiceProfileDomain.ServerSideEncryptionConfiguration.KmsKeyArn }}'
+- discovery_id: aws.chime-sdk-voice.get_voice_tone_analysis_task
+  for_each: aws.chime-sdk-voice.list_voice_connectors
+  calls:
+  - action: get_voice_tone_analysis_task
+    params:
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+      VoiceToneAnalysisTaskId: '{{ item.VoiceToneAnalysisTaskId }}'
+      IsCaller: '{{ item.IsCaller }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CallDetails: '{{ response.VoiceToneAnalysisTask.CallDetails.IsCaller }}'
+      CreatedTimestamp: '{{ response.VoiceToneAnalysisTask.CreatedTimestamp }}'
+      StartedTimestamp: '{{ response.VoiceToneAnalysisTask.StartedTimestamp }}'
+      StatusMessage: '{{ response.VoiceToneAnalysisTask.StatusMessage }}'
+      UpdatedTimestamp: '{{ response.VoiceToneAnalysisTask.UpdatedTimestamp }}'
+      VoiceToneAnalysisTaskId: '{{ response.VoiceToneAnalysisTask.VoiceToneAnalysisTaskId }}'
+      VoiceToneAnalysisTaskStatus: '{{ response.VoiceToneAnalysisTask.VoiceToneAnalysisTaskStatus }}'
+      IsCaller: '{{ response.VoiceToneAnalysisTask.CallDetails.IsCaller }}'
+      TransactionId: '{{ response.VoiceToneAnalysisTask.CallDetails.TransactionId }}'
+      VoiceConnectorId: '{{ response.VoiceToneAnalysisTask.CallDetails.VoiceConnectorId }}'
+- discovery_id: aws.chime-sdk-voice.list_proxy_sessions
+  for_each: aws.chime-sdk-voice.list_voice_connectors
+  calls:
+  - action: list_proxy_sessions
+    params:
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ProxySessions }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      Capabilities: '{{ item.Capabilities }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      EndedTimestamp: '{{ item.EndedTimestamp }}'
+      ExpiryMinutes: '{{ item.ExpiryMinutes }}'
+      GeoMatchLevel: '{{ item.GeoMatchLevel }}'
+      GeoMatchParams: '{{ item.GeoMatchParams }}'
+      NumberSelectionBehavior: '{{ item.NumberSelectionBehavior }}'
+      Participants: '{{ item.Participants }}'
+      ProxySessionId: '{{ item.ProxySessionId }}'
+      UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+      VoiceConnectorId: '{{ item.VoiceConnectorId }}'
+- discovery_id: aws.chime-sdk-voice.list_supported_phone_number_countries
+  for_each: aws.chime-sdk-voice.list_phone_number_orders
+  calls:
+  - action: list_supported_phone_number_countries
+    params:
+      ProductType: '{{ item.ProductType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PhoneNumberCountries }}'
+    item:
+      CountryCode: '{{ item.CountryCode }}'
+      SupportedPhoneNumberTypes: '{{ item.SupportedPhoneNumberTypes }}'
+- discovery_id: aws.chime-sdk-voice.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.chime-sdk-voice.list_voice_connector_termination_credentials
+  calls:
+  - action: list_voice_connector_termination_credentials
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Usernames }}'
+    item:
+      Termination: '{{ item.Termination }}'
+- discovery_id: aws.chime-sdk-voice.list_voice_profiles
+  for_each: aws.chime-sdk-voice.list_voice_profile_domains
+  calls:
+  - action: list_voice_profiles
+    params:
+      VoiceProfileDomainId: '{{ item.VoiceProfileDomainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VoiceProfiles }}'
+    item:
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      ExpirationTimestamp: '{{ item.ExpirationTimestamp }}'
+      UpdatedTimestamp: '{{ item.UpdatedTimestamp }}'
+      VoiceProfileArn: '{{ item.VoiceProfileArn }}'
+      VoiceProfileDomainId: '{{ item.VoiceProfileDomainId }}'
+      VoiceProfileId: '{{ item.VoiceProfileId }}'

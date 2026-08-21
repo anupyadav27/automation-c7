@@ -1,0 +1,261 @@
+version: '1.0'
+provider: aws
+service: emr-containers
+services:
+  client: emr-containers
+  module: boto3.client
+discovery:
+- discovery_id: aws.emr-containers.list_job_templates
+  calls:
+  - action: list_job_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.templates }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      decryptionError: '{{ item.decryptionError }}'
+      id: '{{ item.id }}'
+      jobTemplate: '{{ item.jobTemplate }}'
+      jobTemplateData: '{{ item.jobTemplateData }}'
+      kmsKeyArn: '{{ item.kmsKeyArn }}'
+      name: '{{ item.name }}'
+      tags: '{{ item.tags }}'
+- discovery_id: aws.emr-containers.list_security_configurations
+  calls:
+  - action: list_security_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.securityConfigurations }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      securityConfiguration: '{{ item.securityConfiguration }}'
+      securityConfigurationData: '{{ item.securityConfigurationData }}'
+      tags: '{{ item.tags }}'
+- discovery_id: aws.emr-containers.list_virtual_clusters
+  calls:
+  - action: list_virtual_clusters
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.virtualClusters }}'
+    item:
+      arn: '{{ item.arn }}'
+      containerProvider: '{{ item.containerProvider }}'
+      createdAt: '{{ item.createdAt }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      securityConfigurationId: '{{ item.securityConfigurationId }}'
+      state: '{{ item.state }}'
+      tags: '{{ item.tags }}'
+- discovery_id: aws.emr-containers.describe_job_run
+  for_each: aws.emr-containers.list_job_templates
+  calls:
+  - action: describe_job_run
+    params:
+      id: '{{ item.id }}'
+      virtualClusterId: '{{ item.virtualClusterId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Statement: '{{ response.jobRun.Statement }}'
+      Version: '{{ response.jobRun.Version }}'
+      arn: '{{ response.jobRun.arn }}'
+      clientToken: '{{ response.jobRun.clientToken }}'
+      configurationOverrides: '{{ response.jobRun.configurationOverrides }}'
+      createdAt: '{{ response.jobRun.createdAt }}'
+      createdBy: '{{ response.jobRun.createdBy }}'
+      executionRoleArn: '{{ response.jobRun.executionRoleArn }}'
+      failureReason: '{{ response.jobRun.failureReason }}'
+      finishedAt: '{{ response.jobRun.finishedAt }}'
+      id: '{{ response.jobRun.id }}'
+      jobDriver: '{{ response.jobRun.jobDriver }}'
+      name: '{{ response.jobRun.name }}'
+      releaseLabel: '{{ response.jobRun.releaseLabel }}'
+      retryPolicyConfiguration: '{{ response.jobRun.retryPolicyConfiguration }}'
+      retryPolicyExecution: '{{ response.jobRun.retryPolicyExecution }}'
+      state: '{{ response.jobRun.state }}'
+      stateDetails: '{{ response.jobRun.stateDetails }}'
+      tags: '{{ response.jobRun.tags }}'
+      virtualClusterId: '{{ response.jobRun.virtualClusterId }}'
+- discovery_id: aws.emr-containers.describe_job_template
+  for_each: aws.emr-containers.list_job_templates
+  calls:
+  - action: describe_job_template
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.jobTemplate.arn }}'
+      createdAt: '{{ response.jobTemplate.createdAt }}'
+      createdBy: '{{ response.jobTemplate.createdBy }}'
+      decryptionError: '{{ response.jobTemplate.decryptionError }}'
+      id: '{{ response.jobTemplate.id }}'
+      jobTemplate: '{{ response.jobTemplate.jobTemplate }}'
+      jobTemplateData: '{{ response.jobTemplate.jobTemplateData }}'
+      kmsKeyArn: '{{ response.jobTemplate.kmsKeyArn }}'
+      name: '{{ response.jobTemplate.name }}'
+      tags: '{{ response.jobTemplate.tags }}'
+- discovery_id: aws.emr-containers.describe_managed_endpoint
+  for_each: aws.emr-containers.list_job_templates
+  calls:
+  - action: describe_managed_endpoint
+    params:
+      id: '{{ item.id }}'
+      virtualClusterId: '{{ item.virtualClusterId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.endpoint.arn }}'
+      certificateArn: '{{ response.endpoint.certificateArn }}'
+      certificateAuthority: '{{ response.endpoint.certificateAuthority }}'
+      configurationOverrides: '{{ response.endpoint.configurationOverrides }}'
+      createdAt: '{{ response.endpoint.createdAt }}'
+      endpoint: '{{ response.endpoint.endpoint }}'
+      executionRoleArn: '{{ response.endpoint.executionRoleArn }}'
+      failureReason: '{{ response.endpoint.failureReason }}'
+      id: '{{ response.endpoint.id }}'
+      name: '{{ response.endpoint.name }}'
+      releaseLabel: '{{ response.endpoint.releaseLabel }}'
+      securityGroup: '{{ response.endpoint.securityGroup }}'
+      serverUrl: '{{ response.endpoint.serverUrl }}'
+      state: '{{ response.endpoint.state }}'
+      stateDetails: '{{ response.endpoint.stateDetails }}'
+      subnetIds: '{{ response.endpoint.subnetIds }}'
+      tags: '{{ response.endpoint.tags }}'
+      type: '{{ response.endpoint.type }}'
+      virtualClusterId: '{{ response.endpoint.virtualClusterId }}'
+- discovery_id: aws.emr-containers.describe_security_configuration
+  for_each: aws.emr-containers.list_job_templates
+  calls:
+  - action: describe_security_configuration
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.securityConfiguration.arn }}'
+      createdAt: '{{ response.securityConfiguration.createdAt }}'
+      createdBy: '{{ response.securityConfiguration.createdBy }}'
+      id: '{{ response.securityConfiguration.id }}'
+      name: '{{ response.securityConfiguration.name }}'
+      securityConfiguration: '{{ response.securityConfiguration.securityConfiguration
+        }}'
+      securityConfigurationData: '{{ response.securityConfiguration.securityConfigurationData
+        }}'
+      tags: '{{ response.securityConfiguration.tags }}'
+- discovery_id: aws.emr-containers.describe_virtual_cluster
+  for_each: aws.emr-containers.list_job_templates
+  calls:
+  - action: describe_virtual_cluster
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.virtualCluster.arn }}'
+      containerProvider: '{{ response.virtualCluster.containerProvider }}'
+      createdAt: '{{ response.virtualCluster.createdAt }}'
+      id: '{{ response.virtualCluster.id }}'
+      name: '{{ response.virtualCluster.name }}'
+      securityConfigurationId: '{{ response.virtualCluster.securityConfigurationId
+        }}'
+      state: '{{ response.virtualCluster.state }}'
+      tags: '{{ response.virtualCluster.tags }}'
+- discovery_id: aws.emr-containers.get_managed_endpoint_session_credentials
+  calls:
+  - action: get_managed_endpoint_session_credentials
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      credentials: '{{ response.credentials }}'
+      token: '{{ response.token }}'
+- discovery_id: aws.emr-containers.list_job_runs
+  calls:
+  - action: list_job_runs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.jobRuns }}'
+    item:
+      arn: '{{ item.arn }}'
+      clientToken: '{{ item.clientToken }}'
+      configurationOverrides: '{{ item.configurationOverrides }}'
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      executionRoleArn: '{{ item.executionRoleArn }}'
+      failureReason: '{{ item.failureReason }}'
+      finishedAt: '{{ item.finishedAt }}'
+      id: '{{ item.id }}'
+      jobDriver: '{{ item.jobDriver }}'
+      name: '{{ item.name }}'
+      releaseLabel: '{{ item.releaseLabel }}'
+      retryPolicyConfiguration: '{{ item.retryPolicyConfiguration }}'
+      retryPolicyExecution: '{{ item.retryPolicyExecution }}'
+      state: '{{ item.state }}'
+      stateDetails: '{{ item.stateDetails }}'
+      tags: '{{ item.tags }}'
+      virtualClusterId: '{{ item.virtualClusterId }}'
+- discovery_id: aws.emr-containers.list_managed_endpoints
+  calls:
+  - action: list_managed_endpoints
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.endpoints }}'
+    item:
+      arn: '{{ item.arn }}'
+      certificateArn: '{{ item.certificateArn }}'
+      certificateAuthority: '{{ item.certificateAuthority }}'
+      configurationOverrides: '{{ item.configurationOverrides }}'
+      createdAt: '{{ item.createdAt }}'
+      endpoint: '{{ item.endpoint }}'
+      executionRoleArn: '{{ item.executionRoleArn }}'
+      failureReason: '{{ item.failureReason }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      releaseLabel: '{{ item.releaseLabel }}'
+      securityGroup: '{{ item.securityGroup }}'
+      serverUrl: '{{ item.serverUrl }}'
+      state: '{{ item.state }}'
+      stateDetails: '{{ item.stateDetails }}'
+      subnetIds: '{{ item.subnetIds }}'
+      tags: '{{ item.tags }}'
+      type: '{{ item.type }}'
+      virtualClusterId: '{{ item.virtualClusterId }}'
+- discovery_id: aws.emr-containers.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

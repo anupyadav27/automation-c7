@@ -1,0 +1,186 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: ecs, fargate
+# 7 ops (4 from checks, +3 for inventory)
+version: '1.0'
+provider: aws
+service: fargate
+discovery:
+  - calls:
+    - action: list_account_settings
+      on_error: continue
+      save_as: response
+    discovery_id: aws.fargate.list_account_settings
+    emit:
+      as: item
+      item:
+        name: '{{ response.name }}'
+        principalArn: '{{ response.principalArn }}'
+        type: '{{ response.type }}'
+        value: '{{ response.value }}'
+  - calls:
+    - action: describe_clusters
+      on_error: continue
+      save_as: response
+    discovery_id: aws.fargate.describe_clusters
+    emit:
+      as: item
+      item:
+        activeServicesCount: '{{ response.activeServicesCount }}'
+        attachments: '{{ response.attachments }}'
+        attachmentsStatus: '{{ response.attachmentsStatus }}'
+        capacityProviders: '{{ response.capacityProviders }}'
+        clusterArn: '{{ response.clusterArn }}'
+        clusterName: '{{ response.clusterName }}'
+        clusters: '{{ response.clusters }}'
+        configuration: '{{ response.configuration }}'
+        defaultCapacityProviderStrategy: '{{ response.defaultCapacityProviderStrategy
+          }}'
+        pendingTasksCount: '{{ response.pendingTasksCount }}'
+        registeredContainerInstancesCount: '{{ response.registeredContainerInstancesCount
+          }}'
+        runningTasksCount: '{{ response.runningTasksCount }}'
+        serviceConnectDefaults: '{{ response.serviceConnectDefaults }}'
+        settings: '{{ response.settings }}'
+        statistics: '{{ response.statistics }}'
+        status: '{{ response.status }}'
+        tags: '{{ response.tags }}'
+  - calls:
+    - action: describe_capacity_providers
+      on_error: continue
+      save_as: response
+    discovery_id: aws.fargate.describe_capacity_providers
+    emit:
+      as: item
+      item:
+        autoScalingGroupProvider: '{{ response.autoScalingGroupProvider }}'
+        capacityProviderArn: '{{ response.capacityProviderArn }}'
+        cluster: '{{ response.cluster }}'
+        failures: '{{ response.failures }}'
+        managedInstancesProvider: '{{ response.managedInstancesProvider }}'
+        name: '{{ response.name }}'
+        status: '{{ response.status }}'
+        tags: '{{ response.tags }}'
+        type: '{{ response.type }}'
+        updateStatus: '{{ response.updateStatus }}'
+        updateStatusReason: '{{ response.updateStatusReason }}'
+  - calls:
+    - action: list_task_definitions
+      on_error: continue
+      save_as: response
+    discovery_id: aws.ecs.list_task_definitions
+    emit:
+      as: item
+      items_for: '{{ response.taskDefinitionArns }}'
+  - calls:
+    - action: describe_task_definition
+      on_error: continue
+      params:
+        taskDefinition: '{{ item }}'
+      save_as: response
+    discovery_id: aws.ecs.describe_task_definition
+    emit:
+      as: item
+      item:
+        containerDefinitions: '{{ item.containerDefinitions }}'
+        cpu: '{{ item.cpu }}'
+        executionRoleArn: '{{ item.executionRoleArn }}'
+        family: '{{ item.family }}'
+        memory: '{{ item.memory }}'
+        networkMode: '{{ item.networkMode }}'
+        requiresCompatibilities: '{{ item.requiresCompatibilities }}'
+        revision: '{{ item.revision }}'
+        status: '{{ item.status }}'
+        taskDefinitionArn: '{{ item.taskDefinitionArn }}'
+        taskRoleArn: '{{ item.taskRoleArn }}'
+      items_for: '{{ [response.taskDefinition] }}'
+    for_each: aws.ecs.list_task_definitions
+  - calls:
+    - action: describe_tasks
+      on_error: continue
+      save_as: response
+    discovery_id: aws.ecs.describe_tasks
+    emit:
+      as: item
+      item:
+        attachments: '{{ item.attachments }}'
+        attributes: '{{ item.attributes }}'
+        availabilityZone: '{{ item.availabilityZone }}'
+        capacityProviderName: '{{ item.capacityProviderName }}'
+        clusterArn: '{{ item.clusterArn }}'
+        connectivity: '{{ item.connectivity }}'
+        connectivityAt: '{{ item.connectivityAt }}'
+        containerInstanceArn: '{{ item.containerInstanceArn }}'
+        containers: '{{ item.containers }}'
+        cpu: '{{ item.cpu }}'
+        createdAt: '{{ item.createdAt }}'
+        desiredStatus: '{{ item.desiredStatus }}'
+        enableExecuteCommand: '{{ item.enableExecuteCommand }}'
+        ephemeralStorage: '{{ item.ephemeralStorage }}'
+        executionStoppedAt: '{{ item.executionStoppedAt }}'
+        fargateEphemeralStorage: '{{ item.fargateEphemeralStorage }}'
+        group: '{{ item.group }}'
+        healthStatus: '{{ item.healthStatus }}'
+        inferenceAccelerators: '{{ item.inferenceAccelerators }}'
+        lastStatus: '{{ item.lastStatus }}'
+        launchType: '{{ item.launchType }}'
+        memory: '{{ item.memory }}'
+        overrides: '{{ item.overrides }}'
+        platformFamily: '{{ item.platformFamily }}'
+        platformVersion: '{{ item.platformVersion }}'
+        pullStartedAt: '{{ item.pullStartedAt }}'
+        pullStoppedAt: '{{ item.pullStoppedAt }}'
+        startedAt: '{{ item.startedAt }}'
+        startedBy: '{{ item.startedBy }}'
+        stopCode: '{{ item.stopCode }}'
+        stoppedAt: '{{ item.stoppedAt }}'
+        stoppedReason: '{{ item.stoppedReason }}'
+        stoppingAt: '{{ item.stoppingAt }}'
+        tags: '{{ item.tags }}'
+        taskArn: '{{ item.taskArn }}'
+        taskDefinitionArn: '{{ item.taskDefinitionArn }}'
+        version: '{{ item.version }}'
+      items_for: '{{ response.tasks }}'
+  - calls:
+    - action: describe_services
+      on_error: continue
+      save_as: response
+    discovery_id: aws.ecs.describe_services
+    emit:
+      as: item
+      item:
+        availabilityZoneRebalancing: '{{ item.availabilityZoneRebalancing }}'
+        capacityProviderStrategy: '{{ item.capacityProviderStrategy }}'
+        clusterArn: '{{ item.clusterArn }}'
+        createdAt: '{{ item.createdAt }}'
+        createdBy: '{{ item.createdBy }}'
+        currentServiceDeployment: '{{ item.currentServiceDeployment }}'
+        currentServiceRevisions: '{{ item.currentServiceRevisions }}'
+        deploymentConfiguration: '{{ item.deploymentConfiguration }}'
+        deploymentController: '{{ item.deploymentController }}'
+        deployments: '{{ item.deployments }}'
+        desiredCount: '{{ item.desiredCount }}'
+        enableECSManagedTags: '{{ item.enableECSManagedTags }}'
+        enableExecuteCommand: '{{ item.enableExecuteCommand }}'
+        events: '{{ item.events }}'
+        healthCheckGracePeriodSeconds: '{{ item.healthCheckGracePeriodSeconds }}'
+        launchType: '{{ item.launchType }}'
+        loadBalancers: '{{ item.loadBalancers }}'
+        networkConfiguration: '{{ item.networkConfiguration }}'
+        pendingCount: '{{ item.pendingCount }}'
+        placementConstraints: '{{ item.placementConstraints }}'
+        placementStrategy: '{{ item.placementStrategy }}'
+        platformFamily: '{{ item.platformFamily }}'
+        platformVersion: '{{ item.platformVersion }}'
+        propagateTags: '{{ item.propagateTags }}'
+        resourceManagementType: '{{ item.resourceManagementType }}'
+        roleArn: '{{ item.roleArn }}'
+        runningCount: '{{ item.runningCount }}'
+        schedulingStrategy: '{{ item.schedulingStrategy }}'
+        serviceArn: '{{ item.serviceArn }}'
+        serviceName: '{{ item.serviceName }}'
+        serviceRegistries: '{{ item.serviceRegistries }}'
+        status: '{{ item.status }}'
+        tags: '{{ item.tags }}'
+        taskDefinition: '{{ item.taskDefinition }}'
+        taskSets: '{{ item.taskSets }}'
+      items_for: '{{ response.services }}'

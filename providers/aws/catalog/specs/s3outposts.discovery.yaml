@@ -1,0 +1,75 @@
+# ============================================================
+# Discovery YAML — s3outposts (AWS)
+# Generated: 2026-02-21T04:56:59Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: s3outposts
+services:
+  client: s3outposts
+  module: boto3.client
+discovery:
+  # ── ListEndpoints ──
+  - discovery_id: aws.s3outposts.list_endpoints
+    calls:
+      - action: list_endpoints
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Endpoints }}'
+      item:
+        CidrBlock: '{{ item.CidrBlock }}'
+        CreationTime: '{{ item.CreationTime }}'
+        NetworkInterfaces: '{{ item.NetworkInterfaces }}'
+        Status: '{{ item.Status }}'
+        SubnetId: '{{ item.SubnetId }}'
+        VpcId: '{{ item.VpcId }}'
+        AccessType: '{{ item.AccessType }}'
+        CustomerOwnedIpv4Pool: '{{ item.CustomerOwnedIpv4Pool }}'
+        EndpointArn: '{{ item.EndpointArn }}'
+        FailedReason: '{{ item.FailedReason }}'
+        OutpostsId: '{{ item.OutpostsId }}'
+        SecurityGroupId: '{{ item.SecurityGroupId }}'
+  # ── ListOutpostsWithS3 ──
+  - discovery_id: aws.s3outposts.list_outposts_with_s3
+    calls:
+      - action: list_outposts_with_s3
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Outposts }}'
+      item:
+        OwnerId: '{{ item.OwnerId }}'
+        CapacityInBytes: '{{ item.CapacityInBytes }}'
+        OutpostArn: '{{ item.OutpostArn }}'
+        OutpostId: '{{ item.OutpostId }}'
+        S3OutpostArn: '{{ item.S3OutpostArn }}'
+  # ── Dependent read operations (require identifiers) ──
+  # ── ListSharedEndpoints ──
+  - discovery_id: aws.s3outposts.list_shared_endpoints
+    for_each: aws.s3outposts.list_outposts_with_s3
+    calls:
+      - action: list_shared_endpoints
+        params:
+          OutpostId: '{{ item.OutpostId }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Endpoints }}'
+      item:
+        CidrBlock: '{{ item.CidrBlock }}'
+        CreationTime: '{{ item.CreationTime }}'
+        NetworkInterfaces: '{{ item.NetworkInterfaces }}'
+        Status: '{{ item.Status }}'
+        SubnetId: '{{ item.SubnetId }}'
+        VpcId: '{{ item.VpcId }}'
+        AccessType: '{{ item.AccessType }}'
+        CustomerOwnedIpv4Pool: '{{ item.CustomerOwnedIpv4Pool }}'
+        EndpointArn: '{{ item.EndpointArn }}'
+        FailedReason: '{{ item.FailedReason }}'
+        OutpostsId: '{{ item.OutpostsId }}'
+        SecurityGroupId: '{{ item.SecurityGroupId }}'

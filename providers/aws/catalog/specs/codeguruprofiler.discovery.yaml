@@ -1,0 +1,165 @@
+version: '1.0'
+provider: aws
+service: codeguruprofiler
+services:
+  client: codeguruprofiler
+  module: boto3.client
+discovery:
+- discovery_id: aws.codeguruprofiler.get_findings_report_account_summary
+  calls:
+  - action: get_findings_report_account_summary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.reportSummaries }}'
+    item:
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      profileEndTime: '{{ item.profileEndTime }}'
+      profileStartTime: '{{ item.profileStartTime }}'
+      profilingGroupName: '{{ item.profilingGroupName }}'
+      totalNumberOfFindings: '{{ item.totalNumberOfFindings }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codeguruprofiler.list_profiling_groups
+  calls:
+  - action: list_profiling_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.profilingGroupNames }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codeguruprofiler.describe_profiling_group
+  for_each: aws.codeguruprofiler.list_profiling_groups
+  calls:
+  - action: describe_profiling_group
+    params:
+      profilingGroupName: '{{ item.profilingGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      agentOrchestrationConfig: '{{ response.profilingGroup.agentOrchestrationConfig }}'
+      arn: '{{ response.profilingGroup.arn }}'
+      computePlatform: '{{ response.profilingGroup.computePlatform }}'
+      createdAt: '{{ response.profilingGroup.createdAt }}'
+      profilingStatus: '{{ response.profilingGroup.profilingStatus }}'
+      tags: '{{ response.profilingGroup.tags }}'
+      updatedAt: '{{ response.profilingGroup.updatedAt }}'
+      profilingEnabled: '{{ response.profilingGroup.agentOrchestrationConfig.profilingEnabled }}'
+      name: '{{ response.profilingGroup.name }}'
+      latestAgentOrchestratedAt: '{{ response.profilingGroup.profilingStatus.latestAgentOrchestratedAt }}'
+      latestAgentProfileReportedAt: '{{ response.profilingGroup.profilingStatus.latestAgentProfileReportedAt }}'
+      period: '{{ response.profilingGroup.profilingStatus.latestAggregatedProfile.period }}'
+      start: '{{ response.profilingGroup.profilingStatus.latestAggregatedProfile.start }}'
+- discovery_id: aws.codeguruprofiler.get_notification_configuration
+  for_each: aws.codeguruprofiler.list_profiling_groups
+  calls:
+  - action: get_notification_configuration
+    params:
+      profilingGroupName: '{{ item.profilingGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      channels: '{{ response.notificationConfiguration.channels[].id }}'
+- discovery_id: aws.codeguruprofiler.get_policy
+  for_each: aws.codeguruprofiler.list_profiling_groups
+  calls:
+  - action: get_policy
+    params:
+      profilingGroupName: '{{ item.profilingGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+      policy: '{{ response.policy }}'
+      revisionId: '{{ response.revisionId }}'
+- discovery_id: aws.codeguruprofiler.get_profile
+  for_each: aws.codeguruprofiler.list_profiling_groups
+  calls:
+  - action: get_profile
+    params:
+      profilingGroupName: '{{ item.profilingGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      contentEncoding: '{{ response.contentEncoding }}'
+      contentType: '{{ response.contentType }}'
+      profile: '{{ response.profile }}'
+- discovery_id: aws.codeguruprofiler.get_recommendations
+  for_each: aws.codeguruprofiler.list_profiling_groups
+  calls:
+  - action: get_recommendations
+    params:
+      endTime: '{{ item.endTime }}'
+      profilingGroupName: '{{ item.profilingGroupName }}'
+      startTime: '{{ item.startTime }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.anomalies }}'
+    item:
+      anomalies: '{{ item.anomalies }}'
+      instances: '{{ item.instances }}'
+      metric: '{{ item.metric }}'
+      reason: '{{ item.reason }}'
+      profileEndTime: '{{ response.profileEndTime }}'
+      profileStartTime: '{{ response.profileStartTime }}'
+      profilingGroupName: '{{ response.profilingGroupName }}'
+- discovery_id: aws.codeguruprofiler.list_findings_reports
+  for_each: aws.codeguruprofiler.list_profiling_groups
+  calls:
+  - action: list_findings_reports
+    params:
+      endTime: '{{ item.endTime }}'
+      profilingGroupName: '{{ item.profilingGroupName }}'
+      startTime: '{{ item.startTime }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.findingsReportSummaries }}'
+    item:
+      id: '{{ item.id }}'
+      profileEndTime: '{{ item.profileEndTime }}'
+      profileStartTime: '{{ item.profileStartTime }}'
+      profilingGroupName: '{{ item.profilingGroupName }}'
+      totalNumberOfFindings: '{{ item.totalNumberOfFindings }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codeguruprofiler.list_profile_times
+  for_each: aws.codeguruprofiler.list_profiling_groups
+  calls:
+  - action: list_profile_times
+    params:
+      endTime: '{{ item.endTime }}'
+      period: '{{ item.period }}'
+      profilingGroupName: '{{ item.profilingGroupName }}'
+      startTime: '{{ item.startTime }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.profileTimes }}'
+    item:
+      start: '{{ item.start }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codeguruprofiler.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

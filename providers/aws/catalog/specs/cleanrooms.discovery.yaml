@@ -1,0 +1,883 @@
+version: '1.0'
+provider: aws
+service: cleanrooms
+services:
+  client: cleanrooms
+  module: boto3.client
+discovery:
+- discovery_id: aws.cleanrooms.list_collaborations
+  calls:
+  - action: list_collaborations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.collaborationList }}'
+    item:
+      analyticsEngine: '{{ item.analyticsEngine }}'
+      arn: '{{ item.arn }}'
+      collaboration: '{{ item.collaboration }}'
+      createTime: '{{ item.createTime }}'
+      creatorAccountId: '{{ item.creatorAccountId }}'
+      creatorDisplayName: '{{ item.creatorDisplayName }}'
+      id: '{{ item.id }}'
+      memberStatus: '{{ item.memberStatus }}'
+      membershipArn: '{{ item.membershipArn }}'
+      membershipId: '{{ item.membershipId }}'
+      name: '{{ item.name }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_configured_tables
+  calls:
+  - action: list_configured_tables
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.configuredTableSummaries }}'
+    item:
+      analysisMethod: '{{ item.analysisMethod }}'
+      analysisRuleTypes: '{{ item.analysisRuleTypes }}'
+      arn: '{{ item.arn }}'
+      createTime: '{{ item.createTime }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      selectedAnalysisMethods: '{{ item.selectedAnalysisMethods }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_memberships
+  calls:
+  - action: list_memberships
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.membershipSummaries }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      arn: '{{ item.arn }}'
+      collaborationArn: '{{ item.collaborationArn }}'
+      collaborationCreatorAccountId: '{{ item.collaborationCreatorAccountId }}'
+      collaborationCreatorDisplayName: '{{ item.collaborationCreatorDisplayName }}'
+      collaborationId: '{{ item.collaborationId }}'
+      collaborationName: '{{ item.collaborationName }}'
+      createTime: '{{ item.createTime }}'
+      id: '{{ item.id }}'
+      memberAbilities: '{{ item.memberAbilities }}'
+      membership: '{{ item.membership }}'
+      mlMemberAbilities: '{{ item.mlMemberAbilities }}'
+      paymentConfiguration: '{{ item.paymentConfiguration }}'
+      status: '{{ item.status }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.get_analysis_template
+  calls:
+  - action: get_analysis_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      analysisParameters: '{{ response.analysisTemplate.analysisParameters[].type }}'
+      arn: '{{ response.analysisTemplate.arn }}'
+      collaborationArn: '{{ response.analysisTemplate.collaborationArn }}'
+      collaborationId: '{{ response.analysisTemplate.collaborationId }}'
+      createTime: '{{ response.analysisTemplate.createTime }}'
+      description: '{{ response.analysisTemplate.description }}'
+      errorMessageConfiguration: '{{ response.analysisTemplate.errorMessageConfiguration }}'
+      format: '{{ response.analysisTemplate.format }}'
+      id: '{{ response.analysisTemplate.id }}'
+      membershipArn: '{{ response.analysisTemplate.membershipArn }}'
+      membershipId: '{{ response.analysisTemplate.membershipId }}'
+      name: '{{ response.analysisTemplate.name }}'
+      schema: '{{ response.analysisTemplate.schema }}'
+      source: '{{ response.analysisTemplate.source.text }}'
+      sourceMetadata: '{{ response.analysisTemplate.sourceMetadata }}'
+      updateTime: '{{ response.analysisTemplate.updateTime }}'
+      validations: '{{ response.analysisTemplate.validations[].type }}'
+      sha256: '{{ response.analysisTemplate.sourceMetadata.artifacts.entryPointHash.sha256 }}'
+      roleArn: '{{ response.analysisTemplate.source.artifacts.roleArn }}'
+      text: '{{ response.analysisTemplate.source.text }}'
+- discovery_id: aws.cleanrooms.get_collaboration
+  calls:
+  - action: get_collaboration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      allowedResultRegions: '{{ response.collaboration.allowedResultRegions }}'
+      analyticsEngine: '{{ response.collaboration.analyticsEngine }}'
+      arn: '{{ response.collaboration.arn }}'
+      autoApprovedChangeTypes: '{{ response.collaboration.autoApprovedChangeTypes }}'
+      createTime: '{{ response.collaboration.createTime }}'
+      creatorAccountId: '{{ response.collaboration.creatorAccountId }}'
+      creatorDisplayName: '{{ response.collaboration.creatorDisplayName }}'
+      dataEncryptionMetadata: '{{ response.collaboration.dataEncryptionMetadata }}'
+      description: '{{ response.collaboration.description }}'
+      id: '{{ response.collaboration.id }}'
+      jobLogStatus: '{{ response.collaboration.jobLogStatus }}'
+      memberStatus: '{{ response.collaboration.memberStatus }}'
+      membershipArn: '{{ response.collaboration.membershipArn }}'
+      membershipId: '{{ response.collaboration.membershipId }}'
+      name: '{{ response.collaboration.name }}'
+      queryLogStatus: '{{ response.collaboration.queryLogStatus }}'
+      updateTime: '{{ response.collaboration.updateTime }}'
+      allowCleartext: '{{ response.collaboration.dataEncryptionMetadata.allowCleartext }}'
+      allowDuplicates: '{{ response.collaboration.dataEncryptionMetadata.allowDuplicates }}'
+      allowJoinsOnColumnsWithDifferentNames: '{{ response.collaboration.dataEncryptionMetadata.allowJoinsOnColumnsWithDifferentNames }}'
+      preserveNulls: '{{ response.collaboration.dataEncryptionMetadata.preserveNulls }}'
+- discovery_id: aws.cleanrooms.get_collaboration_analysis_template
+  calls:
+  - action: get_collaboration_analysis_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      analysisParameters: '{{ response.collaborationAnalysisTemplate.analysisParameters[].type }}'
+      arn: '{{ response.collaborationAnalysisTemplate.arn }}'
+      collaborationArn: '{{ response.collaborationAnalysisTemplate.collaborationArn }}'
+      collaborationId: '{{ response.collaborationAnalysisTemplate.collaborationId }}'
+      createTime: '{{ response.collaborationAnalysisTemplate.createTime }}'
+      creatorAccountId: '{{ response.collaborationAnalysisTemplate.creatorAccountId }}'
+      description: '{{ response.collaborationAnalysisTemplate.description }}'
+      errorMessageConfiguration: '{{ response.collaborationAnalysisTemplate.errorMessageConfiguration }}'
+      format: '{{ response.collaborationAnalysisTemplate.format }}'
+      id: '{{ response.collaborationAnalysisTemplate.id }}'
+      name: '{{ response.collaborationAnalysisTemplate.name }}'
+      schema: '{{ response.collaborationAnalysisTemplate.arn }}'
+      source: '{{ response.collaborationAnalysisTemplate.source.text }}'
+      sourceMetadata: '{{ response.collaborationAnalysisTemplate.source.text }}'
+      updateTime: '{{ response.collaborationAnalysisTemplate.updateTime }}'
+      validations: '{{ response.collaborationAnalysisTemplate.validations[].type }}'
+      sha256: '{{ response.collaborationAnalysisTemplate.sourceMetadata.artifacts.entryPointHash.sha256 }}'
+      roleArn: '{{ response.collaborationAnalysisTemplate.source.artifacts.roleArn }}'
+      text: '{{ response.collaborationAnalysisTemplate.source.text }}'
+- discovery_id: aws.cleanrooms.get_collaboration_change_request
+  calls:
+  - action: get_collaboration_change_request
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      changes: '{{ response.collaborationChangeRequest.changes }}'
+      collaborationId: '{{ response.collaborationChangeRequest.collaborationId }}'
+      createTime: '{{ response.collaborationChangeRequest.createTime }}'
+      id: '{{ response.collaborationChangeRequest.id }}'
+      isAutoApproved: '{{ response.collaborationChangeRequest.isAutoApproved }}'
+      status: '{{ response.collaborationChangeRequest.status }}'
+      updateTime: '{{ response.collaborationChangeRequest.updateTime }}'
+- discovery_id: aws.cleanrooms.get_collaboration_configured_audience_model_association
+  calls:
+  - action: get_collaboration_configured_audience_model_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.collaborationConfiguredAudienceModelAssociation.arn }}'
+      collaborationArn: '{{ response.collaborationConfiguredAudienceModelAssociation.collaborationArn }}'
+      collaborationId: '{{ response.collaborationConfiguredAudienceModelAssociation.collaborationId }}'
+      configuredAudienceModelArn: '{{ response.collaborationConfiguredAudienceModelAssociation.configuredAudienceModelArn }}'
+      createTime: '{{ response.collaborationConfiguredAudienceModelAssociation.createTime }}'
+      creatorAccountId: '{{ response.collaborationConfiguredAudienceModelAssociation.creatorAccountId }}'
+      description: '{{ response.collaborationConfiguredAudienceModelAssociation.description }}'
+      id: '{{ response.collaborationConfiguredAudienceModelAssociation.id }}'
+      name: '{{ response.collaborationConfiguredAudienceModelAssociation.name }}'
+      updateTime: '{{ response.collaborationConfiguredAudienceModelAssociation.updateTime }}'
+- discovery_id: aws.cleanrooms.get_collaboration_id_namespace_association
+  calls:
+  - action: get_collaboration_id_namespace_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.collaborationIdNamespaceAssociation.arn }}'
+      collaborationArn: '{{ response.collaborationIdNamespaceAssociation.collaborationArn }}'
+      collaborationId: '{{ response.collaborationIdNamespaceAssociation.collaborationId }}'
+      createTime: '{{ response.collaborationIdNamespaceAssociation.createTime }}'
+      creatorAccountId: '{{ response.collaborationIdNamespaceAssociation.creatorAccountId }}'
+      description: '{{ response.collaborationIdNamespaceAssociation.description }}'
+      id: '{{ response.collaborationIdNamespaceAssociation.id }}'
+      idMappingConfig: '{{ response.collaborationIdNamespaceAssociation.id }}'
+      inputReferenceConfig: '{{ response.collaborationIdNamespaceAssociation.inputReferenceConfig.inputReferenceArn }}'
+      inputReferenceProperties: '{{ response.collaborationIdNamespaceAssociation.inputReferenceProperties.idNamespaceType }}'
+      name: '{{ response.collaborationIdNamespaceAssociation.name }}'
+      updateTime: '{{ response.collaborationIdNamespaceAssociation.updateTime }}'
+      allowUseAsDimensionColumn: '{{ response.collaborationIdNamespaceAssociation.idMappingConfig.allowUseAsDimensionColumn }}'
+      inputReferenceArn: '{{ response.collaborationIdNamespaceAssociation.inputReferenceConfig.inputReferenceArn }}'
+      manageResourcePolicies: '{{ response.collaborationIdNamespaceAssociation.inputReferenceConfig.manageResourcePolicies }}'
+      idNamespaceType: '{{ response.collaborationIdNamespaceAssociation.inputReferenceProperties.idNamespaceType }}'
+- discovery_id: aws.cleanrooms.get_collaboration_privacy_budget_template
+  calls:
+  - action: get_collaboration_privacy_budget_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.collaborationPrivacyBudgetTemplate.arn }}'
+      autoRefresh: '{{ response.collaborationPrivacyBudgetTemplate.autoRefresh }}'
+      collaborationArn: '{{ response.collaborationPrivacyBudgetTemplate.collaborationArn }}'
+      collaborationId: '{{ response.collaborationPrivacyBudgetTemplate.collaborationId }}'
+      createTime: '{{ response.collaborationPrivacyBudgetTemplate.createTime }}'
+      creatorAccountId: '{{ response.collaborationPrivacyBudgetTemplate.creatorAccountId }}'
+      id: '{{ response.collaborationPrivacyBudgetTemplate.id }}'
+      parameters: '{{ response.collaborationPrivacyBudgetTemplate.arn }}'
+      privacyBudgetType: '{{ response.collaborationPrivacyBudgetTemplate.privacyBudgetType }}'
+      updateTime: '{{ response.collaborationPrivacyBudgetTemplate.updateTime }}'
+      epsilon: '{{ response.collaborationPrivacyBudgetTemplate.parameters.differentialPrivacy.epsilon }}'
+      usersNoisePerQuery: '{{ response.collaborationPrivacyBudgetTemplate.parameters.differentialPrivacy.usersNoisePerQuery }}'
+- discovery_id: aws.cleanrooms.get_configured_audience_model_association
+  calls:
+  - action: get_configured_audience_model_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.configuredAudienceModelAssociation.arn }}'
+      collaborationArn: '{{ response.configuredAudienceModelAssociation.collaborationArn }}'
+      collaborationId: '{{ response.configuredAudienceModelAssociation.collaborationId }}'
+      configuredAudienceModelArn: '{{ response.configuredAudienceModelAssociation.configuredAudienceModelArn }}'
+      createTime: '{{ response.configuredAudienceModelAssociation.createTime }}'
+      description: '{{ response.configuredAudienceModelAssociation.description }}'
+      id: '{{ response.configuredAudienceModelAssociation.id }}'
+      manageResourcePolicies: '{{ response.configuredAudienceModelAssociation.manageResourcePolicies }}'
+      membershipArn: '{{ response.configuredAudienceModelAssociation.membershipArn }}'
+      membershipId: '{{ response.configuredAudienceModelAssociation.membershipId }}'
+      name: '{{ response.configuredAudienceModelAssociation.name }}'
+      updateTime: '{{ response.configuredAudienceModelAssociation.updateTime }}'
+- discovery_id: aws.cleanrooms.get_configured_table
+  calls:
+  - action: get_configured_table
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      allowedColumns: '{{ response.configuredTable.allowedColumns }}'
+      analysisMethod: '{{ response.configuredTable.analysisMethod }}'
+      analysisRuleTypes: '{{ response.configuredTable.analysisRuleTypes }}'
+      arn: '{{ response.configuredTable.arn }}'
+      createTime: '{{ response.configuredTable.createTime }}'
+      description: '{{ response.configuredTable.description }}'
+      id: '{{ response.configuredTable.id }}'
+      name: '{{ response.configuredTable.name }}'
+      selectedAnalysisMethods: '{{ response.configuredTable.selectedAnalysisMethods }}'
+      tableReference: '{{ response.configuredTable.tableReference }}'
+      updateTime: '{{ response.configuredTable.updateTime }}'
+      databaseName: '{{ response.configuredTable.tableReference.athena.databaseName }}'
+      outputLocation: '{{ response.configuredTable.tableReference.athena.outputLocation }}'
+      tableName: '{{ response.configuredTable.tableReference.athena.tableName }}'
+      workGroup: '{{ response.configuredTable.tableReference.athena.workGroup }}'
+      accountIdentifier: '{{ response.configuredTable.tableReference.snowflake.accountIdentifier }}'
+      schemaName: '{{ response.configuredTable.tableReference.snowflake.schemaName }}'
+      secretArn: '{{ response.configuredTable.tableReference.snowflake.secretArn }}'
+- discovery_id: aws.cleanrooms.get_configured_table_analysis_rule
+  calls:
+  - action: get_configured_table_analysis_rule
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      configuredTableArn: '{{ response.analysisRule.configuredTableArn }}'
+      configuredTableId: '{{ response.analysisRule.configuredTableId }}'
+      createTime: '{{ response.analysisRule.createTime }}'
+      policy: '{{ response.analysisRule.policy }}'
+      type: '{{ response.analysisRule.type }}'
+      updateTime: '{{ response.analysisRule.updateTime }}'
+      additionalAnalyses: '{{ response.analysisRule.policy.v1.aggregation.additionalAnalyses }}'
+      joinRequired: '{{ response.analysisRule.policy.v1.aggregation.joinRequired }}'
+- discovery_id: aws.cleanrooms.get_configured_table_association
+  calls:
+  - action: get_configured_table_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      analysisRuleTypes: '{{ response.configuredTableAssociation.analysisRuleTypes }}'
+      arn: '{{ response.configuredTableAssociation.arn }}'
+      configuredTableArn: '{{ response.configuredTableAssociation.configuredTableArn }}'
+      configuredTableId: '{{ response.configuredTableAssociation.configuredTableId }}'
+      createTime: '{{ response.configuredTableAssociation.createTime }}'
+      description: '{{ response.configuredTableAssociation.description }}'
+      id: '{{ response.configuredTableAssociation.id }}'
+      membershipArn: '{{ response.configuredTableAssociation.membershipArn }}'
+      membershipId: '{{ response.configuredTableAssociation.membershipId }}'
+      name: '{{ response.configuredTableAssociation.name }}'
+      roleArn: '{{ response.configuredTableAssociation.roleArn }}'
+      updateTime: '{{ response.configuredTableAssociation.updateTime }}'
+- discovery_id: aws.cleanrooms.get_configured_table_association_analysis_rule
+  calls:
+  - action: get_configured_table_association_analysis_rule
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      configuredTableAssociationArn: '{{ response.analysisRule.configuredTableAssociationArn }}'
+      configuredTableAssociationId: '{{ response.analysisRule.configuredTableAssociationId }}'
+      createTime: '{{ response.analysisRule.createTime }}'
+      membershipIdentifier: '{{ response.analysisRule.membershipIdentifier }}'
+      policy: '{{ response.analysisRule.policy }}'
+      type: '{{ response.analysisRule.type }}'
+      updateTime: '{{ response.analysisRule.updateTime }}'
+- discovery_id: aws.cleanrooms.get_id_mapping_table
+  calls:
+  - action: get_id_mapping_table
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.idMappingTable.arn }}'
+      collaborationArn: '{{ response.idMappingTable.collaborationArn }}'
+      collaborationId: '{{ response.idMappingTable.collaborationId }}'
+      createTime: '{{ response.idMappingTable.createTime }}'
+      description: '{{ response.idMappingTable.description }}'
+      id: '{{ response.idMappingTable.id }}'
+      inputReferenceConfig: '{{ response.idMappingTable.inputReferenceConfig }}'
+      inputReferenceProperties: '{{ response.idMappingTable.inputReferenceProperties }}'
+      kmsKeyArn: '{{ response.idMappingTable.kmsKeyArn }}'
+      membershipArn: '{{ response.idMappingTable.membershipArn }}'
+      membershipId: '{{ response.idMappingTable.membershipId }}'
+      name: '{{ response.idMappingTable.name }}'
+      updateTime: '{{ response.idMappingTable.updateTime }}'
+      inputReferenceArn: '{{ response.idMappingTable.inputReferenceConfig.inputReferenceArn }}'
+      manageResourcePolicies: '{{ response.idMappingTable.inputReferenceConfig.manageResourcePolicies }}'
+- discovery_id: aws.cleanrooms.get_id_namespace_association
+  calls:
+  - action: get_id_namespace_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.idNamespaceAssociation.arn }}'
+      collaborationArn: '{{ response.idNamespaceAssociation.collaborationArn }}'
+      collaborationId: '{{ response.idNamespaceAssociation.collaborationId }}'
+      createTime: '{{ response.idNamespaceAssociation.createTime }}'
+      description: '{{ response.idNamespaceAssociation.description }}'
+      id: '{{ response.idNamespaceAssociation.id }}'
+      idMappingConfig: '{{ response.idNamespaceAssociation.idMappingConfig }}'
+      inputReferenceConfig: '{{ response.idNamespaceAssociation.inputReferenceConfig }}'
+      inputReferenceProperties: '{{ response.idNamespaceAssociation.inputReferenceProperties.idNamespaceType }}'
+      membershipArn: '{{ response.idNamespaceAssociation.membershipArn }}'
+      membershipId: '{{ response.idNamespaceAssociation.membershipId }}'
+      name: '{{ response.idNamespaceAssociation.name }}'
+      updateTime: '{{ response.idNamespaceAssociation.updateTime }}'
+      allowUseAsDimensionColumn: '{{ response.idNamespaceAssociation.idMappingConfig.allowUseAsDimensionColumn }}'
+      inputReferenceArn: '{{ response.idNamespaceAssociation.inputReferenceConfig.inputReferenceArn }}'
+      manageResourcePolicies: '{{ response.idNamespaceAssociation.inputReferenceConfig.manageResourcePolicies }}'
+      idNamespaceType: '{{ response.idNamespaceAssociation.inputReferenceProperties.idNamespaceType }}'
+- discovery_id: aws.cleanrooms.get_membership
+  calls:
+  - action: get_membership
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.membership.arn }}'
+      collaborationArn: '{{ response.membership.collaborationArn }}'
+      collaborationCreatorAccountId: '{{ response.membership.collaborationCreatorAccountId }}'
+      collaborationCreatorDisplayName: '{{ response.membership.collaborationCreatorDisplayName }}'
+      collaborationId: '{{ response.membership.collaborationId }}'
+      collaborationName: '{{ response.membership.collaborationName }}'
+      createTime: '{{ response.membership.createTime }}'
+      defaultJobResultConfiguration: '{{ response.membership.defaultJobResultConfiguration.roleArn }}'
+      defaultResultConfiguration: '{{ response.membership.defaultResultConfiguration.roleArn }}'
+      id: '{{ response.membership.id }}'
+      jobLogStatus: '{{ response.membership.jobLogStatus }}'
+      memberAbilities: '{{ response.membership.memberAbilities }}'
+      mlMemberAbilities: '{{ response.membership.mlMemberAbilities }}'
+      paymentConfiguration: '{{ response.membership.paymentConfiguration }}'
+      queryLogStatus: '{{ response.membership.queryLogStatus }}'
+      status: '{{ response.membership.status }}'
+      updateTime: '{{ response.membership.updateTime }}'
+      bucket: '{{ response.membership.defaultJobResultConfiguration.outputConfiguration.s3.bucket }}'
+      keyPrefix: '{{ response.membership.defaultJobResultConfiguration.outputConfiguration.s3.keyPrefix }}'
+      roleArn: '{{ response.membership.defaultJobResultConfiguration.roleArn }}'
+      resultFormat: '{{ response.membership.defaultResultConfiguration.outputConfiguration.s3.resultFormat }}'
+      singleFileOutput: '{{ response.membership.defaultResultConfiguration.outputConfiguration.s3.singleFileOutput }}'
+      isResponsible: '{{ response.membership.paymentConfiguration.jobCompute.isResponsible }}'
+- discovery_id: aws.cleanrooms.get_privacy_budget_template
+  calls:
+  - action: get_privacy_budget_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.privacyBudgetTemplate.arn }}'
+      autoRefresh: '{{ response.privacyBudgetTemplate.autoRefresh }}'
+      collaborationArn: '{{ response.privacyBudgetTemplate.collaborationArn }}'
+      collaborationId: '{{ response.privacyBudgetTemplate.collaborationId }}'
+      createTime: '{{ response.privacyBudgetTemplate.createTime }}'
+      id: '{{ response.privacyBudgetTemplate.id }}'
+      membershipArn: '{{ response.privacyBudgetTemplate.membershipArn }}'
+      membershipId: '{{ response.privacyBudgetTemplate.membershipId }}'
+      parameters: '{{ response.privacyBudgetTemplate.parameters }}'
+      privacyBudgetType: '{{ response.privacyBudgetTemplate.privacyBudgetType }}'
+      updateTime: '{{ response.privacyBudgetTemplate.updateTime }}'
+      epsilon: '{{ response.privacyBudgetTemplate.parameters.differentialPrivacy.epsilon }}'
+      usersNoisePerQuery: '{{ response.privacyBudgetTemplate.parameters.differentialPrivacy.usersNoisePerQuery }}'
+- discovery_id: aws.cleanrooms.get_protected_job
+  calls:
+  - action: get_protected_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      computeConfiguration: '{{ response.protectedJob.computeConfiguration }}'
+      createTime: '{{ response.protectedJob.createTime }}'
+      error: '{{ response.protectedJob.error.code }}'
+      id: '{{ response.protectedJob.id }}'
+      jobParameters: '{{ response.protectedJob.jobParameters }}'
+      membershipArn: '{{ response.protectedJob.membershipArn }}'
+      membershipId: '{{ response.protectedJob.membershipId }}'
+      result: '{{ response.protectedJob.result }}'
+      resultConfiguration: '{{ response.protectedJob.resultConfiguration }}'
+      statistics: '{{ response.protectedJob.status }}'
+      status: '{{ response.protectedJob.status }}'
+      code: '{{ response.protectedJob.error.code }}'
+      message: '{{ response.protectedJob.error.message }}'
+      analysisTemplateArn: '{{ response.protectedJob.jobParameters.analysisTemplateArn }}'
+      accountId: '{{ response.protectedJob.resultConfiguration.outputConfiguration.member.accountId }}'
+      bucket: '{{ response.protectedJob.resultConfiguration.outputConfiguration.s3.bucket }}'
+      keyPrefix: '{{ response.protectedJob.resultConfiguration.outputConfiguration.s3.keyPrefix }}'
+      location: '{{ response.protectedJob.result.output.s3.location }}'
+      units: '{{ response.protectedJob.statistics.billedResourceUtilization.units }}'
+      totalDurationInMillis: '{{ response.protectedJob.statistics.totalDurationInMillis }}'
+- discovery_id: aws.cleanrooms.get_protected_query
+  calls:
+  - action: get_protected_query
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      computeConfiguration: '{{ response.protectedQuery.computeConfiguration.worker.type }}'
+      createTime: '{{ response.protectedQuery.createTime }}'
+      differentialPrivacy: '{{ response.protectedQuery.differentialPrivacy }}'
+      error: '{{ response.protectedQuery.error.code }}'
+      id: '{{ response.protectedQuery.id }}'
+      membershipArn: '{{ response.protectedQuery.membershipArn }}'
+      membershipId: '{{ response.protectedQuery.membershipId }}'
+      result: '{{ response.protectedQuery.result }}'
+      resultConfiguration: '{{ response.protectedQuery.resultConfiguration }}'
+      sqlParameters: '{{ response.protectedQuery.sqlParameters }}'
+      statistics: '{{ response.protectedQuery.status }}'
+      status: '{{ response.protectedQuery.status }}'
+      number: '{{ response.protectedQuery.computeConfiguration.worker.number }}'
+      type: '{{ response.protectedQuery.computeConfiguration.worker.type }}'
+      code: '{{ response.protectedQuery.error.code }}'
+      message: '{{ response.protectedQuery.error.message }}'
+      accountId: '{{ response.protectedQuery.resultConfiguration.outputConfiguration.member.accountId }}'
+      bucket: '{{ response.protectedQuery.resultConfiguration.outputConfiguration.s3.bucket }}'
+      keyPrefix: '{{ response.protectedQuery.resultConfiguration.outputConfiguration.s3.keyPrefix }}'
+      resultFormat: '{{ response.protectedQuery.resultConfiguration.outputConfiguration.s3.resultFormat }}'
+      singleFileOutput: '{{ response.protectedQuery.resultConfiguration.outputConfiguration.s3.singleFileOutput }}'
+      location: '{{ response.protectedQuery.result.output.s3.location }}'
+      analysisTemplateArn: '{{ response.protectedQuery.sqlParameters.analysisTemplateArn }}'
+      parameters: '{{ response.protectedQuery.sqlParameters.parameters }}'
+      queryString: '{{ response.protectedQuery.sqlParameters.queryString }}'
+      units: '{{ response.protectedQuery.statistics.billedResourceUtilization.units }}'
+      totalDurationInMillis: '{{ response.protectedQuery.statistics.totalDurationInMillis }}'
+- discovery_id: aws.cleanrooms.get_schema
+  for_each: aws.cleanrooms.list_collaborations
+  calls:
+  - action: get_schema
+    params:
+      collaborationIdentifier: '{{ item.collaborationIdentifier }}'
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      analysisMethod: '{{ response.schema.analysisMethod }}'
+      analysisRuleTypes: '{{ response.schema.analysisRuleTypes }}'
+      collaborationArn: '{{ response.schema.collaborationArn }}'
+      collaborationId: '{{ response.schema.collaborationId }}'
+      columns: '{{ response.schema.columns }}'
+      createTime: '{{ response.schema.createTime }}'
+      creatorAccountId: '{{ response.schema.creatorAccountId }}'
+      description: '{{ response.schema.description }}'
+      name: '{{ response.schema.name }}'
+      partitionKeys: '{{ response.schema.partitionKeys[].type }}'
+      resourceArn: '{{ response.schema.resourceArn }}'
+      schemaStatusDetails: '{{ response.schema.schemaStatusDetails[].status }}'
+      schemaTypeProperties: '{{ response.schema.schemaTypeProperties }}'
+      selectedAnalysisMethods: '{{ response.schema.selectedAnalysisMethods }}'
+      type: '{{ response.schema.type }}'
+      updateTime: '{{ response.schema.updateTime }}'
+- discovery_id: aws.cleanrooms.get_schema_analysis_rule
+  for_each: aws.cleanrooms.list_collaborations
+  calls:
+  - action: get_schema_analysis_rule
+    params:
+      collaborationIdentifier: '{{ item.collaborationIdentifier }}'
+      name: '{{ item.name }}'
+      type: '{{ item.type }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      collaborationId: '{{ response.analysisRule.collaborationId }}'
+      collaborationPolicy: '{{ response.analysisRule.collaborationId }}'
+      consolidatedPolicy: '{{ response.analysisRule.consolidatedPolicy }}'
+      createTime: '{{ response.analysisRule.createTime }}'
+      name: '{{ response.analysisRule.name }}'
+      policy: '{{ response.analysisRule.policy }}'
+      type: '{{ response.analysisRule.type }}'
+      updateTime: '{{ response.analysisRule.updateTime }}'
+      additionalAnalyses: '{{ response.analysisRule.consolidatedPolicy.v1.aggregation.additionalAnalyses }}'
+      joinRequired: '{{ response.analysisRule.consolidatedPolicy.v1.aggregation.joinRequired }}'
+- discovery_id: aws.cleanrooms.list_analysis_templates
+  calls:
+  - action: list_analysis_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.analysisTemplateSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      collaborationArn: '{{ item.collaborationArn }}'
+      collaborationId: '{{ item.collaborationId }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      membershipArn: '{{ item.membershipArn }}'
+      membershipId: '{{ item.membershipId }}'
+      name: '{{ item.name }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_collaboration_analysis_templates
+  calls:
+  - action: list_collaboration_analysis_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.collaborationAnalysisTemplateSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      collaborationArn: '{{ item.collaborationArn }}'
+      collaborationId: '{{ item.collaborationId }}'
+      createTime: '{{ item.createTime }}'
+      creatorAccountId: '{{ item.creatorAccountId }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_collaboration_change_requests
+  calls:
+  - action: list_collaboration_change_requests
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.collaborationChangeRequestSummaries }}'
+    item:
+      changes: '{{ item.changes }}'
+      collaborationId: '{{ item.collaborationId }}'
+      createTime: '{{ item.createTime }}'
+      id: '{{ item.id }}'
+      isAutoApproved: '{{ item.isAutoApproved }}'
+      status: '{{ item.status }}'
+      updateTime: '{{ item.updateTime }}'
+- discovery_id: aws.cleanrooms.list_collaboration_configured_audience_model_associations
+  calls:
+  - action: list_collaboration_configured_audience_model_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.collaborationConfiguredAudienceModelAssociationSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      collaborationArn: '{{ item.collaborationArn }}'
+      collaborationId: '{{ item.collaborationId }}'
+      createTime: '{{ item.createTime }}'
+      creatorAccountId: '{{ item.creatorAccountId }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_collaboration_id_namespace_associations
+  calls:
+  - action: list_collaboration_id_namespace_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.collaborationIdNamespaceAssociationSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      collaborationArn: '{{ item.collaborationArn }}'
+      collaborationId: '{{ item.collaborationId }}'
+      createTime: '{{ item.createTime }}'
+      creatorAccountId: '{{ item.creatorAccountId }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      inputReferenceConfig: '{{ item.inputReferenceConfig }}'
+      inputReferenceProperties: '{{ item.inputReferenceProperties }}'
+      name: '{{ item.name }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_collaboration_privacy_budget_templates
+  calls:
+  - action: list_collaboration_privacy_budget_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.collaborationPrivacyBudgetTemplateSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      collaborationArn: '{{ item.collaborationArn }}'
+      collaborationId: '{{ item.collaborationId }}'
+      createTime: '{{ item.createTime }}'
+      creatorAccountId: '{{ item.creatorAccountId }}'
+      id: '{{ item.id }}'
+      privacyBudgetType: '{{ item.privacyBudgetType }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_collaboration_privacy_budgets
+  calls:
+  - action: list_collaboration_privacy_budgets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.collaborationPrivacyBudgetSummaries }}'
+    item:
+      budget: '{{ item.budget }}'
+      collaborationArn: '{{ item.collaborationArn }}'
+      collaborationId: '{{ item.collaborationId }}'
+      createTime: '{{ item.createTime }}'
+      creatorAccountId: '{{ item.creatorAccountId }}'
+      id: '{{ item.id }}'
+      privacyBudgetTemplateArn: '{{ item.privacyBudgetTemplateArn }}'
+      privacyBudgetTemplateId: '{{ item.privacyBudgetTemplateId }}'
+      type: '{{ item.type }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_configured_audience_model_associations
+  calls:
+  - action: list_configured_audience_model_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.configuredAudienceModelAssociationSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      collaborationArn: '{{ item.collaborationArn }}'
+      collaborationId: '{{ item.collaborationId }}'
+      configuredAudienceModelArn: '{{ item.configuredAudienceModelArn }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      membershipArn: '{{ item.membershipArn }}'
+      membershipId: '{{ item.membershipId }}'
+      name: '{{ item.name }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_configured_table_associations
+  calls:
+  - action: list_configured_table_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.configuredTableAssociationSummaries }}'
+    item:
+      analysisRuleTypes: '{{ item.analysisRuleTypes }}'
+      arn: '{{ item.arn }}'
+      configuredTableId: '{{ item.configuredTableId }}'
+      createTime: '{{ item.createTime }}'
+      id: '{{ item.id }}'
+      membershipArn: '{{ item.membershipArn }}'
+      membershipId: '{{ item.membershipId }}'
+      name: '{{ item.name }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_id_mapping_tables
+  calls:
+  - action: list_id_mapping_tables
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.idMappingTableSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      collaborationArn: '{{ item.collaborationArn }}'
+      collaborationId: '{{ item.collaborationId }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      inputReferenceConfig: '{{ item.inputReferenceConfig }}'
+      membershipArn: '{{ item.membershipArn }}'
+      membershipId: '{{ item.membershipId }}'
+      name: '{{ item.name }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_id_namespace_associations
+  calls:
+  - action: list_id_namespace_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.idNamespaceAssociationSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      collaborationArn: '{{ item.collaborationArn }}'
+      collaborationId: '{{ item.collaborationId }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      inputReferenceConfig: '{{ item.inputReferenceConfig }}'
+      inputReferenceProperties: '{{ item.inputReferenceProperties }}'
+      membershipArn: '{{ item.membershipArn }}'
+      membershipId: '{{ item.membershipId }}'
+      name: '{{ item.name }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_members
+  calls:
+  - action: list_members
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.memberSummaries }}'
+    item:
+      abilities: '{{ item.abilities }}'
+      accountId: '{{ item.accountId }}'
+      createTime: '{{ item.createTime }}'
+      displayName: '{{ item.displayName }}'
+      membershipArn: '{{ item.membershipArn }}'
+      membershipId: '{{ item.membershipId }}'
+      mlAbilities: '{{ item.mlAbilities }}'
+      paymentConfiguration: '{{ item.paymentConfiguration }}'
+      status: '{{ item.status }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_privacy_budget_templates
+  calls:
+  - action: list_privacy_budget_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.privacyBudgetTemplateSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      collaborationArn: '{{ item.collaborationArn }}'
+      collaborationId: '{{ item.collaborationId }}'
+      createTime: '{{ item.createTime }}'
+      id: '{{ item.id }}'
+      membershipArn: '{{ item.membershipArn }}'
+      membershipId: '{{ item.membershipId }}'
+      privacyBudgetType: '{{ item.privacyBudgetType }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_privacy_budgets
+  calls:
+  - action: list_privacy_budgets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.privacyBudgetSummaries }}'
+    item:
+      budget: '{{ item.budget }}'
+      collaborationArn: '{{ item.collaborationArn }}'
+      collaborationId: '{{ item.collaborationId }}'
+      createTime: '{{ item.createTime }}'
+      id: '{{ item.id }}'
+      membershipArn: '{{ item.membershipArn }}'
+      membershipId: '{{ item.membershipId }}'
+      privacyBudgetTemplateArn: '{{ item.privacyBudgetTemplateArn }}'
+      privacyBudgetTemplateId: '{{ item.privacyBudgetTemplateId }}'
+      type: '{{ item.type }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_protected_jobs
+  calls:
+  - action: list_protected_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.protectedJobs }}'
+    item:
+      createTime: '{{ item.createTime }}'
+      id: '{{ item.id }}'
+      membershipArn: '{{ item.membershipArn }}'
+      membershipId: '{{ item.membershipId }}'
+      receiverConfigurations: '{{ item.receiverConfigurations }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_protected_queries
+  calls:
+  - action: list_protected_queries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.protectedQueries }}'
+    item:
+      createTime: '{{ item.createTime }}'
+      id: '{{ item.id }}'
+      membershipArn: '{{ item.membershipArn }}'
+      membershipId: '{{ item.membershipId }}'
+      receiverConfigurations: '{{ item.receiverConfigurations }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_schemas
+  calls:
+  - action: list_schemas
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.schemaSummaries }}'
+    item:
+      analysisMethod: '{{ item.analysisMethod }}'
+      analysisRuleTypes: '{{ item.analysisRuleTypes }}'
+      collaborationArn: '{{ item.collaborationArn }}'
+      collaborationId: '{{ item.collaborationId }}'
+      createTime: '{{ item.createTime }}'
+      creatorAccountId: '{{ item.creatorAccountId }}'
+      name: '{{ item.name }}'
+      resourceArn: '{{ item.resourceArn }}'
+      selectedAnalysisMethods: '{{ item.selectedAnalysisMethods }}'
+      type: '{{ item.type }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.cleanrooms.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

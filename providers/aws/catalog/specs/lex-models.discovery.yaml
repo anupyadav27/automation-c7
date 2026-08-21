@@ -1,0 +1,131 @@
+version: '1.0'
+provider: aws
+service: lex-models
+discovery:
+- calls:
+  - action: get_bots
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lex-models.get_bots
+  emit:
+    as: item
+    item:
+      BotAliases: '{{ item.BotAliases }}'
+      botVersion: '{{ item.botVersion }}'
+      bots: '{{ item.bots }}'
+      checksum: '{{ item.checksum }}'
+      conversationLogs: '{{ item.conversationLogs }}'
+      createdDate: '{{ item.createdDate }}'
+      description: '{{ item.description }}'
+      iamRoleArn: '{{ item.iamRoleArn }}'
+      lastUpdatedDate: '{{ item.lastUpdatedDate }}'
+      logSettings: '{{ item.logSettings }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      utterances: '{{ item.utterances }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.bots }}'
+- calls:
+  - action: get_builtin_intents
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lex-models.get_builtin_intents
+  emit:
+    as: item
+    item:
+      intents: '{{ item.intents }}'
+      signature: '{{ item.signature }}'
+      supportedLocales: '{{ item.supportedLocales }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.intents }}'
+- calls:
+  - action: get_builtin_slot_types
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lex-models.get_builtin_slot_types
+  emit:
+    as: item
+    item:
+      signature: '{{ item.signature }}'
+      slotTypes: '{{ item.slotTypes }}'
+      supportedLocales: '{{ item.supportedLocales }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.slotTypes }}'
+- calls:
+  - action: get_intents
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lex-models.get_intents
+  emit:
+    as: item
+    item:
+      createdDate: '{{ item.createdDate }}'
+      description: '{{ item.description }}'
+      lastUpdatedDate: '{{ item.lastUpdatedDate }}'
+      locale: '{{ item.locale }}'
+      name: '{{ item.name }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.intents }}'
+- calls:
+  - action: get_migrations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lex-models.get_migrations
+  emit:
+    as: item
+    item:
+      migrationId: '{{ item.migrationId }}'
+      migrationStatus: '{{ item.migrationStatus }}'
+      migrationStrategy: '{{ item.migrationStrategy }}'
+      migrationSummaries: '{{ item.migrationSummaries }}'
+      migrationTimestamp: '{{ item.migrationTimestamp }}'
+      v1BotLocale: '{{ item.v1BotLocale }}'
+      v1BotName: '{{ item.v1BotName }}'
+      v1BotVersion: '{{ item.v1BotVersion }}'
+      v2BotId: '{{ item.v2BotId }}'
+      v2BotRole: '{{ item.v2BotRole }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.migrationSummaries }}'
+- calls:
+  - action: get_slot_types
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lex-models.get_slot_types
+  emit:
+    as: item
+    item:
+      createdDate: '{{ item.createdDate }}'
+      description: '{{ item.description }}'
+      lastUpdatedDate: '{{ item.lastUpdatedDate }}'
+      name: '{{ item.name }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.slotTypes }}'
+- calls:
+  - action: get_import
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lex-models.get_import
+  emit:
+    as: item
+    items_for: '{{ response.failureReason }}'
+    item:
+      createdDate: '{{ response.createdDate }}'
+      importId: '{{ response.importId }}'
+      importStatus: '{{ response.importStatus }}'
+      mergeStrategy: '{{ response.mergeStrategy }}'
+      name: '{{ response.name }}'
+      resourceType: '{{ response.resourceType }}'
+- calls:
+  - action: list_tags_for_resource
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lex-models.list_tags_for_resource
+  emit:
+    as: item
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'
+    items_for: '{{ response.tags }}'

@@ -1,0 +1,291 @@
+version: '1.0'
+provider: aws
+service: service-quotas
+services:
+  client: service-quotas
+  module: boto3.client
+discovery:
+- discovery_id: aws.service-quotas.get_association_for_service_quota_template
+  calls:
+  - action: get_association_for_service_quota_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ServiceQuotaTemplateAssociationStatus: '{{ response.ServiceQuotaTemplateAssociationStatus }}'
+- discovery_id: aws.service-quotas.get_auto_management_configuration
+  calls:
+  - action: get_auto_management_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ExclusionList: '{{ response.ExclusionList }}'
+      NotificationArn: '{{ response.NotificationArn }}'
+      OptInLevel: '{{ response.OptInLevel }}'
+      OptInStatus: '{{ response.OptInStatus }}'
+      OptInType: '{{ response.OptInType }}'
+- discovery_id: aws.service-quotas.list_requested_service_quota_change_history
+  calls:
+  - action: list_requested_service_quota_change_history
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RequestedQuotas }}'
+    item:
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      CaseId: '{{ item.CaseId }}'
+      Created: '{{ item.Created }}'
+      DesiredValue: '{{ item.DesiredValue }}'
+      GlobalQuota: '{{ item.GlobalQuota }}'
+      LastUpdated: '{{ item.LastUpdated }}'
+      QuotaArn: '{{ item.QuotaArn }}'
+      QuotaCode: '{{ item.QuotaCode }}'
+      QuotaContext: '{{ item.QuotaContext }}'
+      QuotaName: '{{ item.QuotaName }}'
+      QuotaRequestedAtLevel: '{{ item.QuotaRequestedAtLevel }}'
+      Requester: '{{ item.Requester }}'
+      ServiceCode: '{{ item.ServiceCode }}'
+      ServiceName: '{{ item.ServiceName }}'
+      Unit: '{{ item.Unit }}'
+- discovery_id: aws.service-quotas.list_service_quota_increase_requests_in_template
+  calls:
+  - action: list_service_quota_increase_requests_in_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ServiceQuotaIncreaseRequestInTemplateList }}'
+    item:
+      AwsRegion: '{{ item.AwsRegion }}'
+      DesiredValue: '{{ item.DesiredValue }}'
+      GlobalQuota: '{{ item.GlobalQuota }}'
+      QuotaCode: '{{ item.QuotaCode }}'
+      QuotaName: '{{ item.QuotaName }}'
+      ServiceCode: '{{ item.ServiceCode }}'
+      ServiceName: '{{ item.ServiceName }}'
+      ServiceQuotaIncreaseRequestInTemplate: '{{ item.ServiceQuotaIncreaseRequestInTemplateList[].Unit }}'
+      Unit: '{{ item.Unit }}'
+- discovery_id: aws.service-quotas.list_services
+  calls:
+  - action: list_services
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Services }}'
+    item:
+      ServiceCode: '{{ item.ServiceCode }}'
+      ServiceName: '{{ item.ServiceName }}'
+- discovery_id: aws.service-quotas.get_aws_default_service_quota
+  for_each: aws.service-quotas.list_requested_service_quota_change_history
+  calls:
+  - action: get_aws_default_service_quota
+    params:
+      ServiceCode: '{{ item.ServiceCode }}'
+      QuotaCode: '{{ item.QuotaCode }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Adjustable: '{{ response.Quota.Adjustable }}'
+      Description: '{{ response.Quota.Description }}'
+      ErrorReason: '{{ response.Quota.ErrorReason }}'
+      GlobalQuota: '{{ response.Quota.GlobalQuota }}'
+      Period: '{{ response.Quota.Period }}'
+      QuotaAppliedAtLevel: '{{ response.Quota.QuotaAppliedAtLevel }}'
+      QuotaArn: '{{ response.Quota.QuotaArn }}'
+      QuotaCode: '{{ response.Quota.QuotaCode }}'
+      QuotaContext: '{{ response.Quota.QuotaContext }}'
+      QuotaName: '{{ response.Quota.QuotaName }}'
+      ServiceCode: '{{ response.Quota.ServiceCode }}'
+      ServiceName: '{{ response.Quota.ServiceName }}'
+      Unit: '{{ response.Quota.Unit }}'
+      UsageMetric: '{{ response.Quota.UsageMetric }}'
+      Value: '{{ response.Quota.Value }}'
+- discovery_id: aws.service-quotas.get_requested_service_quota_change
+  calls:
+  - action: get_requested_service_quota_change
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.RequestedQuota.Id }}'
+      Status: '{{ response.RequestedQuota.Status }}'
+      CaseId: '{{ response.RequestedQuota.CaseId }}'
+      Created: '{{ response.RequestedQuota.Created }}'
+      DesiredValue: '{{ response.RequestedQuota.DesiredValue }}'
+      GlobalQuota: '{{ response.RequestedQuota.GlobalQuota }}'
+      LastUpdated: '{{ response.RequestedQuota.LastUpdated }}'
+      QuotaArn: '{{ response.RequestedQuota.QuotaArn }}'
+      QuotaCode: '{{ response.RequestedQuota.QuotaCode }}'
+      QuotaContext: '{{ response.RequestedQuota.QuotaCode }}'
+      QuotaName: '{{ response.RequestedQuota.QuotaName }}'
+      QuotaRequestedAtLevel: '{{ response.RequestedQuota.QuotaRequestedAtLevel }}'
+      Requester: '{{ response.RequestedQuota.Requester }}'
+      ServiceCode: '{{ response.RequestedQuota.ServiceCode }}'
+      ServiceName: '{{ response.RequestedQuota.ServiceName }}'
+      Unit: '{{ response.RequestedQuota.Unit }}'
+      ContextId: '{{ response.RequestedQuota.QuotaContext.ContextId }}'
+      ContextScope: '{{ response.RequestedQuota.QuotaContext.ContextScope }}'
+      ContextScopeType: '{{ response.RequestedQuota.QuotaContext.ContextScopeType }}'
+- discovery_id: aws.service-quotas.get_service_quota
+  for_each: aws.service-quotas.list_requested_service_quota_change_history
+  calls:
+  - action: get_service_quota
+    params:
+      ServiceCode: '{{ item.ServiceCode }}'
+      QuotaCode: '{{ item.QuotaCode }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Adjustable: '{{ response.Quota.Adjustable }}'
+      Description: '{{ response.Quota.Description }}'
+      ErrorReason: '{{ response.Quota.ErrorReason }}'
+      GlobalQuota: '{{ response.Quota.GlobalQuota }}'
+      Period: '{{ response.Quota.Period }}'
+      QuotaAppliedAtLevel: '{{ response.Quota.QuotaAppliedAtLevel }}'
+      QuotaArn: '{{ response.Quota.QuotaArn }}'
+      QuotaCode: '{{ response.Quota.QuotaCode }}'
+      QuotaContext: '{{ response.Quota.QuotaContext }}'
+      QuotaName: '{{ response.Quota.QuotaName }}'
+      ServiceCode: '{{ response.Quota.ServiceCode }}'
+      ServiceName: '{{ response.Quota.ServiceName }}'
+      Unit: '{{ response.Quota.Unit }}'
+      UsageMetric: '{{ response.Quota.UsageMetric }}'
+      Value: '{{ response.Quota.Value }}'
+      ErrorCode: '{{ response.Quota.ErrorReason.ErrorCode }}'
+      ErrorMessage: '{{ response.Quota.ErrorReason.ErrorMessage }}'
+      PeriodUnit: '{{ response.Quota.Period.PeriodUnit }}'
+      PeriodValue: '{{ response.Quota.Period.PeriodValue }}'
+      ContextId: '{{ response.Quota.QuotaContext.ContextId }}'
+      ContextScope: '{{ response.Quota.QuotaContext.ContextScope }}'
+      ContextScopeType: '{{ response.Quota.QuotaContext.ContextScopeType }}'
+      MetricDimensions: '{{ response.Quota.UsageMetric.MetricDimensions }}'
+      MetricName: '{{ response.Quota.UsageMetric.MetricName }}'
+      MetricNamespace: '{{ response.Quota.UsageMetric.MetricNamespace }}'
+      MetricStatisticRecommendation: '{{ response.Quota.UsageMetric.MetricStatisticRecommendation }}'
+- discovery_id: aws.service-quotas.get_service_quota_increase_request_from_template
+  for_each: aws.service-quotas.list_requested_service_quota_change_history
+  calls:
+  - action: get_service_quota_increase_request_from_template
+    params:
+      ServiceCode: '{{ item.ServiceCode }}'
+      QuotaCode: '{{ item.QuotaCode }}'
+      AwsRegion: '{{ item.AwsRegion }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AwsRegion: '{{ response.ServiceQuotaIncreaseRequestInTemplate.AwsRegion }}'
+      DesiredValue: '{{ response.ServiceQuotaIncreaseRequestInTemplate.DesiredValue }}'
+      GlobalQuota: '{{ response.ServiceQuotaIncreaseRequestInTemplate.GlobalQuota }}'
+      QuotaCode: '{{ response.ServiceQuotaIncreaseRequestInTemplate.QuotaCode }}'
+      QuotaName: '{{ response.ServiceQuotaIncreaseRequestInTemplate.QuotaName }}'
+      ServiceCode: '{{ response.ServiceQuotaIncreaseRequestInTemplate.ServiceCode }}'
+      ServiceName: '{{ response.ServiceQuotaIncreaseRequestInTemplate.ServiceName }}'
+      ServiceQuotaIncreaseRequestInTemplate: '{{ response.ServiceQuotaIncreaseRequestInTemplate.ServiceQuotaIncreaseRequestInTemplate }}'
+      Unit: '{{ response.ServiceQuotaIncreaseRequestInTemplate.Unit }}'
+- discovery_id: aws.service-quotas.list_aws_default_service_quotas
+  for_each: aws.service-quotas.list_requested_service_quota_change_history
+  calls:
+  - action: list_aws_default_service_quotas
+    params:
+      ServiceCode: '{{ item.ServiceCode }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Quotas }}'
+    item:
+      Adjustable: '{{ item.Adjustable }}'
+      Description: '{{ item.Description }}'
+      ErrorReason: '{{ item.ErrorReason }}'
+      GlobalQuota: '{{ item.GlobalQuota }}'
+      Period: '{{ item.Period }}'
+      QuotaAppliedAtLevel: '{{ item.QuotaAppliedAtLevel }}'
+      QuotaArn: '{{ item.QuotaArn }}'
+      QuotaCode: '{{ item.QuotaCode }}'
+      QuotaContext: '{{ item.QuotaContext }}'
+      QuotaName: '{{ item.QuotaName }}'
+      ServiceCode: '{{ item.ServiceCode }}'
+      ServiceName: '{{ item.ServiceName }}'
+      Unit: '{{ item.Unit }}'
+      UsageMetric: '{{ item.UsageMetric }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.service-quotas.list_requested_service_quota_change_history_by_quota
+  for_each: aws.service-quotas.list_requested_service_quota_change_history
+  calls:
+  - action: list_requested_service_quota_change_history_by_quota
+    params:
+      ServiceCode: '{{ item.ServiceCode }}'
+      QuotaCode: '{{ item.QuotaCode }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RequestedQuotas }}'
+    item:
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      CaseId: '{{ item.CaseId }}'
+      Created: '{{ item.Created }}'
+      DesiredValue: '{{ item.DesiredValue }}'
+      GlobalQuota: '{{ item.GlobalQuota }}'
+      LastUpdated: '{{ item.LastUpdated }}'
+      QuotaArn: '{{ item.QuotaArn }}'
+      QuotaCode: '{{ item.QuotaCode }}'
+      QuotaContext: '{{ item.QuotaContext }}'
+      QuotaName: '{{ item.QuotaName }}'
+      QuotaRequestedAtLevel: '{{ item.QuotaRequestedAtLevel }}'
+      Requester: '{{ item.Requester }}'
+      ServiceCode: '{{ item.ServiceCode }}'
+      ServiceName: '{{ item.ServiceName }}'
+      Unit: '{{ item.Unit }}'
+- discovery_id: aws.service-quotas.list_service_quotas
+  for_each: aws.service-quotas.list_requested_service_quota_change_history
+  calls:
+  - action: list_service_quotas
+    params:
+      ServiceCode: '{{ item.ServiceCode }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Quotas }}'
+    item:
+      Adjustable: '{{ item.Adjustable }}'
+      Description: '{{ item.Description }}'
+      ErrorReason: '{{ item.ErrorReason }}'
+      GlobalQuota: '{{ item.GlobalQuota }}'
+      Period: '{{ item.Period }}'
+      QuotaAppliedAtLevel: '{{ item.QuotaAppliedAtLevel }}'
+      QuotaArn: '{{ item.QuotaArn }}'
+      QuotaCode: '{{ item.QuotaCode }}'
+      QuotaContext: '{{ item.QuotaContext }}'
+      QuotaName: '{{ item.QuotaName }}'
+      ServiceCode: '{{ item.ServiceCode }}'
+      ServiceName: '{{ item.ServiceName }}'
+      Unit: '{{ item.Unit }}'
+      UsageMetric: '{{ item.UsageMetric }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.service-quotas.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

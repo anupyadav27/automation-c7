@@ -1,0 +1,808 @@
+version: '1.0'
+provider: aws
+service: qbusiness
+services:
+  client: qbusiness
+  module: boto3.client
+discovery:
+- discovery_id: aws.qbusiness.list_applications
+  calls:
+  - action: list_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.applications }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      action: '{{ item.action }}'
+      actionConfigurations: '{{ item.actionConfigurations }}'
+      actionExecution: '{{ item.actionExecution }}'
+      actionReview: '{{ item.actionReview }}'
+      applicationArn: '{{ item.applicationArn }}'
+      applicationId: '{{ item.applicationId }}'
+      attachments: '{{ item.attachments }}'
+      attachmentsConfiguration: '{{ item.attachmentsConfiguration }}'
+      authenticationConfiguration: '{{ item.authenticationConfiguration }}'
+      authenticationDetail: '{{ item.authenticationDetail }}'
+      autoSubscriptionConfiguration: '{{ item.autoSubscriptionConfiguration }}'
+      blockedPhrases: '{{ item.blockedPhrases }}'
+      body: '{{ item.body }}'
+      browserExtensionConfiguration: '{{ item.browserExtensionConfiguration }}'
+      buildStatus: '{{ item.buildStatus }}'
+      capacityConfiguration: '{{ item.capacityConfiguration }}'
+      clientIdsForOIDC: '{{ item.clientIdsForOIDC }}'
+      configuration: '{{ item.configuration }}'
+      copyFrom: '{{ item.copyFrom }}'
+      createdAt: '{{ item.createdAt }}'
+      creatorModeConfiguration: '{{ item.creatorModeConfiguration }}'
+      currentSubscription: '{{ item.currentSubscription }}'
+      customizationConfiguration: '{{ item.customizationConfiguration }}'
+      defaultEndpoint: '{{ item.defaultEndpoint }}'
+      displayName: '{{ item.displayName }}'
+      documentAttributeConfigurations: '{{ item.documentAttributeConfigurations }}'
+      encryptionConfiguration: '{{ item.encryptionConfiguration }}'
+      error: '{{ item.error }}'
+      exampleChatMessages: '{{ item.exampleChatMessages }}'
+      fileSize: '{{ item.fileSize }}'
+      fileType: '{{ item.fileType }}'
+      filterConfiguration: '{{ item.filterConfiguration }}'
+      hallucinationReductionConfiguration: '{{ item.hallucinationReductionConfiguration }}'
+      iamIdentityProviderArn: '{{ item.iamIdentityProviderArn }}'
+      identityCenterApplicationArn: '{{ item.identityCenterApplicationArn }}'
+      identityProviderConfiguration: '{{ item.identityProviderConfiguration }}'
+      identityType: '{{ item.identityType }}'
+      inUseConfiguration: '{{ item.inUseConfiguration }}'
+      indexArn: '{{ item.indexArn }}'
+      indexStatistics: '{{ item.indexStatistics }}'
+      lastUpdateConfiguration: '{{ item.lastUpdateConfiguration }}'
+      md5chksum: '{{ item.md5chksum }}'
+      name: '{{ item.name }}'
+      nextSubscription: '{{ item.nextSubscription }}'
+      orchestrationConfiguration: '{{ item.orchestrationConfiguration }}'
+      personalizationConfiguration: '{{ item.personalizationConfiguration }}'
+      principal: '{{ item.principal }}'
+      qAppsConfiguration: '{{ item.qAppsConfiguration }}'
+      quickSightConfiguration: '{{ item.quickSightConfiguration }}'
+      responseConfigurationSummary: '{{ item.responseConfigurationSummary }}'
+      responseConfigurations: '{{ item.responseConfigurations }}'
+      responseScope: '{{ item.responseScope }}'
+      roleArn: '{{ item.roleArn }}'
+      rules: '{{ item.rules }}'
+      samplePromptsControlMode: '{{ item.samplePromptsControlMode }}'
+      search: '{{ item.search }}'
+      serverUrl: '{{ item.serverUrl }}'
+      sourceAttribution: '{{ item.sourceAttribution }}'
+      startTime: '{{ item.startTime }}'
+      state: '{{ item.state }}'
+      status: '{{ item.status }}'
+      time: '{{ item.time }}'
+      title: '{{ item.title }}'
+      topicConfigurations: '{{ item.topicConfigurations }}'
+      updatedAt: '{{ item.updatedAt }}'
+      webExperienceArn: '{{ item.webExperienceArn }}'
+      welcomeMessage: '{{ item.welcomeMessage }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_plugin_type_metadata
+  calls:
+  - action: list_plugin_type_metadata
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      category: '{{ item.category }}'
+      description: '{{ item.description }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.get_application
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: get_application
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.clientIdsForOIDC }}'
+    item:
+      attachmentsConfiguration: '{{ item.attachmentsConfiguration }}'
+      autoSubscriptionConfiguration: '{{ item.autoSubscriptionConfiguration }}'
+      capacityConfiguration: '{{ item.capacityConfiguration }}'
+      clientIdsForOIDC: '{{ item.clientIdsForOIDC }}'
+      documentAttributeConfigurations: '{{ item.documentAttributeConfigurations }}'
+      encryptionConfiguration: '{{ item.encryptionConfiguration }}'
+      iamIdentityProviderArn: '{{ item.iamIdentityProviderArn }}'
+      identityCenterApplicationArn: '{{ item.identityCenterApplicationArn }}'
+      indexArn: '{{ item.indexArn }}'
+      indexStatistics: '{{ item.indexStatistics }}'
+      personalizationConfiguration: '{{ item.personalizationConfiguration }}'
+      qAppsConfiguration: '{{ item.qAppsConfiguration }}'
+      roleArn: '{{ item.roleArn }}'
+      search: '{{ item.search }}'
+      applicationArn: '{{ response.applicationArn }}'
+      applicationId: '{{ response.applicationId }}'
+      attachmentsControlMode: '{{ response.attachmentsConfiguration.attachmentsControlMode }}'
+      autoSubscribe: '{{ response.autoSubscriptionConfiguration.autoSubscribe }}'
+      defaultSubscriptionType: '{{ response.autoSubscriptionConfiguration.defaultSubscriptionType }}'
+      createdAt: '{{ response.createdAt }}'
+      description: '{{ response.description }}'
+      displayName: '{{ response.displayName }}'
+      kmsKeyId: '{{ response.encryptionConfiguration.kmsKeyId }}'
+      errorCode: '{{ response.error.errorCode }}'
+      errorMessage: '{{ response.error.errorMessage }}'
+      identityType: '{{ response.identityType }}'
+      personalizationControlMode: '{{ response.personalizationConfiguration.personalizationControlMode }}'
+      qAppsControlMode: '{{ response.qAppsConfiguration.qAppsControlMode }}'
+      clientNamespace: '{{ response.quickSightConfiguration.clientNamespace }}'
+      status: '{{ response.status }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.qbusiness.get_chat_controls_configuration
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: get_chat_controls_configuration
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.topicConfigurations }}'
+    item:
+      blockedPhrases: '{{ item.blockedPhrases }}'
+      creatorModeConfiguration: '{{ item.creatorModeConfiguration }}'
+      description: '{{ item.description }}'
+      exampleChatMessages: '{{ item.exampleChatMessages }}'
+      hallucinationReductionConfiguration: '{{ item.hallucinationReductionConfiguration }}'
+      name: '{{ item.name }}'
+      orchestrationConfiguration: '{{ item.orchestrationConfiguration.control }}'
+      responseScope: '{{ item.responseScope }}'
+      rules: '{{ item.rules }}'
+      topicConfigurations: '{{ item.topicConfigurations }}'
+      systemMessageOverride: '{{ response.blockedPhrases.systemMessageOverride }}'
+      creatorModeControl: '{{ response.creatorModeConfiguration.creatorModeControl }}'
+      hallucinationReductionControl: '{{ response.hallucinationReductionConfiguration.hallucinationReductionControl }}'
+      nextToken: '{{ response.nextToken }}'
+      control: '{{ response.orchestrationConfiguration.control }}'
+- discovery_id: aws.qbusiness.get_chat_response_configuration
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: get_chat_response_configuration
+    params:
+      applicationId: '{{ item.applicationId }}'
+      chatResponseConfigurationId: '{{ item.chatResponseConfigurationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      error: '{{ response.inUseConfiguration.error }}'
+      inUseConfiguration: '{{ response.inUseConfiguration.inUseConfiguration }}'
+      lastUpdateConfiguration: '{{ response.inUseConfiguration.lastUpdateConfiguration }}'
+      responseConfigurationSummary: '{{ response.inUseConfiguration.responseConfigurationSummary }}'
+      responseConfigurations: '{{ response.inUseConfiguration.responseConfigurations }}'
+      status: '{{ response.inUseConfiguration.status }}'
+      updatedAt: '{{ response.inUseConfiguration.updatedAt }}'
+- discovery_id: aws.qbusiness.get_data_accessor
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: get_data_accessor
+    params:
+      applicationId: '{{ item.applicationId }}'
+      dataAccessorId: '{{ item.dataAccessorId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.actionConfigurations }}'
+    item:
+      action: '{{ item.action }}'
+      actionConfigurations: '{{ item.actionConfigurations }}'
+      applicationArn: '{{ item.applicationArn }}'
+      filterConfiguration: '{{ item.filterConfiguration }}'
+      identityCenterApplicationArn: '{{ item.identityCenterApplicationArn }}'
+      applicationId: '{{ response.applicationId }}'
+      createdAt: '{{ response.createdAt }}'
+      dataAccessorArn: '{{ response.dataAccessorArn }}'
+      dataAccessorId: '{{ response.dataAccessorId }}'
+      displayName: '{{ response.displayName }}'
+      idcApplicationArn: '{{ response.idcApplicationArn }}'
+      principal: '{{ response.principal }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.qbusiness.get_data_source
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: get_data_source
+    params:
+      applicationId: '{{ item.applicationId }}'
+      indexId: '{{ item.indexId }}'
+      dataSourceId: '{{ item.dataSourceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      configuration: '{{ response.configuration.configuration }}'
+      applicationId: '{{ response.applicationId }}'
+      createdAt: '{{ response.createdAt }}'
+      dataSourceArn: '{{ response.dataSourceArn }}'
+      dataSourceId: '{{ response.dataSourceId }}'
+      description: '{{ response.description }}'
+      displayName: '{{ response.displayName }}'
+      key: '{{ response.documentEnrichmentConfiguration.postExtractionHookConfiguration.invocationCondition.key }}'
+      operator: '{{ response.documentEnrichmentConfiguration.postExtractionHookConfiguration.invocationCondition.operator }}'
+      dateValue: '{{ response.documentEnrichmentConfiguration.postExtractionHookConfiguration.invocationCondition.value.dateValue }}'
+      longValue: '{{ response.documentEnrichmentConfiguration.postExtractionHookConfiguration.invocationCondition.value.longValue }}'
+      stringValue: '{{ response.documentEnrichmentConfiguration.postExtractionHookConfiguration.invocationCondition.value.stringValue }}'
+      lambdaArn: '{{ response.documentEnrichmentConfiguration.postExtractionHookConfiguration.lambdaArn }}'
+      roleArn: '{{ response.documentEnrichmentConfiguration.postExtractionHookConfiguration.roleArn }}'
+      s3BucketName: '{{ response.documentEnrichmentConfiguration.postExtractionHookConfiguration.s3BucketName }}'
+      errorCode: '{{ response.error.errorCode }}'
+      errorMessage: '{{ response.error.errorMessage }}'
+      indexId: '{{ response.indexId }}'
+      audioExtractionStatus: '{{ response.mediaExtractionConfiguration.audioExtractionConfiguration.audioExtractionStatus }}'
+      imageExtractionStatus: '{{ response.mediaExtractionConfiguration.imageExtractionConfiguration.imageExtractionStatus }}'
+      videoExtractionStatus: '{{ response.mediaExtractionConfiguration.videoExtractionConfiguration.videoExtractionStatus }}'
+      status: '{{ response.status }}'
+      syncSchedule: '{{ response.syncSchedule }}'
+      type: '{{ response.type }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.qbusiness.get_document_content
+  calls:
+  - action: get_document_content
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      mimeType: '{{ response.mimeType }}'
+      presignedUrl: '{{ response.presignedUrl }}'
+- discovery_id: aws.qbusiness.get_group
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: get_group
+    params:
+      applicationId: '{{ item.applicationId }}'
+      indexId: '{{ item.indexId }}'
+      groupName: '{{ item.groupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.statusHistory }}'
+    item:
+      errorDetail: '{{ item.errorDetail }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      status: '{{ item.status }}'
+      errorCode: '{{ response.status.errorDetail.errorCode }}'
+      errorMessage: '{{ response.status.errorDetail.errorMessage }}'
+- discovery_id: aws.qbusiness.get_index
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: get_index
+    params:
+      applicationId: '{{ item.applicationId }}'
+      indexId: '{{ item.indexId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.documentAttributeConfigurations }}'
+    item:
+      capacityConfiguration: '{{ item.capacityConfiguration.units }}'
+      documentAttributeConfigurations: '{{ item.documentAttributeConfigurations[].type }}'
+      indexArn: '{{ item.indexArn }}'
+      indexStatistics: '{{ item.indexStatistics }}'
+      name: '{{ item.name }}'
+      search: '{{ item.search }}'
+      type: '{{ item.type }}'
+      applicationId: '{{ response.applicationId }}'
+      units: '{{ response.capacityConfiguration.units }}'
+      createdAt: '{{ response.createdAt }}'
+      description: '{{ response.description }}'
+      displayName: '{{ response.displayName }}'
+      errorCode: '{{ response.error.errorCode }}'
+      errorMessage: '{{ response.error.errorMessage }}'
+      indexId: '{{ response.indexId }}'
+      indexedTextBytes: '{{ response.indexStatistics.textDocumentStatistics.indexedTextBytes }}'
+      indexedTextDocumentCount: '{{ response.indexStatistics.textDocumentStatistics.indexedTextDocumentCount }}'
+      status: '{{ response.status }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.qbusiness.get_media
+  calls:
+  - action: get_media
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      mediaBytes: '{{ response.mediaBytes }}'
+      mediaMimeType: '{{ response.mediaMimeType }}'
+- discovery_id: aws.qbusiness.get_plugin
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: get_plugin
+    params:
+      applicationId: '{{ item.applicationId }}'
+      pluginId: '{{ item.pluginId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      basicAuthConfiguration: '{{ response.authConfiguration.basicAuthConfiguration.roleArn }}'
+      idcAuthConfiguration: '{{ response.authConfiguration.idcAuthConfiguration.roleArn }}'
+      noAuthConfiguration: '{{ response.authConfiguration.noAuthConfiguration }}'
+      oAuth2ClientCredentialConfiguration: '{{ response.authConfiguration.oAuth2ClientCredentialConfiguration.roleArn }}'
+      applicationId: '{{ response.applicationId }}'
+      roleArn: '{{ response.authConfiguration.basicAuthConfiguration.roleArn }}'
+      secretArn: '{{ response.authConfiguration.basicAuthConfiguration.secretArn }}'
+      idcApplicationArn: '{{ response.authConfiguration.idcAuthConfiguration.idcApplicationArn }}'
+      authorizationUrl: '{{ response.authConfiguration.oAuth2ClientCredentialConfiguration.authorizationUrl }}'
+      tokenUrl: '{{ response.authConfiguration.oAuth2ClientCredentialConfiguration.tokenUrl }}'
+      buildStatus: '{{ response.buildStatus }}'
+      createdAt: '{{ response.createdAt }}'
+      apiSchemaType: '{{ response.customPluginConfiguration.apiSchemaType }}'
+      payload: '{{ response.customPluginConfiguration.apiSchema.payload }}'
+      bucket: '{{ response.customPluginConfiguration.apiSchema.s3.bucket }}'
+      key: '{{ response.customPluginConfiguration.apiSchema.s3.key }}'
+      description: '{{ response.customPluginConfiguration.description }}'
+      displayName: '{{ response.displayName }}'
+      pluginArn: '{{ response.pluginArn }}'
+      pluginId: '{{ response.pluginId }}'
+      serverUrl: '{{ response.serverUrl }}'
+      state: '{{ response.state }}'
+      type: '{{ response.type }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.qbusiness.get_policy
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: get_policy
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+      policy: '{{ response.policy }}'
+- discovery_id: aws.qbusiness.get_retriever
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: get_retriever
+    params:
+      applicationId: '{{ item.applicationId }}'
+      retrieverId: '{{ item.retrieverId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      kendraIndexConfiguration: '{{ response.configuration.kendraIndexConfiguration.indexId }}'
+      nativeIndexConfiguration: '{{ response.configuration.nativeIndexConfiguration.indexId }}'
+      applicationId: '{{ response.applicationId }}'
+      indexId: '{{ response.configuration.kendraIndexConfiguration.indexId }}'
+      boostingOverride: '{{ response.configuration.nativeIndexConfiguration.boostingOverride }}'
+      createdAt: '{{ response.createdAt }}'
+      displayName: '{{ response.displayName }}'
+      retrieverArn: '{{ response.retrieverArn }}'
+      retrieverId: '{{ response.retrieverId }}'
+      roleArn: '{{ response.roleArn }}'
+      status: '{{ response.status }}'
+      type: '{{ response.type }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.qbusiness.get_user
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: get_user
+    params:
+      applicationId: '{{ item.applicationId }}'
+      userId: '{{ item.userId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.userAliases }}'
+    item:
+      dataSourceId: '{{ item.dataSourceId }}'
+      indexId: '{{ item.indexId }}'
+      userId: '{{ item.userId }}'
+- discovery_id: aws.qbusiness.get_web_experience
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: get_web_experience
+    params:
+      applicationId: '{{ item.applicationId }}'
+      webExperienceId: '{{ item.webExperienceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.origins }}'
+    item:
+      authenticationConfiguration: '{{ item.authenticationConfiguration }}'
+      browserExtensionConfiguration: '{{ item.browserExtensionConfiguration }}'
+      configuration: '{{ item.configuration }}'
+      customizationConfiguration: '{{ item.customizationConfiguration.logoUrl }}'
+      identityProviderConfiguration: '{{ item.identityProviderConfiguration }}'
+      origins: '{{ item.origins }}'
+      samplePromptsControlMode: '{{ item.samplePromptsControlMode }}'
+      subtitle: '{{ item.subtitle }}'
+      webExperienceArn: '{{ item.webExperienceArn }}'
+      welcomeMessage: '{{ item.welcomeMessage }}'
+      applicationId: '{{ response.applicationId }}'
+      metadataXML: '{{ response.authenticationConfiguration.samlConfiguration.metadataXML }}'
+      roleArn: '{{ response.authenticationConfiguration.samlConfiguration.roleArn }}'
+      userGroupAttribute: '{{ response.authenticationConfiguration.samlConfiguration.userGroupAttribute }}'
+      userIdAttribute: '{{ response.authenticationConfiguration.samlConfiguration.userIdAttribute }}'
+      createdAt: '{{ response.createdAt }}'
+      customCSSUrl: '{{ response.customizationConfiguration.customCSSUrl }}'
+      faviconUrl: '{{ response.customizationConfiguration.faviconUrl }}'
+      fontUrl: '{{ response.customizationConfiguration.fontUrl }}'
+      logoUrl: '{{ response.customizationConfiguration.logoUrl }}'
+      defaultEndpoint: '{{ response.defaultEndpoint }}'
+      errorCode: '{{ response.error.errorCode }}'
+      errorMessage: '{{ response.error.errorMessage }}'
+      secretsArn: '{{ response.identityProviderConfiguration.openIDConnectConfiguration.secretsArn }}'
+      secretsRole: '{{ response.identityProviderConfiguration.openIDConnectConfiguration.secretsRole }}'
+      authenticationUrl: '{{ response.identityProviderConfiguration.samlConfiguration.authenticationUrl }}'
+      status: '{{ response.status }}'
+      title: '{{ response.title }}'
+      updatedAt: '{{ response.updatedAt }}'
+      webExperienceId: '{{ response.webExperienceId }}'
+- discovery_id: aws.qbusiness.list_attachments
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_attachments
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.attachments }}'
+    item:
+      actionExecution: '{{ item.actionExecution }}'
+      actionReview: '{{ item.actionReview }}'
+      attachmentId: '{{ item.attachmentId }}'
+      attachments: '{{ item.attachments }}'
+      body: '{{ item.body }}'
+      conversationId: '{{ item.conversationId }}'
+      copyFrom: '{{ item.copyFrom }}'
+      createdAt: '{{ item.createdAt }}'
+      error: '{{ item.error }}'
+      fileSize: '{{ item.fileSize }}'
+      fileType: '{{ item.fileType }}'
+      md5chksum: '{{ item.md5chksum }}'
+      name: '{{ item.name }}'
+      sourceAttribution: '{{ item.sourceAttribution }}'
+      status: '{{ item.status }}'
+      time: '{{ item.time }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_chat_response_configurations
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_chat_response_configurations
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.chatResponseConfigurations }}'
+    item:
+      chatResponseConfigurationArn: '{{ item.chatResponseConfigurationArn }}'
+      chatResponseConfigurationId: '{{ item.chatResponseConfigurationId }}'
+      createdAt: '{{ item.createdAt }}'
+      displayName: '{{ item.displayName }}'
+      inUseConfiguration: '{{ item.inUseConfiguration }}'
+      lastUpdateConfiguration: '{{ item.lastUpdateConfiguration }}'
+      responseConfigurationSummary: '{{ item.responseConfigurationSummary }}'
+      status: '{{ item.status }}'
+      updatedAt: '{{ item.updatedAt }}'
+- discovery_id: aws.qbusiness.list_conversations
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_conversations
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.conversations }}'
+    item:
+      conversationId: '{{ item.conversationId }}'
+      startTime: '{{ item.startTime }}'
+      title: '{{ item.title }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_data_accessors
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_data_accessors
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dataAccessors }}'
+    item:
+      actionConfigurations: '{{ item.actionConfigurations }}'
+      authenticationDetail: '{{ item.authenticationDetail }}'
+      createdAt: '{{ item.createdAt }}'
+      dataAccessorArn: '{{ item.dataAccessorArn }}'
+      dataAccessorId: '{{ item.dataAccessorId }}'
+      displayName: '{{ item.displayName }}'
+      idcApplicationArn: '{{ item.idcApplicationArn }}'
+      principal: '{{ item.principal }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_data_source_sync_jobs
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_data_source_sync_jobs
+    params:
+      dataSourceId: '{{ item.dataSourceId }}'
+      applicationId: '{{ item.applicationId }}'
+      indexId: '{{ item.indexId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.history }}'
+    item:
+      configuration: '{{ item.configuration }}'
+      dataSourceErrorCode: '{{ item.dataSourceErrorCode }}'
+      endTime: '{{ item.endTime }}'
+      error: '{{ item.error }}'
+      executionId: '{{ item.executionId }}'
+      metrics: '{{ item.metrics }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_data_sources
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_data_sources
+    params:
+      applicationId: '{{ item.applicationId }}'
+      indexId: '{{ item.indexId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dataSources }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      dataSourceId: '{{ item.dataSourceId }}'
+      displayName: '{{ item.displayName }}'
+      status: '{{ item.status }}'
+      type: '{{ item.type }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_documents
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_documents
+    params:
+      applicationId: '{{ item.applicationId }}'
+      indexId: '{{ item.indexId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.documentDetailList }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      error: '{{ item.error }}'
+      status: '{{ item.status }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_groups
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_groups
+    params:
+      applicationId: '{{ item.applicationId }}'
+      indexId: '{{ item.indexId }}'
+      updatedEarlierThan: '{{ item.updatedEarlierThan }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      groupName: '{{ item.groupName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_indices
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_indices
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.indices }}'
+    item:
+      capacityConfiguration: '{{ item.capacityConfiguration }}'
+      createdAt: '{{ item.createdAt }}'
+      displayName: '{{ item.displayName }}'
+      documentAttributeConfigurations: '{{ item.documentAttributeConfigurations }}'
+      indexArn: '{{ item.indexArn }}'
+      indexId: '{{ item.indexId }}'
+      indexStatistics: '{{ item.indexStatistics }}'
+      search: '{{ item.search }}'
+      status: '{{ item.status }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_messages
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_messages
+    params:
+      conversationId: '{{ item.conversationId }}'
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.messages }}'
+    item:
+      actionExecution: '{{ item.actionExecution }}'
+      actionReview: '{{ item.actionReview }}'
+      attachments: '{{ item.attachments }}'
+      body: '{{ item.body }}'
+      messageId: '{{ item.messageId }}'
+      sourceAttribution: '{{ item.sourceAttribution }}'
+      time: '{{ item.time }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_plugin_actions
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_plugin_actions
+    params:
+      applicationId: '{{ item.applicationId }}'
+      pluginId: '{{ item.pluginId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      actionIdentifier: '{{ item.actionIdentifier }}'
+      description: '{{ item.description }}'
+      displayName: '{{ item.displayName }}'
+      instructionExample: '{{ item.instructionExample }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_plugin_type_actions
+  calls:
+  - action: list_plugin_type_actions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      actionIdentifier: '{{ item.actionIdentifier }}'
+      description: '{{ item.description }}'
+      displayName: '{{ item.displayName }}'
+      instructionExample: '{{ item.instructionExample }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_plugins
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_plugins
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.plugins }}'
+    item:
+      buildStatus: '{{ item.buildStatus }}'
+      createdAt: '{{ item.createdAt }}'
+      displayName: '{{ item.displayName }}'
+      pluginId: '{{ item.pluginId }}'
+      serverUrl: '{{ item.serverUrl }}'
+      state: '{{ item.state }}'
+      type: '{{ item.type }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_retrievers
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_retrievers
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.retrievers }}'
+    item:
+      applicationId: '{{ item.applicationId }}'
+      displayName: '{{ item.displayName }}'
+      retrieverId: '{{ item.retrieverId }}'
+      status: '{{ item.status }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_subscriptions
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_subscriptions
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.subscriptions }}'
+    item:
+      currentSubscription: '{{ item.currentSubscription }}'
+      nextSubscription: '{{ item.nextSubscription }}'
+      principal: '{{ item.principal }}'
+      subscriptionArn: '{{ item.subscriptionArn }}'
+      subscriptionId: '{{ item.subscriptionId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'
+- discovery_id: aws.qbusiness.list_web_experiences
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: list_web_experiences
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.webExperiences }}'
+    item:
+      authenticationConfiguration: '{{ item.authenticationConfiguration }}'
+      browserExtensionConfiguration: '{{ item.browserExtensionConfiguration }}'
+      createdAt: '{{ item.createdAt }}'
+      customizationConfiguration: '{{ item.customizationConfiguration }}'
+      defaultEndpoint: '{{ item.defaultEndpoint }}'
+      identityProviderConfiguration: '{{ item.identityProviderConfiguration }}'
+      origins: '{{ item.origins }}'
+      samplePromptsControlMode: '{{ item.samplePromptsControlMode }}'
+      status: '{{ item.status }}'
+      subtitle: '{{ item.subtitle }}'
+      updatedAt: '{{ item.updatedAt }}'
+      webExperienceId: '{{ item.webExperienceId }}'
+      welcomeMessage: '{{ item.welcomeMessage }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qbusiness.search_relevant_content
+  for_each: aws.qbusiness.list_applications
+  calls:
+  - action: search_relevant_content
+    params:
+      applicationId: '{{ item.applicationId }}'
+      queryText: '{{ item.queryText }}'
+      contentSource: '{{ item.contentSource }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.relevantContent }}'
+    item:
+      nextToken: '{{ response.nextToken }}'

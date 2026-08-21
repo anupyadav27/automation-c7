@@ -1,0 +1,610 @@
+version: '1.0'
+provider: aws
+service: iot-managed-integrations
+services:
+  client: iot-managed-integrations
+  module: boto3.client
+discovery:
+- discovery_id: aws.iot-managed-integrations.get_custom_endpoint
+  calls:
+  - action: get_custom_endpoint
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      EndpointAddress: '{{ response.EndpointAddress }}'
+- discovery_id: aws.iot-managed-integrations.get_default_encryption_configuration
+  calls:
+  - action: get_default_encryption_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      encryptionType: '{{ response.encryptionType }}'
+      kmsKeyArn: '{{ response.kmsKeyArn }}'
+      error: '{{ response.configurationStatus.error }}'
+      state: '{{ response.configurationStatus.state }}'
+- discovery_id: aws.iot-managed-integrations.get_hub_configuration
+  calls:
+  - action: get_hub_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      HubTokenTimerExpirySettingInSeconds: '{{ response.HubTokenTimerExpirySettingInSeconds
+        }}'
+      UpdatedAt: '{{ response.UpdatedAt }}'
+- discovery_id: aws.iot-managed-integrations.list_account_associations
+  calls:
+  - action: list_account_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Name: '{{ item.Name }}'
+      Tags: '{{ item.Tags }}'
+      AccountAssociationId: '{{ item.AccountAssociationId }}'
+      AssociationState: '{{ item.AssociationState }}'
+      ConnectorDestinationId: '{{ item.ConnectorDestinationId }}'
+      Description: '{{ item.Description }}'
+      ErrorMessage: '{{ item.ErrorMessage }}'
+- discovery_id: aws.iot-managed-integrations.list_cloud_connectors
+  calls:
+  - action: list_cloud_connectors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Description: '{{ item.Description }}'
+      EndpointConfig: '{{ item.EndpointConfig }}'
+      EndpointType: '{{ item.EndpointType }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.iot-managed-integrations.list_connector_destinations
+  calls:
+  - action: list_connector_destinations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ConnectorDestinationList }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      CloudConnectorId: '{{ item.CloudConnectorId }}'
+      Description: '{{ item.Description }}'
+- discovery_id: aws.iot-managed-integrations.list_credential_lockers
+  calls:
+  - action: list_credential_lockers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+- discovery_id: aws.iot-managed-integrations.list_destinations
+  calls:
+  - action: list_destinations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DestinationList }}'
+    item:
+      Name: '{{ item.Name }}'
+      RoleArn: '{{ item.RoleArn }}'
+      DeliveryDestinationArn: '{{ item.DeliveryDestinationArn }}'
+      DeliveryDestinationType: '{{ item.DeliveryDestinationType }}'
+      Description: '{{ item.Description }}'
+- discovery_id: aws.iot-managed-integrations.list_device_discoveries
+  calls:
+  - action: list_device_discoveries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      DiscoveryType: '{{ item.DiscoveryType }}'
+- discovery_id: aws.iot-managed-integrations.list_event_log_configurations
+  calls:
+  - action: list_event_log_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EventLogConfigurationList }}'
+    item:
+      Id: '{{ item.Id }}'
+      ResourceId: '{{ item.ResourceId }}'
+      EventLogLevel: '{{ item.EventLogLevel }}'
+      ResourceType: '{{ item.ResourceType }}'
+- discovery_id: aws.iot-managed-integrations.list_managed_thing_account_associations
+  calls:
+  - action: list_managed_thing_account_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      AccountAssociationId: '{{ item.AccountAssociationId }}'
+      Connected: '{{ item.Connected }}'
+      ManagedThingId: '{{ item.ManagedThingId }}'
+      Timestamp: '{{ item.Timestamp }}'
+- discovery_id: aws.iot-managed-integrations.list_managed_things
+  calls:
+  - action: list_managed_things
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Classification: '{{ item.Classification }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      ActivatedAt: '{{ item.ActivatedAt }}'
+      AdvertisedProductId: '{{ item.AdvertisedProductId }}'
+      Brand: '{{ item.Brand }}'
+      ConnectorDestinationId: '{{ item.ConnectorDestinationId }}'
+      ConnectorDeviceId: '{{ item.ConnectorDeviceId }}'
+      ConnectorPolicyId: '{{ item.ConnectorPolicyId }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      CredentialLockerId: '{{ item.CredentialLockerId }}'
+      Model: '{{ item.Model }}'
+      Owner: '{{ item.Owner }}'
+      ParentControllerId: '{{ item.ParentControllerId }}'
+      ProvisioningStatus: '{{ item.ProvisioningStatus }}'
+      Role: '{{ item.Role }}'
+      SerialNumber: '{{ item.SerialNumber }}'
+      Statement: '{{ item.Statement }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.iot-managed-integrations.list_notification_configurations
+  calls:
+  - action: list_notification_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.NotificationConfigurationList }}'
+    item:
+      DestinationName: '{{ item.DestinationName }}'
+      EventType: '{{ item.EventType }}'
+- discovery_id: aws.iot-managed-integrations.list_ota_task_configurations
+  calls:
+  - action: list_ota_task_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Name: '{{ item.Name }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Protocol: '{{ item.Protocol }}'
+      Target: '{{ item.Target }}'
+      TaskConfigurationId: '{{ item.TaskConfigurationId }}'
+- discovery_id: aws.iot-managed-integrations.list_ota_tasks
+  calls:
+  - action: list_ota_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tasks }}'
+    item:
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      TaskArn: '{{ item.TaskArn }}'
+      TaskConfigurationId: '{{ item.TaskConfigurationId }}'
+      TaskId: '{{ item.TaskId }}'
+- discovery_id: aws.iot-managed-integrations.list_provisioning_profiles
+  calls:
+  - action: list_provisioning_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      ProvisioningType: '{{ item.ProvisioningType }}'
+- discovery_id: aws.iot-managed-integrations.get_account_association
+  for_each: aws.iot-managed-integrations.list_account_associations
+  calls:
+  - action: get_account_association
+    params:
+      AccountAssociationId: '{{ item.AccountAssociationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Name: '{{ response.Name }}'
+      Tags: '{{ response.Tags }}'
+      AccountAssociationId: '{{ response.AccountAssociationId }}'
+      AssociationState: '{{ response.AssociationState }}'
+      ConnectorDestinationId: '{{ response.ConnectorDestinationId }}'
+      Description: '{{ response.Description }}'
+      ErrorMessage: '{{ response.ErrorMessage }}'
+      OAuthAuthorizationUrl: '{{ response.OAuthAuthorizationUrl }}'
+- discovery_id: aws.iot-managed-integrations.get_cloud_connector
+  calls:
+  - action: get_cloud_connector
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      Description: '{{ response.Description }}'
+      EndpointType: '{{ response.EndpointType }}'
+      Type: '{{ response.Type }}'
+      lambda: '{{ response.EndpointConfig.lambda }}'
+- discovery_id: aws.iot-managed-integrations.get_connector_destination
+  calls:
+  - action: get_connector_destination
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      AuthType: '{{ response.AuthType }}'
+      CloudConnectorId: '{{ response.CloudConnectorId }}'
+      Description: '{{ response.Description }}'
+      OAuthCompleteRedirectUrl: '{{ response.OAuthCompleteRedirectUrl }}'
+      SecretsManager: '{{ response.SecretsManager }}'
+      oAuth: '{{ response.AuthConfig.oAuth }}'
+- discovery_id: aws.iot-managed-integrations.get_credential_locker
+  calls:
+  - action: get_credential_locker
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      Tags: '{{ response.Tags }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+- discovery_id: aws.iot-managed-integrations.get_destination
+  for_each: aws.iot-managed-integrations.list_account_associations
+  calls:
+  - action: get_destination
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.Name }}'
+      RoleArn: '{{ response.RoleArn }}'
+      Tags: '{{ response.Tags }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      DeliveryDestinationArn: '{{ response.DeliveryDestinationArn }}'
+      DeliveryDestinationType: '{{ response.DeliveryDestinationType }}'
+      Description: '{{ response.Description }}'
+      UpdatedAt: '{{ response.UpdatedAt }}'
+- discovery_id: aws.iot-managed-integrations.get_device_discovery
+  calls:
+  - action: get_device_discovery
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Status: '{{ response.Status }}'
+      Tags: '{{ response.Tags }}'
+      AccountAssociationId: '{{ response.AccountAssociationId }}'
+      ConnectorAssociationId: '{{ response.ConnectorAssociationId }}'
+      ControllerId: '{{ response.ControllerId }}'
+      DiscoveryType: '{{ response.DiscoveryType }}'
+      FinishedAt: '{{ response.FinishedAt }}'
+      StartedAt: '{{ response.StartedAt }}'
+- discovery_id: aws.iot-managed-integrations.get_event_log_configuration
+  for_each: aws.iot-managed-integrations.list_event_log_configurations
+  calls:
+  - action: get_event_log_configuration
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.Id }}'
+      ResourceId: '{{ response.ResourceId }}'
+      EventLogLevel: '{{ response.EventLogLevel }}'
+      ResourceType: '{{ response.ResourceType }}'
+- discovery_id: aws.iot-managed-integrations.get_managed_thing
+  calls:
+  - action: get_managed_thing
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Classification: '{{ response.Classification }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      Tags: '{{ response.Tags }}'
+      ActivatedAt: '{{ response.ActivatedAt }}'
+      AdvertisedProductId: '{{ response.AdvertisedProductId }}'
+      Brand: '{{ response.Brand }}'
+      ConnectorDestinationId: '{{ response.ConnectorDestinationId }}'
+      ConnectorDeviceId: '{{ response.ConnectorDeviceId }}'
+      ConnectorPolicyId: '{{ response.ConnectorPolicyId }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      CredentialLockerId: '{{ response.CredentialLockerId }}'
+      DeviceSpecificKey: '{{ response.DeviceSpecificKey }}'
+      HubNetworkMode: '{{ response.HubNetworkMode }}'
+      InternationalArticleNumber: '{{ response.InternationalArticleNumber }}'
+      MacAddress: '{{ response.MacAddress }}'
+      MetaData: '{{ response.MetaData }}'
+      Model: '{{ response.Model }}'
+      Owner: '{{ response.Owner }}'
+      ParentControllerId: '{{ response.ParentControllerId }}'
+      ProvisioningStatus: '{{ response.ProvisioningStatus }}'
+      Role: '{{ response.Role }}'
+      SerialNumber: '{{ response.SerialNumber }}'
+      UniversalProductCode: '{{ response.UniversalProductCode }}'
+      UpdatedAt: '{{ response.UpdatedAt }}'
+- discovery_id: aws.iot-managed-integrations.get_managed_thing_capabilities
+  calls:
+  - action: get_managed_thing_capabilities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Capabilities: '{{ response.Capabilities }}'
+      CapabilityReport: '{{ response.CapabilityReport }}'
+      ManagedThingId: '{{ response.ManagedThingId }}'
+      endpoints: '{{ response.endpoints }}'
+      nodeId: '{{ response.nodeId }}'
+      version: '{{ response.version }}'
+- discovery_id: aws.iot-managed-integrations.get_managed_thing_certificate
+  calls:
+  - action: get_managed_thing_certificate
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CertificatePem: '{{ response.CertificatePem }}'
+      ManagedThingId: '{{ response.ManagedThingId }}'
+- discovery_id: aws.iot-managed-integrations.get_managed_thing_connectivity_data
+  calls:
+  - action: get_managed_thing_connectivity_data
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Connected: '{{ response.Connected }}'
+      DisconnectReason: '{{ response.DisconnectReason }}'
+      ManagedThingId: '{{ response.ManagedThingId }}'
+      Timestamp: '{{ response.Timestamp }}'
+- discovery_id: aws.iot-managed-integrations.get_managed_thing_meta_data
+  calls:
+  - action: get_managed_thing_meta_data
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ManagedThingId: '{{ response.ManagedThingId }}'
+      MetaData: '{{ response.MetaData }}'
+- discovery_id: aws.iot-managed-integrations.get_managed_thing_state
+  for_each: aws.iot-managed-integrations.list_managed_thing_account_associations
+  calls:
+  - action: get_managed_thing_state
+    params:
+      ManagedThingId: '{{ item.ManagedThingId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Endpoints }}'
+    item:
+      Endpoints: '{{ item.Endpoints }}'
+      capabilities: '{{ item.capabilities }}'
+      endpointId: '{{ item.endpointId }}'
+- discovery_id: aws.iot-managed-integrations.get_notification_configuration
+  for_each: aws.iot-managed-integrations.list_notification_configurations
+  calls:
+  - action: get_notification_configuration
+    params:
+      EventType: '{{ item.EventType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      DestinationName: '{{ response.DestinationName }}'
+      EventType: '{{ response.EventType }}'
+      UpdatedAt: '{{ response.UpdatedAt }}'
+- discovery_id: aws.iot-managed-integrations.get_ota_task
+  calls:
+  - action: get_ota_task
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Target }}'
+    item:
+      Protocol: '{{ item.Protocol }}'
+      Target: '{{ item.Target }}'
+- discovery_id: aws.iot-managed-integrations.get_ota_task_configuration
+  calls:
+  - action: get_ota_task_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.Name }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      Description: '{{ response.Description }}'
+      TaskConfigurationId: '{{ response.TaskConfigurationId }}'
+      AbortConfig: '{{ response.PushConfig.AbortConfig }}'
+      RolloutConfig: '{{ response.PushConfig.RolloutConfig }}'
+      TimeoutConfig: '{{ response.PushConfig.TimeoutConfig }}'
+- discovery_id: aws.iot-managed-integrations.get_provisioning_profile
+  calls:
+  - action: get_provisioning_profile
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      Tags: '{{ response.Tags }}'
+      ClaimCertificate: '{{ response.ClaimCertificate }}'
+      ProvisioningType: '{{ response.ProvisioningType }}'
+- discovery_id: aws.iot-managed-integrations.get_runtime_log_configuration
+  for_each: aws.iot-managed-integrations.list_managed_thing_account_associations
+  calls:
+  - action: get_runtime_log_configuration
+    params:
+      ManagedThingId: '{{ item.ManagedThingId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ManagedThingId: '{{ response.ManagedThingId }}'
+      DeleteLocalStoreAfterUpload: '{{ response.RuntimeLogConfigurations.DeleteLocalStoreAfterUpload
+        }}'
+      LocalStoreFileRotationMaxBytes: '{{ response.RuntimeLogConfigurations.LocalStoreFileRotationMaxBytes
+        }}'
+      LocalStoreFileRotationMaxFiles: '{{ response.RuntimeLogConfigurations.LocalStoreFileRotationMaxFiles
+        }}'
+      LocalStoreLocation: '{{ response.RuntimeLogConfigurations.LocalStoreLocation
+        }}'
+      LogFlushLevel: '{{ response.RuntimeLogConfigurations.LogFlushLevel }}'
+      LogLevel: '{{ response.RuntimeLogConfigurations.LogLevel }}'
+      UploadLog: '{{ response.RuntimeLogConfigurations.UploadLog }}'
+      UploadPeriodMinutes: '{{ response.RuntimeLogConfigurations.UploadPeriodMinutes
+        }}'
+- discovery_id: aws.iot-managed-integrations.get_schema_version
+  for_each: aws.iot-managed-integrations.list_cloud_connectors
+  calls:
+  - action: get_schema_version
+    params:
+      Type: '{{ item.Type }}'
+      SchemaVersionedId: '{{ item.SchemaVersionedId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Description: '{{ response.Description }}'
+      Namespace: '{{ response.Namespace }}'
+      Schema: '{{ response.Schema }}'
+      SchemaId: '{{ response.SchemaId }}'
+      SemanticVersion: '{{ response.SemanticVersion }}'
+      Type: '{{ response.Type }}'
+      Visibility: '{{ response.Visibility }}'
+- discovery_id: aws.iot-managed-integrations.list_discovered_devices
+  calls:
+  - action: list_discovered_devices
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      AuthenticationMaterial: '{{ item.AuthenticationMaterial }}'
+      Brand: '{{ item.Brand }}'
+      ConnectorDeviceId: '{{ item.ConnectorDeviceId }}'
+      ConnectorDeviceName: '{{ item.ConnectorDeviceName }}'
+      DeviceTypes: '{{ item.DeviceTypes }}'
+      DiscoveredAt: '{{ item.DiscoveredAt }}'
+      ManagedThingId: '{{ item.ManagedThingId }}'
+      Model: '{{ item.Model }}'
+      Modification: '{{ item.Modification }}'
+- discovery_id: aws.iot-managed-integrations.list_managed_thing_schemas
+  calls:
+  - action: list_managed_thing_schemas
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      CapabilityId: '{{ item.CapabilityId }}'
+      EndpointId: '{{ item.EndpointId }}'
+      Schema: '{{ item.Schema }}'
+- discovery_id: aws.iot-managed-integrations.list_ota_task_executions
+  calls:
+  - action: list_ota_task_executions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ExecutionSummaries }}'
+    item:
+      ManagedThingId: '{{ item.ManagedThingId }}'
+      TaskExecutionSummary: '{{ item.TaskExecutionSummary }}'
+- discovery_id: aws.iot-managed-integrations.list_schema_versions
+  for_each: aws.iot-managed-integrations.list_cloud_connectors
+  calls:
+  - action: list_schema_versions
+    params:
+      Type: '{{ item.Type }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Description: '{{ item.Description }}'
+      Namespace: '{{ item.Namespace }}'
+      SchemaId: '{{ item.SchemaId }}'
+      SemanticVersion: '{{ item.SemanticVersion }}'
+      Type: '{{ item.Type }}'
+      Visibility: '{{ item.Visibility }}'
+- discovery_id: aws.iot-managed-integrations.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

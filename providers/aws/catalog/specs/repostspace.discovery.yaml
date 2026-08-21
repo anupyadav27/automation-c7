@@ -1,0 +1,124 @@
+version: '1.0'
+provider: aws
+service: repostspace
+services:
+  client: repostspace
+  module: boto3.client
+discovery:
+- discovery_id: aws.repostspace.list_spaces
+  calls:
+  - action: list_spaces
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.spaces }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      applicationArn: '{{ item.applicationArn }}'
+      arn: '{{ item.arn }}'
+      channelRoles: '{{ item.channelRoles }}'
+      clientId: '{{ item.clientId }}'
+      configurationStatus: '{{ item.configurationStatus }}'
+      contentSize: '{{ item.contentSize }}'
+      createDateTime: '{{ item.createDateTime }}'
+      customerRoleArn: '{{ item.customerRoleArn }}'
+      deleteDateTime: '{{ item.deleteDateTime }}'
+      description: '{{ item.description }}'
+      groupAdmins: '{{ item.groupAdmins }}'
+      groupCount: '{{ item.groupCount }}'
+      identityStoreId: '{{ item.identityStoreId }}'
+      name: '{{ item.name }}'
+      randomDomain: '{{ item.randomDomain }}'
+      roles: '{{ item.roles }}'
+      spaceId: '{{ item.spaceId }}'
+      status: '{{ item.status }}'
+      storageLimit: '{{ item.storageLimit }}'
+      supportedEmailDomains: '{{ item.supportedEmailDomains }}'
+      tier: '{{ item.tier }}'
+      userAdmins: '{{ item.userAdmins }}'
+      userCount: '{{ item.userCount }}'
+      userKMSKey: '{{ item.userKMSKey }}'
+      vanityDomain: '{{ item.vanityDomain }}'
+      vanityDomainStatus: '{{ item.vanityDomainStatus }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.repostspace.get_channel
+  for_each: aws.repostspace.list_spaces
+  calls:
+  - action: get_channel
+    params:
+      spaceId: '{{ item.spaceId }}'
+      channelId: '{{ item.channelId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      channelRoles: '{{ response.channelRoles }}'
+- discovery_id: aws.repostspace.get_space
+  for_each: aws.repostspace.list_spaces
+  calls:
+  - action: get_space
+    params:
+      spaceId: '{{ item.spaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.userAdmins }}'
+    item:
+      applicationArn: '{{ item.applicationArn }}'
+      clientId: '{{ item.clientId }}'
+      customerRoleArn: '{{ item.customerRoleArn }}'
+      groupAdmins: '{{ item.groupAdmins }}'
+      identityStoreId: '{{ item.identityStoreId }}'
+      roles: '{{ item.roles }}'
+      userAdmins: '{{ item.userAdmins }}'
+      arn: '{{ response.arn }}'
+      configurationStatus: '{{ response.configurationStatus }}'
+      contentSize: '{{ response.contentSize }}'
+      createDateTime: '{{ response.createDateTime }}'
+      deleteDateTime: '{{ response.deleteDateTime }}'
+      description: '{{ response.description }}'
+      name: '{{ response.name }}'
+      randomDomain: '{{ response.randomDomain }}'
+      spaceId: '{{ response.spaceId }}'
+      status: '{{ response.status }}'
+      storageLimit: '{{ response.storageLimit }}'
+      tier: '{{ response.tier }}'
+      userCount: '{{ response.userCount }}'
+      userKMSKey: '{{ response.userKMSKey }}'
+      vanityDomain: '{{ response.vanityDomain }}'
+      vanityDomainStatus: '{{ response.vanityDomainStatus }}'
+- discovery_id: aws.repostspace.list_channels
+  for_each: aws.repostspace.list_spaces
+  calls:
+  - action: list_channels
+    params:
+      spaceId: '{{ item.spaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.channels }}'
+    item:
+      channelDescription: '{{ item.channelDescription }}'
+      channelId: '{{ item.channelId }}'
+      channelName: '{{ item.channelName }}'
+      channelRoles: '{{ item.channelRoles }}'
+      channelStatus: '{{ item.channelStatus }}'
+      createDateTime: '{{ item.createDateTime }}'
+      deleteDateTime: '{{ item.deleteDateTime }}'
+      groupCount: '{{ item.groupCount }}'
+      spaceId: '{{ item.spaceId }}'
+      userCount: '{{ item.userCount }}'
+- discovery_id: aws.repostspace.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

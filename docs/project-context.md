@@ -1,11 +1,11 @@
 ---
-project_name: 'automation-c7'
+project_name: 'cloud-estate'
 user_name: 'Ajay'
 date: '2026-04-19'
 sections_completed: ['technology_stack', 'architecture', 'implementation_rules', 'api_contracts', 'policy_system', 'ui_patterns', 'docker_deployment', 'anti_patterns']
 ---
 
-# Project Context for AI Agents — automation-c7
+# Project Context for AI Agents — cloud-estate
 
 _Critical rules and patterns for AI agents working on this Cloud Custodian AWS automation project.
 Focus on unobvious details that would otherwise be missed._

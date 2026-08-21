@@ -1,0 +1,238 @@
+version: '1.0'
+provider: aws
+service: kinesisanalyticsv2
+services:
+  client: kinesisanalyticsv2
+  module: boto3.client
+discovery:
+- discovery_id: aws.kinesisanalyticsv2.list_applications
+  calls:
+  - action: list_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ApplicationSummaries }}'
+    item:
+      ApplicationARN: '{{ item.ApplicationARN }}'
+      ApplicationDetail: '{{ item.ApplicationDetail }}'
+      ApplicationMode: '{{ item.ApplicationMode }}'
+      ApplicationName: '{{ item.ApplicationName }}'
+      ApplicationOperationInfoDetails: '{{ item.ApplicationOperationInfoDetails }}'
+      ApplicationStatus: '{{ item.ApplicationStatus }}'
+      ApplicationVersionDetail: '{{ item.ApplicationVersionDetail }}'
+      ApplicationVersionId: '{{ item.ApplicationVersionId }}'
+      RuntimeEnvironment: '{{ item.RuntimeEnvironment }}'
+      SnapshotDetails: '{{ item.SnapshotDetails }}'
+- discovery_id: aws.kinesisanalyticsv2.describe_application
+  for_each: aws.kinesisanalyticsv2.list_applications
+  calls:
+  - action: describe_application
+    params:
+      ApplicationName: '{{ item.ApplicationName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ApplicationARN: '{{ response.ApplicationDetail.ApplicationARN }}'
+      ApplicationConfigurationDescription: '{{ response.ApplicationDetail.ApplicationDescription }}'
+      ApplicationDescription: '{{ response.ApplicationDetail.ApplicationDescription }}'
+      ApplicationDetail: '{{ response.ApplicationDetail.ApplicationStatus }}'
+      ApplicationMaintenanceConfigurationDescription: '{{ response.ApplicationDetail.ApplicationMaintenanceConfigurationDescription }}'
+      ApplicationMode: '{{ response.ApplicationDetail.ApplicationMode }}'
+      ApplicationName: '{{ response.ApplicationDetail.ApplicationName }}'
+      ApplicationStatus: '{{ response.ApplicationDetail.ApplicationStatus }}'
+      ApplicationVersionCreateTimestamp: '{{ response.ApplicationDetail.ApplicationVersionCreateTimestamp }}'
+      ApplicationVersionId: '{{ response.ApplicationDetail.ApplicationVersionId }}'
+      ApplicationVersionRolledBackFrom: '{{ response.ApplicationDetail.ApplicationVersionRolledBackFrom }}'
+      ApplicationVersionRolledBackTo: '{{ response.ApplicationDetail.ApplicationVersionRolledBackTo }}'
+      ApplicationVersionUpdatedFrom: '{{ response.ApplicationDetail.ApplicationVersionUpdatedFrom }}'
+      CloudWatchLoggingOptionDescriptions: '{{ response.ApplicationDetail.CloudWatchLoggingOptionDescriptions[].RoleARN }}'
+      ConditionalToken: '{{ response.ApplicationDetail.ConditionalToken }}'
+      CreateTimestamp: '{{ response.ApplicationDetail.CreateTimestamp }}'
+      LastUpdateTimestamp: '{{ response.ApplicationDetail.LastUpdateTimestamp }}'
+      RuntimeEnvironment: '{{ response.ApplicationDetail.RuntimeEnvironment }}'
+      ServiceExecutionRole: '{{ response.ApplicationDetail.ServiceExecutionRole }}'
+      CodeMD5: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.ApplicationCodeConfigurationDescription.CodeContentDescription.CodeMD5 }}'
+      CodeSize: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.ApplicationCodeConfigurationDescription.CodeContentDescription.CodeSize }}'
+      TextContent: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.ApplicationCodeConfigurationDescription.CodeContentDescription.TextContent }}'
+      CodeContentType: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.ApplicationCodeConfigurationDescription.CodeContentType }}'
+      SnapshotsEnabled: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.ApplicationSnapshotConfigurationDescription.SnapshotsEnabled }}'
+      RollbackEnabled: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.ApplicationSystemRollbackConfigurationDescription.RollbackEnabled }}'
+      CheckpointInterval: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.CheckpointConfigurationDescription.CheckpointInterval }}'
+      CheckpointingEnabled: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.CheckpointConfigurationDescription.CheckpointingEnabled }}'
+      ConfigurationType: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.CheckpointConfigurationDescription.ConfigurationType }}'
+      MinPauseBetweenCheckpoints: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.CheckpointConfigurationDescription.MinPauseBetweenCheckpoints
+        }}'
+      JobPlanDescription: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.JobPlanDescription }}'
+      LogLevel: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.MonitoringConfigurationDescription.LogLevel }}'
+      MetricsLevel: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.MonitoringConfigurationDescription.MetricsLevel }}'
+      AutoScalingEnabled: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.ParallelismConfigurationDescription.AutoScalingEnabled }}'
+      CurrentParallelism: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.ParallelismConfigurationDescription.CurrentParallelism }}'
+      Parallelism: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.ParallelismConfigurationDescription.Parallelism }}'
+      ParallelismPerKPU: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.ParallelismConfigurationDescription.ParallelismPerKPU }}'
+      ApplicationRestoreType: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.RunConfigurationDescription.ApplicationRestoreConfigurationDescription.ApplicationRestoreType }}'
+      SnapshotName: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.RunConfigurationDescription.ApplicationRestoreConfigurationDescription.SnapshotName }}'
+      AllowNonRestoredState: '{{ response.ApplicationDetail.ApplicationConfigurationDescription.RunConfigurationDescription.FlinkRunConfigurationDescription.AllowNonRestoredState }}'
+      ApplicationMaintenanceWindowEndTime: '{{ response.ApplicationDetail.ApplicationMaintenanceConfigurationDescription.ApplicationMaintenanceWindowEndTime }}'
+      ApplicationMaintenanceWindowStartTime: '{{ response.ApplicationDetail.ApplicationMaintenanceConfigurationDescription.ApplicationMaintenanceWindowStartTime }}'
+- discovery_id: aws.kinesisanalyticsv2.describe_application_operation
+  for_each: aws.kinesisanalyticsv2.list_applications
+  calls:
+  - action: describe_application_operation
+    params:
+      ApplicationName: '{{ item.ApplicationName }}'
+      OperationId: '{{ item.OperationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ApplicationOperationInfoDetails: '{{ response.ApplicationOperationInfoDetails.ApplicationOperationInfoDetails }}'
+      ApplicationVersionChangeDetails: '{{ response.ApplicationOperationInfoDetails.ApplicationVersionChangeDetails }}'
+      EndTime: '{{ response.ApplicationOperationInfoDetails.EndTime }}'
+      Operation: '{{ response.ApplicationOperationInfoDetails.Operation }}'
+      OperationFailureDetails: '{{ response.ApplicationOperationInfoDetails.OperationStatus }}'
+      OperationStatus: '{{ response.ApplicationOperationInfoDetails.OperationStatus }}'
+      StartTime: '{{ response.ApplicationOperationInfoDetails.StartTime }}'
+      ApplicationVersionUpdatedFrom: '{{ response.ApplicationOperationInfoDetails.ApplicationVersionChangeDetails.ApplicationVersionUpdatedFrom }}'
+      ApplicationVersionUpdatedTo: '{{ response.ApplicationOperationInfoDetails.ApplicationVersionChangeDetails.ApplicationVersionUpdatedTo }}'
+      ErrorString: '{{ response.ApplicationOperationInfoDetails.OperationFailureDetails.ErrorInfo.ErrorString }}'
+      RollbackOperationId: '{{ response.ApplicationOperationInfoDetails.OperationFailureDetails.RollbackOperationId }}'
+- discovery_id: aws.kinesisanalyticsv2.describe_application_snapshot
+  for_each: aws.kinesisanalyticsv2.list_applications
+  calls:
+  - action: describe_application_snapshot
+    params:
+      ApplicationName: '{{ item.ApplicationName }}'
+      SnapshotName: '{{ item.SnapshotName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ApplicationEncryptionConfigurationDescription: '{{ response.SnapshotDetails.ApplicationEncryptionConfigurationDescription }}'
+      ApplicationVersionId: '{{ response.SnapshotDetails.ApplicationVersionId }}'
+      RuntimeEnvironment: '{{ response.SnapshotDetails.RuntimeEnvironment }}'
+      SnapshotCreationTimestamp: '{{ response.SnapshotDetails.SnapshotCreationTimestamp }}'
+      SnapshotDetails: '{{ response.SnapshotDetails.SnapshotStatus }}'
+      SnapshotName: '{{ response.SnapshotDetails.SnapshotName }}'
+      SnapshotStatus: '{{ response.SnapshotDetails.SnapshotStatus }}'
+- discovery_id: aws.kinesisanalyticsv2.describe_application_version
+  for_each: aws.kinesisanalyticsv2.list_applications
+  calls:
+  - action: describe_application_version
+    params:
+      ApplicationName: '{{ item.ApplicationName }}'
+      ApplicationVersionId: '{{ item.ApplicationVersionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ApplicationARN: '{{ response.ApplicationVersionDetail.ApplicationARN }}'
+      ApplicationConfigurationDescription: '{{ response.ApplicationVersionDetail.ApplicationDescription }}'
+      ApplicationDescription: '{{ response.ApplicationVersionDetail.ApplicationDescription }}'
+      ApplicationMaintenanceConfigurationDescription: '{{ response.ApplicationVersionDetail.ApplicationMaintenanceConfigurationDescription }}'
+      ApplicationMode: '{{ response.ApplicationVersionDetail.ApplicationMode }}'
+      ApplicationName: '{{ response.ApplicationVersionDetail.ApplicationName }}'
+      ApplicationStatus: '{{ response.ApplicationVersionDetail.ApplicationStatus }}'
+      ApplicationVersionCreateTimestamp: '{{ response.ApplicationVersionDetail.ApplicationVersionCreateTimestamp }}'
+      ApplicationVersionDetail: '{{ response.ApplicationVersionDetail.ApplicationVersionId }}'
+      ApplicationVersionId: '{{ response.ApplicationVersionDetail.ApplicationVersionId }}'
+      ApplicationVersionRolledBackFrom: '{{ response.ApplicationVersionDetail.ApplicationVersionRolledBackFrom }}'
+      ApplicationVersionRolledBackTo: '{{ response.ApplicationVersionDetail.ApplicationVersionRolledBackTo }}'
+      ApplicationVersionUpdatedFrom: '{{ response.ApplicationVersionDetail.ApplicationVersionUpdatedFrom }}'
+      CloudWatchLoggingOptionDescriptions: '{{ response.ApplicationVersionDetail.CloudWatchLoggingOptionDescriptions[].RoleARN }}'
+      ConditionalToken: '{{ response.ApplicationVersionDetail.ConditionalToken }}'
+      CreateTimestamp: '{{ response.ApplicationVersionDetail.CreateTimestamp }}'
+      LastUpdateTimestamp: '{{ response.ApplicationVersionDetail.LastUpdateTimestamp }}'
+      RuntimeEnvironment: '{{ response.ApplicationVersionDetail.RuntimeEnvironment }}'
+      ServiceExecutionRole: '{{ response.ApplicationVersionDetail.ServiceExecutionRole }}'
+      CodeMD5: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.ApplicationCodeConfigurationDescription.CodeContentDescription.CodeMD5 }}'
+      CodeSize: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.ApplicationCodeConfigurationDescription.CodeContentDescription.CodeSize }}'
+      TextContent: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.ApplicationCodeConfigurationDescription.CodeContentDescription.TextContent }}'
+      CodeContentType: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.ApplicationCodeConfigurationDescription.CodeContentType }}'
+      SnapshotsEnabled: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.ApplicationSnapshotConfigurationDescription.SnapshotsEnabled }}'
+      RollbackEnabled: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.ApplicationSystemRollbackConfigurationDescription.RollbackEnabled }}'
+      CheckpointInterval: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.CheckpointConfigurationDescription.CheckpointInterval }}'
+      CheckpointingEnabled: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.CheckpointConfigurationDescription.CheckpointingEnabled }}'
+      ConfigurationType: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.CheckpointConfigurationDescription.ConfigurationType }}'
+      MinPauseBetweenCheckpoints: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.CheckpointConfigurationDescription.MinPauseBetweenCheckpoints
+        }}'
+      JobPlanDescription: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.JobPlanDescription }}'
+      LogLevel: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.MonitoringConfigurationDescription.LogLevel }}'
+      MetricsLevel: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.MonitoringConfigurationDescription.MetricsLevel }}'
+      AutoScalingEnabled: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.ParallelismConfigurationDescription.AutoScalingEnabled }}'
+      CurrentParallelism: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.ParallelismConfigurationDescription.CurrentParallelism }}'
+      Parallelism: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.ParallelismConfigurationDescription.Parallelism }}'
+      ParallelismPerKPU: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.FlinkApplicationConfigurationDescription.ParallelismConfigurationDescription.ParallelismPerKPU }}'
+      ApplicationRestoreType: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.RunConfigurationDescription.ApplicationRestoreConfigurationDescription.ApplicationRestoreType }}'
+      SnapshotName: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.RunConfigurationDescription.ApplicationRestoreConfigurationDescription.SnapshotName }}'
+      AllowNonRestoredState: '{{ response.ApplicationVersionDetail.ApplicationConfigurationDescription.RunConfigurationDescription.FlinkRunConfigurationDescription.AllowNonRestoredState }}'
+      ApplicationMaintenanceWindowEndTime: '{{ response.ApplicationVersionDetail.ApplicationMaintenanceConfigurationDescription.ApplicationMaintenanceWindowEndTime }}'
+      ApplicationMaintenanceWindowStartTime: '{{ response.ApplicationVersionDetail.ApplicationMaintenanceConfigurationDescription.ApplicationMaintenanceWindowStartTime }}'
+- discovery_id: aws.kinesisanalyticsv2.list_application_operations
+  for_each: aws.kinesisanalyticsv2.list_applications
+  calls:
+  - action: list_application_operations
+    params:
+      ApplicationName: '{{ item.ApplicationName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ApplicationOperationInfoList }}'
+    item:
+      ApplicationOperationInfoDetails: '{{ item.ApplicationOperationInfoDetails }}'
+      EndTime: '{{ item.EndTime }}'
+      Operation: '{{ item.Operation }}'
+      OperationId: '{{ item.OperationId }}'
+      OperationStatus: '{{ item.OperationStatus }}'
+      StartTime: '{{ item.StartTime }}'
+- discovery_id: aws.kinesisanalyticsv2.list_application_snapshots
+  for_each: aws.kinesisanalyticsv2.list_applications
+  calls:
+  - action: list_application_snapshots
+    params:
+      ApplicationName: '{{ item.ApplicationName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SnapshotSummaries }}'
+    item:
+      ApplicationEncryptionConfigurationDescription: '{{ item.ApplicationEncryptionConfigurationDescription }}'
+      ApplicationVersionId: '{{ item.ApplicationVersionId }}'
+      RuntimeEnvironment: '{{ item.RuntimeEnvironment }}'
+      SnapshotCreationTimestamp: '{{ item.SnapshotCreationTimestamp }}'
+      SnapshotDetails: '{{ item.SnapshotDetails }}'
+      SnapshotName: '{{ item.SnapshotName }}'
+      SnapshotStatus: '{{ item.SnapshotStatus }}'
+- discovery_id: aws.kinesisanalyticsv2.list_application_versions
+  for_each: aws.kinesisanalyticsv2.list_applications
+  calls:
+  - action: list_application_versions
+    params:
+      ApplicationName: '{{ item.ApplicationName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ApplicationVersionSummaries }}'
+    item:
+      ApplicationStatus: '{{ item.ApplicationStatus }}'
+      ApplicationVersionDetail: '{{ item.ApplicationVersionDetail }}'
+      ApplicationVersionId: '{{ item.ApplicationVersionId }}'
+- discovery_id: aws.kinesisanalyticsv2.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

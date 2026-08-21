@@ -1,0 +1,315 @@
+version: '1.0'
+provider: aws
+service: connectcases
+services:
+  client: connectcases
+  module: boto3.client
+discovery:
+- discovery_id: aws.connectcases.list_domains
+  calls:
+  - action: list_domains
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.domains }}'
+    item:
+      active: '{{ item.active }}'
+      auditEvents: '{{ item.auditEvents }}'
+      basic: '{{ item.basic }}'
+      caseRuleArn: '{{ item.caseRuleArn }}'
+      caseRuleId: '{{ item.caseRuleId }}'
+      description: '{{ item.description }}'
+      domainArn: '{{ item.domainArn }}'
+      domainId: '{{ item.domainId }}'
+      domainStatus: '{{ item.domainStatus }}'
+      enabled: '{{ item.enabled }}'
+      eventBridge: '{{ item.eventBridge }}'
+      eventId: '{{ item.eventId }}'
+      id: '{{ item.id }}'
+      includedData: '{{ item.includedData }}'
+      layoutConfiguration: '{{ item.layoutConfiguration }}'
+      name: '{{ item.name }}'
+      namespace: '{{ item.namespace }}'
+      performedTime: '{{ item.performedTime }}'
+      relatedItemType: '{{ item.relatedItemType }}'
+      requiredFields: '{{ item.requiredFields }}'
+      ruleType: '{{ item.ruleType }}'
+      rules: '{{ item.rules }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.connectcases.get_case
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: get_case
+    params:
+      caseId: '{{ item.caseId }}'
+      domainId: '{{ item.domainId }}'
+      fields: '{{ item.fields }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.fields }}'
+    item:
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'
+      tags: '{{ response.tags }}'
+      templateId: '{{ response.templateId }}'
+- discovery_id: aws.connectcases.get_case_audit_events
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: get_case_audit_events
+    params:
+      caseId: '{{ item.caseId }}'
+      domainId: '{{ item.domainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.auditEvents }}'
+    item:
+      auditEvents: '{{ item.auditEvents }}'
+      eventId: '{{ item.eventId }}'
+      performedTime: '{{ item.performedTime }}'
+      relatedItemType: '{{ item.relatedItemType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.connectcases.get_case_event_configuration
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: get_case_event_configuration
+    params:
+      domainId: '{{ item.domainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      enabled: '{{ response.eventBridge.enabled }}'
+      eventBridge: '{{ response.eventBridge.eventBridge }}'
+      includedData: '{{ response.eventBridge.includedData }}'
+      includeContent: '{{ response.eventBridge.includedData.relatedItemData.includeContent }}'
+- discovery_id: aws.connectcases.get_domain
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: get_domain
+    params:
+      domainId: '{{ item.domainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      domainStatus: '{{ response.domainStatus }}'
+      createdTime: '{{ response.createdTime }}'
+      domainArn: '{{ response.domainArn }}'
+      domainId: '{{ response.domainId }}'
+      name: '{{ response.name }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.connectcases.get_layout
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: get_layout
+    params:
+      domainId: '{{ item.domainId }}'
+      layoutId: '{{ item.layoutId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      basic: '{{ response.content.basic }}'
+      createdTime: '{{ response.createdTime }}'
+      deleted: '{{ response.deleted }}'
+      lastModifiedTime: '{{ response.lastModifiedTime }}'
+      layoutArn: '{{ response.layoutArn }}'
+      layoutId: '{{ response.layoutId }}'
+      name: '{{ response.name }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.connectcases.get_template
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: get_template
+    params:
+      domainId: '{{ item.domainId }}'
+      templateId: '{{ item.templateId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.requiredFields }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      fieldId: '{{ item.fieldId }}'
+      layoutConfiguration: '{{ item.layoutConfiguration }}'
+      requiredFields: '{{ item.requiredFields }}'
+      rules: '{{ item.rules }}'
+      createdTime: '{{ response.createdTime }}'
+      deleted: '{{ response.deleted }}'
+      description: '{{ response.description }}'
+      lastModifiedTime: '{{ response.lastModifiedTime }}'
+      defaultLayout: '{{ response.layoutConfiguration.defaultLayout }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+      tags: '{{ response.tags }}'
+      templateArn: '{{ response.templateArn }}'
+      templateId: '{{ response.templateId }}'
+- discovery_id: aws.connectcases.list_case_rules
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: list_case_rules
+    params:
+      domainId: '{{ item.domainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.caseRules }}'
+    item:
+      caseRuleArn: '{{ item.caseRuleArn }}'
+      caseRuleId: '{{ item.caseRuleId }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      ruleType: '{{ item.ruleType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.connectcases.list_cases_for_contact
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: list_cases_for_contact
+    params:
+      domainId: '{{ item.domainId }}'
+      contactArn: '{{ item.contactArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.cases }}'
+    item:
+      auditEvents: '{{ item.auditEvents }}'
+      eventId: '{{ item.eventId }}'
+      layoutConfiguration: '{{ item.layoutConfiguration }}'
+      performedTime: '{{ item.performedTime }}'
+      relatedItemType: '{{ item.relatedItemType }}'
+      requiredFields: '{{ item.requiredFields }}'
+      rules: '{{ item.rules }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.connectcases.list_field_options
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: list_field_options
+    params:
+      domainId: '{{ item.domainId }}'
+      fieldId: '{{ item.fieldId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.options }}'
+    item:
+      active: '{{ item.active }}'
+      name: '{{ item.name }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.connectcases.list_fields
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: list_fields
+    params:
+      domainId: '{{ item.domainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.fields }}'
+    item:
+      active: '{{ item.active }}'
+      fieldArn: '{{ item.fieldArn }}'
+      fieldId: '{{ item.fieldId }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      namespace: '{{ item.namespace }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.connectcases.list_layouts
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: list_layouts
+    params:
+      domainId: '{{ item.domainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.layouts }}'
+    item:
+      basic: '{{ item.basic }}'
+      layoutArn: '{{ item.layoutArn }}'
+      layoutId: '{{ item.layoutId }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.connectcases.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.connectcases.list_templates
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: list_templates
+    params:
+      domainId: '{{ item.domainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.templates }}'
+    item:
+      layoutConfiguration: '{{ item.layoutConfiguration }}'
+      name: '{{ item.name }}'
+      requiredFields: '{{ item.requiredFields }}'
+      rules: '{{ item.rules }}'
+      status: '{{ item.status }}'
+      templateArn: '{{ item.templateArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.connectcases.search_all_related_items
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: search_all_related_items
+    params:
+      domainId: '{{ item.domainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.relatedItems }}'
+- discovery_id: aws.connectcases.search_cases
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: search_cases
+    params:
+      domainId: '{{ item.domainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.cases }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.connectcases.search_related_items
+  for_each: aws.connectcases.list_domains
+  calls:
+  - action: search_related_items
+    params:
+      domainId: '{{ item.domainId }}'
+      caseId: '{{ item.caseId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.relatedItems }}'
+    item:
+      nextToken: '{{ response.nextToken }}'

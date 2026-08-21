@@ -1,0 +1,8 @@
+version: '1.0'
+provider: aws
+service: marketplacecommerceanalytics
+services:
+  client: marketplacecommerceanalytics
+  module: boto3.client
+discovery:
+checks: []

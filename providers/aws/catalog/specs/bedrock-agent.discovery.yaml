@@ -1,0 +1,243 @@
+version: '1.0'
+provider: aws
+service: bedrock-agent
+discovery:
+- calls:
+  - action: list_agents
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock-agent.list_agents
+  emit:
+    as: item
+    item:
+      Enabled: '{{ item.Enabled }}'
+      Status: '{{ item.Status }}'
+      actionGroupExecutor: '{{ item.actionGroupExecutor }}'
+      actionGroupId: '{{ item.actionGroupId }}'
+      actionGroupName: '{{ item.actionGroupName }}'
+      actionGroupState: '{{ item.actionGroupState }}'
+      agent: '{{ item.agent }}'
+      agentActionGroup: '{{ item.agentActionGroup }}'
+      agentAlias: '{{ item.agentAlias }}'
+      agentAliasArn: '{{ item.agentAliasArn }}'
+      agentAliasHistoryEvents: '{{ item.agentAliasHistoryEvents }}'
+      agentAliasId: '{{ item.agentAliasId }}'
+      agentAliasName: '{{ item.agentAliasName }}'
+      agentAliasStatus: '{{ item.agentAliasStatus }}'
+      agentDescriptor: '{{ item.agentDescriptor }}'
+      agentId: '{{ item.agentId }}'
+      agentKnowledgeBase: '{{ item.agentKnowledgeBase }}'
+      agentName: '{{ item.agentName }}'
+      agentStatus: '{{ item.agentStatus }}'
+      aliasInvocationState: '{{ item.aliasInvocationState }}'
+      apiSchema: '{{ item.apiSchema }}'
+      clientToken: '{{ item.clientToken }}'
+      collaborationInstruction: '{{ item.collaborationInstruction }}'
+      customOrchestration: '{{ item.customOrchestration }}'
+      description: '{{ item.description }}'
+      executionRoleArn: '{{ item.executionRoleArn }}'
+      failureReasons: '{{ item.failureReasons }}'
+      foundationModel: '{{ item.foundationModel }}'
+      functionSchema: '{{ item.functionSchema }}'
+      guardrailConfiguration: '{{ item.guardrailConfiguration }}'
+      idleSessionTTLInSeconds: '{{ item.idleSessionTTLInSeconds }}'
+      instruction: '{{ item.instruction }}'
+      knowledgeBase: '{{ item.knowledgeBase }}'
+      knowledgeBaseState: '{{ item.knowledgeBaseState }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      latestAgentVersion: '{{ item.latestAgentVersion }}'
+      memoryConfiguration: '{{ item.memoryConfiguration }}'
+      orchestrationType: '{{ item.orchestrationType }}'
+      parentActionGroupSignatureParams: '{{ item.parentActionGroupSignatureParams }}'
+      parentActionSignature: '{{ item.parentActionSignature }}'
+      preparedAt: '{{ item.preparedAt }}'
+      promptOverrideConfiguration: '{{ item.promptOverrideConfiguration }}'
+      recommendedActions: '{{ item.recommendedActions }}'
+      relayConversationHistory: '{{ item.relayConversationHistory }}'
+      routingConfiguration: '{{ item.routingConfiguration }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.agentSummaries }}'
+- calls:
+  - action: list_flows
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock-agent.list_flows
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      connections: '{{ item.connections }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      nodes: '{{ item.nodes }}'
+      status: '{{ item.status }}'
+      updatedAt: '{{ item.updatedAt }}'
+      validations: '{{ item.validations }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.flowSummaries }}'
+- calls:
+  - action: list_knowledge_bases
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock-agent.list_knowledge_bases
+  emit:
+    as: item
+    item:
+      description: '{{ item.description }}'
+      knowledgeBaseId: '{{ item.knowledgeBaseId }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.knowledgeBaseSummaries }}'
+- calls:
+  - action: list_prompts
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock-agent.list_prompts
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      updatedAt: '{{ item.updatedAt }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.promptSummaries }}'
+- calls:
+  - action: get_flow
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock-agent.get_flow
+  emit:
+    as: item
+    item:
+      details: '{{ item.details }}'
+      message: '{{ item.message }}'
+      severity: '{{ item.severity }}'
+      type: '{{ item.type }}'
+      validations: '{{ item.validations }}'
+      arn: '{{ response.arn }}'
+      createdAt: '{{ response.createdAt }}'
+      customerEncryptionKeyArn: '{{ response.customerEncryptionKeyArn }}'
+      description: '{{ response.description }}'
+      executionRoleArn: '{{ response.executionRoleArn }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+      updatedAt: '{{ response.updatedAt }}'
+      version: '{{ response.version }}'
+    items_for: '{{ response.validations }}'
+- calls:
+  - action: get_flow_alias
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock-agent.get_flow_alias
+  emit:
+    as: item
+    item:
+      flowVersion: '{{ item.flowVersion }}'
+      arn: '{{ response.arn }}'
+      maxConcurrency: '{{ response.concurrencyConfiguration.maxConcurrency }}'
+      type: '{{ response.concurrencyConfiguration.type }}'
+      createdAt: '{{ response.createdAt }}'
+      description: '{{ response.description }}'
+      flowId: '{{ response.flowId }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      updatedAt: '{{ response.updatedAt }}'
+    items_for: '{{ response.routingConfiguration }}'
+- calls:
+  - action: get_flow_version
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock-agent.get_flow_version
+  emit:
+    as: item
+    item:
+      connections: '{{ response.definition.connections[].type }}'
+      nodes: '{{ response.definition.nodes }}'
+      arn: '{{ response.arn }}'
+      createdAt: '{{ response.createdAt }}'
+      customerEncryptionKeyArn: '{{ response.customerEncryptionKeyArn }}'
+      description: '{{ response.description }}'
+      executionRoleArn: '{{ response.executionRoleArn }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+      version: '{{ response.version }}'
+- calls:
+  - action: get_prompt
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock-agent.get_prompt
+  emit:
+    as: item
+    item:
+      additionalModelRequestFields: '{{ item.additionalModelRequestFields }}'
+      genAiResource: '{{ item.genAiResource }}'
+      inferenceConfiguration: '{{ item.inferenceConfiguration }}'
+      metadata: '{{ item.metadata }}'
+      modelId: '{{ item.modelId }}'
+      name: '{{ item.name }}'
+      templateConfiguration: '{{ item.templateConfiguration }}'
+      templateType: '{{ item.templateType }}'
+      arn: '{{ response.arn }}'
+      createdAt: '{{ response.createdAt }}'
+      customerEncryptionKeyArn: '{{ response.customerEncryptionKeyArn }}'
+      defaultVariant: '{{ response.defaultVariant }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      updatedAt: '{{ response.updatedAt }}'
+      version: '{{ response.version }}'
+    items_for: '{{ response.variants }}'
+- calls:
+  - action: list_flow_aliases
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock-agent.list_flow_aliases
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      concurrencyConfiguration: '{{ item.concurrencyConfiguration }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      flowId: '{{ item.flowId }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      routingConfiguration: '{{ item.routingConfiguration }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.flowAliasSummaries }}'
+- calls:
+  - action: list_flow_versions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock-agent.list_flow_versions
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      id: '{{ item.id }}'
+      status: '{{ item.status }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.flowVersionSummaries }}'
+- calls:
+  - action: list_tags_for_resource
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock-agent.list_tags_for_resource
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

@@ -1,0 +1,94 @@
+version: '1.0'
+provider: aws
+service: guardduty
+discovery:
+- calls:
+  - action: describe_organization_configuration
+    on_error: continue
+    save_as: response
+  discovery_id: aws.guardduty.describe_organization_configuration
+  emit:
+    as: item
+    item:
+      AdditionalConfiguration: '{{ item.AdditionalConfiguration }}'
+      AutoEnable: '{{ item.AutoEnable }}'
+      AutoEnableOrganizationMembers: '{{ response.AutoEnableOrganizationMembers }}'
+      DataSources: '{{ response.DataSources }}'
+      Enabled: '{{ item.Enabled }}'
+      MemberAccountLimitReached: '{{ response.MemberAccountLimitReached }}'
+      Name: '{{ item.Name }}'
+    items_for: '{{ response.Features }}'
+- calls:
+  - action: get_member_detectors
+    on_error: continue
+    save_as: response
+  discovery_id: aws.guardduty.get_member_detectors
+  emit:
+    as: item
+    item:
+      AccountId: '{{ item.AccountId }}'
+      DataSources: '{{ item.DataSources }}'
+      Features: '{{ item.Features }}'
+      MemberDataSourceConfigurations: '{{ item.MemberDataSourceConfigurations }}'
+    items_for: '{{ response.MemberDataSourceConfigurations }}'
+- calls:
+  - action: get_detector
+    on_error: continue
+    save_as: response
+  discovery_id: aws.guardduty.get_detector
+  emit:
+    as: item
+    item:
+      AdditionalConfiguration: '{{ item.AdditionalConfiguration }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      FindingPublishingFrequency: '{{ response.FindingPublishingFrequency }}'
+      Name: '{{ item.Name }}'
+      ServiceRole: '{{ response.ServiceRole }}'
+      Status: '{{ item.Status }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+      Reason: '{{ response.DataSources.MalwareProtection.ScanEc2InstanceWithFindings.EbsVolumes.Reason
+        }}'
+      Tags: '{{ response.Tags }}'
+    items_for: '{{ response.Features }}'
+- calls:
+  - action: describe_malware_scans
+    on_error: continue
+    save_as: response
+  discovery_id: aws.guardduty.describe_malware_scans
+  emit:
+    as: item
+    item:
+      AccountId: '{{ item.AccountId }}'
+      AdminDetectorId: '{{ item.AdminDetectorId }}'
+      AttachedVolumes: '{{ item.AttachedVolumes }}'
+      DetectorId: '{{ item.DetectorId }}'
+      FailureReason: '{{ item.FailureReason }}'
+      FileCount: '{{ item.FileCount }}'
+      ResourceDetails: '{{ item.ResourceDetails }}'
+      ScanEndTime: '{{ item.ScanEndTime }}'
+      ScanId: '{{ item.ScanId }}'
+      ScanResultDetails: '{{ item.ScanResultDetails }}'
+      ScanStartTime: '{{ item.ScanStartTime }}'
+      ScanStatus: '{{ item.ScanStatus }}'
+      ScanType: '{{ item.ScanType }}'
+      TotalBytes: '{{ item.TotalBytes }}'
+      TriggerDetails: '{{ item.TriggerDetails }}'
+    items_for: '{{ response.Scans }}'
+- calls:
+  - action: list_malware_scans
+    on_error: continue
+    save_as: response
+  discovery_id: aws.guardduty.list_malware_scans
+  emit:
+    as: item
+    item:
+      ResourceArn: '{{ item.ResourceArn }}'
+      ResourceType: '{{ item.ResourceType }}'
+      ScanCompletedAt: '{{ item.ScanCompletedAt }}'
+      ScanId: '{{ item.ScanId }}'
+      ScanResultStatus: '{{ item.ScanResultStatus }}'
+      ScanStartedAt: '{{ item.ScanStartedAt }}'
+      ScanStatus: '{{ item.ScanStatus }}'
+      ScanType: '{{ item.ScanType }}'
+      Scans: '{{ item.Scans }}'
+    items_for: '{{ response.Scans }}'

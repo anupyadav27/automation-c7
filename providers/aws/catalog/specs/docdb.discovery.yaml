@@ -1,0 +1,229 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: docdb
+# 9 ops (3 from checks, +6 for inventory)
+version: '1.0'
+provider: aws
+service: docdb
+discovery:
+  - calls:
+    - action: describe_certificates
+      on_error: continue
+      save_as: response
+    discovery_id: aws.docdb.describe_certificates
+    emit:
+      as: item
+      item:
+        CertificateArn: '{{ item.CertificateArn }}'
+        CertificateIdentifier: '{{ item.CertificateIdentifier }}'
+        CertificateType: '{{ item.CertificateType }}'
+        Certificates: '{{ item.Certificates }}'
+        Thumbprint: '{{ item.Thumbprint }}'
+        ValidFrom: '{{ item.ValidFrom }}'
+        ValidTill: '{{ item.ValidTill }}'
+      items_for: '{{ response.Certificates }}'
+  - calls:
+    - action: describe_db_cluster_parameter_groups
+      on_error: continue
+      save_as: response
+    discovery_id: aws.docdb.describe_db_cluster_parameter_groups
+    emit:
+      as: item
+      item:
+        DBClusterParameterGroupArn: '{{ item.DBClusterParameterGroupArn }}'
+        DBClusterParameterGroupName: '{{ item.DBClusterParameterGroupName }}'
+        DBClusterParameterGroups: '{{ item.DBClusterParameterGroups }}'
+        DBParameterGroupFamily: '{{ item.DBParameterGroupFamily }}'
+        Description: '{{ item.Description }}'
+      items_for: '{{ response.DBClusterParameterGroups }}'
+  - calls:
+    - action: describe_global_clusters
+      on_error: continue
+      save_as: response
+    discovery_id: aws.docdb.describe_global_clusters
+    emit:
+      as: item
+      item:
+        DatabaseName: '{{ item.DatabaseName }}'
+        DeletionProtection: '{{ item.DeletionProtection }}'
+        Engine: '{{ item.Engine }}'
+        EngineVersion: '{{ item.EngineVersion }}'
+        FailoverState: '{{ item.FailoverState }}'
+        GlobalClusterArn: '{{ item.GlobalClusterArn }}'
+        GlobalClusterIdentifier: '{{ item.GlobalClusterIdentifier }}'
+        GlobalClusterMembers: '{{ item.GlobalClusterMembers }}'
+        GlobalClusterResourceId: '{{ item.GlobalClusterResourceId }}'
+        GlobalClusters: '{{ item.GlobalClusters }}'
+        Status: '{{ item.Status }}'
+        StorageEncrypted: '{{ item.StorageEncrypted }}'
+        TagList: '{{ item.TagList }}'
+      items_for: '{{ response.GlobalClusters }}'
+  - calls:
+    - action: describe_event_subscriptions
+      on_error: continue
+      save_as: response
+    discovery_id: aws.docdb.describe_event_subscriptions
+    emit:
+      as: item
+      item:
+        CustSubscriptionId: '{{ item.CustSubscriptionId }}'
+        CustomerAwsId: '{{ item.CustomerAwsId }}'
+        Enabled: '{{ item.Enabled }}'
+        EventCategoriesList: '{{ item.EventCategoriesList }}'
+        EventSubscriptionArn: '{{ item.EventSubscriptionArn }}'
+        EventSubscriptionsList: '{{ item.EventSubscriptionsList }}'
+        SnsTopicArn: '{{ item.SnsTopicArn }}'
+        SourceIdsList: '{{ item.SourceIdsList }}'
+        SourceType: '{{ item.SourceType }}'
+        Status: '{{ item.Status }}'
+        SubscriptionCreationTime: '{{ item.SubscriptionCreationTime }}'
+      items_for: '{{ response.EventSubscriptionsList }}'
+  - calls:
+    - action: describe_db_clusters
+      on_error: continue
+      save_as: response
+    discovery_id: aws.docdb.describe_db_clusters
+    emit:
+      as: item
+      item:
+        AssociatedRoles: '{{ item.AssociatedRoles }}'
+        AvailabilityZones: '{{ item.AvailabilityZones }}'
+        BackupRetentionPeriod: '{{ item.BackupRetentionPeriod }}'
+        CloneGroupId: '{{ item.CloneGroupId }}'
+        ClusterCreateTime: '{{ item.ClusterCreateTime }}'
+        DBClusterArn: '{{ item.DBClusterArn }}'
+        DBClusterIdentifier: '{{ item.DBClusterIdentifier }}'
+        DBClusterMembers: '{{ item.DBClusterMembers }}'
+        DBClusterParameterGroup: '{{ item.DBClusterParameterGroup }}'
+        DBClusters: '{{ item.DBClusters }}'
+        DBSubnetGroup: '{{ item.DBSubnetGroup }}'
+        DbClusterResourceId: '{{ item.DbClusterResourceId }}'
+        DeletionProtection: '{{ item.DeletionProtection }}'
+        EarliestRestorableTime: '{{ item.EarliestRestorableTime }}'
+        EnabledCloudwatchLogsExports: '{{ item.EnabledCloudwatchLogsExports }}'
+        Endpoint: '{{ item.Endpoint }}'
+        Engine: '{{ item.Engine }}'
+        EngineVersion: '{{ item.EngineVersion }}'
+        HostedZoneId: '{{ item.HostedZoneId }}'
+        IOOptimizedNextAllowedModificationTime: '{{ item.IOOptimizedNextAllowedModificationTime
+          }}'
+        KmsKeyId: '{{ item.KmsKeyId }}'
+        LatestRestorableTime: '{{ item.LatestRestorableTime }}'
+        MasterUserSecret: '{{ item.MasterUserSecret }}'
+        MasterUsername: '{{ item.MasterUsername }}'
+        MultiAZ: '{{ item.MultiAZ }}'
+        NetworkType: '{{ item.NetworkType }}'
+        PercentProgress: '{{ item.PercentProgress }}'
+        Port: '{{ item.Port }}'
+        PreferredBackupWindow: '{{ item.PreferredBackupWindow }}'
+        PreferredMaintenanceWindow: '{{ item.PreferredMaintenanceWindow }}'
+        ReadReplicaIdentifiers: '{{ item.ReadReplicaIdentifiers }}'
+        ReaderEndpoint: '{{ item.ReaderEndpoint }}'
+        ReplicationSourceIdentifier: '{{ item.ReplicationSourceIdentifier }}'
+        ServerlessV2ScalingConfiguration: '{{ item.ServerlessV2ScalingConfiguration
+          }}'
+        Status: '{{ item.Status }}'
+        StorageEncrypted: '{{ item.StorageEncrypted }}'
+        StorageType: '{{ item.StorageType }}'
+        VpcSecurityGroups: '{{ item.VpcSecurityGroups }}'
+      items_for: '{{ response.DBClusters }}'
+  - calls:
+    - action: describe_db_instances
+      on_error: continue
+      save_as: response
+    discovery_id: aws.docdb.describe_db_instances
+    emit:
+      as: item
+      item:
+        AutoMinorVersionUpgrade: '{{ item.AutoMinorVersionUpgrade }}'
+        AvailabilityZone: '{{ item.AvailabilityZone }}'
+        BackupRetentionPeriod: '{{ item.BackupRetentionPeriod }}'
+        CACertificateIdentifier: '{{ item.CACertificateIdentifier }}'
+        CertificateDetails: '{{ item.CertificateDetails }}'
+        CopyTagsToSnapshot: '{{ item.CopyTagsToSnapshot }}'
+        DBClusterIdentifier: '{{ item.DBClusterIdentifier }}'
+        DBInstanceArn: '{{ item.DBInstanceArn }}'
+        DBInstanceClass: '{{ item.DBInstanceClass }}'
+        DBInstanceIdentifier: '{{ item.DBInstanceIdentifier }}'
+        DBInstanceStatus: '{{ item.DBInstanceStatus }}'
+        DBInstances: '{{ item.DBInstances }}'
+        DBSubnetGroup: '{{ item.DBSubnetGroup }}'
+        DbiResourceId: '{{ item.DbiResourceId }}'
+        EnabledCloudwatchLogsExports: '{{ item.EnabledCloudwatchLogsExports }}'
+        Endpoint: '{{ item.Endpoint }}'
+        Engine: '{{ item.Engine }}'
+        EngineVersion: '{{ item.EngineVersion }}'
+        InstanceCreateTime: '{{ item.InstanceCreateTime }}'
+        KmsKeyId: '{{ item.KmsKeyId }}'
+        LatestRestorableTime: '{{ item.LatestRestorableTime }}'
+        PendingModifiedValues: '{{ item.PendingModifiedValues }}'
+        PerformanceInsightsEnabled: '{{ item.PerformanceInsightsEnabled }}'
+        PerformanceInsightsKMSKeyId: '{{ item.PerformanceInsightsKMSKeyId }}'
+        PreferredBackupWindow: '{{ item.PreferredBackupWindow }}'
+        PreferredMaintenanceWindow: '{{ item.PreferredMaintenanceWindow }}'
+        PromotionTier: '{{ item.PromotionTier }}'
+        PubliclyAccessible: '{{ item.PubliclyAccessible }}'
+        StatusInfos: '{{ item.StatusInfos }}'
+        StorageEncrypted: '{{ item.StorageEncrypted }}'
+        VpcSecurityGroups: '{{ item.VpcSecurityGroups }}'
+      items_for: '{{ response.DBInstances }}'
+  - calls:
+    - action: describe_db_cluster_snapshots
+      on_error: continue
+      save_as: response
+    discovery_id: aws.docdb.describe_db_cluster_snapshots
+    emit:
+      as: item
+      item:
+        AvailabilityZones: '{{ item.AvailabilityZones }}'
+        ClusterCreateTime: '{{ item.ClusterCreateTime }}'
+        DBClusterIdentifier: '{{ item.DBClusterIdentifier }}'
+        DBClusterSnapshotArn: '{{ item.DBClusterSnapshotArn }}'
+        DBClusterSnapshotIdentifier: '{{ item.DBClusterSnapshotIdentifier }}'
+        DBClusterSnapshots: '{{ item.DBClusterSnapshots }}'
+        Engine: '{{ item.Engine }}'
+        EngineVersion: '{{ item.EngineVersion }}'
+        KmsKeyId: '{{ item.KmsKeyId }}'
+        MasterUsername: '{{ item.MasterUsername }}'
+        PercentProgress: '{{ item.PercentProgress }}'
+        Port: '{{ item.Port }}'
+        SnapshotCreateTime: '{{ item.SnapshotCreateTime }}'
+        SnapshotType: '{{ item.SnapshotType }}'
+        SourceDBClusterSnapshotArn: '{{ item.SourceDBClusterSnapshotArn }}'
+        Status: '{{ item.Status }}'
+        StorageEncrypted: '{{ item.StorageEncrypted }}'
+        StorageType: '{{ item.StorageType }}'
+        VpcId: '{{ item.VpcId }}'
+      items_for: '{{ response.DBClusterSnapshots }}'
+  - calls:
+    - action: describe_db_subnet_groups
+      on_error: continue
+      save_as: response
+    discovery_id: aws.docdb.describe_db_subnet_groups
+    emit:
+      as: item
+      item:
+        DBSubnetGroupArn: '{{ item.DBSubnetGroupArn }}'
+        DBSubnetGroupDescription: '{{ item.DBSubnetGroupDescription }}'
+        DBSubnetGroupName: '{{ item.DBSubnetGroupName }}'
+        DBSubnetGroups: '{{ item.DBSubnetGroups }}'
+        SubnetGroupStatus: '{{ item.SubnetGroupStatus }}'
+        Subnets: '{{ item.Subnets }}'
+        SupportedNetworkTypes: '{{ item.SupportedNetworkTypes }}'
+        VpcId: '{{ item.VpcId }}'
+      items_for: '{{ response.DBSubnetGroups }}'
+  - calls:
+    - action: describe_events
+      on_error: continue
+      save_as: response
+    discovery_id: aws.docdb.describe_events
+    emit:
+      as: item
+      item:
+        Date: '{{ item.Date }}'
+        EventCategories: '{{ item.EventCategories }}'
+        Events: '{{ item.Events }}'
+        Message: '{{ item.Message }}'
+        SourceArn: '{{ item.SourceArn }}'
+        SourceIdentifier: '{{ item.SourceIdentifier }}'
+        SourceType: '{{ item.SourceType }}'
+      items_for: '{{ response.Events }}'

@@ -1,0 +1,318 @@
+version: '1.0'
+provider: aws
+service: devops-guru
+services:
+  client: devops-guru
+  module: boto3.client
+discovery:
+- discovery_id: aws.devops-guru.describe_account_health
+  calls:
+  - action: describe_account_health
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      MetricsAnalyzed: '{{ response.MetricsAnalyzed }}'
+      ResourceHours: '{{ response.ResourceHours }}'
+      AnalyzedResourceCount: '{{ response.AnalyzedResourceCount }}'
+      OpenProactiveInsights: '{{ response.OpenProactiveInsights }}'
+      OpenReactiveInsights: '{{ response.OpenReactiveInsights }}'
+- discovery_id: aws.devops-guru.describe_event_sources_config
+  calls:
+  - action: describe_event_sources_config
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AmazonCodeGuruProfiler: '{{ response.EventSources.AmazonCodeGuruProfiler.Status }}'
+      EventSources: '{{ response.EventSources.EventSources }}'
+      Status: '{{ response.EventSources.AmazonCodeGuruProfiler.Status }}'
+- discovery_id: aws.devops-guru.describe_feedback
+  calls:
+  - action: describe_feedback
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Feedback: '{{ response.InsightFeedback.Feedback }}'
+      InsightFeedback: '{{ response.InsightFeedback.Feedback }}'
+      Id: '{{ response.InsightFeedback.Id }}'
+- discovery_id: aws.devops-guru.describe_organization_health
+  calls:
+  - action: describe_organization_health
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      MetricsAnalyzed: '{{ response.MetricsAnalyzed }}'
+      OpenProactiveInsights: '{{ response.OpenProactiveInsights }}'
+      OpenReactiveInsights: '{{ response.OpenReactiveInsights }}'
+      ResourceHours: '{{ response.ResourceHours }}'
+- discovery_id: aws.devops-guru.describe_service_integration
+  calls:
+  - action: describe_service_integration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      KMSServerSideEncryption: '{{ response.ServiceIntegration.KMSServerSideEncryption.Type }}'
+      LogsAnomalyDetection: '{{ response.ServiceIntegration.LogsAnomalyDetection.OptInStatus }}'
+      OpsCenter: '{{ response.ServiceIntegration.OpsCenter }}'
+      ServiceIntegration: '{{ response.ServiceIntegration.ServiceIntegration }}'
+      KMSKeyId: '{{ response.ServiceIntegration.KMSServerSideEncryption.KMSKeyId }}'
+      OptInStatus: '{{ response.ServiceIntegration.KMSServerSideEncryption.OptInStatus }}'
+      Type: '{{ response.ServiceIntegration.KMSServerSideEncryption.Type }}'
+- discovery_id: aws.devops-guru.get_cost_estimation
+  calls:
+  - action: get_cost_estimation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Costs }}'
+    item:
+      State: '{{ item.State }}'
+      Cost: '{{ item.Cost }}'
+      Costs: '{{ item.Costs }}'
+      TimeRange: '{{ item.TimeRange }}'
+      TotalCost: '{{ item.TotalCost }}'
+      Type: '{{ item.Type }}'
+      UnitCost: '{{ item.UnitCost }}'
+      Status: '{{ response.Status }}'
+      EndTime: '{{ response.TimeRange.EndTime }}'
+      StartTime: '{{ response.TimeRange.StartTime }}'
+- discovery_id: aws.devops-guru.list_monitored_resources
+  calls:
+  - action: list_monitored_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MonitoredResourceIdentifiers }}'
+    item:
+      LastUpdated: '{{ item.LastUpdated }}'
+      MonitoredResourceName: '{{ item.MonitoredResourceName }}'
+      ResourcePermission: '{{ item.ResourcePermission }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.devops-guru.list_notification_channels
+  calls:
+  - action: list_notification_channels
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Channels }}'
+    item:
+      Config: '{{ item.Config }}'
+- discovery_id: aws.devops-guru.describe_account_overview
+  calls:
+  - action: describe_account_overview
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      MeanTimeToRecoverInMilliseconds: '{{ response.MeanTimeToRecoverInMilliseconds }}'
+      ProactiveInsights: '{{ response.ProactiveInsights }}'
+      ReactiveInsights: '{{ response.ReactiveInsights }}'
+- discovery_id: aws.devops-guru.describe_anomaly
+  calls:
+  - action: describe_anomaly
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AnomalyReportedTimeRange: '{{ response.ProactiveAnomaly.AnomalyReportedTimeRange.OpenTime }}'
+      AnomalyResources: '{{ response.ProactiveAnomaly.AnomalyResources[].Type }}'
+      AnomalyTimeRange: '{{ response.ProactiveAnomaly.AnomalyTimeRange.EndTime }}'
+      AssociatedInsightId: '{{ response.ProactiveAnomaly.AssociatedInsightId }}'
+      Description: '{{ response.ProactiveAnomaly.Description }}'
+      Limit: '{{ response.ProactiveAnomaly.Limit }}'
+      SourceDetails: '{{ response.ProactiveAnomaly.SourceDetails }}'
+      SourceMetadata: '{{ response.ProactiveAnomaly.SourceMetadata.Source }}'
+      UpdateTime: '{{ response.ProactiveAnomaly.UpdateTime }}'
+      CloseTime: '{{ response.ProactiveAnomaly.AnomalyReportedTimeRange.CloseTime }}'
+      OpenTime: '{{ response.ProactiveAnomaly.AnomalyReportedTimeRange.OpenTime }}'
+      EndTime: '{{ response.ProactiveAnomaly.AnomalyTimeRange.EndTime }}'
+      StartTime: '{{ response.ProactiveAnomaly.AnomalyTimeRange.StartTime }}'
+      Id: '{{ response.ProactiveAnomaly.Id }}'
+      Severity: '{{ response.ProactiveAnomaly.Severity }}'
+      Source: '{{ response.ProactiveAnomaly.SourceMetadata.Source }}'
+      SourceResourceName: '{{ response.ProactiveAnomaly.SourceMetadata.SourceResourceName }}'
+      SourceResourceType: '{{ response.ProactiveAnomaly.SourceMetadata.SourceResourceType }}'
+      Status: '{{ response.ProactiveAnomaly.Status }}'
+      CausalAnomalyId: '{{ response.ReactiveAnomaly.CausalAnomalyId }}'
+      Name: '{{ response.ReactiveAnomaly.Name }}'
+      Type: '{{ response.ReactiveAnomaly.Type }}'
+- discovery_id: aws.devops-guru.describe_insight
+  calls:
+  - action: describe_insight
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Description: '{{ response.ProactiveInsight.Description }}'
+      SsmOpsItemId: '{{ response.ProactiveInsight.SsmOpsItemId }}'
+      Id: '{{ response.ProactiveInsight.Id }}'
+      EndTime: '{{ response.ProactiveInsight.InsightTimeRange.EndTime }}'
+      StartTime: '{{ response.ProactiveInsight.InsightTimeRange.StartTime }}'
+      Name: '{{ response.ProactiveInsight.Name }}'
+      Severity: '{{ response.ProactiveInsight.Severity }}'
+      Status: '{{ response.ProactiveInsight.Status }}'
+- discovery_id: aws.devops-guru.describe_organization_overview
+  calls:
+  - action: describe_organization_overview
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ProactiveInsights: '{{ response.ProactiveInsights }}'
+      ReactiveInsights: '{{ response.ReactiveInsights }}'
+- discovery_id: aws.devops-guru.describe_organization_resource_collection_health
+  calls:
+  - action: describe_organization_resource_collection_health
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CloudFormation }}'
+    item:
+      AnalyzedResourceCount: '{{ item.Tags[].AnalyzedResourceCount }}'
+      Insight: '{{ item.Insight }}'
+      StackName: '{{ item.StackName }}'
+- discovery_id: aws.devops-guru.describe_resource_collection_health
+  calls:
+  - action: describe_resource_collection_health
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CloudFormation }}'
+    item:
+      AnalyzedResourceCount: '{{ item.Tags[].AnalyzedResourceCount }}'
+      Insight: '{{ item.Insight }}'
+      StackName: '{{ item.StackName }}'
+- discovery_id: aws.devops-guru.get_resource_collection
+  calls:
+  - action: get_resource_collection
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.ResourceCollection.Tags }}'
+      CloudFormation: '{{ response.ResourceCollection.CloudFormation }}'
+- discovery_id: aws.devops-guru.list_anomalies_for_insight
+  calls:
+  - action: list_anomalies_for_insight
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ProactiveAnomalies }}'
+    item:
+      AnomalyReportedTimeRange: '{{ item.AnomalyReportedTimeRange }}'
+      AnomalyResources: '{{ item.AnomalyResources }}'
+      AnomalyTimeRange: '{{ item.AnomalyTimeRange }}'
+      AssociatedInsightId: '{{ item.AssociatedInsightId }}'
+      Description: '{{ item.Description }}'
+      Limit: '{{ item.Limit }}'
+      SourceDetails: '{{ item.SourceDetails }}'
+      SourceMetadata: '{{ item.SourceMetadata }}'
+      UpdateTime: '{{ item.UpdateTime }}'
+- discovery_id: aws.devops-guru.list_anomalous_log_groups
+  calls:
+  - action: list_anomalous_log_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AnomalousLogGroups }}'
+    item:
+      ImpactEndTime: '{{ item.ImpactEndTime }}'
+      ImpactStartTime: '{{ item.ImpactStartTime }}'
+      LogAnomalyShowcases: '{{ item.LogAnomalyShowcases }}'
+      LogGroupName: '{{ item.LogGroupName }}'
+      NumberOfLogLinesScanned: '{{ item.NumberOfLogLinesScanned }}'
+      InsightId: '{{ response.InsightId }}'
+- discovery_id: aws.devops-guru.list_events
+  calls:
+  - action: list_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Events }}'
+    item:
+      DataSource: '{{ item.DataSource }}'
+      EventClass: '{{ item.EventClass }}'
+      EventSource: '{{ item.EventSource }}'
+      Resources: '{{ item.Resources }}'
+      Time: '{{ item.Time }}'
+- discovery_id: aws.devops-guru.list_insights
+  calls:
+  - action: list_insights
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ProactiveInsights }}'
+- discovery_id: aws.devops-guru.list_organization_insights
+  calls:
+  - action: list_organization_insights
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ProactiveInsights }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      OrganizationalUnitId: '{{ item.OrganizationalUnitId }}'
+- discovery_id: aws.devops-guru.list_recommendations
+  calls:
+  - action: list_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Recommendations }}'
+    item:
+      Category: '{{ item.Category }}'
+      Description: '{{ item.Description }}'
+      Link: '{{ item.Link }}'
+      Reason: '{{ item.Reason }}'
+      RelatedAnomalies: '{{ item.RelatedAnomalies }}'
+      RelatedEvents: '{{ item.RelatedEvents }}'
+- discovery_id: aws.devops-guru.search_insights
+  for_each: aws.devops-guru.get_cost_estimation
+  calls:
+  - action: search_insights
+    params:
+      StartTimeRange: '{{ item.StartTimeRange }}'
+      Type: '{{ item.Type }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ProactiveInsights }}'
+- discovery_id: aws.devops-guru.search_organization_insights
+  for_each: aws.devops-guru.get_cost_estimation
+  calls:
+  - action: search_organization_insights
+    params:
+      AccountIds: '{{ item.AccountIds }}'
+      StartTimeRange: '{{ item.StartTimeRange }}'
+      Type: '{{ item.Type }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ProactiveInsights }}'

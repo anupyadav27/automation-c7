@@ -1,0 +1,93 @@
+version: '1.0'
+provider: aws
+service: networkmonitor
+services:
+  client: networkmonitor
+  module: boto3.client
+discovery:
+- discovery_id: aws.networkmonitor.list_monitors
+  calls:
+  - action: list_monitors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.monitors }}'
+    item:
+      addressFamily: '{{ item.addressFamily }}'
+      aggregationPeriod: '{{ item.aggregationPeriod }}'
+      createdAt: '{{ item.createdAt }}'
+      destination: '{{ item.destination }}'
+      destinationPort: '{{ item.destinationPort }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      monitorArn: '{{ item.monitorArn }}'
+      monitorName: '{{ item.monitorName }}'
+      packetSize: '{{ item.packetSize }}'
+      probes: '{{ item.probes }}'
+      protocol: '{{ item.protocol }}'
+      state: '{{ item.state }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.networkmonitor.get_monitor
+  for_each: aws.networkmonitor.list_monitors
+  calls:
+  - action: get_monitor
+    params:
+      monitorName: '{{ item.monitorName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.probes }}'
+    item:
+      addressFamily: '{{ item.addressFamily }}'
+      createdAt: '{{ item.createdAt }}'
+      destination: '{{ item.destination }}'
+      destinationPort: '{{ item.destinationPort }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      packetSize: '{{ item.packetSize }}'
+      probeArn: '{{ item.probeArn }}'
+      probeId: '{{ item.probeId }}'
+      probes: '{{ item.probes }}'
+      protocol: '{{ item.protocol }}'
+      sourceArn: '{{ item.sourceArn }}'
+      state: '{{ item.state }}'
+      tags: '{{ item.tags }}'
+      vpcId: '{{ item.vpcId }}'
+      aggregationPeriod: '{{ response.aggregationPeriod }}'
+      monitorArn: '{{ response.monitorArn }}'
+      monitorName: '{{ response.monitorName }}'
+- discovery_id: aws.networkmonitor.get_probe
+  for_each: aws.networkmonitor.list_monitors
+  calls:
+  - action: get_probe
+    params:
+      monitorName: '{{ item.monitorName }}'
+      probeId: '{{ item.probeId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      addressFamily: '{{ response.addressFamily }}'
+      createdAt: '{{ response.createdAt }}'
+      destination: '{{ response.destination }}'
+      destinationPort: '{{ response.destinationPort }}'
+      modifiedAt: '{{ response.modifiedAt }}'
+      packetSize: '{{ response.packetSize }}'
+      probeArn: '{{ response.probeArn }}'
+      probeId: '{{ response.probeId }}'
+      protocol: '{{ response.protocol }}'
+      sourceArn: '{{ response.sourceArn }}'
+      state: '{{ response.state }}'
+      tags: '{{ response.tags }}'
+      vpcId: '{{ response.vpcId }}'
+- discovery_id: aws.networkmonitor.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

@@ -1,0 +1,384 @@
+version: '1.0'
+provider: aws
+service: mgn
+services:
+  client: mgn
+  module: boto3.client
+discovery:
+- discovery_id: aws.mgn.describe_jobs
+  calls:
+  - action: describe_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      event: '{{ item.event }}'
+      initiatedBy: '{{ item.initiatedBy }}'
+      items: '{{ item["items"] }}'
+      jobID: '{{ item.jobID }}'
+      logDateTime: '{{ item.logDateTime }}'
+      participatingServers: '{{ item.participatingServers }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.describe_launch_configuration_templates
+  calls:
+  - action: describe_launch_configuration_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      associatePublicIpAddress: '{{ item.items[].associatePublicIpAddress }}'
+      bootMode: '{{ item.bootMode }}'
+      copyPrivateIp: '{{ item.copyPrivateIp }}'
+      copyTags: '{{ item.copyTags }}'
+      ec2LaunchTemplateID: '{{ item.ec2LaunchTemplateID }}'
+      enableMapAutoTagging: '{{ item.enableMapAutoTagging }}'
+      largeVolumeConf: '{{ item.largeVolumeConf }}'
+      launchConfigurationTemplateID: '{{ item.items[].launchConfigurationTemplateID }}'
+      launchDisposition: '{{ item.launchDisposition }}'
+      licensing: '{{ item.licensing }}'
+      mapAutoTaggingMpeID: '{{ item.mapAutoTaggingMpeID }}'
+      postLaunchActions: '{{ item.postLaunchActions }}'
+      smallVolumeConf: '{{ item.smallVolumeConf }}'
+      smallVolumeMaxSize: '{{ item.smallVolumeMaxSize }}'
+      tags: '{{ item.tags }}'
+      targetInstanceTypeRightSizingMethod: '{{ item.items[].targetInstanceTypeRightSizingMethod }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.describe_replication_configuration_templates
+  calls:
+  - action: describe_replication_configuration_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      associateDefaultSecurityGroup: '{{ item.items[].associateDefaultSecurityGroup }}'
+      bandwidthThrottling: '{{ item.bandwidthThrottling }}'
+      createPublicIP: '{{ item.createPublicIP }}'
+      dataPlaneRouting: '{{ item.dataPlaneRouting }}'
+      defaultLargeStagingDiskType: '{{ item.items[].defaultLargeStagingDiskType }}'
+      ebsEncryption: '{{ item.ebsEncryption }}'
+      ebsEncryptionKeyArn: '{{ item.ebsEncryptionKeyArn }}'
+      replicationConfigurationTemplateID: '{{ item.items[].replicationConfigurationTemplateID }}'
+      replicationServerInstanceType: '{{ item.items[].replicationServerInstanceType }}'
+      replicationServersSecurityGroupsIDs: '{{ item.replicationServersSecurityGroupsIDs }}'
+      stagingAreaSubnetId: '{{ item.stagingAreaSubnetId }}'
+      stagingAreaTags: '{{ item.stagingAreaTags }}'
+      tags: '{{ item.tags }}'
+      useDedicatedReplicationServer: '{{ item.items[].useDedicatedReplicationServer }}'
+      useFipsEndpoint: '{{ item.useFipsEndpoint }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.describe_source_servers
+  calls:
+  - action: describe_source_servers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      applicationID: '{{ item.applicationID }}'
+      arn: '{{ item.arn }}'
+      connectorAction: '{{ item.connectorAction }}'
+      dataReplicationInfo: '{{ item.dataReplicationInfo }}'
+      fqdnForActionFramework: '{{ item.fqdnForActionFramework }}'
+      launchedInstance: '{{ item.launchedInstance }}'
+      lifeCycle: '{{ item.lifeCycle }}'
+      replicationType: '{{ item.replicationType }}'
+      sourceProperties: '{{ item.sourceProperties }}'
+      sourceServerID: '{{ item.sourceServerID }}'
+      tags: '{{ item.tags }}'
+      userProvidedID: '{{ item.userProvidedID }}'
+      vcenterClientID: '{{ item.vcenterClientID }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.describe_vcenter_clients
+  calls:
+  - action: describe_vcenter_clients
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      datacenterName: '{{ item.datacenterName }}'
+      hostname: '{{ item.hostname }}'
+      lastSeenDatetime: '{{ item.lastSeenDatetime }}'
+      sourceServerTags: '{{ item.sourceServerTags }}'
+      tags: '{{ item.tags }}'
+      vcenterClientID: '{{ item.vcenterClientID }}'
+      vcenterUUID: '{{ item.vcenterUUID }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.list_applications
+  calls:
+  - action: list_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      applicationAggregatedStatus: '{{ item.applicationAggregatedStatus }}'
+      applicationID: '{{ item.applicationID }}'
+      arn: '{{ item.arn }}'
+      creationDateTime: '{{ item.creationDateTime }}'
+      description: '{{ item.description }}'
+      isArchived: '{{ item.isArchived }}'
+      lastModifiedDateTime: '{{ item.lastModifiedDateTime }}'
+      name: '{{ item.name }}'
+      tags: '{{ item.tags }}'
+      waveID: '{{ item.waveID }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.list_connectors
+  calls:
+  - action: list_connectors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      connectorID: '{{ item.connectorID }}'
+      name: '{{ item.name }}'
+      ssmCommandConfig: '{{ item.ssmCommandConfig }}'
+      ssmInstanceID: '{{ item.ssmInstanceID }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.list_exports
+  calls:
+  - action: list_exports
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      creationDateTime: '{{ item.creationDateTime }}'
+      endDateTime: '{{ item.endDateTime }}'
+      exportID: '{{ item.exportID }}'
+      progressPercentage: '{{ item.progressPercentage }}'
+      s3Bucket: '{{ item.s3Bucket }}'
+      s3BucketOwner: '{{ item.s3BucketOwner }}'
+      s3Key: '{{ item.s3Key }}'
+      status: '{{ item.status }}'
+      summary: '{{ item.summary }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.list_imports
+  calls:
+  - action: list_imports
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      creationDateTime: '{{ item.creationDateTime }}'
+      endDateTime: '{{ item.endDateTime }}'
+      importID: '{{ item.importID }}'
+      progressPercentage: '{{ item.progressPercentage }}'
+      s3BucketSource: '{{ item.s3BucketSource }}'
+      status: '{{ item.status }}'
+      summary: '{{ item.summary }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.list_managed_accounts
+  calls:
+  - action: list_managed_accounts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.list_waves
+  calls:
+  - action: list_waves
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationDateTime: '{{ item.creationDateTime }}'
+      description: '{{ item.description }}'
+      isArchived: '{{ item.isArchived }}'
+      lastModifiedDateTime: '{{ item.lastModifiedDateTime }}'
+      name: '{{ item.name }}'
+      tags: '{{ item.tags }}'
+      waveAggregatedStatus: '{{ item.waveAggregatedStatus }}'
+      waveID: '{{ item.waveID }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.describe_job_log_items
+  for_each: aws.mgn.describe_jobs
+  calls:
+  - action: describe_job_log_items
+    params:
+      jobID: '{{ item.jobID }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      event: '{{ item.event }}'
+      eventData: '{{ item.eventData }}'
+      logDateTime: '{{ item.logDateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.get_launch_configuration
+  for_each: aws.mgn.describe_source_servers
+  calls:
+  - action: get_launch_configuration
+    params:
+      sourceServerID: '{{ item.sourceServerID }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      osByol: '{{ response.licensing.osByol }}'
+      bootMode: '{{ response.bootMode }}'
+      copyPrivateIp: '{{ response.copyPrivateIp }}'
+      copyTags: '{{ response.copyTags }}'
+      ec2LaunchTemplateID: '{{ response.ec2LaunchTemplateID }}'
+      enableMapAutoTagging: '{{ response.enableMapAutoTagging }}'
+      launchDisposition: '{{ response.launchDisposition }}'
+      mapAutoTaggingMpeID: '{{ response.mapAutoTaggingMpeID }}'
+      name: '{{ response.name }}'
+      cloudWatchLogGroupName: '{{ response.postLaunchActions.cloudWatchLogGroupName }}'
+      deployment: '{{ response.postLaunchActions.deployment }}'
+      s3LogBucket: '{{ response.postLaunchActions.s3LogBucket }}'
+      s3OutputKeyPrefix: '{{ response.postLaunchActions.s3OutputKeyPrefix }}'
+      sourceServerID: '{{ response.sourceServerID }}'
+      targetInstanceTypeRightSizingMethod: '{{ response.targetInstanceTypeRightSizingMethod }}'
+- discovery_id: aws.mgn.get_replication_configuration
+  for_each: aws.mgn.describe_source_servers
+  calls:
+  - action: get_replication_configuration
+    params:
+      sourceServerID: '{{ item.sourceServerID }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.replicatedDisks }}'
+    item:
+      deviceName: '{{ item.deviceName }}'
+      iops: '{{ item.iops }}'
+      isBootDisk: '{{ item.isBootDisk }}'
+      stagingDiskType: '{{ item.stagingDiskType }}'
+      throughput: '{{ item.throughput }}'
+      associateDefaultSecurityGroup: '{{ response.associateDefaultSecurityGroup }}'
+      bandwidthThrottling: '{{ response.bandwidthThrottling }}'
+      createPublicIP: '{{ response.createPublicIP }}'
+      dataPlaneRouting: '{{ response.dataPlaneRouting }}'
+      defaultLargeStagingDiskType: '{{ response.defaultLargeStagingDiskType }}'
+      ebsEncryption: '{{ response.ebsEncryption }}'
+      ebsEncryptionKeyArn: '{{ response.ebsEncryptionKeyArn }}'
+      name: '{{ response.name }}'
+      replicationServerInstanceType: '{{ response.replicationServerInstanceType }}'
+      sourceServerID: '{{ response.sourceServerID }}'
+      stagingAreaSubnetId: '{{ response.stagingAreaSubnetId }}'
+      stagingAreaTags: '{{ response.stagingAreaTags }}'
+      useDedicatedReplicationServer: '{{ response.useDedicatedReplicationServer }}'
+      useFipsEndpoint: '{{ response.useFipsEndpoint }}'
+- discovery_id: aws.mgn.list_export_errors
+  for_each: aws.mgn.list_exports
+  calls:
+  - action: list_export_errors
+    params:
+      exportID: '{{ item.exportID }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      errorData: '{{ item.errorData }}'
+      errorDateTime: '{{ item.errorDateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.list_import_errors
+  for_each: aws.mgn.list_imports
+  calls:
+  - action: list_import_errors
+    params:
+      importID: '{{ item.importID }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      errorData: '{{ item.errorData }}'
+      errorDateTime: '{{ item.errorDateTime }}'
+      errorType: '{{ item.errorType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.list_source_server_actions
+  for_each: aws.mgn.describe_source_servers
+  calls:
+  - action: list_source_server_actions
+    params:
+      sourceServerID: '{{ item.sourceServerID }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      actionID: '{{ item.actionID }}'
+      actionName: '{{ item.actionName }}'
+      active: '{{ item.active }}'
+      category: '{{ item.category }}'
+      description: '{{ item.description }}'
+      documentIdentifier: '{{ item.documentIdentifier }}'
+      documentVersion: '{{ item.documentVersion }}'
+      externalParameters: '{{ item.externalParameters }}'
+      mustSucceedForCutover: '{{ item.mustSucceedForCutover }}'
+      order: '{{ item.order }}'
+      parameters: '{{ item.parameters }}'
+      timeoutSeconds: '{{ item.timeoutSeconds }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.mgn.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.mgn.list_template_actions
+  for_each: aws.mgn.describe_launch_configuration_templates
+  calls:
+  - action: list_template_actions
+    params:
+      launchConfigurationTemplateID: '{{ item.launchConfigurationTemplateID }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      actionID: '{{ item.actionID }}'
+      actionName: '{{ item.actionName }}'
+      active: '{{ item.active }}'
+      category: '{{ item.category }}'
+      description: '{{ item.description }}'
+      documentIdentifier: '{{ item.documentIdentifier }}'
+      documentVersion: '{{ item.documentVersion }}'
+      externalParameters: '{{ item.externalParameters }}'
+      mustSucceedForCutover: '{{ item.mustSucceedForCutover }}'
+      operatingSystem: '{{ item.operatingSystem }}'
+      order: '{{ item.order }}'
+      parameters: '{{ item.parameters }}'
+      timeoutSeconds: '{{ item.timeoutSeconds }}'
+      nextToken: '{{ response.nextToken }}'

@@ -1,0 +1,145 @@
+version: '1.0'
+provider: aws
+service: autoscaling
+discovery:
+- calls:
+  - action: describe_launch_configurations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.autoscaling.describe_launch_configurations
+  emit:
+    as: item
+    item:
+      AssociatePublicIpAddress: '{{ item.AssociatePublicIpAddress }}'
+      BlockDeviceMappings: '{{ item.BlockDeviceMappings }}'
+      ClassicLinkVPCId: '{{ item.ClassicLinkVPCId }}'
+      ClassicLinkVPCSecurityGroups: '{{ item.ClassicLinkVPCSecurityGroups }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      EbsOptimized: '{{ item.EbsOptimized }}'
+      IamInstanceProfile: '{{ item.IamInstanceProfile }}'
+      ImageId: '{{ item.ImageId }}'
+      InstanceMonitoring: '{{ item.InstanceMonitoring }}'
+      InstanceType: '{{ item.InstanceType }}'
+      KernelId: '{{ item.KernelId }}'
+      KeyName: '{{ item.KeyName }}'
+      LaunchConfigurationARN: '{{ item.LaunchConfigurationARN }}'
+      LaunchConfigurationName: '{{ item.LaunchConfigurations[].KeyName }}'
+      LaunchConfigurations: '{{ item.LaunchConfigurations }}'
+      MetadataOptions: '{{ item.MetadataOptions }}'
+      PlacementTenancy: '{{ item.PlacementTenancy }}'
+      RamdiskId: '{{ item.RamdiskId }}'
+      SecurityGroups: '{{ item.SecurityGroups }}'
+      SpotPrice: '{{ item.SpotPrice }}'
+      UserData: '{{ item.UserData }}'
+    items_for: '{{ response.LaunchConfigurations }}'
+- calls:
+  - action: describe_scheduled_actions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.autoscaling.describe_scheduled_actions
+  emit:
+    as: item
+    item:
+      AutoScalingGroupName: '{{ item.AutoScalingGroupName }}'
+      DesiredCapacity: '{{ item.DesiredCapacity }}'
+      EndTime: '{{ item.EndTime }}'
+      MaxSize: '{{ item.MaxSize }}'
+      MinSize: '{{ item.MinSize }}'
+      Recurrence: '{{ item.Recurrence }}'
+      ScheduledActionARN: '{{ item.ScheduledActionARN }}'
+      ScheduledActionName: '{{ item.ScheduledActionName }}'
+      ScheduledUpdateGroupActions: '{{ item.ScheduledUpdateGroupActions[].Time }}'
+      StartTime: '{{ item.StartTime }}'
+      Time: '{{ item.Time }}'
+      TimeZone: '{{ item.TimeZone }}'
+    items_for: '{{ response.ScheduledUpdateGroupActions }}'
+- calls:
+  - action: describe_policies
+    on_error: continue
+    save_as: response
+  discovery_id: aws.autoscaling.describe_policies
+  emit:
+    as: item
+    item:
+      AdjustmentType: '{{ item.AdjustmentType }}'
+      Alarms: '{{ item.Alarms }}'
+      AutoScalingGroupName: '{{ item.AutoScalingGroupName }}'
+      Cooldown: '{{ item.Cooldown }}'
+      Enabled: '{{ item.Enabled }}'
+      EstimatedInstanceWarmup: '{{ item.EstimatedInstanceWarmup }}'
+      MetricAggregationType: '{{ item.MetricAggregationType }}'
+      MinAdjustmentMagnitude: '{{ item.MinAdjustmentMagnitude }}'
+      MinAdjustmentStep: '{{ item.MinAdjustmentStep }}'
+      PolicyARN: '{{ item.PolicyARN }}'
+      PolicyName: '{{ item.PolicyName }}'
+      PolicyType: '{{ item.PolicyType }}'
+      PredictiveScalingConfiguration: '{{ item.PredictiveScalingConfiguration }}'
+      ScalingAdjustment: '{{ item.ScalingAdjustment }}'
+      ScalingPolicies: '{{ item.ScalingPolicies }}'
+      StepAdjustments: '{{ item.StepAdjustments }}'
+      TargetTrackingConfiguration: '{{ item.TargetTrackingConfiguration }}'
+    items_for: '{{ response.ScalingPolicies }}'
+- calls:
+  - action: describe_notification_configurations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.autoscaling.describe_notification_configurations
+  emit:
+    as: item
+    item:
+      AutoScalingGroupName: '{{ item.AutoScalingGroupName }}'
+      NotificationConfigurations: '{{ item.NotificationConfigurations }}'
+      NotificationType: '{{ item.NotificationType }}'
+      TopicARN: '{{ item.TopicARN }}'
+    items_for: '{{ response.NotificationConfigurations }}'
+- calls:
+  - action: describe_auto_scaling_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.autoscaling.describe_auto_scaling_groups
+  emit:
+    as: item
+    item:
+      AutoScalingGroupARN: '{{ item.AutoScalingGroupARN }}'
+      AutoScalingGroupName: '{{ item.AutoScalingGroupName }}'
+      AutoScalingGroups: '{{ item.AutoScalingGroups }}'
+      AvailabilityZoneDistribution: '{{ item.AvailabilityZoneDistribution }}'
+      AvailabilityZoneImpairmentPolicy: '{{ item.AvailabilityZoneImpairmentPolicy }}'
+      AvailabilityZones: '{{ item.AvailabilityZones }}'
+      CapacityRebalance: '{{ item.CapacityRebalance }}'
+      CapacityReservationSpecification: '{{ item.CapacityReservationSpecification }}'
+      Context: '{{ item.Context }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      DefaultCooldown: '{{ item.DefaultCooldown }}'
+      DefaultInstanceWarmup: '{{ item.DefaultInstanceWarmup }}'
+      DesiredCapacity: '{{ item.DesiredCapacity }}'
+      DesiredCapacityType: '{{ item.DesiredCapacityType }}'
+      EnabledMetrics: '{{ item.EnabledMetrics }}'
+      HealthCheckGracePeriod: '{{ item.HealthCheckGracePeriod }}'
+      HealthCheckType: '{{ item.HealthCheckType }}'
+      InstanceLifecyclePolicy: '{{ item.InstanceLifecyclePolicy }}'
+      InstanceMaintenancePolicy: '{{ item.InstanceMaintenancePolicy }}'
+      Instances: '{{ item.Instances }}'
+      LaunchConfigurationName: '{{ item.LaunchConfigurationName }}'
+      LaunchTemplate: '{{ item.LaunchTemplate }}'
+      LoadBalancerNames: '{{ item.LoadBalancerNames }}'
+      MaxInstanceLifetime: '{{ item.MaxInstanceLifetime }}'
+      MaxSize: '{{ item.MaxSize }}'
+      MinSize: '{{ item.MinSize }}'
+      MixedInstancesPolicy: '{{ item.MixedInstancesPolicy }}'
+      NewInstancesProtectedFromScaleIn: '{{ item.NewInstancesProtectedFromScaleIn }}'
+      PlacementGroup: '{{ item.PlacementGroup }}'
+      PredictedCapacity: '{{ item.PredictedCapacity }}'
+      ServiceLinkedRoleARN: '{{ item.ServiceLinkedRoleARN }}'
+      Statement: '{{ item.Statement }}'
+      Status: '{{ item.Status }}'
+      SuspendedProcesses: '{{ item.SuspendedProcesses }}'
+      Tags: '{{ item.Tags }}'
+      TargetGroupARNs: '{{ item.TargetGroupARNs }}'
+      TerminationPolicies: '{{ item.TerminationPolicies }}'
+      TrafficSources: '{{ item.TrafficSources }}'
+      VPCZoneIdentifier: '{{ item.VPCZoneIdentifier }}'
+      Version: '{{ item.Version }}'
+      WarmPoolConfiguration: '{{ item.WarmPoolConfiguration }}'
+      WarmPoolSize: '{{ item.WarmPoolSize }}'
+    items_for: '{{ response.AutoScalingGroups }}'

@@ -1,0 +1,149 @@
+version: '1.0'
+provider: aws
+service: invoicing
+services:
+  client: invoicing
+  module: boto3.client
+discovery:
+- discovery_id: aws.invoicing.list_invoice_units
+  calls:
+  - action: list_invoice_units
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.InvoiceUnits }}'
+    item:
+      Name: '{{ item.Name }}'
+      Description: '{{ item.Description }}'
+      InvoiceReceiver: '{{ item.InvoiceReceiver }}'
+      InvoiceUnitArn: '{{ item.InvoiceUnitArn }}'
+      LastModified: '{{ item.LastModified }}'
+      Rule: '{{ item.Rule }}'
+      TaxInheritanceDisabled: '{{ item.TaxInheritanceDisabled }}'
+- discovery_id: aws.invoicing.list_procurement_portal_preferences
+  calls:
+  - action: list_procurement_portal_preferences
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ProcurementPortalPreferences }}'
+    item:
+      AwsAccountId: '{{ item.AwsAccountId }}'
+      BuyerDomain: '{{ item.BuyerDomain }}'
+      BuyerIdentifier: '{{ item.BuyerIdentifier }}'
+      CreateDate: '{{ item.CreateDate }}'
+      EinvoiceDeliveryEnabled: '{{ item.EinvoiceDeliveryEnabled }}'
+      EinvoiceDeliveryPreferenceStatus: '{{ item.EinvoiceDeliveryPreferenceStatus }}'
+      EinvoiceDeliveryPreferenceStatusReason: '{{ item.EinvoiceDeliveryPreferenceStatusReason }}'
+      LastUpdateDate: '{{ item.LastUpdateDate }}'
+      ProcurementPortalName: '{{ item.ProcurementPortalName }}'
+      ProcurementPortalPreferenceArn: '{{ item.ProcurementPortalPreferenceArn }}'
+      PurchaseOrderRetrievalEnabled: '{{ item.PurchaseOrderRetrievalEnabled }}'
+      PurchaseOrderRetrievalPreferenceStatus: '{{ item.PurchaseOrderRetrievalPreferenceStatus }}'
+      PurchaseOrderRetrievalPreferenceStatusReason: '{{ item.PurchaseOrderRetrievalPreferenceStatusReason }}'
+      Selector: '{{ item.Selector }}'
+      SupplierDomain: '{{ item.SupplierDomain }}'
+      SupplierIdentifier: '{{ item.SupplierIdentifier }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.invoicing.get_invoice_pdf
+  calls:
+  - action: get_invoice_pdf
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DocumentUrl: '{{ response.InvoicePDF.DocumentUrl }}'
+      DocumentUrlExpirationDate: '{{ response.InvoicePDF.DocumentUrlExpirationDate }}'
+      InvoiceId: '{{ response.InvoicePDF.InvoiceId }}'
+      SupplementalDocuments: '{{ response.InvoicePDF.SupplementalDocuments }}'
+- discovery_id: aws.invoicing.get_invoice_unit
+  for_each: aws.invoicing.list_invoice_units
+  calls:
+  - action: get_invoice_unit
+    params:
+      InvoiceUnitArn: '{{ item.InvoiceUnitArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      BillSourceAccounts: '{{ response.Rule.BillSourceAccounts }}'
+      LinkedAccounts: '{{ response.Rule.LinkedAccounts }}'
+      Description: '{{ response.Description }}'
+      InvoiceReceiver: '{{ response.InvoiceReceiver }}'
+      InvoiceUnitArn: '{{ response.InvoiceUnitArn }}'
+      LastModified: '{{ response.LastModified }}'
+      Name: '{{ response.Name }}'
+      TaxInheritanceDisabled: '{{ response.TaxInheritanceDisabled }}'
+- discovery_id: aws.invoicing.get_procurement_portal_preference
+  for_each: aws.invoicing.list_procurement_portal_preferences
+  calls:
+  - action: get_procurement_portal_preference
+    params:
+      ProcurementPortalPreferenceArn: '{{ item.ProcurementPortalPreferenceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AwsAccountId: '{{ response.ProcurementPortalPreference.AwsAccountId }}'
+      BuyerDomain: '{{ response.ProcurementPortalPreference.BuyerDomain }}'
+      BuyerIdentifier: '{{ response.ProcurementPortalPreference.BuyerIdentifier }}'
+      Contacts: '{{ response.ProcurementPortalPreference.Contacts }}'
+      CreateDate: '{{ response.ProcurementPortalPreference.CreateDate }}'
+      EinvoiceDeliveryEnabled: '{{ response.ProcurementPortalPreference.EinvoiceDeliveryEnabled }}'
+      EinvoiceDeliveryPreference: '{{ response.ProcurementPortalPreference.EinvoiceDeliveryPreference }}'
+      EinvoiceDeliveryPreferenceStatus: '{{ response.ProcurementPortalPreference.EinvoiceDeliveryPreferenceStatus }}'
+      EinvoiceDeliveryPreferenceStatusReason: '{{ response.ProcurementPortalPreference.EinvoiceDeliveryPreferenceStatusReason }}'
+      LastUpdateDate: '{{ response.ProcurementPortalPreference.LastUpdateDate }}'
+      ProcurementPortalInstanceEndpoint: '{{ response.ProcurementPortalPreference.ProcurementPortalInstanceEndpoint }}'
+      ProcurementPortalName: '{{ response.ProcurementPortalPreference.ProcurementPortalName }}'
+      ProcurementPortalPreferenceArn: '{{ response.ProcurementPortalPreference.ProcurementPortalPreferenceArn }}'
+      ProcurementPortalSharedSecret: '{{ response.ProcurementPortalPreference.ProcurementPortalSharedSecret }}'
+      PurchaseOrderRetrievalEnabled: '{{ response.ProcurementPortalPreference.PurchaseOrderRetrievalEnabled }}'
+      PurchaseOrderRetrievalEndpoint: '{{ response.ProcurementPortalPreference.PurchaseOrderRetrievalEndpoint }}'
+      PurchaseOrderRetrievalPreferenceStatus: '{{ response.ProcurementPortalPreference.PurchaseOrderRetrievalPreferenceStatus }}'
+      PurchaseOrderRetrievalPreferenceStatusReason: '{{ response.ProcurementPortalPreference.PurchaseOrderRetrievalPreferenceStatusReason }}'
+      Selector: '{{ response.ProcurementPortalPreference.Selector }}'
+      SupplierDomain: '{{ response.ProcurementPortalPreference.SupplierDomain }}'
+      SupplierIdentifier: '{{ response.ProcurementPortalPreference.SupplierIdentifier }}'
+      TestEnvPreference: '{{ response.ProcurementPortalPreference.TestEnvPreference }}'
+      Version: '{{ response.ProcurementPortalPreference.Version }}'
+- discovery_id: aws.invoicing.list_invoice_summaries
+  for_each: aws.invoicing.list_procurement_portal_preferences
+  calls:
+  - action: list_invoice_summaries
+    params:
+      Selector: '{{ item.Selector }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.InvoiceSummaries }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      BaseCurrencyAmount: '{{ item.BaseCurrencyAmount }}'
+      BillingPeriod: '{{ item.BillingPeriod }}'
+      DueDate: '{{ item.DueDate }}'
+      Entity: '{{ item.Entity }}'
+      InvoiceId: '{{ item.InvoiceId }}'
+      InvoiceType: '{{ item.InvoiceType }}'
+      IssuedDate: '{{ item.IssuedDate }}'
+      OriginalInvoiceId: '{{ item.OriginalInvoiceId }}'
+      PaymentCurrencyAmount: '{{ item.PaymentCurrencyAmount }}'
+      PurchaseOrderNumber: '{{ item.PurchaseOrderNumber }}'
+      TaxCurrencyAmount: '{{ item.TaxCurrencyAmount }}'
+- discovery_id: aws.invoicing.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceTags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

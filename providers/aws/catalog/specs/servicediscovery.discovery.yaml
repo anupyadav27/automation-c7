@@ -1,0 +1,190 @@
+version: '1.0'
+provider: aws
+service: servicediscovery
+services:
+  client: servicediscovery
+  module: boto3.client
+discovery:
+- discovery_id: aws.servicediscovery.list_namespaces
+  calls:
+  - action: list_namespaces
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Namespaces }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      CreateDate: '{{ item.CreateDate }}'
+      Description: '{{ item.Description }}'
+      Properties: '{{ item.Properties }}'
+      ResourceOwner: '{{ item.ResourceOwner }}'
+      ServiceCount: '{{ item.ServiceCount }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.servicediscovery.list_operations
+  calls:
+  - action: list_operations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Operations }}'
+    item:
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      ErrorCode: '{{ item.ErrorCode }}'
+      ErrorMessage: '{{ item.ErrorMessage }}'
+      Operation: '{{ item.Operation }}'
+      OwnerAccount: '{{ item.OwnerAccount }}'
+      Targets: '{{ item.Targets }}'
+      UpdateDate: '{{ item.UpdateDate }}'
+- discovery_id: aws.servicediscovery.list_services
+  calls:
+  - action: list_services
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Services }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      CreateDate: '{{ item.CreateDate }}'
+      CreatedByAccount: '{{ item.CreatedByAccount }}'
+      Description: '{{ item.Description }}'
+      DnsConfig: '{{ item.DnsConfig }}'
+      HealthCheckConfig: '{{ item.HealthCheckConfig }}'
+      HealthCheckCustomConfig: '{{ item.HealthCheckCustomConfig }}'
+      InstanceCount: '{{ item.InstanceCount }}'
+      ResourceOwner: '{{ item.ResourceOwner }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.servicediscovery.get_instance
+  calls:
+  - action: get_instance
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.Instance.Id }}'
+      Attributes: '{{ response.Instance.Attributes }}'
+      CreatedByAccount: '{{ response.Instance.CreatedByAccount }}'
+      CreatorRequestId: '{{ response.Instance.CreatorRequestId }}'
+      Instance: '{{ response.Instance.Instance }}'
+- discovery_id: aws.servicediscovery.get_instances_health_status
+  calls:
+  - action: get_instances_health_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+- discovery_id: aws.servicediscovery.get_namespace
+  for_each: aws.servicediscovery.list_namespaces
+  calls:
+  - action: get_namespace
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Namespace.Arn }}'
+      Id: '{{ response.Namespace.Id }}'
+      Name: '{{ response.Namespace.Name }}'
+      CreateDate: '{{ response.Namespace.CreateDate }}'
+      CreatorRequestId: '{{ response.Namespace.CreatorRequestId }}'
+      Description: '{{ response.Namespace.Description }}'
+      Properties: '{{ response.Namespace.Properties }}'
+      ResourceOwner: '{{ response.Namespace.ResourceOwner }}'
+      ServiceCount: '{{ response.Namespace.ServiceCount }}'
+      Type: '{{ response.Namespace.Type }}'
+      HostedZoneId: '{{ response.Namespace.Properties.DnsProperties.HostedZoneId }}'
+      TTL: '{{ response.Namespace.Properties.DnsProperties.SOA.TTL }}'
+      HttpName: '{{ response.Namespace.Properties.HttpProperties.HttpName }}'
+- discovery_id: aws.servicediscovery.get_operation
+  calls:
+  - action: get_operation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.Operation.Id }}'
+      Status: '{{ response.Operation.Status }}'
+      CreateDate: '{{ response.Operation.CreateDate }}'
+      ErrorCode: '{{ response.Operation.ErrorCode }}'
+      ErrorMessage: '{{ response.Operation.ErrorMessage }}'
+      Operation: '{{ response.Operation.Operation }}'
+      OwnerAccount: '{{ response.Operation.OwnerAccount }}'
+      Targets: '{{ response.Operation.Targets }}'
+      Type: '{{ response.Operation.Type }}'
+      UpdateDate: '{{ response.Operation.UpdateDate }}'
+- discovery_id: aws.servicediscovery.get_service
+  for_each: aws.servicediscovery.list_namespaces
+  calls:
+  - action: get_service
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Service.Arn }}'
+      Id: '{{ response.Service.Id }}'
+      Name: '{{ response.Service.Name }}'
+      CreateDate: '{{ response.Service.CreateDate }}'
+      CreatedByAccount: '{{ response.Service.CreatedByAccount }}'
+      CreatorRequestId: '{{ response.Service.CreatorRequestId }}'
+      Description: '{{ response.Service.Description }}'
+      DnsConfig: '{{ response.Service.DnsConfig }}'
+      HealthCheckConfig: '{{ response.Service.HealthCheckConfig.Type }}'
+      HealthCheckCustomConfig: '{{ response.Service.HealthCheckCustomConfig }}'
+      InstanceCount: '{{ response.Service.InstanceCount }}'
+      NamespaceId: '{{ response.Service.NamespaceId }}'
+      ResourceOwner: '{{ response.Service.ResourceOwner }}'
+      Type: '{{ response.Service.Type }}'
+      RoutingPolicy: '{{ response.Service.DnsConfig.RoutingPolicy }}'
+      FailureThreshold: '{{ response.Service.HealthCheckConfig.FailureThreshold }}'
+      ResourcePath: '{{ response.Service.HealthCheckConfig.ResourcePath }}'
+- discovery_id: aws.servicediscovery.get_service_attributes
+  calls:
+  - action: get_service_attributes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Attributes: '{{ response.ServiceAttributes.Attributes }}'
+      ResourceOwner: '{{ response.ServiceAttributes.ResourceOwner }}'
+      ServiceArn: '{{ response.ServiceAttributes.ServiceArn }}'
+- discovery_id: aws.servicediscovery.list_instances
+  calls:
+  - action: list_instances
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Instances }}'
+    item:
+      Id: '{{ item.Id }}'
+      Attributes: '{{ item.Attributes }}'
+      CreatedByAccount: '{{ item.CreatedByAccount }}'
+      Instance: '{{ item.Instance }}'
+- discovery_id: aws.servicediscovery.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

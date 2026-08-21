@@ -1,0 +1,245 @@
+# ============================================================
+# Discovery YAML — stepfunctions (AWS)
+# Generated: 2026-02-21T04:56:59Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: stepfunctions
+services:
+  client: stepfunctions
+  module: boto3.client
+discovery:
+  # ── ListActivities ──
+  - discovery_id: aws.stepfunctions.list_activities
+    calls:
+      - action: list_activities
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.activities }}'
+  # ── ListExecutions ──
+  - discovery_id: aws.stepfunctions.list_executions
+    calls:
+      - action: list_executions
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.executions }}'
+  # ── ListStateMachines ──
+  - discovery_id: aws.stepfunctions.list_state_machines
+    calls:
+      - action: list_state_machines
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.stateMachines }}'
+  # ── Dependent read operations (require identifiers) ──
+  # ── DescribeActivity ──
+  - discovery_id: aws.stepfunctions.describe_activity
+    for_each: aws.stepfunctions.list_activities
+    calls:
+      - action: describe_activity
+        params:
+          activityArn: '{{ item.activityArn }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        activityArn: '{{ response.activityArn }}'
+        creationDate: '{{ response.creationDate }}'
+        encryptionConfiguration: '{{ response.encryptionConfiguration }}'
+        name: '{{ response.name }}'
+  # ── DescribeExecution ──
+  - discovery_id: aws.stepfunctions.describe_execution
+    for_each: aws.stepfunctions.list_executions
+    calls:
+      - action: describe_execution
+        params:
+          executionArn: '{{ item.executionArn }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        cause: '{{ response.cause }}'
+        error: '{{ response.error }}'
+        executionArn: '{{ response.executionArn }}'
+        input: '{{ response.input }}'
+        inputDetails: '{{ response.inputDetails }}'
+        mapRunArn: '{{ response.mapRunArn }}'
+        name: '{{ response.name }}'
+        output: '{{ response.output }}'
+        outputDetails: '{{ response.outputDetails }}'
+        redriveCount: '{{ response.redriveCount }}'
+        redriveDate: '{{ response.redriveDate }}'
+        redriveStatus: '{{ response.redriveStatus }}'
+        redriveStatusReason: '{{ response.redriveStatusReason }}'
+        startDate: '{{ response.startDate }}'
+        stateMachineAliasArn: '{{ response.stateMachineAliasArn }}'
+        stateMachineArn: '{{ response.stateMachineArn }}'
+        stateMachineVersionArn: '{{ response.stateMachineVersionArn }}'
+        status: '{{ response.status }}'
+        stopDate: '{{ response.stopDate }}'
+        traceHeader: '{{ response.traceHeader }}'
+  # ── DescribeMapRun ──
+  - discovery_id: aws.stepfunctions.describe_map_run
+    for_each: aws.stepfunctions.list_executions
+    calls:
+      - action: describe_map_run
+        params:
+          mapRunArn: '{{ item.mapRunArn }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        executionArn: '{{ response.executionArn }}'
+        executionCounts: '{{ response.executionCounts }}'
+        itemCounts: '{{ response.itemCounts }}'
+        mapRunArn: '{{ response.mapRunArn }}'
+        maxConcurrency: '{{ response.maxConcurrency }}'
+        redriveCount: '{{ response.redriveCount }}'
+        redriveDate: '{{ response.redriveDate }}'
+        startDate: '{{ response.startDate }}'
+        status: '{{ response.status }}'
+        stopDate: '{{ response.stopDate }}'
+        toleratedFailureCount: '{{ response.toleratedFailureCount }}'
+        toleratedFailurePercentage: '{{ response.toleratedFailurePercentage }}'
+  # ── DescribeStateMachine ──
+  - discovery_id: aws.stepfunctions.describe_state_machine
+    for_each: aws.stepfunctions.list_state_machines
+    calls:
+      - action: describe_state_machine
+        params:
+          stateMachineArn: '{{ item.stateMachineArn }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        creationDate: '{{ response.creationDate }}'
+        definition: '{{ response.definition }}'
+        description: '{{ response.description }}'
+        encryptionConfiguration: '{{ response.encryptionConfiguration }}'
+        label: '{{ response.label }}'
+        loggingConfiguration: '{{ response.loggingConfiguration }}'
+        name: '{{ response.name }}'
+        revisionId: '{{ response.revisionId }}'
+        roleArn: '{{ response.roleArn }}'
+        stateMachineArn: '{{ response.stateMachineArn }}'
+        status: '{{ response.status }}'
+        tracingConfiguration: '{{ response.tracingConfiguration }}'
+        type: '{{ response.type }}'
+        variableReferences: '{{ response.variableReferences }}'
+  # ── DescribeStateMachineAlias ──
+  - discovery_id: aws.stepfunctions.describe_state_machine_alias
+    for_each: aws.stepfunctions.list_executions
+    calls:
+      - action: describe_state_machine_alias
+        params:
+          stateMachineAliasArn: '{{ item.stateMachineAliasArn }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.routingConfiguration }}'
+  # ── DescribeStateMachineForExecution ──
+  - discovery_id: aws.stepfunctions.describe_state_machine_for_execution
+    for_each: aws.stepfunctions.list_executions
+    calls:
+      - action: describe_state_machine_for_execution
+        params:
+          executionArn: '{{ item.executionArn }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        definition: '{{ response.definition }}'
+        encryptionConfiguration: '{{ response.encryptionConfiguration }}'
+        label: '{{ response.label }}'
+        loggingConfiguration: '{{ response.loggingConfiguration }}'
+        mapRunArn: '{{ response.mapRunArn }}'
+        name: '{{ response.name }}'
+        revisionId: '{{ response.revisionId }}'
+        roleArn: '{{ response.roleArn }}'
+        stateMachineArn: '{{ response.stateMachineArn }}'
+        tracingConfiguration: '{{ response.tracingConfiguration }}'
+        updateDate: '{{ response.updateDate }}'
+        variableReferences: '{{ response.variableReferences }}'
+  # ── GetActivityTask ──
+  - discovery_id: aws.stepfunctions.get_activity_task
+    for_each: aws.stepfunctions.list_activities
+    calls:
+      - action: get_activity_task
+        params:
+          activityArn: '{{ item.activityArn }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        input: '{{ response.input }}'
+        taskToken: '{{ response.taskToken }}'
+  # ── GetExecutionHistory ──
+  - discovery_id: aws.stepfunctions.get_execution_history
+    for_each: aws.stepfunctions.list_executions
+    calls:
+      - action: get_execution_history
+        params:
+          executionArn: '{{ item.executionArn }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.events }}'
+  # ── ListMapRuns ──
+  - discovery_id: aws.stepfunctions.list_map_runs
+    for_each: aws.stepfunctions.list_executions
+    calls:
+      - action: list_map_runs
+        params:
+          executionArn: '{{ item.executionArn }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.mapRuns }}'
+  # ── ListStateMachineAliases ──
+  - discovery_id: aws.stepfunctions.list_state_machine_aliases
+    for_each: aws.stepfunctions.list_state_machines
+    calls:
+      - action: list_state_machine_aliases
+        params:
+          stateMachineArn: '{{ item.stateMachineArn }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.stateMachineAliases }}'
+  # ── ListStateMachineVersions ──
+  - discovery_id: aws.stepfunctions.list_state_machine_versions
+    for_each: aws.stepfunctions.list_state_machines
+    calls:
+      - action: list_state_machine_versions
+        params:
+          stateMachineArn: '{{ item.stateMachineArn }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.stateMachineVersions }}'
+  # ── ListTagsForResource ──
+  - discovery_id: aws.stepfunctions.list_tags_for_resource
+    calls:
+      - action: list_tags_for_resource
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.tags }}'

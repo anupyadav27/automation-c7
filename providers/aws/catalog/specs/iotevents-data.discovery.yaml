@@ -1,0 +1,82 @@
+version: '1.0'
+provider: aws
+service: iotevents-data
+services:
+  client: iotevents-data
+  module: boto3.client
+discovery:
+- discovery_id: aws.iotevents-data.describe_alarm
+  calls:
+  - action: describe_alarm
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      alarm: '{{ response.alarm.alarm }}'
+      alarmModelName: '{{ response.alarm.alarmModelName }}'
+      alarmModelVersion: '{{ response.alarm.alarmModelVersion }}'
+      alarmState: '{{ response.alarm.alarmState }}'
+      creationTime: '{{ response.alarm.creationTime }}'
+      keyValue: '{{ response.alarm.keyValue }}'
+      lastUpdateTime: '{{ response.alarm.lastUpdateTime }}'
+      severity: '{{ response.alarm.severity }}'
+      note: '{{ response.alarm.alarmState.customerAction.acknowledgeActionConfiguration.note }}'
+      actionName: '{{ response.alarm.alarmState.customerAction.actionName }}'
+      snoozeDuration: '{{ response.alarm.alarmState.customerAction.snoozeActionConfiguration.snoozeDuration }}'
+      inputPropertyValue: '{{ response.alarm.alarmState.ruleEvaluation.simpleRuleEvaluation.inputPropertyValue }}'
+      operator: '{{ response.alarm.alarmState.ruleEvaluation.simpleRuleEvaluation.operator }}'
+      thresholdValue: '{{ response.alarm.alarmState.ruleEvaluation.simpleRuleEvaluation.thresholdValue }}'
+      stateName: '{{ response.alarm.alarmState.stateName }}'
+      eventType: '{{ response.alarm.alarmState.systemEvent.eventType }}'
+      triggerType: '{{ response.alarm.alarmState.systemEvent.stateChangeConfiguration.triggerType }}'
+- discovery_id: aws.iotevents-data.describe_detector
+  calls:
+  - action: describe_detector
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      creationTime: '{{ response.detector.creationTime }}'
+      detector: '{{ response.detector.detector }}'
+      detectorModelName: '{{ response.detector.detectorModelName }}'
+      detectorModelVersion: '{{ response.detector.detectorModelVersion }}'
+      keyValue: '{{ response.detector.keyValue }}'
+      lastUpdateTime: '{{ response.detector.lastUpdateTime }}'
+      state: '{{ response.detector.state }}'
+      stateName: '{{ response.detector.state.stateName }}'
+- discovery_id: aws.iotevents-data.list_alarms
+  calls:
+  - action: list_alarms
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.alarmSummaries }}'
+    item:
+      alarm: '{{ item.alarm }}'
+      alarmModelName: '{{ item.alarmModelName }}'
+      alarmModelVersion: '{{ item.alarmModelVersion }}'
+      creationTime: '{{ item.creationTime }}'
+      keyValue: '{{ item.keyValue }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      stateName: '{{ item.stateName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotevents-data.list_detectors
+  calls:
+  - action: list_detectors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.detectorSummaries }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      detector: '{{ item.detector }}'
+      detectorModelName: '{{ item.detectorModelName }}'
+      detectorModelVersion: '{{ item.detectorModelVersion }}'
+      keyValue: '{{ item.keyValue }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      state: '{{ item.state }}'
+      nextToken: '{{ response.nextToken }}'

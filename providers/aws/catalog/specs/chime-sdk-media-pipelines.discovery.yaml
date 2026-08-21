@@ -1,0 +1,188 @@
+version: '1.0'
+provider: aws
+service: chime-sdk-media-pipelines
+services:
+  client: chime-sdk-media-pipelines
+  module: boto3.client
+discovery:
+- discovery_id: aws.chime-sdk-media-pipelines.list_media_capture_pipelines
+  calls:
+  - action: list_media_capture_pipelines
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MediaCapturePipelines }}'
+    item:
+      MediaPipelineArn: '{{ item.MediaPipelineArn }}'
+      MediaPipelineId: '{{ item.MediaPipelineId }}'
+- discovery_id: aws.chime-sdk-media-pipelines.list_media_insights_pipeline_configurations
+  calls:
+  - action: list_media_insights_pipeline_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MediaInsightsPipelineConfigurations }}'
+    item:
+      Enabled: '{{ item.Enabled }}'
+      MediaInsightsPipelineConfigurationArn: '{{ item.MediaInsightsPipelineConfigurationArn }}'
+      MediaInsightsPipelineConfigurationId: '{{ item.MediaInsightsPipelineConfigurationId }}'
+      MediaInsightsPipelineConfigurationName: '{{ item.MediaInsightsPipelineConfigurationName }}'
+- discovery_id: aws.chime-sdk-media-pipelines.list_media_pipeline_kinesis_video_stream_pools
+  calls:
+  - action: list_media_pipeline_kinesis_video_stream_pools
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.KinesisVideoStreamPools }}'
+    item:
+      PoolArn: '{{ item.PoolArn }}'
+      PoolId: '{{ item.PoolId }}'
+      PoolName: '{{ item.PoolName }}'
+- discovery_id: aws.chime-sdk-media-pipelines.list_media_pipelines
+  calls:
+  - action: list_media_pipelines
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MediaPipelines }}'
+    item:
+      MediaPipelineArn: '{{ item.MediaPipelineArn }}'
+      MediaPipelineId: '{{ item.MediaPipelineId }}'
+- discovery_id: aws.chime-sdk-media-pipelines.get_media_capture_pipeline
+  for_each: aws.chime-sdk-media-pipelines.list_media_capture_pipelines
+  calls:
+  - action: get_media_capture_pipeline
+    params:
+      MediaPipelineId: '{{ item.MediaPipelineId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.MediaCapturePipeline.Status }}'
+      ChimeSdkMeetingConfiguration: '{{ response.MediaCapturePipeline.ChimeSdkMeetingConfiguration }}'
+      CreatedTimestamp: '{{ response.MediaCapturePipeline.CreatedTimestamp }}'
+      MediaPipelineArn: '{{ response.MediaCapturePipeline.MediaPipelineArn }}'
+      MediaPipelineId: '{{ response.MediaCapturePipeline.MediaPipelineId }}'
+      SinkArn: '{{ response.MediaCapturePipeline.SinkArn }}'
+      SinkIamRoleArn: '{{ response.MediaCapturePipeline.SinkIamRoleArn }}'
+      SinkType: '{{ response.MediaCapturePipeline.SinkType }}'
+      SourceArn: '{{ response.MediaCapturePipeline.SourceArn }}'
+      SourceType: '{{ response.MediaCapturePipeline.SourceType }}'
+      SseAwsKeyManagementParams: '{{ response.MediaCapturePipeline.SseAwsKeyManagementParams.AwsKmsKeyId }}'
+      UpdatedTimestamp: '{{ response.MediaCapturePipeline.UpdatedTimestamp }}'
+      MuxType: '{{ response.MediaCapturePipeline.ChimeSdkMeetingConfiguration.ArtifactsConfiguration.Audio.MuxType }}'
+      Layout: '{{ response.MediaCapturePipeline.ChimeSdkMeetingConfiguration.ArtifactsConfiguration.CompositedVideo.Layout }}'
+      Resolution: '{{ response.MediaCapturePipeline.ChimeSdkMeetingConfiguration.ArtifactsConfiguration.CompositedVideo.Resolution }}'
+      State: '{{ response.MediaCapturePipeline.ChimeSdkMeetingConfiguration.ArtifactsConfiguration.Content.State }}'
+      AwsKmsEncryptionContext: '{{ response.MediaCapturePipeline.SseAwsKeyManagementParams.AwsKmsEncryptionContext }}'
+      AwsKmsKeyId: '{{ response.MediaCapturePipeline.SseAwsKeyManagementParams.AwsKmsKeyId }}'
+- discovery_id: aws.chime-sdk-media-pipelines.get_media_insights_pipeline_configuration
+  calls:
+  - action: get_media_insights_pipeline_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedTimestamp: '{{ response.MediaInsightsPipelineConfiguration.CreatedTimestamp }}'
+      Elements: '{{ response.MediaInsightsPipelineConfiguration.Elements[].Type }}'
+      MediaInsightsPipelineConfigurationArn: '{{ response.MediaInsightsPipelineConfiguration.MediaInsightsPipelineConfigurationArn }}'
+      MediaInsightsPipelineConfigurationId: '{{ response.MediaInsightsPipelineConfiguration.MediaInsightsPipelineConfigurationId }}'
+      MediaInsightsPipelineConfigurationName: '{{ response.MediaInsightsPipelineConfiguration.MediaInsightsPipelineConfigurationName }}'
+      RealTimeAlertConfiguration: '{{ response.MediaInsightsPipelineConfiguration.RealTimeAlertConfiguration.Disabled }}'
+      ResourceAccessRoleArn: '{{ response.MediaInsightsPipelineConfiguration.ResourceAccessRoleArn }}'
+      UpdatedTimestamp: '{{ response.MediaInsightsPipelineConfiguration.UpdatedTimestamp }}'
+      Disabled: '{{ response.MediaInsightsPipelineConfiguration.RealTimeAlertConfiguration.Disabled }}'
+- discovery_id: aws.chime-sdk-media-pipelines.get_media_pipeline
+  for_each: aws.chime-sdk-media-pipelines.list_media_capture_pipelines
+  calls:
+  - action: get_media_pipeline
+    params:
+      MediaPipelineId: '{{ item.MediaPipelineId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      MediaCapturePipeline: '{{ response.MediaPipeline.MediaCapturePipeline.Status }}'
+      MediaConcatenationPipeline: '{{ response.MediaPipeline.MediaConcatenationPipeline.Status }}'
+      MediaInsightsPipeline: '{{ response.MediaPipeline.MediaInsightsPipeline.Status }}'
+      MediaLiveConnectorPipeline: '{{ response.MediaPipeline.MediaLiveConnectorPipeline.Status }}'
+      MediaStreamPipeline: '{{ response.MediaPipeline.MediaStreamPipeline.Status }}'
+      CreatedTimestamp: '{{ response.MediaPipeline.MediaCapturePipeline.CreatedTimestamp }}'
+      MediaPipelineArn: '{{ response.MediaPipeline.MediaCapturePipeline.MediaPipelineArn }}'
+      MediaPipelineId: '{{ response.MediaPipeline.MediaCapturePipeline.MediaPipelineId }}'
+      SinkArn: '{{ response.MediaPipeline.MediaCapturePipeline.SinkArn }}'
+      SinkIamRoleArn: '{{ response.MediaPipeline.MediaCapturePipeline.SinkIamRoleArn }}'
+      SinkType: '{{ response.MediaPipeline.MediaCapturePipeline.SinkType }}'
+      SourceArn: '{{ response.MediaPipeline.MediaCapturePipeline.SourceArn }}'
+      SourceType: '{{ response.MediaPipeline.MediaCapturePipeline.SourceType }}'
+      AwsKmsEncryptionContext: '{{ response.MediaPipeline.MediaCapturePipeline.SseAwsKeyManagementParams.AwsKmsEncryptionContext }}'
+      AwsKmsKeyId: '{{ response.MediaPipeline.MediaCapturePipeline.SseAwsKeyManagementParams.AwsKmsKeyId }}'
+      Status: '{{ response.MediaPipeline.MediaCapturePipeline.Status }}'
+      UpdatedTimestamp: '{{ response.MediaPipeline.MediaCapturePipeline.UpdatedTimestamp }}'
+      FragmentSelectorType: '{{ response.MediaPipeline.MediaInsightsPipeline.KinesisVideoStreamRecordingSourceRuntimeConfiguration.FragmentSelector.FragmentSelectorType }}'
+      MediaEncoding: '{{ response.MediaPipeline.MediaInsightsPipeline.KinesisVideoStreamSourceRuntimeConfiguration.MediaEncoding }}'
+      MediaSampleRate: '{{ response.MediaPipeline.MediaInsightsPipeline.KinesisVideoStreamSourceRuntimeConfiguration.MediaSampleRate }}'
+      MediaInsightsPipelineConfigurationArn: '{{ response.MediaPipeline.MediaInsightsPipeline.MediaInsightsPipelineConfigurationArn }}'
+      MediaInsightsRuntimeMetadata: '{{ response.MediaPipeline.MediaInsightsPipeline.MediaInsightsRuntimeMetadata }}'
+      Destination: '{{ response.MediaPipeline.MediaInsightsPipeline.S3RecordingSinkRuntimeConfiguration.Destination }}'
+      RecordingFileFormat: '{{ response.MediaPipeline.MediaInsightsPipeline.S3RecordingSinkRuntimeConfiguration.RecordingFileFormat }}'
+- discovery_id: aws.chime-sdk-media-pipelines.get_media_pipeline_kinesis_video_stream_pool
+  calls:
+  - action: get_media_pipeline_kinesis_video_stream_pool
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedTimestamp: '{{ response.KinesisVideoStreamPoolConfiguration.CreatedTimestamp }}'
+      PoolArn: '{{ response.KinesisVideoStreamPoolConfiguration.PoolArn }}'
+      PoolId: '{{ response.KinesisVideoStreamPoolConfiguration.PoolId }}'
+      PoolName: '{{ response.KinesisVideoStreamPoolConfiguration.PoolName }}'
+      PoolSize: '{{ response.KinesisVideoStreamPoolConfiguration.PoolSize }}'
+      PoolStatus: '{{ response.KinesisVideoStreamPoolConfiguration.PoolStatus }}'
+      StreamConfiguration: '{{ response.KinesisVideoStreamPoolConfiguration.StreamConfiguration.Region }}'
+      UpdatedTimestamp: '{{ response.KinesisVideoStreamPoolConfiguration.UpdatedTimestamp }}'
+      DataRetentionInHours: '{{ response.KinesisVideoStreamPoolConfiguration.StreamConfiguration.DataRetentionInHours }}'
+      Region: '{{ response.KinesisVideoStreamPoolConfiguration.StreamConfiguration.Region }}'
+- discovery_id: aws.chime-sdk-media-pipelines.get_speaker_search_task
+  calls:
+  - action: get_speaker_search_task
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedTimestamp: '{{ response.SpeakerSearchTask.CreatedTimestamp }}'
+      SpeakerSearchTaskId: '{{ response.SpeakerSearchTask.SpeakerSearchTaskId }}'
+      SpeakerSearchTaskStatus: '{{ response.SpeakerSearchTask.SpeakerSearchTaskStatus }}'
+      UpdatedTimestamp: '{{ response.SpeakerSearchTask.UpdatedTimestamp }}'
+- discovery_id: aws.chime-sdk-media-pipelines.get_voice_tone_analysis_task
+  calls:
+  - action: get_voice_tone_analysis_task
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedTimestamp: '{{ response.VoiceToneAnalysisTask.CreatedTimestamp }}'
+      UpdatedTimestamp: '{{ response.VoiceToneAnalysisTask.UpdatedTimestamp }}'
+      VoiceToneAnalysisTaskId: '{{ response.VoiceToneAnalysisTask.VoiceToneAnalysisTaskId }}'
+      VoiceToneAnalysisTaskStatus: '{{ response.VoiceToneAnalysisTask.VoiceToneAnalysisTaskStatus }}'
+- discovery_id: aws.chime-sdk-media-pipelines.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

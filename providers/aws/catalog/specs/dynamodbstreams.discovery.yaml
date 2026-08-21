@@ -1,0 +1,106 @@
+version: '1.0'
+provider: aws
+service: dynamodbstreams
+services:
+  client: dynamodbstreams
+  module: boto3.client
+discovery:
+- discovery_id: aws.dynamodbstreams.list_streams
+  calls:
+  - action: list_streams
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Streams }}'
+    item:
+      CreationRequestDateTime: '{{ item.CreationRequestDateTime }}'
+      KeySchema: '{{ item.KeySchema }}'
+      NextShardIterator: '{{ item.NextShardIterator }}'
+      ShardIterator: '{{ item.ShardIterator }}'
+      Shards: '{{ item.Shards }}'
+      StreamArn: '{{ item.StreamArn }}'
+      StreamDescription: '{{ item.StreamDescription }}'
+      StreamLabel: '{{ item.StreamLabel }}'
+      StreamStatus: '{{ item.StreamStatus }}'
+      StreamViewType: '{{ item.StreamViewType }}'
+      TableName: '{{ item.TableName }}'
+      awsRegion: '{{ item.awsRegion }}'
+      dynamodb: '{{ item.dynamodb }}'
+      eventID: '{{ item.eventID }}'
+      eventName: '{{ item.eventName }}'
+      eventSource: '{{ item.eventSource }}'
+      eventVersion: '{{ item.eventVersion }}'
+      userIdentity: '{{ item.userIdentity }}'
+      LastEvaluatedStreamArn: '{{ response.LastEvaluatedStreamArn }}'
+- discovery_id: aws.dynamodbstreams.describe_stream
+  for_each: aws.dynamodbstreams.list_streams
+  calls:
+  - action: describe_stream
+    params:
+      StreamArn: '{{ item.StreamArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationRequestDateTime: '{{ response.StreamDescription.CreationRequestDateTime }}'
+      KeySchema: '{{ response.StreamDescription.KeySchema }}'
+      LastEvaluatedShardId: '{{ response.StreamDescription.LastEvaluatedShardId }}'
+      NextShardIterator: '{{ response.StreamDescription.NextShardIterator }}'
+      ShardIterator: '{{ response.StreamDescription.ShardIterator }}'
+      Shards: '{{ response.StreamDescription.Shards }}'
+      StreamArn: '{{ response.StreamDescription.StreamArn }}'
+      StreamDescription: '{{ response.StreamDescription.StreamDescription }}'
+      StreamLabel: '{{ response.StreamDescription.StreamLabel }}'
+      StreamStatus: '{{ response.StreamDescription.StreamStatus }}'
+      StreamViewType: '{{ response.StreamDescription.StreamViewType }}'
+      TableName: '{{ response.StreamDescription.TableName }}'
+      awsRegion: '{{ response.StreamDescription.awsRegion }}'
+      dynamodb: '{{ response.StreamDescription.dynamodb }}'
+      eventID: '{{ response.StreamDescription.eventID }}'
+      eventName: '{{ response.StreamDescription.TableName }}'
+      eventSource: '{{ response.StreamDescription.eventSource }}'
+      eventVersion: '{{ response.StreamDescription.eventVersion }}'
+      userIdentity: '{{ response.StreamDescription.userIdentity }}'
+- discovery_id: aws.dynamodbstreams.get_records
+  calls:
+  - action: get_records
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Records }}'
+    item:
+      NextShardIterator: '{{ item.NextShardIterator }}'
+      Records: '{{ item.Records }}'
+      ShardIterator: '{{ item.NextShardIterator }}'
+      awsRegion: '{{ item.awsRegion }}'
+      dynamodb: '{{ item.dynamodb }}'
+      eventID: '{{ item.eventID }}'
+      eventName: '{{ item.eventName }}'
+      eventSource: '{{ item.eventSource }}'
+      eventVersion: '{{ item.eventVersion }}'
+      userIdentity: '{{ item.userIdentity }}'
+- discovery_id: aws.dynamodbstreams.get_shard_iterator
+  for_each: aws.dynamodbstreams.list_streams
+  calls:
+  - action: get_shard_iterator
+    params:
+      StreamArn: '{{ item.StreamArn }}'
+      ShardId: '{{ item.ShardId }}'
+      ShardIteratorType: '{{ item.ShardIteratorType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      NextShardIterator: '{{ response.ShardIterator }}'
+      ShardIterator: '{{ response.ShardIterator }}'
+      awsRegion: '{{ response.awsRegion }}'
+      dynamodb: '{{ response.dynamodb }}'
+      eventID: '{{ response.eventID }}'
+      eventName: '{{ response.eventName }}'
+      eventSource: '{{ response.eventSource }}'
+      eventVersion: '{{ response.eventVersion }}'
+      userIdentity: '{{ response.userIdentity }}'

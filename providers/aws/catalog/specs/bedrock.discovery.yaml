@@ -1,0 +1,305 @@
+version: '1.0'
+provider: aws
+service: bedrock
+discovery:
+- calls:
+  - action: list_model_invocation_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock.list_model_invocation_jobs
+  emit:
+    as: item
+    item:
+      SecurityGroupIds: '{{ item.SecurityGroupIds }}'
+      SubnetIds: '{{ item.SubnetIds }}'
+      clientRequestToken: '{{ item.clientRequestToken }}'
+      endTime: '{{ item.endTime }}'
+      inputDataConfig: '{{ item.inputDataConfig }}'
+      jobArn: '{{ item.jobArn }}'
+      jobExpirationTime: '{{ item.jobExpirationTime }}'
+      jobName: '{{ item.jobName }}'
+      lastModifiedTime: '{{ item.lastModifiedTime }}'
+      message: '{{ item.message }}'
+      modelId: '{{ item.modelId }}'
+      outputDataConfig: '{{ item.outputDataConfig }}'
+      roleArn: '{{ item.roleArn }}'
+      status: '{{ item.status }}'
+      submitTime: '{{ item.submitTime }}'
+      timeoutDurationInHours: '{{ item.timeoutDurationInHours }}'
+      trainingDataConfig: '{{ item.trainingDataConfig }}'
+      validationDataConfig: '{{ item.validationDataConfig }}'
+      vpcConfig: '{{ item.vpcConfig }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.invocationJobSummaries }}'
+- calls:
+  - action: list_guardrails
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock.list_guardrails
+  emit:
+    as: item
+    item:
+      createdAt: '{{ item.createdAt }}'
+      crossRegionDetails: '{{ item.crossRegionDetails }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      updatedAt: '{{ item.updatedAt }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.guardrails }}'
+- calls:
+  - action: list_marketplace_model_endpoints
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock.list_marketplace_model_endpoints
+  emit:
+    as: item
+    item:
+      createdAt: '{{ item.createdAt }}'
+      endpointArn: '{{ item.endpointArn }}'
+      endpointConfig: '{{ item.endpointConfig }}'
+      endpointStatus: '{{ item.endpointStatus }}'
+      endpointStatusMessage: '{{ item.endpointStatusMessage }}'
+      marketplaceModelEndpoint: '{{ item.marketplaceModelEndpoint }}'
+      modelSourceIdentifier: '{{ item.modelSourceIdentifier }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.marketplaceModelEndpoints }}'
+- calls:
+  - action: get_custom_model
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock.get_custom_model
+  emit:
+    as: item
+    item:
+      importedModelKmsKeyArn: '{{ item.importedModelKmsKeyArn }}'
+      modelKmsKeyArn: '{{ item.modelKmsKeyArn }}'
+      outputModelKmsKeyArn: '{{ item.outputModelKmsKeyArn }}'
+      trainingDataConfig: '{{ item.trainingDataConfig.s3Uri }}'
+      validationDataConfig: '{{ item.validationDataConfig }}'
+      validationLoss: '{{ item.validationLoss }}'
+      baseModelArn: '{{ response.baseModelArn }}'
+      creationTime: '{{ response.creationTime }}'
+      maxResponseLengthForInference: '{{ response.customizationConfig.distillationConfig.teacherModelConfig.maxResponseLengthForInference }}'
+      teacherModelIdentifier: '{{ response.customizationConfig.distillationConfig.teacherModelConfig.teacherModelIdentifier }}'
+      customizationType: '{{ response.customizationType }}'
+      hyperParameters: '{{ response.hyperParameters }}'
+      jobArn: '{{ response.jobArn }}'
+      jobName: '{{ response.jobName }}'
+      modelArn: '{{ response.modelArn }}'
+      modelName: '{{ response.modelName }}'
+      s3Uri: '{{ response.outputDataConfig.s3Uri }}'
+      equals: '{{ response.trainingDataConfig.invocationLogsConfig.requestMetadataFilters.equals }}'
+      notEquals: '{{ response.trainingDataConfig.invocationLogsConfig.requestMetadataFilters.notEquals }}'
+      usePromptResponse: '{{ response.trainingDataConfig.invocationLogsConfig.usePromptResponse }}'
+      trainingLoss: '{{ response.trainingMetrics.trainingLoss }}'
+    items_for: '{{ response.validationMetrics }}'
+- calls:
+  - action: list_automated_reasoning_policies
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock.list_automated_reasoning_policies
+  emit:
+    as: item
+    item:
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      policyArn: '{{ item.policyArn }}'
+      policyId: '{{ item.policyId }}'
+      updatedAt: '{{ item.updatedAt }}'
+      version: '{{ item.version }}'
+    items_for: '{{ response.automatedReasoningPolicySummaries }}'
+- calls:
+  - action: list_inference_profiles
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock.list_inference_profiles
+  emit:
+    as: item
+    item:
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      inferenceProfileArn: '{{ item.inferenceProfileArn }}'
+      inferenceProfileId: '{{ item.inferenceProfileId }}'
+      inferenceProfileName: '{{ item.inferenceProfileName }}'
+      models: '{{ item.models }}'
+      status: '{{ item.status }}'
+      type: '{{ item.type }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.inferenceProfileSummaries }}'
+- calls:
+  - action: list_model_copy_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock.list_model_copy_jobs
+  emit:
+    as: item
+    item:
+      creationTime: '{{ item.creationTime }}'
+      failureMessage: '{{ item.failureMessage }}'
+      jobArn: '{{ item.jobArn }}'
+      kmsKeyArn: '{{ item.kmsKeyArn }}'
+      sourceAccountId: '{{ item.sourceAccountId }}'
+      sourceModelArn: '{{ item.sourceModelArn }}'
+      sourceModelName: '{{ item.sourceModelName }}'
+      status: '{{ item.status }}'
+      targetModelArn: '{{ item.targetModelArn }}'
+      targetModelKmsKeyArn: '{{ item.targetModelKmsKeyArn }}'
+      targetModelName: '{{ item.targetModelName }}'
+      targetModelTags: '{{ item.targetModelTags }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.modelCopyJobSummaries }}'
+- calls:
+  - action: list_custom_model_deployments
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock.list_custom_model_deployments
+  emit:
+    as: item
+    item:
+      createdAt: '{{ item.createdAt }}'
+      customModelDeploymentArn: '{{ item.customModelDeploymentArn }}'
+      customModelDeploymentName: '{{ item.customModelDeploymentName }}'
+      failureMessage: '{{ item.failureMessage }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      modelArn: '{{ item.modelArn }}'
+      modelDeploymentName: '{{ item.modelDeploymentName }}'
+      outputModelArn: '{{ item.outputModelArn }}'
+      status: '{{ item.status }}'
+      trainingDataConfig: '{{ item.trainingDataConfig }}'
+      validationDataConfig: '{{ item.validationDataConfig }}'
+    items_for: '{{ response.modelDeploymentSummaries }}'
+- calls:
+  - action: list_model_customization_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock.list_model_customization_jobs
+  emit:
+    as: item
+    item:
+      baseModelArn: '{{ item.baseModelArn }}'
+      creationTime: '{{ item.creationTime }}'
+      customModelArn: '{{ item.customModelArn }}'
+      customModelName: '{{ item.customModelName }}'
+      customizationType: '{{ item.customizationType }}'
+      endTime: '{{ item.endTime }}'
+      jobArn: '{{ item.jobArn }}'
+      jobName: '{{ item.jobName }}'
+      lastModifiedTime: '{{ item.lastModifiedTime }}'
+      outputModelArn: '{{ item.outputModelArn }}'
+      outputModelKmsKeyArn: '{{ item.outputModelKmsKeyArn }}'
+      outputModelName: '{{ item.outputModelName }}'
+      status: '{{ item.status }}'
+      statusDetails: '{{ item.statusDetails }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.modelCustomizationJobSummaries }}'
+- calls:
+  - action: list_prompt_routers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock.list_prompt_routers
+  emit:
+    as: item
+    item:
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      fallbackModel: '{{ item.fallbackModel }}'
+      models: '{{ item.models }}'
+      promptRouterArn: '{{ item.promptRouterArn }}'
+      promptRouterName: '{{ item.promptRouterName }}'
+      routingCriteria: '{{ item.routingCriteria }}'
+      status: '{{ item.status }}'
+      type: '{{ item.type }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.promptRouterSummaries }}'
+- calls:
+  - action: list_model_import_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock.list_model_import_jobs
+  emit:
+    as: item
+    item:
+      creationTime: '{{ item.creationTime }}'
+      endTime: '{{ item.endTime }}'
+      importedModelArn: '{{ item.importedModelArn }}'
+      importedModelKmsKeyArn: '{{ item.importedModelKmsKeyArn }}'
+      importedModelName: '{{ item.importedModelName }}'
+      jobArn: '{{ item.jobArn }}'
+      jobName: '{{ item.jobName }}'
+      lastModifiedTime: '{{ item.lastModifiedTime }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.modelImportJobSummaries }}'
+- calls:
+  - action: list_provisioned_model_throughputs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock.list_provisioned_model_throughputs
+  emit:
+    as: item
+    item:
+      commitmentDuration: '{{ item.commitmentDuration }}'
+      commitmentExpirationTime: '{{ item.commitmentExpirationTime }}'
+      creationTime: '{{ item.creationTime }}'
+      customModelUnits: '{{ item.customModelUnits }}'
+      desiredModelArn: '{{ item.desiredModelArn }}'
+      desiredModelUnits: '{{ item.desiredModelUnits }}'
+      foundationModelArn: '{{ item.foundationModelArn }}'
+      lastModifiedTime: '{{ item.lastModifiedTime }}'
+      modelArn: '{{ item.modelArn }}'
+      modelUnits: '{{ item.modelUnits }}'
+      provisionedModelArn: '{{ item.provisionedModelArn }}'
+      provisionedModelName: '{{ item.provisionedModelName }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.provisionedModelSummaries }}'
+- calls:
+  - action: get_model_invocation_logging_configuration
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock.get_model_invocation_logging_configuration
+  emit:
+    as: item
+    item:
+      cloudWatchConfig: '{{ response.loggingConfig.cloudWatchConfig.roleArn }}'
+      embeddingDataDeliveryEnabled: '{{ response.loggingConfig.embeddingDataDeliveryEnabled }}'
+      imageDataDeliveryEnabled: '{{ response.loggingConfig.imageDataDeliveryEnabled }}'
+      loggingConfig: '{{ response.loggingConfig.loggingConfig }}'
+      s3Config: '{{ response.loggingConfig.s3Config }}'
+      textDataDeliveryEnabled: '{{ response.loggingConfig.textDataDeliveryEnabled }}'
+      videoDataDeliveryEnabled: '{{ response.loggingConfig.videoDataDeliveryEnabled }}'
+      bucketName: '{{ response.loggingConfig.cloudWatchConfig.largeDataDeliveryS3Config.bucketName }}'
+      keyPrefix: '{{ response.loggingConfig.cloudWatchConfig.largeDataDeliveryS3Config.keyPrefix }}'
+      logGroupName: '{{ response.loggingConfig.cloudWatchConfig.logGroupName }}'
+      roleArn: '{{ response.loggingConfig.cloudWatchConfig.roleArn }}'
+- calls:
+  - action: list_enforced_guardrails_configuration
+    on_error: continue
+    save_as: response
+  discovery_id: aws.bedrock.list_enforced_guardrails_configuration
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      configId: '{{ item.configId }}'
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      guardrailArn: '{{ item.guardrailArn }}'
+      guardrailId: '{{ item.guardrailId }}'
+      guardrailVersion: '{{ item.guardrailVersion }}'
+      id: '{{ item.id }}'
+      inputTags: '{{ item.inputTags }}'
+      owner: '{{ item.owner }}'
+      updatedAt: '{{ item.updatedAt }}'
+      updatedBy: '{{ item.updatedBy }}'
+    items_for: '{{ response.guardrailsConfig }}'

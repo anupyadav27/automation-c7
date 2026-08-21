@@ -1,0 +1,220 @@
+version: '1.0'
+provider: aws
+service: resource-explorer-2
+is_active: false
+services:
+  client: resource-explorer-2
+  module: boto3.client
+discovery:
+- discovery_id: aws.resource-explorer-2.get_account_level_service_configuration
+  calls:
+  - action: get_account_level_service_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.OrgConfiguration.Status }}'
+      AWSServiceAccessStatus: '{{ response.OrgConfiguration.AWSServiceAccessStatus }}'
+      Enabled: '{{ response.OrgConfiguration.Enabled }}'
+      OrgConfiguration: '{{ response.OrgConfiguration.OrgConfiguration }}'
+      ServiceLinkedRole: '{{ response.OrgConfiguration.ServiceLinkedRole }}'
+- discovery_id: aws.resource-explorer-2.get_default_view
+  calls:
+  - action: get_default_view
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ViewArn: '{{ response.ViewArn }}'
+- discovery_id: aws.resource-explorer-2.get_index
+  calls:
+  - action: get_index
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ReplicatingFrom }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      ReplicatingFrom: '{{ item.ReplicatingFrom }}'
+      ReplicatingTo: '{{ item.ReplicatingTo }}'
+      Arn: '{{ response.Arn }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      State: '{{ response.State }}'
+      Type: '{{ response.Type }}'
+- discovery_id: aws.resource-explorer-2.get_service_index
+  calls:
+  - action: get_service_index
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Type: '{{ response.Type }}'
+- discovery_id: aws.resource-explorer-2.list_indexes
+  calls:
+  - action: list_indexes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Indexes }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      ReplicatingFrom: '{{ item.ReplicatingFrom }}'
+      ReplicatingTo: '{{ item.ReplicatingTo }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.resource-explorer-2.list_managed_views
+  calls:
+  - action: list_managed_views
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ManagedViews }}'
+- discovery_id: aws.resource-explorer-2.list_resources
+  calls:
+  - action: list_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Resources }}'
+    item:
+      ViewArn: '{{ response.ViewArn }}'
+- discovery_id: aws.resource-explorer-2.list_service_indexes
+  calls:
+  - action: list_service_indexes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Indexes }}'
+    item:
+      Type: '{{ item.Type }}'
+- discovery_id: aws.resource-explorer-2.list_service_views
+  calls:
+  - action: list_service_views
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ServiceViews }}'
+- discovery_id: aws.resource-explorer-2.list_streaming_access_for_services
+  calls:
+  - action: list_streaming_access_for_services
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.StreamingAccessForServices }}'
+    item:
+      CreatedAt: '{{ item.CreatedAt }}'
+      ServicePrincipal: '{{ item.ServicePrincipal }}'
+- discovery_id: aws.resource-explorer-2.list_views
+  calls:
+  - action: list_views
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Views }}'
+- discovery_id: aws.resource-explorer-2.get_managed_view
+  calls:
+  - action: get_managed_view
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Filters: '{{ response.ManagedView.Filters }}'
+      IncludedProperties: '{{ response.ManagedView.IncludedProperties[].Name }}'
+      LastUpdatedAt: '{{ response.ManagedView.LastUpdatedAt }}'
+      ManagedViewArn: '{{ response.ManagedView.ManagedViewArn }}'
+      ManagedViewName: '{{ response.ManagedView.ManagedViewName }}'
+      Owner: '{{ response.ManagedView.Owner }}'
+      ResourcePolicy: '{{ response.ManagedView.ResourcePolicy }}'
+      Scope: '{{ response.ManagedView.Scope }}'
+      Statement: '{{ response.ManagedView.Statement }}'
+      TrustedService: '{{ response.ManagedView.TrustedService }}'
+      Version: '{{ response.ManagedView.Version }}'
+      FilterString: '{{ response.ManagedView.Filters.FilterString }}'
+- discovery_id: aws.resource-explorer-2.get_resource_explorer_setup
+  calls:
+  - action: get_resource_explorer_setup
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Regions }}'
+    item:
+      Index: '{{ item.Index }}'
+      View: '{{ item.View }}'
+- discovery_id: aws.resource-explorer-2.get_service_view
+  calls:
+  - action: get_service_view
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Filters: '{{ response.View.Filters }}'
+      IncludedProperties: '{{ response.View.IncludedProperties }}'
+      ScopeType: '{{ response.View.ScopeType }}'
+      ServiceViewArn: '{{ response.View.ServiceViewArn }}'
+      StreamingAccessForService: '{{ response.View.StreamingAccessForService }}'
+- discovery_id: aws.resource-explorer-2.get_view
+  for_each: aws.resource-explorer-2.get_default_view
+  calls:
+  - action: get_view
+    params:
+      ViewArn: '{{ item.ViewArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Filters: '{{ response.View.Filters }}'
+      IncludedProperties: '{{ response.View.IncludedProperties[].Name }}'
+      LastUpdatedAt: '{{ response.View.LastUpdatedAt }}'
+      Owner: '{{ response.View.Owner }}'
+      Scope: '{{ response.View.Scope }}'
+      ViewArn: '{{ response.View.ViewArn }}'
+      Tags: '{{ response.Tags }}'
+      FilterString: '{{ response.View.Filters.FilterString }}'
+- discovery_id: aws.resource-explorer-2.list_indexes_for_members
+  calls:
+  - action: list_indexes_for_members
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Indexes }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.resource-explorer-2.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.resource-explorer-2.search
+  calls:
+  - action: search
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Resources }}'
+    item:
+      Complete: '{{ response.Count.Complete }}'
+      TotalResources: '{{ response.Count.TotalResources }}'
+      ViewArn: '{{ response.ViewArn }}'

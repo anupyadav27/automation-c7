@@ -1,0 +1,18 @@
+version: '1.0'
+provider: aws
+service: marketplace-reporting
+services:
+  client: marketplace-reporting
+  module: boto3.client
+discovery:
+- discovery_id: aws.marketplace-reporting.get_buyer_dashboard
+  calls:
+  - action: get_buyer_dashboard
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.embeddingDomains }}'
+    item:
+      dashboardIdentifier: '{{ response.dashboardIdentifier }}'
+      embedUrl: '{{ response.embedUrl }}'

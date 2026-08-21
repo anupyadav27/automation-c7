@@ -1,0 +1,224 @@
+version: '1.0'
+provider: aws
+service: signer
+services:
+  client: signer
+  module: boto3.client
+discovery:
+- discovery_id: aws.signer.list_signing_jobs
+  calls:
+  - action: list_signing_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.jobs }}'
+    item:
+      action: '{{ item.action }}'
+      completedAt: '{{ item.completedAt }}'
+      createdAt: '{{ item.createdAt }}'
+      displayName: '{{ item.displayName }}'
+      encryptionAlgorithmOptions: '{{ item.encryptionAlgorithmOptions }}'
+      hashAlgorithmOptions: '{{ item.hashAlgorithmOptions }}'
+      isRevoked: '{{ item.isRevoked }}'
+      jobId: '{{ item.jobId }}'
+      jobInvoker: '{{ item.jobInvoker }}'
+      jobOwner: '{{ item.jobOwner }}'
+      overrides: '{{ item.overrides }}'
+      platformDisplayName: '{{ item.platformDisplayName }}'
+      platformId: '{{ item.platformId }}'
+      principal: '{{ item.principal }}'
+      profileName: '{{ item.profileName }}'
+      profileVersion: '{{ item.profileVersion }}'
+      requestedBy: '{{ item.requestedBy }}'
+      revocationEffectiveFrom: '{{ item.revocationEffectiveFrom }}'
+      revocationRecord: '{{ item.revocationRecord }}'
+      revokedAt: '{{ item.revokedAt }}'
+      revokedBy: '{{ item.revokedBy }}'
+      revokedEntities: '{{ item.revokedEntities }}'
+      s3: '{{ item.s3 }}'
+      signatureExpiresAt: '{{ item.signatureExpiresAt }}'
+      signedObject: '{{ item.signedObject }}'
+      signingMaterial: '{{ item.signingMaterial }}'
+      source: '{{ item.source }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.signer.list_signing_platforms
+  calls:
+  - action: list_signing_platforms
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.platforms }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      category: '{{ item.category }}'
+      maxSizeInMB: '{{ item.maxSizeInMB }}'
+      partner: '{{ item.partner }}'
+      platformId: '{{ item.platformId }}'
+      revocationSupported: '{{ item.revocationSupported }}'
+      signingConfiguration: '{{ item.signingConfiguration }}'
+      signingImageFormat: '{{ item.signingImageFormat }}'
+      target: '{{ item.target }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.signer.list_signing_profiles
+  calls:
+  - action: list_signing_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.profiles }}'
+    item:
+      arn: '{{ item.arn }}'
+      platformDisplayName: '{{ item.platformDisplayName }}'
+      platformId: '{{ item.platformId }}'
+      profileName: '{{ item.profileName }}'
+      profileVersion: '{{ item.profileVersion }}'
+      profileVersionArn: '{{ item.profileVersionArn }}'
+      signatureValidityPeriod: '{{ item.signatureValidityPeriod }}'
+      signingMaterial: '{{ item.signingMaterial }}'
+      signingParameters: '{{ item.signingParameters }}'
+      status: '{{ item.status }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.signer.describe_signing_job
+  for_each: aws.signer.list_signing_jobs
+  calls:
+  - action: describe_signing_job
+    params:
+      jobId: '{{ item.jobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      completedAt: '{{ response.source.completedAt }}'
+      overrides: '{{ response.source.overrides }}'
+      requestedBy: '{{ response.source.requestedBy }}'
+      revocationRecord: '{{ response.source.revocationRecord }}'
+      s3: '{{ response.source.s3 }}'
+      statusReason: '{{ response.source.statusReason }}'
+      createdAt: '{{ response.createdAt }}'
+      jobId: '{{ response.jobId }}'
+      jobInvoker: '{{ response.jobInvoker }}'
+      jobOwner: '{{ response.jobOwner }}'
+      encryptionAlgorithm: '{{ response.overrides.signingConfiguration.encryptionAlgorithm }}'
+      hashAlgorithm: '{{ response.overrides.signingConfiguration.hashAlgorithm }}'
+      signingImageFormat: '{{ response.overrides.signingImageFormat }}'
+      platformDisplayName: '{{ response.platformDisplayName }}'
+      platformId: '{{ response.platformId }}'
+      profileName: '{{ response.profileName }}'
+      profileVersion: '{{ response.profileVersion }}'
+      reason: '{{ response.revocationRecord.reason }}'
+      revokedAt: '{{ response.revocationRecord.revokedAt }}'
+      revokedBy: '{{ response.revocationRecord.revokedBy }}'
+      signatureExpiresAt: '{{ response.signatureExpiresAt }}'
+      bucketName: '{{ response.signedObject.s3.bucketName }}'
+      key: '{{ response.signedObject.s3.key }}'
+      certificateArn: '{{ response.signingMaterial.certificateArn }}'
+      signingParameters: '{{ response.signingParameters }}'
+      version: '{{ response.source.s3.version }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.signer.get_revocation_status
+  for_each: aws.signer.list_signing_jobs
+  calls:
+  - action: get_revocation_status
+    params:
+      signatureTimestamp: '{{ item.signatureTimestamp }}'
+      platformId: '{{ item.platformId }}'
+      profileVersionArn: '{{ item.profileVersionArn }}'
+      jobArn: '{{ item.jobArn }}'
+      certificateHashes: '{{ item.certificateHashes }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.revokedEntities }}'
+    item:
+      revokedEntities: '{{ item.revokedEntities }}'
+- discovery_id: aws.signer.get_signing_platform
+  for_each: aws.signer.list_signing_jobs
+  calls:
+  - action: get_signing_platform
+    params:
+      platformId: '{{ item.platformId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      encryptionAlgorithmOptions: '{{ response.signingConfiguration.encryptionAlgorithmOptions.defaultValue }}'
+      hashAlgorithmOptions: '{{ response.signingConfiguration.hashAlgorithmOptions.defaultValue }}'
+      category: '{{ response.category }}'
+      displayName: '{{ response.displayName }}'
+      maxSizeInMB: '{{ response.maxSizeInMB }}'
+      partner: '{{ response.partner }}'
+      platformId: '{{ response.platformId }}'
+      revocationSupported: '{{ response.revocationSupported }}'
+      defaultValue: '{{ response.signingConfiguration.encryptionAlgorithmOptions.defaultValue }}'
+      defaultFormat: '{{ response.signingImageFormat.defaultFormat }}'
+      target: '{{ response.target }}'
+- discovery_id: aws.signer.get_signing_profile
+  for_each: aws.signer.list_signing_jobs
+  calls:
+  - action: get_signing_profile
+    params:
+      profileName: '{{ item.profileName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      revocationEffectiveFrom: '{{ response.revocationRecord.revocationEffectiveFrom }}'
+      revokedAt: '{{ response.revocationRecord.revokedAt }}'
+      revokedBy: '{{ response.revocationRecord.revokedBy }}'
+      arn: '{{ response.arn }}'
+      encryptionAlgorithm: '{{ response.overrides.signingConfiguration.encryptionAlgorithm }}'
+      hashAlgorithm: '{{ response.overrides.signingConfiguration.hashAlgorithm }}'
+      signingImageFormat: '{{ response.overrides.signingImageFormat }}'
+      platformDisplayName: '{{ response.platformDisplayName }}'
+      platformId: '{{ response.platformId }}'
+      profileName: '{{ response.profileName }}'
+      profileVersion: '{{ response.profileVersion }}'
+      profileVersionArn: '{{ response.profileVersionArn }}'
+      type: '{{ response.signatureValidityPeriod.type }}'
+      value: '{{ response.signatureValidityPeriod.value }}'
+      certificateArn: '{{ response.signingMaterial.certificateArn }}'
+      signingParameters: '{{ response.signingParameters }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.signer.list_profile_permissions
+  for_each: aws.signer.list_signing_jobs
+  calls:
+  - action: list_profile_permissions
+    params:
+      profileName: '{{ item.profileName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.permissions }}'
+    item:
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+      action: '{{ item.action }}'
+      principal: '{{ item.principal }}'
+      profileVersion: '{{ item.profileVersion }}'
+      statementId: '{{ item.statementId }}'
+      nextToken: '{{ response.nextToken }}'
+      policySizeBytes: '{{ response.policySizeBytes }}'
+      revisionId: '{{ response.revisionId }}'
+- discovery_id: aws.signer.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

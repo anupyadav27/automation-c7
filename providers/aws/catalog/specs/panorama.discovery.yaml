@@ -1,0 +1,408 @@
+version: '1.0'
+provider: aws
+service: panorama
+services:
+  client: panorama
+  module: boto3.client
+discovery:
+- discovery_id: aws.panorama.list_application_instances
+  calls:
+  - action: list_application_instances
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ApplicationInstances }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      ApplicationInstanceId: '{{ item.ApplicationInstanceId }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      DefaultRuntimeContextDevice: '{{ item.DefaultRuntimeContextDevice }}'
+      DefaultRuntimeContextDeviceName: '{{ item.DefaultRuntimeContextDeviceName }}'
+      Description: '{{ item.Description }}'
+      HealthStatus: '{{ item.HealthStatus }}'
+      RuntimeContextStates: '{{ item.RuntimeContextStates }}'
+      StatusDescription: '{{ item.StatusDescription }}'
+- discovery_id: aws.panorama.list_devices
+  calls:
+  - action: list_devices
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Devices }}'
+    item:
+      Name: '{{ item.Name }}'
+      Tags: '{{ item.Tags }}'
+      Brand: '{{ item.Brand }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      CurrentSoftware: '{{ item.CurrentSoftware }}'
+      Description: '{{ item.Description }}'
+      DeviceAggregatedStatus: '{{ item.DeviceAggregatedStatus }}'
+      DeviceId: '{{ item.DeviceId }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      LatestDeviceJob: '{{ item.LatestDeviceJob }}'
+      LeaseExpirationTime: '{{ item.LeaseExpirationTime }}'
+      ProvisioningStatus: '{{ item.ProvisioningStatus }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.panorama.list_devices_jobs
+  calls:
+  - action: list_devices_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DeviceJobs }}'
+    item:
+      CreatedTime: '{{ item.CreatedTime }}'
+      DeviceId: '{{ item.DeviceId }}'
+      DeviceName: '{{ item.DeviceName }}'
+      JobId: '{{ item.JobId }}'
+      JobType: '{{ item.JobType }}'
+- discovery_id: aws.panorama.list_node_from_template_jobs
+  calls:
+  - action: list_node_from_template_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.NodeFromTemplateJobs }}'
+    item:
+      Status: '{{ item.Status }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      JobId: '{{ item.JobId }}'
+      NodeName: '{{ item.NodeName }}'
+      OutputPackageName: '{{ item.OutputPackageName }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      TemplateType: '{{ item.TemplateType }}'
+- discovery_id: aws.panorama.list_nodes
+  calls:
+  - action: list_nodes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Nodes }}'
+    item:
+      Name: '{{ item.Name }}'
+      Category: '{{ item.Category }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      Description: '{{ item.Description }}'
+      NodeId: '{{ item.NodeId }}'
+      OutputPackageName: '{{ item.OutputPackageName }}'
+      OwnerAccount: '{{ item.OwnerAccount }}'
+      PackageArn: '{{ item.PackageArn }}'
+      PackageId: '{{ item.PackageId }}'
+      PackageName: '{{ item.PackageName }}'
+      PackageVersion: '{{ item.PackageVersion }}'
+      PatchVersion: '{{ item.PatchVersion }}'
+- discovery_id: aws.panorama.list_package_import_jobs
+  calls:
+  - action: list_package_import_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PackageImportJobs }}'
+    item:
+      Status: '{{ item.Status }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      JobId: '{{ item.JobId }}'
+      JobType: '{{ item.JobType }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      Output: '{{ item.Output }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+- discovery_id: aws.panorama.list_packages
+  calls:
+  - action: list_packages
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Packages }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Tags: '{{ item.Tags }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      PackageId: '{{ item.PackageId }}'
+      PackageName: '{{ item.PackageName }}'
+- discovery_id: aws.panorama.describe_application_instance
+  for_each: aws.panorama.list_application_instances
+  calls:
+  - action: describe_application_instance
+    params:
+      ApplicationInstanceId: '{{ item.ApplicationInstanceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RuntimeContextStates }}'
+    item:
+      DesiredState: '{{ item.DesiredState }}'
+      DeviceReportedStatus: '{{ item.DeviceReportedStatus }}'
+      DeviceReportedTime: '{{ item.DeviceReportedTime }}'
+      RuntimeContextName: '{{ item.RuntimeContextName }}'
+      ApplicationInstanceId: '{{ response.ApplicationInstanceId }}'
+      ApplicationInstanceIdToReplace: '{{ response.ApplicationInstanceIdToReplace }}'
+      Arn: '{{ response.Arn }}'
+      CreatedTime: '{{ response.CreatedTime }}'
+      DefaultRuntimeContextDevice: '{{ response.DefaultRuntimeContextDevice }}'
+      DefaultRuntimeContextDeviceName: '{{ response.DefaultRuntimeContextDeviceName }}'
+      Description: '{{ response.Description }}'
+      HealthStatus: '{{ response.HealthStatus }}'
+      LastUpdatedTime: '{{ response.LastUpdatedTime }}'
+      Name: '{{ response.Name }}'
+      RuntimeRoleArn: '{{ response.RuntimeRoleArn }}'
+      Status: '{{ response.Status }}'
+      StatusDescription: '{{ response.StatusDescription }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.panorama.describe_application_instance_details
+  for_each: aws.panorama.list_application_instances
+  calls:
+  - action: describe_application_instance_details
+    params:
+      ApplicationInstanceId: '{{ item.ApplicationInstanceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      PayloadData: '{{ response.ManifestOverridesPayload.PayloadData }}'
+      ApplicationInstanceId: '{{ response.ApplicationInstanceId }}'
+      ApplicationInstanceIdToReplace: '{{ response.ApplicationInstanceIdToReplace }}'
+      CreatedTime: '{{ response.CreatedTime }}'
+      DefaultRuntimeContextDevice: '{{ response.DefaultRuntimeContextDevice }}'
+      Description: '{{ response.Description }}'
+      Name: '{{ response.Name }}'
+- discovery_id: aws.panorama.describe_device
+  for_each: aws.panorama.list_devices
+  calls:
+  - action: describe_device
+    params:
+      DeviceId: '{{ item.DeviceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AlternateSoftwares }}'
+    item:
+      Enabled: '{{ item.Enabled }}'
+      Version: '{{ item.Version }}'
+      Arn: '{{ response.Arn }}'
+      Brand: '{{ response.Brand }}'
+      CreatedTime: '{{ response.CreatedTime }}'
+      ConnectionStatus: '{{ response.CurrentNetworkingStatus.Ethernet0Status.ConnectionStatus }}'
+      HwAddress: '{{ response.CurrentNetworkingStatus.Ethernet0Status.HwAddress }}'
+      IpAddress: '{{ response.CurrentNetworkingStatus.Ethernet0Status.IpAddress }}'
+      LastUpdatedTime: '{{ response.CurrentNetworkingStatus.LastUpdatedTime }}'
+      NtpServerName: '{{ response.CurrentNetworkingStatus.NtpStatus.NtpServerName }}'
+      CurrentSoftware: '{{ response.CurrentSoftware }}'
+      Description: '{{ response.Description }}'
+      DeviceAggregatedStatus: '{{ response.DeviceAggregatedStatus }}'
+      DeviceConnectionStatus: '{{ response.DeviceConnectionStatus }}'
+      DeviceId: '{{ response.DeviceId }}'
+      LatestAlternateSoftware: '{{ response.LatestAlternateSoftware }}'
+      ImageVersion: '{{ response.LatestDeviceJob.ImageVersion }}'
+      JobType: '{{ response.LatestDeviceJob.JobType }}'
+      Status: '{{ response.LatestDeviceJob.Status }}'
+      LatestSoftware: '{{ response.LatestSoftware }}'
+      LeaseExpirationTime: '{{ response.LeaseExpirationTime }}'
+      Name: '{{ response.Name }}'
+      ConnectionType: '{{ response.NetworkingConfiguration.Ethernet0.ConnectionType }}'
+      DefaultGateway: '{{ response.NetworkingConfiguration.Ethernet0.StaticIpConnectionInfo.DefaultGateway }}'
+      Mask: '{{ response.NetworkingConfiguration.Ethernet0.StaticIpConnectionInfo.Mask }}'
+      ProvisioningStatus: '{{ response.ProvisioningStatus }}'
+      SerialNumber: '{{ response.SerialNumber }}'
+      Tags: '{{ response.Tags }}'
+      Type: '{{ response.Type }}'
+- discovery_id: aws.panorama.describe_device_job
+  for_each: aws.panorama.list_devices_jobs
+  calls:
+  - action: describe_device_job
+    params:
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+      CreatedTime: '{{ response.CreatedTime }}'
+      DeviceArn: '{{ response.DeviceArn }}'
+      DeviceId: '{{ response.DeviceId }}'
+      DeviceName: '{{ response.DeviceName }}'
+      DeviceType: '{{ response.DeviceType }}'
+      ImageVersion: '{{ response.ImageVersion }}'
+      JobId: '{{ response.JobId }}'
+      JobType: '{{ response.JobType }}'
+- discovery_id: aws.panorama.describe_node
+  for_each: aws.panorama.list_nodes
+  calls:
+  - action: describe_node
+    params:
+      NodeId: '{{ item.NodeId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Inputs: '{{ response.NodeInterface.Inputs[].Type }}'
+      Outputs: '{{ response.NodeInterface.Outputs[].Type }}'
+      AssetName: '{{ response.AssetName }}'
+      Category: '{{ response.Category }}'
+      CreatedTime: '{{ response.CreatedTime }}'
+      Description: '{{ response.Description }}'
+      LastUpdatedTime: '{{ response.LastUpdatedTime }}'
+      Name: '{{ response.Name }}'
+      NodeId: '{{ response.NodeId }}'
+      OwnerAccount: '{{ response.OwnerAccount }}'
+      PackageArn: '{{ response.PackageArn }}'
+      PackageId: '{{ response.PackageId }}'
+      PackageName: '{{ response.PackageName }}'
+      PackageVersion: '{{ response.PackageVersion }}'
+      PatchVersion: '{{ response.PatchVersion }}'
+- discovery_id: aws.panorama.describe_node_from_template_job
+  for_each: aws.panorama.list_devices_jobs
+  calls:
+  - action: describe_node_from_template_job
+    params:
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.JobTags }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      OutputPackageName: '{{ item.OutputPackageName }}'
+      ResourceType: '{{ item.ResourceType }}'
+      CreatedTime: '{{ response.CreatedTime }}'
+      JobId: '{{ response.JobId }}'
+      LastUpdatedTime: '{{ response.LastUpdatedTime }}'
+      NodeDescription: '{{ response.NodeDescription }}'
+      NodeName: '{{ response.NodeName }}'
+      OutputPackageVersion: '{{ response.OutputPackageVersion }}'
+      Status: '{{ response.Status }}'
+      StatusMessage: '{{ response.StatusMessage }}'
+      TemplateParameters: '{{ response.TemplateParameters }}'
+      TemplateType: '{{ response.TemplateType }}'
+- discovery_id: aws.panorama.describe_package
+  for_each: aws.panorama.list_nodes
+  calls:
+  - action: describe_package
+    params:
+      PackageId: '{{ item.PackageId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ReadAccessPrincipalArns }}'
+    item:
+      Arn: '{{ response.Arn }}'
+      CreatedTime: '{{ response.CreatedTime }}'
+      PackageId: '{{ response.PackageId }}'
+      PackageName: '{{ response.PackageName }}'
+      BinaryPrefixLocation: '{{ response.StorageLocation.BinaryPrefixLocation }}'
+      Bucket: '{{ response.StorageLocation.Bucket }}'
+      GeneratedPrefixLocation: '{{ response.StorageLocation.GeneratedPrefixLocation }}'
+      ManifestPrefixLocation: '{{ response.StorageLocation.ManifestPrefixLocation }}'
+      RepoPrefixLocation: '{{ response.StorageLocation.RepoPrefixLocation }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.panorama.describe_package_import_job
+  for_each: aws.panorama.list_devices_jobs
+  calls:
+  - action: describe_package_import_job
+    params:
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.JobTags }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      Output: '{{ item.Output }}'
+      ResourceType: '{{ item.ResourceType }}'
+      ClientToken: '{{ response.ClientToken }}'
+      CreatedTime: '{{ response.CreatedTime }}'
+      BucketName: '{{ response.InputConfig.PackageVersionInputConfig.S3Location.BucketName }}'
+      ObjectKey: '{{ response.InputConfig.PackageVersionInputConfig.S3Location.ObjectKey }}'
+      Region: '{{ response.InputConfig.PackageVersionInputConfig.S3Location.Region }}'
+      JobId: '{{ response.JobId }}'
+      JobType: '{{ response.JobType }}'
+      LastUpdatedTime: '{{ response.LastUpdatedTime }}'
+      MarkLatest: '{{ response.OutputConfig.PackageVersionOutputConfig.MarkLatest }}'
+      PackageName: '{{ response.OutputConfig.PackageVersionOutputConfig.PackageName }}'
+      PackageVersion: '{{ response.OutputConfig.PackageVersionOutputConfig.PackageVersion }}'
+      PackageId: '{{ response.Output.PackageId }}'
+      PatchVersion: '{{ response.Output.PatchVersion }}'
+      Status: '{{ response.Status }}'
+      StatusMessage: '{{ response.StatusMessage }}'
+- discovery_id: aws.panorama.describe_package_version
+  for_each: aws.panorama.list_nodes
+  calls:
+  - action: describe_package_version
+    params:
+      PackageId: '{{ item.PackageId }}'
+      PackageVersion: '{{ item.PackageVersion }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+      IsLatestPatch: '{{ response.IsLatestPatch }}'
+      OwnerAccount: '{{ response.OwnerAccount }}'
+      PackageArn: '{{ response.PackageArn }}'
+      PackageId: '{{ response.PackageId }}'
+      PackageName: '{{ response.PackageName }}'
+      PackageVersion: '{{ response.PackageVersion }}'
+      PatchVersion: '{{ response.PatchVersion }}'
+      RegisteredTime: '{{ response.RegisteredTime }}'
+      StatusDescription: '{{ response.StatusDescription }}'
+- discovery_id: aws.panorama.list_application_instance_dependencies
+  for_each: aws.panorama.list_application_instances
+  calls:
+  - action: list_application_instance_dependencies
+    params:
+      ApplicationInstanceId: '{{ item.ApplicationInstanceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PackageObjects }}'
+    item:
+      Name: '{{ item.Name }}'
+      PackageVersion: '{{ item.PackageVersion }}'
+      PatchVersion: '{{ item.PatchVersion }}'
+- discovery_id: aws.panorama.list_application_instance_node_instances
+  for_each: aws.panorama.list_application_instances
+  calls:
+  - action: list_application_instance_node_instances
+    params:
+      ApplicationInstanceId: '{{ item.ApplicationInstanceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.NodeInstances }}'
+    item:
+      CurrentStatus: '{{ item.CurrentStatus }}'
+      NodeId: '{{ item.NodeId }}'
+      NodeInstanceId: '{{ item.NodeInstanceId }}'
+      NodeName: '{{ item.NodeName }}'
+      PackageName: '{{ item.PackageName }}'
+      PackagePatchVersion: '{{ item.PackagePatchVersion }}'
+      PackageVersion: '{{ item.PackageVersion }}'
+- discovery_id: aws.panorama.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

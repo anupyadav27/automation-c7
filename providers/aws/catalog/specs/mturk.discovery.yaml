@@ -1,0 +1,364 @@
+version: '1.0'
+provider: aws
+service: mturk
+services:
+  client: mturk
+  module: boto3.client
+discovery:
+- discovery_id: aws.mturk.get_account_balance
+  calls:
+  - action: get_account_balance
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AvailableBalance: '{{ response.AvailableBalance }}'
+      OnHoldBalance: '{{ response.OnHoldBalance }}'
+- discovery_id: aws.mturk.list_bonus_payments
+  calls:
+  - action: list_bonus_payments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.BonusPayments }}'
+    item:
+      AssignmentId: '{{ item.AssignmentId }}'
+      BonusAmount: '{{ item.BonusAmount }}'
+      GrantTime: '{{ item.GrantTime }}'
+      Reason: '{{ item.Reason }}'
+      WorkerId: '{{ item.WorkerId }}'
+      NumResults: '{{ response.NumResults }}'
+- discovery_id: aws.mturk.list_hi_ts
+  calls:
+  - action: list_hi_ts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HITs }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      AssignmentDurationInSeconds: '{{ item.AssignmentDurationInSeconds }}'
+      AutoApprovalDelayInSeconds: '{{ item.AutoApprovalDelayInSeconds }}'
+      Description: '{{ item.Description }}'
+      Expiration: '{{ item.Expiration }}'
+      HIT: '{{ item.HIT }}'
+      HITGroupId: '{{ item.HITGroupId }}'
+      HITId: '{{ item.HITId }}'
+      HITLayoutId: '{{ item.HITLayoutId }}'
+      HITReviewStatus: '{{ item.HITReviewStatus }}'
+      HITStatus: '{{ item.HITStatus }}'
+      HITTypeId: '{{ item.HITTypeId }}'
+      Keywords: '{{ item.Keywords }}'
+      MaxAssignments: '{{ item.MaxAssignments }}'
+      NumberOfAssignmentsAvailable: '{{ item.NumberOfAssignmentsAvailable }}'
+      NumberOfAssignmentsCompleted: '{{ item.NumberOfAssignmentsCompleted }}'
+      NumberOfAssignmentsPending: '{{ item.NumberOfAssignmentsPending }}'
+      QualificationRequirements: '{{ item.QualificationRequirements }}'
+      Question: '{{ item.Question }}'
+      RequesterAnnotation: '{{ item.RequesterAnnotation }}'
+      Reward: '{{ item.Reward }}'
+      Title: '{{ item.Title }}'
+- discovery_id: aws.mturk.list_qualification_requests
+  calls:
+  - action: list_qualification_requests
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.QualificationRequests }}'
+    item:
+      Answer: '{{ item.Answer }}'
+      QualificationRequestId: '{{ item.QualificationRequestId }}'
+      QualificationTypeId: '{{ item.QualificationTypeId }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      Test: '{{ item.Test }}'
+      WorkerId: '{{ item.WorkerId }}'
+      NumResults: '{{ response.NumResults }}'
+- discovery_id: aws.mturk.list_reviewable_hi_ts
+  calls:
+  - action: list_reviewable_hi_ts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HITs }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      AssignmentDurationInSeconds: '{{ item.AssignmentDurationInSeconds }}'
+      AutoApprovalDelayInSeconds: '{{ item.AutoApprovalDelayInSeconds }}'
+      Description: '{{ item.Description }}'
+      Expiration: '{{ item.Expiration }}'
+      HITGroupId: '{{ item.HITGroupId }}'
+      HITId: '{{ item.HITId }}'
+      HITLayoutId: '{{ item.HITLayoutId }}'
+      HITReviewStatus: '{{ item.HITReviewStatus }}'
+      HITStatus: '{{ item.HITStatus }}'
+      HITTypeId: '{{ item.HITTypeId }}'
+      Keywords: '{{ item.Keywords }}'
+      MaxAssignments: '{{ item.MaxAssignments }}'
+      NumberOfAssignmentsAvailable: '{{ item.NumberOfAssignmentsAvailable }}'
+      NumberOfAssignmentsCompleted: '{{ item.NumberOfAssignmentsCompleted }}'
+      NumberOfAssignmentsPending: '{{ item.NumberOfAssignmentsPending }}'
+      QualificationRequirements: '{{ item.QualificationRequirements }}'
+      Question: '{{ item.Question }}'
+      RequesterAnnotation: '{{ item.RequesterAnnotation }}'
+      Reward: '{{ item.Reward }}'
+      Title: '{{ item.Title }}'
+- discovery_id: aws.mturk.list_worker_blocks
+  calls:
+  - action: list_worker_blocks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.WorkerBlocks }}'
+    item:
+      Reason: '{{ item.Reason }}'
+      WorkerId: '{{ item.WorkerId }}'
+      NumResults: '{{ response.NumResults }}'
+- discovery_id: aws.mturk.get_assignment
+  for_each: aws.mturk.list_bonus_payments
+  calls:
+  - action: get_assignment
+    params:
+      AssignmentId: '{{ item.AssignmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AcceptTime: '{{ response.Assignment.AcceptTime }}'
+      Answer: '{{ response.Assignment.Answer }}'
+      ApprovalTime: '{{ response.Assignment.ApprovalTime }}'
+      Assignment: '{{ response.Assignment.AssignmentId }}'
+      AssignmentId: '{{ response.Assignment.AssignmentId }}'
+      AssignmentStatus: '{{ response.Assignment.AssignmentStatus }}'
+      AutoApprovalTime: '{{ response.Assignment.AutoApprovalTime }}'
+      Deadline: '{{ response.Assignment.Deadline }}'
+      HITId: '{{ response.Assignment.HITId }}'
+      RejectionTime: '{{ response.Assignment.RejectionTime }}'
+      RequesterFeedback: '{{ response.Assignment.RequesterFeedback }}'
+      SubmitTime: '{{ response.Assignment.SubmitTime }}'
+      WorkerId: '{{ response.Assignment.WorkerId }}'
+      AssignmentDurationInSeconds: '{{ response.HIT.AssignmentDurationInSeconds }}'
+      AutoApprovalDelayInSeconds: '{{ response.HIT.AutoApprovalDelayInSeconds }}'
+      CreationTime: '{{ response.HIT.CreationTime }}'
+      Description: '{{ response.HIT.Description }}'
+      Expiration: '{{ response.HIT.Expiration }}'
+      HITGroupId: '{{ response.HIT.HITGroupId }}'
+      HITLayoutId: '{{ response.HIT.HITLayoutId }}'
+      HITReviewStatus: '{{ response.HIT.HITReviewStatus }}'
+      HITStatus: '{{ response.HIT.HITStatus }}'
+      HITTypeId: '{{ response.HIT.HITTypeId }}'
+      Keywords: '{{ response.HIT.Keywords }}'
+      MaxAssignments: '{{ response.HIT.MaxAssignments }}'
+      NumberOfAssignmentsAvailable: '{{ response.HIT.NumberOfAssignmentsAvailable }}'
+      NumberOfAssignmentsCompleted: '{{ response.HIT.NumberOfAssignmentsCompleted }}'
+      NumberOfAssignmentsPending: '{{ response.HIT.NumberOfAssignmentsPending }}'
+      Question: '{{ response.HIT.Question }}'
+      RequesterAnnotation: '{{ response.HIT.RequesterAnnotation }}'
+      Reward: '{{ response.HIT.Reward }}'
+      Title: '{{ response.HIT.Title }}'
+- discovery_id: aws.mturk.get_file_upload_url
+  calls:
+  - action: get_file_upload_url
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      FileUploadURL: '{{ response.FileUploadURL }}'
+- discovery_id: aws.mturk.get_hit
+  for_each: aws.mturk.list_hi_ts
+  calls:
+  - action: get_hit
+    params:
+      HITId: '{{ item.HITId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ response.HIT.CreationTime }}'
+      AssignmentDurationInSeconds: '{{ response.HIT.AssignmentDurationInSeconds }}'
+      AutoApprovalDelayInSeconds: '{{ response.HIT.AutoApprovalDelayInSeconds }}'
+      Description: '{{ response.HIT.Description }}'
+      Expiration: '{{ response.HIT.Expiration }}'
+      HITGroupId: '{{ response.HIT.HITGroupId }}'
+      HITId: '{{ response.HIT.HITId }}'
+      HITLayoutId: '{{ response.HIT.HITLayoutId }}'
+      HITReviewStatus: '{{ response.HIT.HITReviewStatus }}'
+      HITStatus: '{{ response.HIT.HITStatus }}'
+      HITTypeId: '{{ response.HIT.HITTypeId }}'
+      Keywords: '{{ response.HIT.Keywords }}'
+      MaxAssignments: '{{ response.HIT.MaxAssignments }}'
+      NumberOfAssignmentsAvailable: '{{ response.HIT.NumberOfAssignmentsAvailable }}'
+      NumberOfAssignmentsCompleted: '{{ response.HIT.NumberOfAssignmentsCompleted }}'
+      NumberOfAssignmentsPending: '{{ response.HIT.NumberOfAssignmentsPending }}'
+      QualificationRequirements: '{{ response.HIT.QualificationRequirements }}'
+      Question: '{{ response.HIT.Question }}'
+      RequesterAnnotation: '{{ response.HIT.RequesterAnnotation }}'
+      Reward: '{{ response.HIT.Reward }}'
+      Title: '{{ response.HIT.Title }}'
+- discovery_id: aws.mturk.get_qualification_score
+  for_each: aws.mturk.list_bonus_payments
+  calls:
+  - action: get_qualification_score
+    params:
+      QualificationTypeId: '{{ item.QualificationTypeId }}'
+      WorkerId: '{{ item.WorkerId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Qualification.Status }}'
+      GrantTime: '{{ response.Qualification.GrantTime }}'
+      IntegerValue: '{{ response.Qualification.IntegerValue }}'
+      LocaleValue: '{{ response.Qualification.LocaleValue.Country }}'
+      QualificationTypeId: '{{ response.Qualification.QualificationTypeId }}'
+      WorkerId: '{{ response.Qualification.WorkerId }}'
+      Country: '{{ response.Qualification.LocaleValue.Country }}'
+      Subdivision: '{{ response.Qualification.LocaleValue.Subdivision }}'
+- discovery_id: aws.mturk.get_qualification_type
+  for_each: aws.mturk.list_qualification_requests
+  calls:
+  - action: get_qualification_type
+    params:
+      QualificationTypeId: '{{ item.QualificationTypeId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ response.QualificationType.CreationTime }}'
+      Name: '{{ response.QualificationType.Name }}'
+      AnswerKey: '{{ response.QualificationType.AnswerKey }}'
+      AutoGranted: '{{ response.QualificationType.AutoGranted }}'
+      AutoGrantedValue: '{{ response.QualificationType.AutoGrantedValue }}'
+      Description: '{{ response.QualificationType.Description }}'
+      IsRequestable: '{{ response.QualificationType.IsRequestable }}'
+      Keywords: '{{ response.QualificationType.Keywords }}'
+      QualificationTypeId: '{{ response.QualificationType.QualificationTypeId }}'
+      QualificationTypeStatus: '{{ response.QualificationType.QualificationTypeStatus }}'
+      RetryDelayInSeconds: '{{ response.QualificationType.RetryDelayInSeconds }}'
+      Test: '{{ response.QualificationType.Test }}'
+      TestDurationInSeconds: '{{ response.QualificationType.TestDurationInSeconds }}'
+- discovery_id: aws.mturk.list_assignments_for_hit
+  for_each: aws.mturk.list_hi_ts
+  calls:
+  - action: list_assignments_for_hit
+    params:
+      HITId: '{{ item.HITId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Assignments }}'
+    item:
+      AcceptTime: '{{ item.AcceptTime }}'
+      Answer: '{{ item.Answer }}'
+      ApprovalTime: '{{ item.ApprovalTime }}'
+      Assignment: '{{ item.Assignment }}'
+      AssignmentId: '{{ item.AssignmentId }}'
+      AssignmentStatus: '{{ item.AssignmentStatus }}'
+      AutoApprovalTime: '{{ item.AutoApprovalTime }}'
+      Deadline: '{{ item.Deadline }}'
+      HITId: '{{ item.HITId }}'
+      RejectionTime: '{{ item.RejectionTime }}'
+      RequesterFeedback: '{{ item.RequesterFeedback }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      WorkerId: '{{ item.WorkerId }}'
+- discovery_id: aws.mturk.list_hi_ts_for_qualification_type
+  for_each: aws.mturk.list_qualification_requests
+  calls:
+  - action: list_hi_ts_for_qualification_type
+    params:
+      QualificationTypeId: '{{ item.QualificationTypeId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HITs }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      AssignmentDurationInSeconds: '{{ item.AssignmentDurationInSeconds }}'
+      AutoApprovalDelayInSeconds: '{{ item.AutoApprovalDelayInSeconds }}'
+      Description: '{{ item.Description }}'
+      Expiration: '{{ item.Expiration }}'
+      HITGroupId: '{{ item.HITGroupId }}'
+      HITId: '{{ item.HITId }}'
+      HITLayoutId: '{{ item.HITLayoutId }}'
+      HITReviewStatus: '{{ item.HITReviewStatus }}'
+      HITStatus: '{{ item.HITStatus }}'
+      HITTypeId: '{{ item.HITTypeId }}'
+      Keywords: '{{ item.Keywords }}'
+      MaxAssignments: '{{ item.MaxAssignments }}'
+      NumberOfAssignmentsAvailable: '{{ item.NumberOfAssignmentsAvailable }}'
+      NumberOfAssignmentsCompleted: '{{ item.NumberOfAssignmentsCompleted }}'
+      NumberOfAssignmentsPending: '{{ item.NumberOfAssignmentsPending }}'
+      QualificationRequirements: '{{ item.QualificationRequirements }}'
+      Question: '{{ item.Question }}'
+      RequesterAnnotation: '{{ item.RequesterAnnotation }}'
+      Reward: '{{ item.Reward }}'
+      Title: '{{ item.Title }}'
+- discovery_id: aws.mturk.list_qualification_types
+  calls:
+  - action: list_qualification_types
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.QualificationTypes }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      Name: '{{ item.Name }}'
+      AnswerKey: '{{ item.AnswerKey }}'
+      AutoGranted: '{{ item.AutoGranted }}'
+      AutoGrantedValue: '{{ item.AutoGrantedValue }}'
+      Description: '{{ item.Description }}'
+      IsRequestable: '{{ item.IsRequestable }}'
+      Keywords: '{{ item.Keywords }}'
+      QualificationTypeId: '{{ item.QualificationTypeId }}'
+      QualificationTypeStatus: '{{ item.QualificationTypeStatus }}'
+      RetryDelayInSeconds: '{{ item.RetryDelayInSeconds }}'
+      Test: '{{ item.Test }}'
+      TestDurationInSeconds: '{{ item.TestDurationInSeconds }}'
+      NumResults: '{{ response.NumResults }}'
+- discovery_id: aws.mturk.list_review_policy_results_for_hit
+  for_each: aws.mturk.list_hi_ts
+  calls:
+  - action: list_review_policy_results_for_hit
+    params:
+      HITId: '{{ item.HITId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Parameters: '{{ response.AssignmentReviewPolicy.Parameters }}'
+      PolicyName: '{{ response.AssignmentReviewPolicy.PolicyName }}'
+      Statement: '{{ response.AssignmentReviewPolicy.Statement }}'
+      Version: '{{ response.AssignmentReviewPolicy.Version }}'
+- discovery_id: aws.mturk.list_workers_with_qualification_type
+  for_each: aws.mturk.list_qualification_requests
+  calls:
+  - action: list_workers_with_qualification_type
+    params:
+      QualificationTypeId: '{{ item.QualificationTypeId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Qualifications }}'
+    item:
+      Status: '{{ item.Status }}'
+      GrantTime: '{{ item.GrantTime }}'
+      IntegerValue: '{{ item.IntegerValue }}'
+      LocaleValue: '{{ item.LocaleValue }}'
+      QualificationTypeId: '{{ item.QualificationTypeId }}'
+      WorkerId: '{{ item.WorkerId }}'
+      NumResults: '{{ response.NumResults }}'

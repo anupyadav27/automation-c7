@@ -1,0 +1,113 @@
+version: '1.0'
+provider: aws
+service: application-autoscaling
+services:
+  client: application-autoscaling
+  module: boto3.client
+discovery:
+- discovery_id: aws.application-autoscaling.describe_scalable_targets
+  calls:
+  - action: describe_scalable_targets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ScalableTargets }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      ResourceId: '{{ item.ResourceId }}'
+      MaxCapacity: '{{ item.MaxCapacity }}'
+      MinCapacity: '{{ item.MinCapacity }}'
+      PredictedCapacity: '{{ item.PredictedCapacity }}'
+      RoleARN: '{{ item.RoleARN }}'
+      ScalableDimension: '{{ item.ScalableDimension }}'
+      ScalableTargetARN: '{{ item.ScalableTargetARN }}'
+      ServiceNamespace: '{{ item.ServiceNamespace }}'
+      SuspendedState: '{{ item.SuspendedState }}'
+- discovery_id: aws.application-autoscaling.describe_scaling_activities
+  calls:
+  - action: describe_scaling_activities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ScalingActivities }}'
+    item:
+      ResourceId: '{{ item.ResourceId }}'
+      ActivityId: '{{ item.ActivityId }}'
+      Cause: '{{ item.Cause }}'
+      Description: '{{ item.Description }}'
+      Details: '{{ item.Details }}'
+      EndTime: '{{ item.EndTime }}'
+      NotScaledReasons: '{{ item.NotScaledReasons }}'
+      ScalableDimension: '{{ item.ScalableDimension }}'
+      ServiceNamespace: '{{ item.ServiceNamespace }}'
+      StartTime: '{{ item.StartTime }}'
+      StatusCode: '{{ item.StatusCode }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+- discovery_id: aws.application-autoscaling.describe_scaling_policies
+  calls:
+  - action: describe_scaling_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ScalingPolicies }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      ResourceId: '{{ item.ResourceId }}'
+      Status: '{{ item.Status }}'
+      Alarms: '{{ item.Alarms }}'
+      Enabled: '{{ item.Enabled }}'
+      PolicyARN: '{{ item.PolicyARN }}'
+      PolicyName: '{{ item.PolicyName }}'
+      PolicyType: '{{ item.PolicyType }}'
+      PredictiveScalingPolicyConfiguration: '{{ item.PredictiveScalingPolicyConfiguration }}'
+      ScalableDimension: '{{ item.ScalableDimension }}'
+      ServiceNamespace: '{{ item.ServiceNamespace }}'
+      Statement: '{{ item.Statement }}'
+      StepScalingPolicyConfiguration: '{{ item.StepScalingPolicyConfiguration }}'
+      TargetTrackingScalingPolicyConfiguration: '{{ item.TargetTrackingScalingPolicyConfiguration }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.application-autoscaling.describe_scheduled_actions
+  calls:
+  - action: describe_scheduled_actions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ScheduledActions }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      ResourceId: '{{ item.ResourceId }}'
+      EndTime: '{{ item.EndTime }}'
+      ScalableDimension: '{{ item.ScalableDimension }}'
+      ScalableTargetAction: '{{ item.ScalableTargetAction }}'
+      Schedule: '{{ item.Schedule }}'
+      ScheduledActionARN: '{{ item.ScheduledActionARN }}'
+      ScheduledActionName: '{{ item.ScheduledActionName }}'
+      ServiceNamespace: '{{ item.ServiceNamespace }}'
+      StartTime: '{{ item.StartTime }}'
+      Timezone: '{{ item.Timezone }}'
+- discovery_id: aws.application-autoscaling.get_predictive_scaling_forecast
+  calls:
+  - action: get_predictive_scaling_forecast
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LoadForecast }}'
+    item:
+      MetricSpecification: '{{ item.MetricSpecification }}'
+      Timestamps: '{{ item.Timestamps }}'
+      Values: '{{ item.Values }}'
+      UpdateTime: '{{ response.UpdateTime }}'
+- discovery_id: aws.application-autoscaling.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

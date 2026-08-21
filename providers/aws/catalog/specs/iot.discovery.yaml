@@ -1,0 +1,2257 @@
+version: '1.0'
+provider: aws
+service: iot
+services:
+  client: iot
+  module: boto3.client
+discovery:
+- discovery_id: aws.iot.describe_account_audit_configuration
+  calls:
+  - action: describe_account_audit_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+      Enabled: '{{ response.Enabled }}'
+      auditCheckConfigurations: '{{ response.auditCheckConfigurations }}'
+      auditNotificationTargetConfigurations: '{{ response.auditNotificationTargetConfigurations }}'
+      kmsAccessRoleArn: '{{ response.kmsAccessRoleArn }}'
+      provisioningRoleArn: '{{ response.provisioningRoleArn }}'
+      roleArn: '{{ response.roleArn }}'
+- discovery_id: aws.iot.describe_default_authorizer
+  calls:
+  - action: describe_default_authorizer
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      authorizerArn: '{{ response.authorizerDescription.authorizerArn }}'
+      authorizerDescription: '{{ response.authorizerDescription.authorizerArn }}'
+      authorizerFunctionArn: '{{ response.authorizerDescription.authorizerFunctionArn }}'
+      authorizerName: '{{ response.authorizerDescription.authorizerName }}'
+      creationDate: '{{ response.authorizerDescription.creationDate }}'
+      enableCachingForHttp: '{{ response.authorizerDescription.enableCachingForHttp }}'
+      lastModifiedDate: '{{ response.authorizerDescription.lastModifiedDate }}'
+      signingDisabled: '{{ response.authorizerDescription.signingDisabled }}'
+      status: '{{ response.authorizerDescription.status }}'
+      tokenKeyName: '{{ response.authorizerDescription.tokenKeyName }}'
+      tokenSigningPublicKeys: '{{ response.authorizerDescription.tokenSigningPublicKeys }}'
+- discovery_id: aws.iot.describe_encryption_configuration
+  calls:
+  - action: describe_encryption_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      configurationDetails: '{{ response.configurationDetails }}'
+      configurationStatus: '{{ response.configurationStatus }}'
+      domainConfigurationStatus: '{{ response.domainConfigurationStatus }}'
+      encryptionType: '{{ response.encryptionType }}'
+      errorCode: '{{ response.errorCode }}'
+      errorMessage: '{{ response.errorMessage }}'
+      kmsAccessRoleArn: '{{ response.kmsAccessRoleArn }}'
+      kmsKeyArn: '{{ response.kmsKeyArn }}'
+- discovery_id: aws.iot.describe_endpoint
+  calls:
+  - action: describe_endpoint
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      endpointAddress: '{{ response.endpointAddress }}'
+- discovery_id: aws.iot.describe_event_configurations
+  calls:
+  - action: describe_event_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      eventConfigurations: '{{ response.eventConfigurations }}'
+      creationDate: '{{ response.creationDate }}'
+      lastModifiedDate: '{{ response.lastModifiedDate }}'
+- discovery_id: aws.iot.get_behavior_model_training_summaries
+  calls:
+  - action: get_behavior_model_training_summaries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.summaries }}'
+    item:
+      behaviorName: '{{ item.behaviorName }}'
+      datapointsCollectionPercentage: '{{ item.datapointsCollectionPercentage }}'
+      lastModelRefreshDate: '{{ item.lastModelRefreshDate }}'
+      modelStatus: '{{ item.modelStatus }}'
+      securityProfileName: '{{ item.securityProfileName }}'
+      summaries: '{{ item.summaries }}'
+      trainingDataCollectionStartDate: '{{ item.trainingDataCollectionStartDate }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.get_effective_policies
+  calls:
+  - action: get_effective_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.effectivePolicies }}'
+    item:
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+      effectivePolicies: '{{ item.effectivePolicies }}'
+      policyArn: '{{ item.policyArn }}'
+      policyDocument: '{{ item.policyDocument }}'
+      policyName: '{{ item.policyName }}'
+- discovery_id: aws.iot.get_indexing_configuration
+  calls:
+  - action: get_indexing_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      customFields: '{{ response.thingIndexingConfiguration.customFields[].type }}'
+      deviceDefenderIndexingMode: '{{ response.thingIndexingConfiguration.deviceDefenderIndexingMode }}'
+      filter: '{{ response.thingIndexingConfiguration.filter }}'
+      managedFields: '{{ response.thingIndexingConfiguration.managedFields[].type }}'
+      namedShadowIndexingMode: '{{ response.thingIndexingConfiguration.namedShadowIndexingMode }}'
+      thingConnectivityIndexingMode: '{{ response.thingIndexingConfiguration.thingConnectivityIndexingMode }}'
+      thingGroupIndexingConfiguration: '{{ response.thingIndexingConfiguration.thingGroupIndexingConfiguration }}'
+      thingIndexingConfiguration: '{{ response.thingIndexingConfiguration.thingIndexingConfiguration }}'
+      thingIndexingMode: '{{ response.thingIndexingConfiguration.thingIndexingMode }}'
+      thingGroupIndexingMode: '{{ response.thingGroupIndexingConfiguration.thingGroupIndexingMode }}'
+- discovery_id: aws.iot.get_logging_options
+  calls:
+  - action: get_logging_options
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      logLevel: '{{ response.logLevel }}'
+      roleArn: '{{ response.roleArn }}'
+- discovery_id: aws.iot.get_package_configuration
+  calls:
+  - action: get_package_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      enabled: '{{ response.versionUpdateByJobsConfig.enabled }}'
+      roleArn: '{{ response.versionUpdateByJobsConfig.roleArn }}'
+      versionUpdateByJobsConfig: '{{ response.versionUpdateByJobsConfig.versionUpdateByJobsConfig }}'
+- discovery_id: aws.iot.get_registration_code
+  calls:
+  - action: get_registration_code
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      registrationCode: '{{ response.registrationCode }}'
+- discovery_id: aws.iot.get_v2_logging_options
+  calls:
+  - action: get_v2_logging_options
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      defaultLogLevel: '{{ response.defaultLogLevel }}'
+      disableAllLogs: '{{ response.disableAllLogs }}'
+      roleArn: '{{ response.roleArn }}'
+- discovery_id: aws.iot.list_active_violations
+  calls:
+  - action: list_active_violations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.activeViolations }}'
+    item:
+      behavior: '{{ item.behavior }}'
+      defaultClientId: '{{ item.defaultClientId }}'
+      disconnectReason: '{{ item.disconnectReason }}'
+      lastViolationTime: '{{ item.lastViolationTime }}'
+      lastViolationValue: '{{ item.lastViolationValue }}'
+      principal: '{{ item.principal }}'
+      securityProfileName: '{{ item.securityProfileName }}'
+      verificationState: '{{ item.verificationState }}'
+      verificationStateDescription: '{{ item.verificationStateDescription }}'
+      violationEventAdditionalInfo: '{{ item.violationEventAdditionalInfo }}'
+      violationId: '{{ item.violationId }}'
+      violationStartTime: '{{ item.violationStartTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_audit_findings
+  calls:
+  - action: list_audit_findings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.findings }}'
+    item:
+      actionParams: '{{ item.actionParams }}'
+      additionalInfo: '{{ item.additionalInfo }}'
+      auditCheckToActionsMapping: '{{ item.auditCheckToActionsMapping }}'
+      auditDetails: '{{ item.auditDetails }}'
+      canceledChecks: '{{ item.canceledChecks }}'
+      checkName: '{{ item.checkName }}'
+      compliantChecks: '{{ item.compliantChecks }}'
+      endTime: '{{ item.endTime }}'
+      failedChecks: '{{ item.failedChecks }}'
+      failureCount: '{{ item.failureCount }}'
+      finding: '{{ item.finding }}'
+      findingId: '{{ item.findingId }}'
+      findingTime: '{{ item.findingTime }}'
+      id: '{{ item.id }}'
+      inProgressChecks: '{{ item.inProgressChecks }}'
+      inputFileBucket: '{{ item.inputFileBucket }}'
+      inputFileKey: '{{ item.inputFileKey }}'
+      isSuppressed: '{{ item.isSuppressed }}'
+      nonCompliantChecks: '{{ item.nonCompliantChecks }}'
+      nonCompliantResource: '{{ item.nonCompliantResource }}'
+      percentageProgress: '{{ item.percentageProgress }}'
+      reasonForNonCompliance: '{{ item.reasonForNonCompliance }}'
+      reasonForNonComplianceCode: '{{ item.reasonForNonComplianceCode }}'
+      relatedResources: '{{ item.relatedResources }}'
+      resourceType: '{{ item.resourceType }}'
+      severity: '{{ item.severity }}'
+      statistics: '{{ item.statistics }}'
+      successCount: '{{ item.successCount }}'
+      taskId: '{{ item.taskId }}'
+      taskStartTime: '{{ item.taskStartTime }}'
+      taskSummary: '{{ item.taskSummary }}'
+      templateBody: '{{ item.templateBody }}'
+      totalChecks: '{{ item.totalChecks }}'
+      waitingForDataCollectionChecks: '{{ item.waitingForDataCollectionChecks }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_audit_suppressions
+  calls:
+  - action: list_audit_suppressions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.suppressions }}'
+    item:
+      checkName: '{{ item.checkName }}'
+      description: '{{ item.description }}'
+      expirationDate: '{{ item.expirationDate }}'
+      resourceIdentifier: '{{ item.resourceIdentifier }}'
+      suppressIndefinitely: '{{ item.suppressIndefinitely }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_authorizers
+  calls:
+  - action: list_authorizers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.authorizers }}'
+    item:
+      authorizerArn: '{{ item.authorizerArn }}'
+      authorizerName: '{{ item.authorizerName }}'
+      nextMarker: '{{ response.nextMarker }}'
+- discovery_id: aws.iot.list_billing_groups
+  calls:
+  - action: list_billing_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.billingGroups }}'
+    item:
+      billingGroupName: '{{ item.billingGroupName }}'
+      groupArn: '{{ item.groupArn }}'
+      groupName: '{{ item.groupName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_ca_certificates
+  calls:
+  - action: list_ca_certificates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.certificates }}'
+    item:
+      autoRegistrationStatus: '{{ item.autoRegistrationStatus }}'
+      certificateArn: '{{ item.certificateArn }}'
+      certificateDescription: '{{ item.certificateDescription }}'
+      certificateId: '{{ item.certificateId }}'
+      certificatePem: '{{ item.certificatePem }}'
+      creationDate: '{{ item.creationDate }}'
+      customerVersion: '{{ item.customerVersion }}'
+      generationId: '{{ item.generationId }}'
+      ownedBy: '{{ item.ownedBy }}'
+      previousOwnedBy: '{{ item.previousOwnedBy }}'
+      registrationConfig: '{{ item.registrationConfig }}'
+      status: '{{ item.status }}'
+      transferData: '{{ item.transferData }}'
+      validity: '{{ item.validity }}'
+- discovery_id: aws.iot.list_certificate_providers
+  calls:
+  - action: list_certificate_providers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.certificateProviders }}'
+    item:
+      certificateProviderArn: '{{ item.certificateProviderArn }}'
+      certificateProviderName: '{{ item.certificateProviderName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_certificates
+  calls:
+  - action: list_certificates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.certificates }}'
+    item:
+      certificateArn: '{{ item.certificateArn }}'
+      certificateId: '{{ item.certificateId }}'
+      certificateMode: '{{ item.certificateMode }}'
+      creationDate: '{{ item.creationDate }}'
+      status: '{{ item.status }}'
+      nextMarker: '{{ response.nextMarker }}'
+- discovery_id: aws.iot.list_command_executions
+  calls:
+  - action: list_command_executions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.commandExecutions }}'
+    item:
+      commandArn: '{{ item.commandArn }}'
+      completedAt: '{{ item.completedAt }}'
+      createdAt: '{{ item.createdAt }}'
+      executionId: '{{ item.executionId }}'
+      executionTimeoutSeconds: '{{ item.executionTimeoutSeconds }}'
+      mandatoryParameters: '{{ item.mandatoryParameters }}'
+      namespace: '{{ item.namespace }}'
+      parameters: '{{ item.parameters }}'
+      payload: '{{ item.payload }}'
+      reasonDescription: '{{ item.reasonDescription }}'
+      result: '{{ item.result }}'
+      startedAt: '{{ item.startedAt }}'
+      status: '{{ item.status }}'
+      targetArn: '{{ item.targetArn }}'
+      timeToLive: '{{ item.timeToLive }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_commands
+  calls:
+  - action: list_commands
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.commands }}'
+    item:
+      commandArn: '{{ item.commandArn }}'
+      commandId: '{{ item.commandId }}'
+      createdAt: '{{ item.createdAt }}'
+      defaultValue: '{{ item.defaultValue }}'
+      deprecated: '{{ item.deprecated }}'
+      displayName: '{{ item.displayName }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      mandatoryParameters: '{{ item.mandatoryParameters }}'
+      namespace: '{{ item.namespace }}'
+      payload: '{{ item.payload }}'
+      pendingDeletion: '{{ item.pendingDeletion }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_custom_metrics
+  calls:
+  - action: list_custom_metrics
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.metricNames }}'
+    item:
+      metricType: '{{ item.metricType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_detect_mitigation_actions_executions
+  calls:
+  - action: list_detect_mitigation_actions_executions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.actionsExecutions }}'
+    item:
+      actionName: '{{ item.actionName }}'
+      actionType: '{{ item.actionType }}'
+      addThingsToThingGroupParams: '{{ item.addThingsToThingGroupParams }}'
+      enableIoTLoggingParams: '{{ item.enableIoTLoggingParams }}'
+      errorCode: '{{ item.errorCode }}'
+      execution: '{{ item.execution }}'
+      executionEndDate: '{{ item.executionEndDate }}'
+      executionStartDate: '{{ item.executionStartDate }}'
+      message: '{{ item.message }}'
+      publishFindingToSnsParams: '{{ item.publishFindingToSnsParams }}'
+      replaceDefaultPolicyVersionParams: '{{ item.replaceDefaultPolicyVersionParams }}'
+      status: '{{ item.status }}'
+      taskId: '{{ item.taskId }}'
+      updateCACertificateParams: '{{ item.updateCACertificateParams }}'
+      updateDeviceCertificateParams: '{{ item.updateDeviceCertificateParams }}'
+      violationId: '{{ item.violationId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_dimensions
+  calls:
+  - action: list_dimensions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dimensionNames }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_domain_configurations
+  calls:
+  - action: list_domain_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.domainConfigurations }}'
+    item:
+      domainConfigurationArn: '{{ item.domainConfigurationArn }}'
+      domainConfigurationName: '{{ item.domainConfigurationName }}'
+      domainConfigurationStatus: '{{ item.domainConfigurationStatus }}'
+      serviceType: '{{ item.serviceType }}'
+      nextMarker: '{{ response.nextMarker }}'
+- discovery_id: aws.iot.list_fleet_metrics
+  calls:
+  - action: list_fleet_metrics
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.fleetMetrics }}'
+    item:
+      aggregationField: '{{ item.aggregationField }}'
+      aggregationType: '{{ item.aggregationType }}'
+      metricArn: '{{ item.metricArn }}'
+      metricName: '{{ item.metricName }}'
+      metricType: '{{ item.metricType }}'
+      period: '{{ item.period }}'
+      unit: '{{ item.unit }}'
+      values: '{{ item["values"] }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_indices
+  calls:
+  - action: list_indices
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.indexNames }}'
+    item:
+      schema: '{{ item.schema }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_job_templates
+  calls:
+  - action: list_job_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.jobTemplates }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      document: '{{ item.document }}'
+      documentSource: '{{ item.documentSource }}'
+      job: '{{ item.job }}'
+      jobTemplateArn: '{{ item.jobTemplateArn }}'
+      jobTemplateId: '{{ item.jobTemplateId }}'
+      maintenanceWindows: '{{ item.maintenanceWindows }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_jobs
+  calls:
+  - action: list_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.jobs }}'
+    item:
+      abortConfig: '{{ item.abortConfig }}'
+      comment: '{{ item.comment }}'
+      completedAt: '{{ item.completedAt }}'
+      createdAt: '{{ item.createdAt }}'
+      destinationPackageVersions: '{{ item.destinationPackageVersions }}'
+      document: '{{ item.document }}'
+      documentParameters: '{{ item.documentParameters }}'
+      documentSource: '{{ item.documentSource }}'
+      durationInMinutes: '{{ item.durationInMinutes }}'
+      forceCanceled: '{{ item.forceCanceled }}'
+      isConcurrent: '{{ item.isConcurrent }}'
+      jobArn: '{{ item.jobArn }}'
+      jobId: '{{ item.jobId }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      maintenanceWindows: '{{ item.maintenanceWindows }}'
+      namespaceId: '{{ item.namespaceId }}'
+      presignedUrlConfig: '{{ item.presignedUrlConfig }}'
+      reasonCode: '{{ item.reasonCode }}'
+      scheduledJobRollouts: '{{ item.scheduledJobRollouts }}'
+      schedulingConfig: '{{ item.schedulingConfig }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      targetSelection: '{{ item.targetSelection }}'
+      targets: '{{ item.targets }}'
+      thingGroupId: '{{ item.thingGroupId }}'
+      timeoutConfig: '{{ item.timeoutConfig }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_managed_job_templates
+  calls:
+  - action: list_managed_job_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.managedJobTemplates }}'
+    item:
+      description: '{{ item.description }}'
+      environments: '{{ item.environments }}'
+      payloadVersion: '{{ item.payloadVersion }}'
+      preProvisioningHook: '{{ item.preProvisioningHook }}'
+      templateArn: '{{ item.templateArn }}'
+      templateName: '{{ item.templateName }}'
+      templateVersion: '{{ item.templateVersion }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_mitigation_actions
+  calls:
+  - action: list_mitigation_actions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.actionIdentifiers }}'
+    item:
+      actionArn: '{{ item.actionArn }}'
+      actionName: '{{ item.actionName }}'
+      creationDate: '{{ item.creationDate }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_ota_updates
+  calls:
+  - action: list_ota_updates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.otaUpdates }}'
+    item:
+      creationDate: '{{ item.creationDate }}'
+      otaUpdateArn: '{{ item.otaUpdateArn }}'
+      otaUpdateId: '{{ item.otaUpdateId }}'
+- discovery_id: aws.iot.list_outgoing_certificates
+  calls:
+  - action: list_outgoing_certificates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.outgoingCertificates }}'
+    item:
+      certificateArn: '{{ item.certificateArn }}'
+      certificateId: '{{ item.certificateId }}'
+      creationDate: '{{ item.creationDate }}'
+      transferDate: '{{ item.transferDate }}'
+      transferMessage: '{{ item.transferMessage }}'
+      transferredTo: '{{ item.transferredTo }}'
+      nextMarker: '{{ response.nextMarker }}'
+- discovery_id: aws.iot.list_packages
+  calls:
+  - action: list_packages
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.packageSummaries }}'
+    item:
+      creationDate: '{{ item.creationDate }}'
+      defaultVersionName: '{{ item.defaultVersionName }}'
+      errorReason: '{{ item.errorReason }}'
+      lastModifiedDate: '{{ item.lastModifiedDate }}'
+      packageArn: '{{ item.packageArn }}'
+      packageName: '{{ item.packageName }}'
+      packageVersionArn: '{{ item.packageVersionArn }}'
+      s3Location: '{{ item.s3Location }}'
+      sbomValidationStatus: '{{ item.sbomValidationStatus }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_policies
+  calls:
+  - action: list_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.policies }}'
+    item:
+      policyArn: '{{ item.policyArn }}'
+      policyName: '{{ item.policyName }}'
+      nextMarker: '{{ response.nextMarker }}'
+- discovery_id: aws.iot.list_provisioning_templates
+  calls:
+  - action: list_provisioning_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.templates }}'
+    item:
+      creationDate: '{{ item.creationDate }}'
+      description: '{{ item.description }}'
+      enabled: '{{ item.enabled }}'
+      lastModifiedDate: '{{ item.lastModifiedDate }}'
+      preProvisioningHook: '{{ item.preProvisioningHook }}'
+      provisioningRoleArn: '{{ item.provisioningRoleArn }}'
+      templateArn: '{{ item.templateArn }}'
+      templateBody: '{{ item.templateBody }}'
+      templateName: '{{ item.templateName }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_role_aliases
+  calls:
+  - action: list_role_aliases
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.roleAliases }}'
+    item:
+      nextMarker: '{{ response.nextMarker }}'
+- discovery_id: aws.iot.list_scheduled_audits
+  calls:
+  - action: list_scheduled_audits
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.scheduledAudits }}'
+    item:
+      dayOfMonth: '{{ item.dayOfMonth }}'
+      dayOfWeek: '{{ item.dayOfWeek }}'
+      frequency: '{{ item.frequency }}'
+      scheduledAuditArn: '{{ item.scheduledAuditArn }}'
+      scheduledAuditName: '{{ item.scheduledAuditName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_security_profiles
+  calls:
+  - action: list_security_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.securityProfileIdentifiers }}'
+    item:
+      arn: '{{ item.arn }}'
+      behaviors: '{{ item.behaviors }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_streams
+  calls:
+  - action: list_streams
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.streams }}'
+    item:
+      description: '{{ item.description }}'
+      streamArn: '{{ item.streamArn }}'
+      streamId: '{{ item.streamId }}'
+      streamInfo: '{{ item.streamInfo }}'
+      streamVersion: '{{ item.streamVersion }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_thing_groups
+  calls:
+  - action: list_thing_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.thingGroups }}'
+    item:
+      billingGroupArn: '{{ item.billingGroupArn }}'
+      defaultClientId: '{{ item.defaultClientId }}'
+      groupArn: '{{ item.groupArn }}'
+      groupName: '{{ item.groupName }}'
+      thingGroupArn: '{{ item.thingGroupArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_thing_registration_tasks
+  calls:
+  - action: list_thing_registration_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.taskIds }}'
+    item:
+      failureCount: '{{ item.failureCount }}'
+      inputFileBucket: '{{ item.inputFileBucket }}'
+      inputFileKey: '{{ item.inputFileKey }}'
+      percentageProgress: '{{ item.percentageProgress }}'
+      successCount: '{{ item.successCount }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_thing_types
+  calls:
+  - action: list_thing_types
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.thingTypes }}'
+    item:
+      thingTypeArn: '{{ item.thingTypeArn }}'
+      thingTypeMetadata: '{{ item.thingTypeMetadata }}'
+      thingTypeProperties: '{{ item.thingTypeProperties }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_things
+  calls:
+  - action: list_things
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.things }}'
+    item:
+      thingArn: '{{ item.thingArn }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_topic_rule_destinations
+  calls:
+  - action: list_topic_rule_destinations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.destinationSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      httpUrlSummary: '{{ item.httpUrlSummary }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      rule: '{{ item.rule }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      vpcDestinationSummary: '{{ item.vpcDestinationSummary }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_topic_rules
+  calls:
+  - action: list_topic_rules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.rules }}'
+    item:
+      actions: '{{ item.actions }}'
+      awsIotSqlVersion: '{{ item.awsIotSqlVersion }}'
+      createdAt: '{{ item.createdAt }}'
+      errorAction: '{{ item.errorAction }}'
+      ruleArn: '{{ item.ruleArn }}'
+      ruleDisabled: '{{ item.ruleDisabled }}'
+      ruleName: '{{ item.ruleName }}'
+      sql: '{{ item.sql }}'
+      topicPattern: '{{ item.topicPattern }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_v2_logging_levels
+  calls:
+  - action: list_v2_logging_levels
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.logTargetConfigurations }}'
+    item:
+      logLevel: '{{ item.logLevel }}'
+      logTarget: '{{ item.logTarget }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.describe_audit_finding
+  for_each: aws.iot.list_audit_findings
+  calls:
+  - action: describe_audit_finding
+    params:
+      findingId: '{{ item.findingId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      checkName: '{{ response.finding.checkName }}'
+      finding: '{{ response.finding.findingId }}'
+      findingId: '{{ response.finding.findingId }}'
+      findingTime: '{{ response.finding.findingTime }}'
+      isSuppressed: '{{ response.finding.isSuppressed }}'
+      nonCompliantResource: '{{ response.finding.nonCompliantResource }}'
+      reasonForNonCompliance: '{{ response.finding.reasonForNonCompliance }}'
+      reasonForNonComplianceCode: '{{ response.finding.reasonForNonComplianceCode }}'
+      relatedResources: '{{ response.finding.relatedResources }}'
+      severity: '{{ response.finding.severity }}'
+      taskId: '{{ response.finding.taskId }}'
+      taskStartTime: '{{ response.finding.taskStartTime }}'
+      additionalInfo: '{{ response.finding.nonCompliantResource.additionalInfo }}'
+      account: '{{ response.finding.nonCompliantResource.resourceIdentifier.account }}'
+      caCertificateId: '{{ response.finding.nonCompliantResource.resourceIdentifier.caCertificateId }}'
+      clientId: '{{ response.finding.nonCompliantResource.resourceIdentifier.clientId }}'
+      cognitoIdentityPoolId: '{{ response.finding.nonCompliantResource.resourceIdentifier.cognitoIdentityPoolId }}'
+      deviceCertificateArn: '{{ response.finding.nonCompliantResource.resourceIdentifier.deviceCertificateArn }}'
+      deviceCertificateId: '{{ response.finding.nonCompliantResource.resourceIdentifier.deviceCertificateId }}'
+      iamRoleArn: '{{ response.finding.nonCompliantResource.resourceIdentifier.iamRoleArn }}'
+      issuerCertificateSerialNumber: '{{ response.finding.nonCompliantResource.resourceIdentifier.issuerCertificateIdentifier.issuerCertificateSerialNumber }}'
+      issuerCertificateSubject: '{{ response.finding.nonCompliantResource.resourceIdentifier.issuerCertificateIdentifier.issuerCertificateSubject }}'
+      issuerId: '{{ response.finding.nonCompliantResource.resourceIdentifier.issuerCertificateIdentifier.issuerId }}'
+      policyName: '{{ response.finding.nonCompliantResource.resourceIdentifier.policyVersionIdentifier.policyName }}'
+      policyVersionId: '{{ response.finding.nonCompliantResource.resourceIdentifier.policyVersionIdentifier.policyVersionId }}'
+      roleAliasArn: '{{ response.finding.nonCompliantResource.resourceIdentifier.roleAliasArn }}'
+      resourceType: '{{ response.finding.nonCompliantResource.resourceType }}'
+- discovery_id: aws.iot.describe_audit_mitigation_actions_task
+  for_each: aws.iot.list_audit_findings
+  calls:
+  - action: describe_audit_mitigation_actions_task
+    params:
+      taskId: '{{ item.taskId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.actionsDefinition }}'
+    item:
+      actionParams: '{{ item.actionParams }}'
+      auditCheckToActionsMapping: '{{ item.auditCheckToActionsMapping }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      roleArn: '{{ item.roleArn }}'
+      statistics: '{{ item.statistics }}'
+      endTime: '{{ response.endTime }}'
+      startTime: '{{ response.startTime }}'
+      auditCheckToReasonCodeFilter: '{{ response.target.auditCheckToReasonCodeFilter }}'
+      auditTaskId: '{{ response.target.auditTaskId }}'
+      taskStatistics: '{{ response.taskStatistics }}'
+      taskStatus: '{{ response.taskStatus }}'
+- discovery_id: aws.iot.describe_audit_suppression
+  for_each: aws.iot.list_audit_findings
+  calls:
+  - action: describe_audit_suppression
+    params:
+      checkName: '{{ item.checkName }}'
+      resourceIdentifier: '{{ item.resourceIdentifier }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      account: '{{ response.resourceIdentifier.account }}'
+      caCertificateId: '{{ response.resourceIdentifier.caCertificateId }}'
+      clientId: '{{ response.resourceIdentifier.clientId }}'
+      cognitoIdentityPoolId: '{{ response.resourceIdentifier.cognitoIdentityPoolId }}'
+      deviceCertificateArn: '{{ response.resourceIdentifier.deviceCertificateArn }}'
+      deviceCertificateId: '{{ response.resourceIdentifier.deviceCertificateId }}'
+      iamRoleArn: '{{ response.resourceIdentifier.iamRoleArn }}'
+      issuerCertificateIdentifier: '{{ response.resourceIdentifier.issuerCertificateIdentifier.issuerId }}'
+      policyVersionIdentifier: '{{ response.resourceIdentifier.policyVersionIdentifier.policyName }}'
+      roleAliasArn: '{{ response.resourceIdentifier.roleAliasArn }}'
+      checkName: '{{ response.checkName }}'
+      description: '{{ response.description }}'
+      expirationDate: '{{ response.expirationDate }}'
+      issuerCertificateSerialNumber: '{{ response.resourceIdentifier.issuerCertificateIdentifier.issuerCertificateSerialNumber }}'
+      issuerCertificateSubject: '{{ response.resourceIdentifier.issuerCertificateIdentifier.issuerCertificateSubject }}'
+      issuerId: '{{ response.resourceIdentifier.issuerCertificateIdentifier.issuerId }}'
+      policyName: '{{ response.resourceIdentifier.policyVersionIdentifier.policyName }}'
+      policyVersionId: '{{ response.resourceIdentifier.policyVersionIdentifier.policyVersionId }}'
+      suppressIndefinitely: '{{ response.suppressIndefinitely }}'
+- discovery_id: aws.iot.describe_audit_task
+  for_each: aws.iot.list_audit_findings
+  calls:
+  - action: describe_audit_task
+    params:
+      taskId: '{{ item.taskId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      auditDetails: '{{ response.taskStatistics.auditDetails }}'
+      canceledChecks: '{{ response.taskStatistics.canceledChecks }}'
+      compliantChecks: '{{ response.taskStatistics.compliantChecks }}'
+      failedChecks: '{{ response.taskStatistics.failedChecks }}'
+      inProgressChecks: '{{ response.taskStatistics.inProgressChecks }}'
+      nonCompliantChecks: '{{ response.taskStatistics.nonCompliantChecks }}'
+      totalChecks: '{{ response.taskStatistics.totalChecks }}'
+      waitingForDataCollectionChecks: '{{ response.taskStatistics.waitingForDataCollectionChecks }}'
+      scheduledAuditName: '{{ response.scheduledAuditName }}'
+      taskStartTime: '{{ response.taskStartTime }}'
+      taskStatus: '{{ response.taskStatus }}'
+      taskType: '{{ response.taskType }}'
+- discovery_id: aws.iot.describe_authorizer
+  for_each: aws.iot.describe_default_authorizer
+  calls:
+  - action: describe_authorizer
+    params:
+      authorizerName: '{{ item.authorizerName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      authorizerArn: '{{ response.authorizerDescription.authorizerArn }}'
+      authorizerFunctionArn: '{{ response.authorizerDescription.authorizerFunctionArn }}'
+      authorizerName: '{{ response.authorizerDescription.authorizerName }}'
+      creationDate: '{{ response.authorizerDescription.creationDate }}'
+      enableCachingForHttp: '{{ response.authorizerDescription.enableCachingForHttp }}'
+      lastModifiedDate: '{{ response.authorizerDescription.lastModifiedDate }}'
+      signingDisabled: '{{ response.authorizerDescription.signingDisabled }}'
+      status: '{{ response.authorizerDescription.status }}'
+      tokenKeyName: '{{ response.authorizerDescription.tokenKeyName }}'
+      tokenSigningPublicKeys: '{{ response.authorizerDescription.tokenSigningPublicKeys }}'
+- discovery_id: aws.iot.describe_billing_group
+  calls:
+  - action: describe_billing_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      billingGroupDescription: '{{ response.billingGroupProperties.billingGroupDescription }}'
+      billingGroupArn: '{{ response.billingGroupArn }}'
+      billingGroupId: '{{ response.billingGroupId }}'
+      creationDate: '{{ response.billingGroupMetadata.creationDate }}'
+      billingGroupName: '{{ response.billingGroupName }}'
+      version: '{{ response.version }}'
+- discovery_id: aws.iot.describe_ca_certificate
+  for_each: aws.iot.list_ca_certificates
+  calls:
+  - action: describe_ca_certificate
+    params:
+      certificateId: '{{ item.certificateId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      autoRegistrationStatus: '{{ response.certificateDescription.autoRegistrationStatus }}'
+      certificateArn: '{{ response.certificateDescription.certificateArn }}'
+      certificateDescription: '{{ response.certificateDescription.certificateDescription }}'
+      certificateId: '{{ response.certificateDescription.certificateId }}'
+      certificateMode: '{{ response.certificateDescription.certificateMode }}'
+      certificatePem: '{{ response.certificateDescription.certificatePem }}'
+      creationDate: '{{ response.certificateDescription.creationDate }}'
+      customerVersion: '{{ response.certificateDescription.customerVersion }}'
+      generationId: '{{ response.certificateDescription.generationId }}'
+      lastModifiedDate: '{{ response.certificateDescription.lastModifiedDate }}'
+      ownedBy: '{{ response.certificateDescription.ownedBy }}'
+      registrationConfig: '{{ response.certificateDescription.registrationConfig }}'
+      status: '{{ response.certificateDescription.status }}'
+      validity: '{{ response.certificateDescription.validity }}'
+- discovery_id: aws.iot.describe_certificate
+  for_each: aws.iot.list_ca_certificates
+  calls:
+  - action: describe_certificate
+    params:
+      certificateId: '{{ item.certificateId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      caCertificateId: '{{ response.certificateDescription.caCertificateId }}'
+      certificateArn: '{{ response.certificateDescription.certificateArn }}'
+      certificateId: '{{ response.certificateDescription.certificateId }}'
+      certificateMode: '{{ response.certificateDescription.certificateMode }}'
+      certificatePem: '{{ response.certificateDescription.certificatePem }}'
+      creationDate: '{{ response.certificateDescription.creationDate }}'
+      customerVersion: '{{ response.certificateDescription.customerVersion }}'
+      generationId: '{{ response.certificateDescription.generationId }}'
+      lastModifiedDate: '{{ response.certificateDescription.lastModifiedDate }}'
+      ownedBy: '{{ response.certificateDescription.ownedBy }}'
+      previousOwnedBy: '{{ response.certificateDescription.previousOwnedBy }}'
+      status: '{{ response.certificateDescription.status }}'
+      transferData: '{{ response.certificateDescription.transferData.rejectDate }}'
+      validity: '{{ response.certificateDescription.validity.notAfter }}'
+      acceptDate: '{{ response.certificateDescription.transferData.acceptDate }}'
+      rejectDate: '{{ response.certificateDescription.transferData.rejectDate }}'
+      rejectReason: '{{ response.certificateDescription.transferData.rejectReason }}'
+      transferDate: '{{ response.certificateDescription.transferData.transferDate }}'
+      transferMessage: '{{ response.certificateDescription.transferData.transferMessage }}'
+      notAfter: '{{ response.certificateDescription.validity.notAfter }}'
+      notBefore: '{{ response.certificateDescription.validity.notBefore }}'
+- discovery_id: aws.iot.describe_certificate_provider
+  for_each: aws.iot.list_certificate_providers
+  calls:
+  - action: describe_certificate_provider
+    params:
+      certificateProviderName: '{{ item.certificateProviderName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.accountDefaultForOperations }}'
+    item:
+      certificateProviderArn: '{{ response.certificateProviderArn }}'
+      certificateProviderName: '{{ response.certificateProviderName }}'
+      creationDate: '{{ response.creationDate }}'
+      lambdaFunctionArn: '{{ response.lambdaFunctionArn }}'
+      lastModifiedDate: '{{ response.lastModifiedDate }}'
+- discovery_id: aws.iot.describe_custom_metric
+  for_each: aws.iot.list_fleet_metrics
+  calls:
+  - action: describe_custom_metric
+    params:
+      metricName: '{{ item.metricName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      metricType: '{{ response.metricType }}'
+      creationDate: '{{ response.creationDate }}'
+      displayName: '{{ response.displayName }}'
+      lastModifiedDate: '{{ response.lastModifiedDate }}'
+      metricArn: '{{ response.metricArn }}'
+      metricName: '{{ response.metricName }}'
+- discovery_id: aws.iot.describe_detect_mitigation_actions_task
+  for_each: aws.iot.list_audit_findings
+  calls:
+  - action: describe_detect_mitigation_actions_task
+    params:
+      taskId: '{{ item.taskId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      actionsDefinition: '{{ response.taskSummary.actionsDefinition[].id }}'
+      onlyActiveViolationsIncluded: '{{ response.taskSummary.onlyActiveViolationsIncluded }}'
+      suppressedAlertsIncluded: '{{ response.taskSummary.suppressedAlertsIncluded }}'
+      target: '{{ response.taskSummary.target }}'
+      taskEndTime: '{{ response.taskSummary.taskEndTime }}'
+      taskId: '{{ response.taskSummary.taskId }}'
+      taskStartTime: '{{ response.taskSummary.taskStartTime }}'
+      taskStatistics: '{{ response.taskSummary.taskStatus }}'
+      taskStatus: '{{ response.taskSummary.taskStatus }}'
+      taskSummary: '{{ response.taskSummary.taskSummary }}'
+      violationEventOccurrenceRange: '{{ response.taskSummary.violationEventOccurrenceRange.endTime }}'
+      behaviorName: '{{ response.taskSummary.target.behaviorName }}'
+      securityProfileName: '{{ response.taskSummary.target.securityProfileName }}'
+      actionsExecuted: '{{ response.taskSummary.taskStatistics.actionsExecuted }}'
+      actionsFailed: '{{ response.taskSummary.taskStatistics.actionsFailed }}'
+      actionsSkipped: '{{ response.taskSummary.taskStatistics.actionsSkipped }}'
+      endTime: '{{ response.taskSummary.violationEventOccurrenceRange.endTime }}'
+      startTime: '{{ response.taskSummary.violationEventOccurrenceRange.startTime }}'
+- discovery_id: aws.iot.describe_dimension
+  for_each: aws.iot.list_security_profiles
+  calls:
+  - action: describe_dimension
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.stringValues }}'
+    item:
+      arn: '{{ response.arn }}'
+      creationDate: '{{ response.creationDate }}'
+      lastModifiedDate: '{{ response.lastModifiedDate }}'
+      name: '{{ response.name }}'
+      type: '{{ response.type }}'
+- discovery_id: aws.iot.describe_domain_configuration
+  for_each: aws.iot.list_domain_configurations
+  calls:
+  - action: describe_domain_configuration
+    params:
+      domainConfigurationName: '{{ item.domainConfigurationName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.serverCertificates }}'
+    item:
+      domainConfigurationStatus: '{{ item.domainConfigurationStatus }}'
+      serverCertificateArn: '{{ item.serverCertificateArn }}'
+      serverCertificateStatus: '{{ item.serverCertificateStatus }}'
+      serverCertificateStatusDetail: '{{ item.serverCertificateStatusDetail }}'
+      applicationProtocol: '{{ response.applicationProtocol }}'
+      authenticationType: '{{ response.authenticationType }}'
+      allowAuthorizerOverride: '{{ response.authorizerConfig.allowAuthorizerOverride }}'
+      defaultAuthorizerName: '{{ response.authorizerConfig.defaultAuthorizerName }}'
+      clientCertificateCallbackArn: '{{ response.clientCertificateConfig.clientCertificateCallbackArn }}'
+      domainConfigurationArn: '{{ response.domainConfigurationArn }}'
+      domainConfigurationName: '{{ response.domainConfigurationName }}'
+      domainName: '{{ response.domainName }}'
+      domainType: '{{ response.domainType }}'
+      lastStatusChangeDate: '{{ response.lastStatusChangeDate }}'
+      enableOCSPCheck: '{{ response.serverCertificateConfig.enableOCSPCheck }}'
+      ocspAuthorizedResponderArn: '{{ response.serverCertificateConfig.ocspAuthorizedResponderArn }}'
+      ocspLambdaArn: '{{ response.serverCertificateConfig.ocspLambdaArn }}'
+      serviceType: '{{ response.serviceType }}'
+      securityPolicy: '{{ response.tlsConfig.securityPolicy }}'
+- discovery_id: aws.iot.describe_fleet_metric
+  for_each: aws.iot.list_fleet_metrics
+  calls:
+  - action: describe_fleet_metric
+    params:
+      metricName: '{{ item.metricName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      aggregationField: '{{ response.aggregationType.aggregationField }}'
+      aggregationType: '{{ response.aggregationType.aggregationType }}'
+      name: '{{ response.aggregationType.name }}'
+      period: '{{ response.aggregationType.period }}'
+      unit: '{{ response.aggregationType.name }}'
+      values: '{{ response.aggregationType.name }}'
+      creationDate: '{{ response.creationDate }}'
+      description: '{{ response.description }}'
+      indexName: '{{ response.indexName }}'
+      lastModifiedDate: '{{ response.lastModifiedDate }}'
+      metricArn: '{{ response.metricArn }}'
+      metricName: '{{ response.metricName }}'
+      queryString: '{{ response.queryString }}'
+      queryVersion: '{{ response.queryVersion }}'
+      version: '{{ response.version }}'
+- discovery_id: aws.iot.describe_index
+  calls:
+  - action: describe_index
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      schema: '{{ response.schema }}'
+      indexName: '{{ response.indexName }}'
+      indexStatus: '{{ response.indexStatus }}'
+- discovery_id: aws.iot.describe_job
+  for_each: aws.iot.list_jobs
+  calls:
+  - action: describe_job
+    params:
+      jobId: '{{ item.jobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      abortConfig: '{{ response.job.abortConfig }}'
+      comment: '{{ response.job.comment }}'
+      completedAt: '{{ response.job.completedAt }}'
+      createdAt: '{{ response.job.createdAt }}'
+      description: '{{ response.job.description }}'
+      destinationPackageVersions: '{{ response.job.destinationPackageVersions }}'
+      documentParameters: '{{ response.job.documentParameters }}'
+      documentSource: '{{ response.documentSource }}'
+      forceCanceled: '{{ response.job.forceCanceled }}'
+      isConcurrent: '{{ response.job.isConcurrent }}'
+      job: '{{ response.job.jobId }}'
+      jobArn: '{{ response.job.jobArn }}'
+      jobExecutionsRetryConfig: '{{ response.job.jobExecutionsRetryConfig }}'
+      jobExecutionsRolloutConfig: '{{ response.job.jobExecutionsRolloutConfig }}'
+      jobId: '{{ response.job.jobId }}'
+      jobProcessDetails: '{{ response.job.jobProcessDetails }}'
+      jobTemplateArn: '{{ response.job.jobTemplateArn }}'
+      lastUpdatedAt: '{{ response.job.lastUpdatedAt }}'
+      namespaceId: '{{ response.job.namespaceId }}'
+      presignedUrlConfig: '{{ response.job.presignedUrlConfig }}'
+      reasonCode: '{{ response.job.reasonCode }}'
+      scheduledJobRollouts: '{{ response.job.scheduledJobRollouts }}'
+      schedulingConfig: '{{ response.job.schedulingConfig }}'
+      status: '{{ response.job.status }}'
+      targetSelection: '{{ response.job.targetSelection }}'
+      targets: '{{ response.job.targets }}'
+      timeoutConfig: '{{ response.job.timeoutConfig }}'
+      baseRatePerMinute: '{{ response.job.jobExecutionsRolloutConfig.exponentialRate.baseRatePerMinute }}'
+      incrementFactor: '{{ response.job.jobExecutionsRolloutConfig.exponentialRate.incrementFactor }}'
+      numberOfNotifiedThings: '{{ response.job.jobExecutionsRolloutConfig.exponentialRate.rateIncreaseCriteria.numberOfNotifiedThings }}'
+      numberOfSucceededThings: '{{ response.job.jobExecutionsRolloutConfig.exponentialRate.rateIncreaseCriteria.numberOfSucceededThings }}'
+      maximumPerMinute: '{{ response.job.jobExecutionsRolloutConfig.maximumPerMinute }}'
+      numberOfCanceledThings: '{{ response.job.jobProcessDetails.numberOfCanceledThings }}'
+      numberOfFailedThings: '{{ response.job.jobProcessDetails.numberOfFailedThings }}'
+      numberOfInProgressThings: '{{ response.job.jobProcessDetails.numberOfInProgressThings }}'
+      numberOfQueuedThings: '{{ response.job.jobProcessDetails.numberOfQueuedThings }}'
+      numberOfRejectedThings: '{{ response.job.jobProcessDetails.numberOfRejectedThings }}'
+      numberOfRemovedThings: '{{ response.job.jobProcessDetails.numberOfRemovedThings }}'
+      numberOfTimedOutThings: '{{ response.job.jobProcessDetails.numberOfTimedOutThings }}'
+      expiresInSec: '{{ response.job.presignedUrlConfig.expiresInSec }}'
+      roleArn: '{{ response.job.presignedUrlConfig.roleArn }}'
+      endBehavior: '{{ response.job.schedulingConfig.endBehavior }}'
+      endTime: '{{ response.job.schedulingConfig.endTime }}'
+      startTime: '{{ response.job.schedulingConfig.startTime }}'
+      inProgressTimeoutInMinutes: '{{ response.job.timeoutConfig.inProgressTimeoutInMinutes }}'
+- discovery_id: aws.iot.describe_job_execution
+  for_each: aws.iot.list_jobs
+  calls:
+  - action: describe_job_execution
+    params:
+      jobId: '{{ item.jobId }}'
+      thingName: '{{ item.thingName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      approximateSecondsBeforeTimedOut: '{{ response.execution.approximateSecondsBeforeTimedOut }}'
+      execution: '{{ response.execution.executionNumber }}'
+      executionNumber: '{{ response.execution.executionNumber }}'
+      forceCanceled: '{{ response.execution.forceCanceled }}'
+      jobId: '{{ response.execution.jobId }}'
+      lastUpdatedAt: '{{ response.execution.lastUpdatedAt }}'
+      queuedAt: '{{ response.execution.queuedAt }}'
+      startedAt: '{{ response.execution.startedAt }}'
+      status: '{{ response.execution.status }}'
+      statusDetails: '{{ response.execution.statusDetails }}'
+      thingArn: '{{ response.execution.thingArn }}'
+      versionNumber: '{{ response.execution.versionNumber }}'
+      detailsMap: '{{ response.execution.statusDetails.detailsMap }}'
+- discovery_id: aws.iot.describe_job_template
+  for_each: aws.iot.list_job_templates
+  calls:
+  - action: describe_job_template
+    params:
+      jobTemplateId: '{{ item.jobTemplateId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.maintenanceWindows }}'
+    item:
+      document: '{{ item.document }}'
+      durationInMinutes: '{{ item.durationInMinutes }}'
+      maintenanceWindows: '{{ item.maintenanceWindows }}'
+      startTime: '{{ item.startTime }}'
+      createdAt: '{{ response.createdAt }}'
+      description: '{{ response.description }}'
+      documentSource: '{{ response.documentSource }}'
+      baseRatePerMinute: '{{ response.jobExecutionsRolloutConfig.exponentialRate.baseRatePerMinute }}'
+      incrementFactor: '{{ response.jobExecutionsRolloutConfig.exponentialRate.incrementFactor }}'
+      numberOfNotifiedThings: '{{ response.jobExecutionsRolloutConfig.exponentialRate.rateIncreaseCriteria.numberOfNotifiedThings }}'
+      numberOfSucceededThings: '{{ response.jobExecutionsRolloutConfig.exponentialRate.rateIncreaseCriteria.numberOfSucceededThings }}'
+      maximumPerMinute: '{{ response.jobExecutionsRolloutConfig.maximumPerMinute }}'
+      jobTemplateArn: '{{ response.jobTemplateArn }}'
+      jobTemplateId: '{{ response.jobTemplateId }}'
+      expiresInSec: '{{ response.presignedUrlConfig.expiresInSec }}'
+      roleArn: '{{ response.presignedUrlConfig.roleArn }}'
+      inProgressTimeoutInMinutes: '{{ response.timeoutConfig.inProgressTimeoutInMinutes }}'
+- discovery_id: aws.iot.describe_managed_job_template
+  for_each: aws.iot.list_managed_job_templates
+  calls:
+  - action: describe_managed_job_template
+    params:
+      templateName: '{{ item.templateName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.environments }}'
+    item:
+      description: '{{ response.description }}'
+      document: '{{ response.document }}'
+      templateArn: '{{ response.templateArn }}'
+      templateName: '{{ response.templateName }}'
+      templateVersion: '{{ response.templateVersion }}'
+- discovery_id: aws.iot.describe_mitigation_action
+  for_each: aws.iot.list_detect_mitigation_actions_executions
+  calls:
+  - action: describe_mitigation_action
+    params:
+      actionName: '{{ item.actionName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      actionType: '{{ response.actionParams.actionType }}'
+      addThingsToThingGroupParams: '{{ response.actionParams.addThingsToThingGroupParams }}'
+      enableIoTLoggingParams: '{{ response.actionParams.enableIoTLoggingParams.logLevel }}'
+      publishFindingToSnsParams: '{{ response.actionParams.publishFindingToSnsParams.topicArn }}'
+      replaceDefaultPolicyVersionParams: '{{ response.actionParams.replaceDefaultPolicyVersionParams.templateName }}'
+      updateCACertificateParams: '{{ response.actionParams.updateCACertificateParams.action }}'
+      updateDeviceCertificateParams: '{{ response.actionParams.updateDeviceCertificateParams.action }}'
+      actionArn: '{{ response.actionArn }}'
+      actionId: '{{ response.actionId }}'
+      actionName: '{{ response.actionName }}'
+      overrideDynamicGroups: '{{ response.actionParams.addThingsToThingGroupParams.overrideDynamicGroups }}'
+      logLevel: '{{ response.actionParams.enableIoTLoggingParams.logLevel }}'
+      roleArnForLogging: '{{ response.actionParams.enableIoTLoggingParams.roleArnForLogging }}'
+      topicArn: '{{ response.actionParams.publishFindingToSnsParams.topicArn }}'
+      templateName: '{{ response.actionParams.replaceDefaultPolicyVersionParams.templateName }}'
+      action: '{{ response.actionParams.updateCACertificateParams.action }}'
+      creationDate: '{{ response.creationDate }}'
+      lastModifiedDate: '{{ response.lastModifiedDate }}'
+      roleArn: '{{ response.roleArn }}'
+- discovery_id: aws.iot.describe_provisioning_template
+  for_each: aws.iot.list_managed_job_templates
+  calls:
+  - action: describe_provisioning_template
+    params:
+      templateName: '{{ item.templateName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      payloadVersion: '{{ response.preProvisioningHook.payloadVersion }}'
+      preProvisioningHook: '{{ response.preProvisioningHook.preProvisioningHook }}'
+      provisioningRoleArn: '{{ response.preProvisioningHook.provisioningRoleArn }}'
+      targetArn: '{{ response.preProvisioningHook.targetArn }}'
+      templateBody: '{{ response.preProvisioningHook.templateBody }}'
+      creationDate: '{{ response.creationDate }}'
+      defaultVersionId: '{{ response.defaultVersionId }}'
+      description: '{{ response.description }}'
+      enabled: '{{ response.enabled }}'
+      lastModifiedDate: '{{ response.lastModifiedDate }}'
+      templateArn: '{{ response.templateArn }}'
+      templateName: '{{ response.templateName }}'
+      type: '{{ response.type }}'
+- discovery_id: aws.iot.describe_provisioning_template_version
+  for_each: aws.iot.list_managed_job_templates
+  calls:
+  - action: describe_provisioning_template_version
+    params:
+      templateName: '{{ item.templateName }}'
+      versionId: '{{ item.versionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      creationDate: '{{ response.creationDate }}'
+      isDefaultVersion: '{{ response.isDefaultVersion }}'
+      templateBody: '{{ response.templateBody }}'
+      versionId: '{{ response.versionId }}'
+- discovery_id: aws.iot.describe_role_alias
+  calls:
+  - action: describe_role_alias
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      creationDate: '{{ response.roleAliasDescription.creationDate }}'
+      credentialDurationSeconds: '{{ response.roleAliasDescription.credentialDurationSeconds }}'
+      lastModifiedDate: '{{ response.roleAliasDescription.lastModifiedDate }}'
+      owner: '{{ response.roleAliasDescription.owner }}'
+      roleAlias: '{{ response.roleAliasDescription.roleAlias }}'
+      roleAliasArn: '{{ response.roleAliasDescription.roleAliasArn }}'
+      roleArn: '{{ response.roleAliasDescription.roleArn }}'
+- discovery_id: aws.iot.describe_scheduled_audit
+  for_each: aws.iot.list_scheduled_audits
+  calls:
+  - action: describe_scheduled_audit
+    params:
+      scheduledAuditName: '{{ item.scheduledAuditName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.targetCheckNames }}'
+    item:
+      dayOfMonth: '{{ response.dayOfMonth }}'
+      dayOfWeek: '{{ response.dayOfWeek }}'
+      frequency: '{{ response.frequency }}'
+      scheduledAuditArn: '{{ response.scheduledAuditArn }}'
+      scheduledAuditName: '{{ response.scheduledAuditName }}'
+- discovery_id: aws.iot.describe_security_profile
+  for_each: aws.iot.get_behavior_model_training_summaries
+  calls:
+  - action: describe_security_profile
+    params:
+      securityProfileName: '{{ item.securityProfileName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.behaviors }}'
+    item:
+      behaviors: '{{ item.behaviors }}'
+      criteria: '{{ item.criteria }}'
+      exportMetric: '{{ item.exportMetric }}'
+      metric: '{{ item.metric }}'
+      metricDimension: '{{ item.metricDimension }}'
+      name: '{{ item.name }}'
+      suppressAlerts: '{{ item.suppressAlerts }}'
+      alertTargets: '{{ response.alertTargets }}'
+      creationDate: '{{ response.creationDate }}'
+      lastModifiedDate: '{{ response.lastModifiedDate }}'
+      mqttTopic: '{{ response.metricsExportConfig.mqttTopic }}'
+      roleArn: '{{ response.metricsExportConfig.roleArn }}'
+      securityProfileArn: '{{ response.securityProfileArn }}'
+      securityProfileDescription: '{{ response.securityProfileDescription }}'
+      securityProfileName: '{{ response.securityProfileName }}'
+      version: '{{ response.version }}'
+- discovery_id: aws.iot.describe_stream
+  for_each: aws.iot.list_streams
+  calls:
+  - action: describe_stream
+    params:
+      streamId: '{{ item.streamId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdAt: '{{ response.streamInfo.createdAt }}'
+      description: '{{ response.streamInfo.description }}'
+      files: '{{ response.streamInfo.files }}'
+      lastUpdatedAt: '{{ response.streamInfo.lastUpdatedAt }}'
+      roleArn: '{{ response.streamInfo.roleArn }}'
+      streamArn: '{{ response.streamInfo.streamArn }}'
+      streamId: '{{ response.streamInfo.streamId }}'
+      streamInfo: '{{ response.streamInfo.streamId }}'
+      streamVersion: '{{ response.streamInfo.streamVersion }}'
+- discovery_id: aws.iot.describe_thing
+  calls:
+  - action: describe_thing
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      defaultClientId: '{{ response.defaultClientId }}'
+      attributes: '{{ response.attributes }}'
+      billingGroupName: '{{ response.billingGroupName }}'
+      thingArn: '{{ response.thingArn }}'
+      thingId: '{{ response.thingId }}'
+      thingName: '{{ response.thingName }}'
+      thingTypeName: '{{ response.thingTypeName }}'
+      version: '{{ response.version }}'
+- discovery_id: aws.iot.describe_thing_group
+  calls:
+  - action: describe_thing_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      attributePayload: '{{ response.thingGroupProperties.attributePayload.merge }}'
+      thingGroupDescription: '{{ response.thingGroupProperties.thingGroupDescription }}'
+      indexName: '{{ response.indexName }}'
+      queryString: '{{ response.queryString }}'
+      queryVersion: '{{ response.queryVersion }}'
+      status: '{{ response.status }}'
+      thingGroupArn: '{{ response.thingGroupArn }}'
+      thingGroupId: '{{ response.thingGroupId }}'
+      creationDate: '{{ response.thingGroupMetadata.creationDate }}'
+      parentGroupName: '{{ response.thingGroupMetadata.parentGroupName }}'
+      thingGroupName: '{{ response.thingGroupName }}'
+      attributes: '{{ response.thingGroupProperties.attributePayload.attributes }}'
+      merge: '{{ response.thingGroupProperties.attributePayload.merge }}'
+      version: '{{ response.version }}'
+- discovery_id: aws.iot.describe_thing_registration_task
+  for_each: aws.iot.list_audit_findings
+  calls:
+  - action: describe_thing_registration_task
+    params:
+      taskId: '{{ item.taskId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      failureCount: '{{ response.failureCount }}'
+      inputFileBucket: '{{ response.inputFileBucket }}'
+      inputFileKey: '{{ response.inputFileKey }}'
+      percentageProgress: '{{ response.percentageProgress }}'
+      successCount: '{{ response.successCount }}'
+      templateBody: '{{ response.templateBody }}'
+      creationDate: '{{ response.creationDate }}'
+      lastModifiedDate: '{{ response.lastModifiedDate }}'
+      message: '{{ response.message }}'
+      roleArn: '{{ response.roleArn }}'
+      status: '{{ response.status }}'
+      taskId: '{{ response.taskId }}'
+- discovery_id: aws.iot.describe_thing_type
+  calls:
+  - action: describe_thing_type
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      mqtt5Configuration: '{{ response.thingTypeProperties.mqtt5Configuration }}'
+      searchableAttributes: '{{ response.thingTypeProperties.searchableAttributes }}'
+      thingTypeDescription: '{{ response.thingTypeProperties.thingTypeDescription }}'
+      thingTypeArn: '{{ response.thingTypeArn }}'
+      thingTypeId: '{{ response.thingTypeId }}'
+      creationDate: '{{ response.thingTypeMetadata.creationDate }}'
+      deprecated: '{{ response.thingTypeMetadata.deprecated }}'
+      deprecationDate: '{{ response.thingTypeMetadata.deprecationDate }}'
+      thingTypeName: '{{ response.thingTypeName }}'
+- discovery_id: aws.iot.get_buckets_aggregation
+  calls:
+  - action: get_buckets_aggregation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.buckets }}'
+    item:
+      buckets: '{{ item.buckets }}'
+      count: '{{ item.count }}'
+      keyValue: '{{ item.keyValue }}'
+      totalCount: '{{ response.totalCount }}'
+- discovery_id: aws.iot.get_cardinality
+  calls:
+  - action: get_cardinality
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      cardinality: '{{ response.cardinality }}'
+- discovery_id: aws.iot.get_command
+  for_each: aws.iot.list_commands
+  calls:
+  - action: get_command
+    params:
+      commandId: '{{ item.commandId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.mandatoryParameters }}'
+    item:
+      defaultValue: '{{ item.defaultValue }}'
+      description: '{{ item.description }}'
+      mandatoryParameters: '{{ item.mandatoryParameters }}'
+      name: '{{ item.name }}'
+      namespace: '{{ item.namespace }}'
+      payload: '{{ item.payload }}'
+      value: '{{ item.value }}'
+      commandArn: '{{ response.commandArn }}'
+      commandId: '{{ response.commandId }}'
+      createdAt: '{{ response.createdAt }}'
+      deprecated: '{{ response.deprecated }}'
+      displayName: '{{ response.displayName }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      content: '{{ response.payload.content }}'
+      contentType: '{{ response.payload.contentType }}'
+      pendingDeletion: '{{ response.pendingDeletion }}'
+      roleArn: '{{ response.roleArn }}'
+- discovery_id: aws.iot.get_command_execution
+  for_each: aws.iot.list_command_executions
+  calls:
+  - action: get_command_execution
+    params:
+      executionId: '{{ item.executionId }}'
+      targetArn: '{{ item.targetArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      executionTimeoutSeconds: '{{ response.statusReason.executionTimeoutSeconds }}'
+      parameters: '{{ response.statusReason.parameters }}'
+      reasonCode: '{{ response.statusReason.reasonCode }}'
+      reasonDescription: '{{ response.statusReason.reasonDescription }}'
+      result: '{{ response.statusReason.result }}'
+      timeToLive: '{{ response.statusReason.timeToLive }}'
+      commandArn: '{{ response.commandArn }}'
+      completedAt: '{{ response.completedAt }}'
+      createdAt: '{{ response.createdAt }}'
+      executionId: '{{ response.executionId }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      startedAt: '{{ response.startedAt }}'
+      status: '{{ response.status }}'
+      targetArn: '{{ response.targetArn }}'
+- discovery_id: aws.iot.get_job_document
+  for_each: aws.iot.list_jobs
+  calls:
+  - action: get_job_document
+    params:
+      jobId: '{{ item.jobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      document: '{{ response.document }}'
+- discovery_id: aws.iot.get_ota_update
+  for_each: aws.iot.list_ota_updates
+  calls:
+  - action: get_ota_update
+    params:
+      otaUpdateId: '{{ item.otaUpdateId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      additionalParameters: '{{ response.otaUpdateInfo.additionalParameters }}'
+      awsIotJobArn: '{{ response.otaUpdateInfo.awsIotJobArn }}'
+      awsIotJobId: '{{ response.otaUpdateInfo.awsIotJobId }}'
+      awsJobExecutionsRolloutConfig: '{{ response.otaUpdateInfo.awsJobExecutionsRolloutConfig }}'
+      awsJobPresignedUrlConfig: '{{ response.otaUpdateInfo.awsJobPresignedUrlConfig }}'
+      creationDate: '{{ response.otaUpdateInfo.creationDate }}'
+      description: '{{ response.otaUpdateInfo.description }}'
+      errorInfo: '{{ response.otaUpdateInfo.errorInfo }}'
+      lastModifiedDate: '{{ response.otaUpdateInfo.lastModifiedDate }}'
+      otaUpdateArn: '{{ response.otaUpdateInfo.otaUpdateArn }}'
+      otaUpdateFiles: '{{ response.otaUpdateInfo.otaUpdateFiles }}'
+      otaUpdateId: '{{ response.otaUpdateInfo.otaUpdateId }}'
+      otaUpdateStatus: '{{ response.otaUpdateInfo.otaUpdateStatus }}'
+      protocols: '{{ response.otaUpdateInfo.protocols }}'
+      targetSelection: '{{ response.otaUpdateInfo.targetSelection }}'
+      targets: '{{ response.otaUpdateInfo.targets }}'
+- discovery_id: aws.iot.get_package
+  for_each: aws.iot.list_packages
+  calls:
+  - action: get_package
+    params:
+      packageName: '{{ item.packageName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      packageArn: '{{ response.packageArn }}'
+      creationDate: '{{ response.creationDate }}'
+      defaultVersionName: '{{ response.defaultVersionName }}'
+      description: '{{ response.description }}'
+      lastModifiedDate: '{{ response.lastModifiedDate }}'
+      packageName: '{{ response.packageName }}'
+- discovery_id: aws.iot.get_package_version
+  for_each: aws.iot.list_packages
+  calls:
+  - action: get_package_version
+    params:
+      packageName: '{{ item.packageName }}'
+      versionName: '{{ item.versionName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      artifact: '{{ response.artifact.artifact }}'
+      errorReason: '{{ response.artifact.errorReason }}'
+      packageVersionArn: '{{ response.artifact.packageVersionArn }}'
+      recipe: '{{ response.artifact.recipe }}'
+      s3Location: '{{ response.artifact.s3Location.key }}'
+      sbomValidationStatus: '{{ response.artifact.sbomValidationStatus }}'
+      bucket: '{{ response.artifact.s3Location.bucket }}'
+      key: '{{ response.artifact.s3Location.key }}'
+      version: '{{ response.artifact.s3Location.version }}'
+      attributes: '{{ response.attributes }}'
+      creationDate: '{{ response.creationDate }}'
+      description: '{{ response.description }}'
+      lastModifiedDate: '{{ response.lastModifiedDate }}'
+      packageName: '{{ response.packageName }}'
+      status: '{{ response.status }}'
+      versionName: '{{ response.versionName }}'
+- discovery_id: aws.iot.get_percentiles
+  calls:
+  - action: get_percentiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.percentiles }}'
+    item:
+      percent: '{{ item.percent }}'
+      percentiles: '{{ item.percentiles }}'
+      value: '{{ item.value }}'
+- discovery_id: aws.iot.get_policy
+  for_each: aws.iot.get_effective_policies
+  calls:
+  - action: get_policy
+    params:
+      policyName: '{{ item.policyName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      creationDate: '{{ response.creationDate }}'
+      defaultVersionId: '{{ response.defaultVersionId }}'
+      generationId: '{{ response.generationId }}'
+      lastModifiedDate: '{{ response.lastModifiedDate }}'
+      policyArn: '{{ response.policyArn }}'
+      policyDocument: '{{ response.policyDocument }}'
+      policyName: '{{ response.policyName }}'
+- discovery_id: aws.iot.get_policy_version
+  for_each: aws.iot.get_effective_policies
+  calls:
+  - action: get_policy_version
+    params:
+      policyName: '{{ item.policyName }}'
+      policyVersionId: '{{ item.policyVersionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      creationDate: '{{ response.creationDate }}'
+      generationId: '{{ response.generationId }}'
+      isDefaultVersion: '{{ response.isDefaultVersion }}'
+      lastModifiedDate: '{{ response.lastModifiedDate }}'
+      policyArn: '{{ response.policyArn }}'
+      policyDocument: '{{ response.policyDocument }}'
+      policyName: '{{ response.policyName }}'
+      policyVersionId: '{{ response.policyVersionId }}'
+- discovery_id: aws.iot.get_statistics
+  calls:
+  - action: get_statistics
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      average: '{{ response.statistics.average }}'
+      count: '{{ response.statistics.count }}'
+      maximum: '{{ response.statistics.maximum }}'
+      minimum: '{{ response.statistics.minimum }}'
+      statistics: '{{ response.statistics.statistics }}'
+      stdDeviation: '{{ response.statistics.stdDeviation }}'
+      sum: '{{ response.statistics.sum }}'
+      sumOfSquares: '{{ response.statistics.sumOfSquares }}'
+      variance: '{{ response.statistics.variance }}'
+- discovery_id: aws.iot.get_thing_connectivity_data
+  calls:
+  - action: get_thing_connectivity_data
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      connected: '{{ response.connected }}'
+      disconnectReason: '{{ response.disconnectReason }}'
+      thingName: '{{ response.thingName }}'
+      timestamp: '{{ response.timestamp }}'
+- discovery_id: aws.iot.get_topic_rule
+  for_each: aws.iot.list_topic_rules
+  calls:
+  - action: get_topic_rule
+    params:
+      ruleName: '{{ item.ruleName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      actions: '{{ response.rule.actions }}'
+      awsIotSqlVersion: '{{ response.rule.awsIotSqlVersion }}'
+      createdAt: '{{ response.rule.createdAt }}'
+      description: '{{ response.rule.description }}'
+      errorAction: '{{ response.rule.errorAction }}'
+      rule: '{{ response.rule.rule }}'
+      ruleDisabled: '{{ response.rule.ruleDisabled }}'
+      ruleName: '{{ response.rule.ruleName }}'
+      sql: '{{ response.rule.sql }}'
+      ruleArn: '{{ response.ruleArn }}'
+      alarmName: '{{ response.rule.errorAction.cloudwatchAlarm.alarmName }}'
+      roleArn: '{{ response.rule.errorAction.cloudwatchAlarm.roleArn }}'
+      stateReason: '{{ response.rule.errorAction.cloudwatchAlarm.stateReason }}'
+      stateValue: '{{ response.rule.errorAction.cloudwatchAlarm.stateValue }}'
+      batchMode: '{{ response.rule.errorAction.cloudwatchLogs.batchMode }}'
+      logGroupName: '{{ response.rule.errorAction.cloudwatchLogs.logGroupName }}'
+      metricName: '{{ response.rule.errorAction.cloudwatchMetric.metricName }}'
+      metricNamespace: '{{ response.rule.errorAction.cloudwatchMetric.metricNamespace }}'
+      metricTimestamp: '{{ response.rule.errorAction.cloudwatchMetric.metricTimestamp }}'
+      metricUnit: '{{ response.rule.errorAction.cloudwatchMetric.metricUnit }}'
+      metricValue: '{{ response.rule.errorAction.cloudwatchMetric.metricValue }}'
+      hashKeyField: '{{ response.rule.errorAction.dynamoDB.hashKeyField }}'
+      hashKeyType: '{{ response.rule.errorAction.dynamoDB.hashKeyType }}'
+      hashKeyValue: '{{ response.rule.errorAction.dynamoDB.hashKeyValue }}'
+      operation: '{{ response.rule.errorAction.dynamoDB.operation }}'
+      payloadField: '{{ response.rule.errorAction.dynamoDB.payloadField }}'
+      rangeKeyField: '{{ response.rule.errorAction.dynamoDB.rangeKeyField }}'
+      rangeKeyType: '{{ response.rule.errorAction.dynamoDB.rangeKeyType }}'
+      rangeKeyValue: '{{ response.rule.errorAction.dynamoDB.rangeKeyValue }}'
+      tableName: '{{ response.rule.errorAction.dynamoDB.tableName }}'
+      endpoint: '{{ response.rule.errorAction.elasticsearch.endpoint }}'
+      id: '{{ response.rule.errorAction.elasticsearch.id }}'
+      index: '{{ response.rule.errorAction.elasticsearch.index }}'
+      type: '{{ response.rule.errorAction.elasticsearch.type }}'
+      deliveryStreamName: '{{ response.rule.errorAction.firehose.deliveryStreamName }}'
+      separator: '{{ response.rule.errorAction.firehose.separator }}'
+      confirmationUrl: '{{ response.rule.errorAction.http.confirmationUrl }}'
+      url: '{{ response.rule.errorAction.http.url }}'
+      channelArn: '{{ response.rule.errorAction.iotAnalytics.channelArn }}'
+      channelName: '{{ response.rule.errorAction.iotAnalytics.channelName }}'
+      inputName: '{{ response.rule.errorAction.iotEvents.inputName }}'
+      messageId: '{{ response.rule.errorAction.iotEvents.messageId }}'
+      clientProperties: '{{ response.rule.errorAction.kafka.clientProperties }}'
+      destinationArn: '{{ response.rule.errorAction.kafka.destinationArn }}'
+      key: '{{ response.rule.errorAction.kafka.key }}'
+      partition: '{{ response.rule.errorAction.kafka.partition }}'
+      topic: '{{ response.rule.errorAction.kafka.topic }}'
+      partitionKey: '{{ response.rule.errorAction.kinesis.partitionKey }}'
+      streamName: '{{ response.rule.errorAction.kinesis.streamName }}'
+      functionArn: '{{ response.rule.errorAction.lambda.functionArn }}'
+      deviceId: '{{ response.rule.errorAction.location.deviceId }}'
+      latitude: '{{ response.rule.errorAction.location.latitude }}'
+      longitude: '{{ response.rule.errorAction.location.longitude }}'
+      unit: '{{ response.rule.errorAction.location.timestamp.unit }}'
+      value: '{{ response.rule.errorAction.location.timestamp.value }}'
+      trackerName: '{{ response.rule.errorAction.location.trackerName }}'
+      contentType: '{{ response.rule.errorAction.republish.headers.contentType }}'
+      correlationData: '{{ response.rule.errorAction.republish.headers.correlationData }}'
+      messageExpiry: '{{ response.rule.errorAction.republish.headers.messageExpiry }}'
+      payloadFormatIndicator: '{{ response.rule.errorAction.republish.headers.payloadFormatIndicator }}'
+      responseTopic: '{{ response.rule.errorAction.republish.headers.responseTopic }}'
+      qos: '{{ response.rule.errorAction.republish.qos }}'
+      bucketName: '{{ response.rule.errorAction.s3.bucketName }}'
+      cannedAcl: '{{ response.rule.errorAction.s3.cannedAcl }}'
+      token: '{{ response.rule.errorAction.salesforce.token }}'
+      messageFormat: '{{ response.rule.errorAction.sns.messageFormat }}'
+      targetArn: '{{ response.rule.errorAction.sns.targetArn }}'
+      queueUrl: '{{ response.rule.errorAction.sqs.queueUrl }}'
+      useBase64: '{{ response.rule.errorAction.sqs.useBase64 }}'
+      executionNamePrefix: '{{ response.rule.errorAction.stepFunctions.executionNamePrefix }}'
+      stateMachineName: '{{ response.rule.errorAction.stepFunctions.stateMachineName }}'
+      databaseName: '{{ response.rule.errorAction.timestream.databaseName }}'
+- discovery_id: aws.iot.get_topic_rule_destination
+  for_each: aws.iot.list_security_profiles
+  calls:
+  - action: get_topic_rule_destination
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.topicRuleDestination.arn }}'
+      createdAt: '{{ response.topicRuleDestination.createdAt }}'
+      httpUrlProperties: '{{ response.topicRuleDestination.httpUrlProperties }}'
+      lastUpdatedAt: '{{ response.topicRuleDestination.lastUpdatedAt }}'
+      status: '{{ response.topicRuleDestination.status }}'
+      statusReason: '{{ response.topicRuleDestination.statusReason }}'
+      vpcProperties: '{{ response.topicRuleDestination.vpcProperties.vpcId }}'
+      confirmationUrl: '{{ response.topicRuleDestination.httpUrlProperties.confirmationUrl }}'
+      roleArn: '{{ response.topicRuleDestination.vpcProperties.roleArn }}'
+      vpcId: '{{ response.topicRuleDestination.vpcProperties.vpcId }}'
+- discovery_id: aws.iot.list_attached_policies
+  calls:
+  - action: list_attached_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.policies }}'
+    item:
+      policyArn: '{{ item.policyArn }}'
+      policyName: '{{ item.policyName }}'
+      nextMarker: '{{ response.nextMarker }}'
+- discovery_id: aws.iot.list_audit_mitigation_actions_executions
+  for_each: aws.iot.list_audit_findings
+  calls:
+  - action: list_audit_mitigation_actions_executions
+    params:
+      taskId: '{{ item.taskId }}'
+      findingId: '{{ item.findingId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.actionsExecutions }}'
+    item:
+      actionId: '{{ item.actionId }}'
+      actionName: '{{ item.actionName }}'
+      endTime: '{{ item.endTime }}'
+      errorCode: '{{ item.errorCode }}'
+      findingId: '{{ item.findingId }}'
+      message: '{{ item.message }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      taskId: '{{ item.taskId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_audit_mitigation_actions_tasks
+  calls:
+  - action: list_audit_mitigation_actions_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tasks }}'
+    item:
+      auditCheckToActionsMapping: '{{ item.auditCheckToActionsMapping }}'
+      startTime: '{{ item.startTime }}'
+      taskId: '{{ item.taskId }}'
+      taskStatus: '{{ item.taskStatus }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_audit_tasks
+  calls:
+  - action: list_audit_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tasks }}'
+    item:
+      auditDetails: '{{ item.auditDetails }}'
+      taskId: '{{ item.taskId }}'
+      taskStatus: '{{ item.taskStatus }}'
+      taskType: '{{ item.taskType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_certificates_by_ca
+  calls:
+  - action: list_certificates_by_ca
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.certificates }}'
+    item:
+      certificateArn: '{{ item.certificateArn }}'
+      certificateId: '{{ item.certificateId }}'
+      certificateMode: '{{ item.certificateMode }}'
+      creationDate: '{{ item.creationDate }}'
+      status: '{{ item.status }}'
+- discovery_id: aws.iot.list_detect_mitigation_actions_tasks
+  calls:
+  - action: list_detect_mitigation_actions_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tasks }}'
+    item:
+      actionsDefinition: '{{ item.actionsDefinition }}'
+      onlyActiveViolationsIncluded: '{{ item.tasks[].onlyActiveViolationsIncluded }}'
+      suppressedAlertsIncluded: '{{ item.tasks[].suppressedAlertsIncluded }}'
+      target: '{{ item.target }}'
+      taskEndTime: '{{ item.taskEndTime }}'
+      taskId: '{{ item.taskId }}'
+      taskStartTime: '{{ item.taskStartTime }}'
+      taskStatistics: '{{ item.taskStatistics }}'
+      taskStatus: '{{ item.taskStatus }}'
+      taskSummary: '{{ item.taskSummary }}'
+      violationEventOccurrenceRange: '{{ item.violationEventOccurrenceRange }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_job_executions_for_job
+  for_each: aws.iot.list_jobs
+  calls:
+  - action: list_job_executions_for_job
+    params:
+      jobId: '{{ item.jobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.executionSummaries }}'
+    item:
+      execution: '{{ item.execution }}'
+      jobExecutionSummary: '{{ item.jobExecutionSummary }}'
+      thingArn: '{{ item.thingArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_job_executions_for_thing
+  calls:
+  - action: list_job_executions_for_thing
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.executionSummaries }}'
+    item:
+      jobExecutionSummary: '{{ item.jobExecutionSummary }}'
+      jobId: '{{ item.jobId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_metric_values
+  for_each: aws.iot.list_fleet_metrics
+  calls:
+  - action: list_metric_values
+    params:
+      thingName: '{{ item.thingName }}'
+      metricName: '{{ item.metricName }}'
+      startTime: '{{ item.startTime }}'
+      endTime: '{{ item.endTime }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.metricDatumList }}'
+    item:
+      timestamp: '{{ item.timestamp }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_package_versions
+  for_each: aws.iot.list_packages
+  calls:
+  - action: list_package_versions
+    params:
+      packageName: '{{ item.packageName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.packageVersionSummaries }}'
+    item:
+      artifact: '{{ item.artifact }}'
+      creationDate: '{{ item.creationDate }}'
+      lastModifiedDate: '{{ item.lastModifiedDate }}'
+      packageName: '{{ item.packageName }}'
+      recipe: '{{ item.recipe }}'
+      status: '{{ item.status }}'
+      versionName: '{{ item.versionName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_policy_principals
+  calls:
+  - action: list_policy_principals
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.principals }}'
+    item:
+      nextMarker: '{{ response.nextMarker }}'
+- discovery_id: aws.iot.list_policy_versions
+  for_each: aws.iot.get_effective_policies
+  calls:
+  - action: list_policy_versions
+    params:
+      policyName: '{{ item.policyName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.policyVersions }}'
+    item:
+      createDate: '{{ item.createDate }}'
+      isDefaultVersion: '{{ item.isDefaultVersion }}'
+      versionId: '{{ item.versionId }}'
+- discovery_id: aws.iot.list_principal_policies
+  calls:
+  - action: list_principal_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.policies }}'
+    item:
+      policyArn: '{{ item.policyArn }}'
+      policyName: '{{ item.policyName }}'
+      nextMarker: '{{ response.nextMarker }}'
+- discovery_id: aws.iot.list_principal_things
+  calls:
+  - action: list_principal_things
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.things }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_principal_things_v2
+  calls:
+  - action: list_principal_things_v2
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.principalThingObjects }}'
+    item:
+      thingPrincipalType: '{{ item.thingPrincipalType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_provisioning_template_versions
+  for_each: aws.iot.list_managed_job_templates
+  calls:
+  - action: list_provisioning_template_versions
+    params:
+      templateName: '{{ item.templateName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.versions }}'
+    item:
+      creationDate: '{{ item.creationDate }}'
+      isDefaultVersion: '{{ item.isDefaultVersion }}'
+      versionId: '{{ item.versionId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_related_resources_for_audit_finding
+  for_each: aws.iot.list_audit_findings
+  calls:
+  - action: list_related_resources_for_audit_finding
+    params:
+      findingId: '{{ item.findingId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.relatedResources }}'
+    item:
+      additionalInfo: '{{ item.additionalInfo }}'
+      resourceIdentifier: '{{ item.resourceIdentifier }}'
+      resourceType: '{{ item.resourceType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_sbom_validation_results
+  for_each: aws.iot.list_packages
+  calls:
+  - action: list_sbom_validation_results
+    params:
+      packageName: '{{ item.packageName }}'
+      versionName: '{{ item.versionName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.validationResultSummaries }}'
+    item:
+      errorCode: '{{ item.errorCode }}'
+      errorMessage: '{{ item.errorMessage }}'
+      fileName: '{{ item.fileName }}'
+      validationResult: '{{ item.validationResult }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_security_profiles_for_target
+  calls:
+  - action: list_security_profiles_for_target
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.securityProfileTargetMappings }}'
+    item:
+      securityProfileIdentifier: '{{ item.securityProfileIdentifier }}'
+      target: '{{ item.target }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_targets_for_policy
+  for_each: aws.iot.get_effective_policies
+  calls:
+  - action: list_targets_for_policy
+    params:
+      policyName: '{{ item.policyName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.targets }}'
+    item:
+      nextMarker: '{{ response.nextMarker }}'
+- discovery_id: aws.iot.list_targets_for_security_profile
+  for_each: aws.iot.get_behavior_model_training_summaries
+  calls:
+  - action: list_targets_for_security_profile
+    params:
+      securityProfileName: '{{ item.securityProfileName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.securityProfileTargets }}'
+    item:
+      arn: '{{ item.arn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_thing_groups_for_thing
+  calls:
+  - action: list_thing_groups_for_thing
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.thingGroups }}'
+    item:
+      groupArn: '{{ item.groupArn }}'
+      groupName: '{{ item.groupName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_thing_principals
+  calls:
+  - action: list_thing_principals
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.principals }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_thing_principals_v2
+  calls:
+  - action: list_thing_principals_v2
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.thingPrincipalObjects }}'
+    item:
+      principal: '{{ item.principal }}'
+      thingPrincipalType: '{{ item.thingPrincipalType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_thing_registration_task_reports
+  for_each: aws.iot.list_audit_findings
+  calls:
+  - action: list_thing_registration_task_reports
+    params:
+      taskId: '{{ item.taskId }}'
+      reportType: '{{ item.reportType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.resourceLinks }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+      reportType: '{{ response.reportType }}'
+- discovery_id: aws.iot.list_things_in_billing_group
+  calls:
+  - action: list_things_in_billing_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.things }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_things_in_thing_group
+  calls:
+  - action: list_things_in_thing_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.things }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.list_violation_events
+  calls:
+  - action: list_violation_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.violationEvents }}'
+    item:
+      behavior: '{{ item.behavior }}'
+      metricValue: '{{ item.metricValue }}'
+      securityProfileName: '{{ item.securityProfileName }}'
+      verificationState: '{{ item.verificationState }}'
+      verificationStateDescription: '{{ item.verificationStateDescription }}'
+      violationEventAdditionalInfo: '{{ item.violationEventAdditionalInfo }}'
+      violationEventTime: '{{ item.violationEventTime }}'
+      violationEventType: '{{ item.violationEventType }}'
+      violationId: '{{ item.violationId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot.search_index
+  calls:
+  - action: search_index
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.things }}'
+    item:
+      nextToken: '{{ response.nextToken }}'

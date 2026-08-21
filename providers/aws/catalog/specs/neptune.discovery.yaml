@@ -1,0 +1,283 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: neptune
+# 10 ops (3 from checks, +7 for inventory)
+version: '1.0'
+provider: aws
+service: neptune
+discovery:
+  - calls:
+    - action: describe_db_clusters
+      on_error: continue
+      save_as: response
+    discovery_id: aws.neptune.describe_db_clusters
+    emit:
+      as: item
+      item:
+        AllocatedStorage: '{{ item.AllocatedStorage }}'
+        AssociatedRoles: '{{ item.AssociatedRoles }}'
+        AutomaticRestartTime: '{{ item.AutomaticRestartTime }}'
+        AvailabilityZones: '{{ item.AvailabilityZones }}'
+        BackupRetentionPeriod: '{{ item.BackupRetentionPeriod }}'
+        CharacterSetName: '{{ item.CharacterSetName }}'
+        CloneGroupId: '{{ item.CloneGroupId }}'
+        ClusterCreateTime: '{{ item.ClusterCreateTime }}'
+        CopyTagsToSnapshot: '{{ item.CopyTagsToSnapshot }}'
+        CrossAccountClone: '{{ item.CrossAccountClone }}'
+        DBClusterArn: '{{ item.DBClusterArn }}'
+        DBClusterIdentifier: '{{ item.DBClusterIdentifier }}'
+        DBClusterMembers: '{{ item.DBClusterMembers }}'
+        DBClusterOptionGroupMemberships: '{{ item.DBClusterOptionGroupMemberships }}'
+        DBClusterParameterGroup: '{{ item.DBClusterParameterGroup }}'
+        DBClusters: '{{ item.DBClusters }}'
+        DBSubnetGroup: '{{ item.DBSubnetGroup }}'
+        DatabaseName: '{{ item.DatabaseName }}'
+        DbClusterResourceId: '{{ item.DbClusterResourceId }}'
+        DeletionProtection: '{{ item.DeletionProtection }}'
+        EarliestRestorableTime: '{{ item.EarliestRestorableTime }}'
+        EnabledCloudwatchLogsExports: '{{ item.EnabledCloudwatchLogsExports }}'
+        Endpoint: '{{ item.Endpoint }}'
+        Engine: '{{ item.Engine }}'
+        EngineVersion: '{{ item.EngineVersion }}'
+        GlobalClusterIdentifier: '{{ item.GlobalClusterIdentifier }}'
+        HostedZoneId: '{{ item.HostedZoneId }}'
+        IAMDatabaseAuthenticationEnabled: '{{ item.IAMDatabaseAuthenticationEnabled
+          }}'
+        IOOptimizedNextAllowedModificationTime: '{{ item.IOOptimizedNextAllowedModificationTime
+          }}'
+        KmsKeyId: '{{ item.KmsKeyId }}'
+        LatestRestorableTime: '{{ item.LatestRestorableTime }}'
+        MasterUsername: '{{ item.MasterUsername }}'
+        MultiAZ: '{{ item.MultiAZ }}'
+        PendingModifiedValues: '{{ item.PendingModifiedValues }}'
+        PercentProgress: '{{ item.PercentProgress }}'
+        Port: '{{ item.Port }}'
+        PreferredBackupWindow: '{{ item.PreferredBackupWindow }}'
+        PreferredMaintenanceWindow: '{{ item.PreferredMaintenanceWindow }}'
+        ReadReplicaIdentifiers: '{{ item.ReadReplicaIdentifiers }}'
+        ReaderEndpoint: '{{ item.ReaderEndpoint }}'
+        ReplicationSourceIdentifier: '{{ item.ReplicationSourceIdentifier }}'
+        ServerlessV2ScalingConfiguration: '{{ item.ServerlessV2ScalingConfiguration
+          }}'
+        Status: '{{ item.Status }}'
+        StorageEncrypted: '{{ item.StorageEncrypted }}'
+        StorageType: '{{ item.StorageType }}'
+        VpcSecurityGroups: '{{ item.VpcSecurityGroups }}'
+      items_for: '{{ response.DBClusters }}'
+  - calls:
+    - action: describe_db_cluster_endpoints
+      on_error: continue
+      save_as: response
+    discovery_id: aws.neptune.describe_db_cluster_endpoints
+    emit:
+      as: item
+      item:
+        CustomEndpointType: '{{ item.CustomEndpointType }}'
+        DBClusterEndpointArn: '{{ item.DBClusterEndpointArn }}'
+        DBClusterEndpointIdentifier: '{{ item.DBClusterEndpointIdentifier }}'
+        DBClusterEndpointResourceIdentifier: '{{ item.DBClusterEndpointResourceIdentifier
+          }}'
+        DBClusterEndpoints: '{{ item.DBClusterEndpoints }}'
+        DBClusterIdentifier: '{{ item.DBClusterIdentifier }}'
+        Endpoint: '{{ item.Endpoint }}'
+        EndpointType: '{{ item.EndpointType }}'
+        ExcludedMembers: '{{ item.ExcludedMembers }}'
+        StaticMembers: '{{ item.StaticMembers }}'
+        Status: '{{ item.Status }}'
+      items_for: '{{ response.DBClusterEndpoints }}'
+  - calls:
+    - action: describe_db_cluster_snapshots
+      on_error: continue
+      save_as: response
+    discovery_id: aws.neptune.describe_db_cluster_snapshots
+    emit:
+      as: item
+      item:
+        AllocatedStorage: '{{ item.AllocatedStorage }}'
+        AvailabilityZones: '{{ item.AvailabilityZones }}'
+        ClusterCreateTime: '{{ item.ClusterCreateTime }}'
+        DBClusterIdentifier: '{{ item.DBClusterIdentifier }}'
+        DBClusterSnapshotArn: '{{ item.DBClusterSnapshotArn }}'
+        DBClusterSnapshotIdentifier: '{{ item.DBClusterSnapshotIdentifier }}'
+        DBClusterSnapshots: '{{ item.DBClusterSnapshots }}'
+        Engine: '{{ item.Engine }}'
+        EngineVersion: '{{ item.EngineVersion }}'
+        IAMDatabaseAuthenticationEnabled: '{{ item.IAMDatabaseAuthenticationEnabled
+          }}'
+        KmsKeyId: '{{ item.KmsKeyId }}'
+        LicenseModel: '{{ item.LicenseModel }}'
+        MasterUsername: '{{ item.MasterUsername }}'
+        PercentProgress: '{{ item.PercentProgress }}'
+        Port: '{{ item.Port }}'
+        SnapshotCreateTime: '{{ item.SnapshotCreateTime }}'
+        SnapshotType: '{{ item.SnapshotType }}'
+        SourceDBClusterSnapshotArn: '{{ item.SourceDBClusterSnapshotArn }}'
+        Status: '{{ item.Status }}'
+        StorageEncrypted: '{{ item.StorageEncrypted }}'
+        StorageType: '{{ item.StorageType }}'
+        VpcId: '{{ item.VpcId }}'
+      items_for: '{{ response.DBClusterSnapshots }}'
+  - calls:
+    - action: describe_db_instances
+      on_error: continue
+      save_as: response
+    discovery_id: aws.neptune.describe_db_instances
+    emit:
+      as: item
+      item:
+        AllocatedStorage: '{{ item.AllocatedStorage }}'
+        AutoMinorVersionUpgrade: '{{ item.AutoMinorVersionUpgrade }}'
+        AvailabilityZone: '{{ item.AvailabilityZone }}'
+        BackupRetentionPeriod: '{{ item.BackupRetentionPeriod }}'
+        CACertificateIdentifier: '{{ item.CACertificateIdentifier }}'
+        CharacterSetName: '{{ item.CharacterSetName }}'
+        CopyTagsToSnapshot: '{{ item.CopyTagsToSnapshot }}'
+        DBClusterIdentifier: '{{ item.DBClusterIdentifier }}'
+        DBInstanceArn: '{{ item.DBInstanceArn }}'
+        DBInstanceClass: '{{ item.DBInstanceClass }}'
+        DBInstanceIdentifier: '{{ item.DBInstanceIdentifier }}'
+        DBInstanceStatus: '{{ item.DBInstanceStatus }}'
+        DBInstances: '{{ item.DBInstances }}'
+        DBName: '{{ item.DBName }}'
+        DBParameterGroups: '{{ item.DBParameterGroups }}'
+        DBSecurityGroups: '{{ item.DBSecurityGroups }}'
+        DBSubnetGroup: '{{ item.DBSubnetGroup }}'
+        DbInstancePort: '{{ item.DbInstancePort }}'
+        DbiResourceId: '{{ item.DbiResourceId }}'
+        DeletionProtection: '{{ item.DeletionProtection }}'
+        DomainMemberships: '{{ item.DomainMemberships }}'
+        EnabledCloudwatchLogsExports: '{{ item.EnabledCloudwatchLogsExports }}'
+        Endpoint: '{{ item.Endpoint }}'
+        Engine: '{{ item.Engine }}'
+        EngineVersion: '{{ item.EngineVersion }}'
+        EnhancedMonitoringResourceArn: '{{ item.EnhancedMonitoringResourceArn }}'
+        IAMDatabaseAuthenticationEnabled: '{{ item.IAMDatabaseAuthenticationEnabled
+          }}'
+        InstanceCreateTime: '{{ item.InstanceCreateTime }}'
+        Iops: '{{ item.Iops }}'
+        KmsKeyId: '{{ item.KmsKeyId }}'
+        LatestRestorableTime: '{{ item.LatestRestorableTime }}'
+        LicenseModel: '{{ item.LicenseModel }}'
+        MasterUsername: '{{ item.MasterUsername }}'
+        MonitoringInterval: '{{ item.MonitoringInterval }}'
+        MonitoringRoleArn: '{{ item.MonitoringRoleArn }}'
+        MultiAZ: '{{ item.MultiAZ }}'
+        OptionGroupMemberships: '{{ item.OptionGroupMemberships }}'
+        PendingModifiedValues: '{{ item.PendingModifiedValues }}'
+        PerformanceInsightsEnabled: '{{ item.PerformanceInsightsEnabled }}'
+        PerformanceInsightsKMSKeyId: '{{ item.PerformanceInsightsKMSKeyId }}'
+        PreferredBackupWindow: '{{ item.PreferredBackupWindow }}'
+        PreferredMaintenanceWindow: '{{ item.PreferredMaintenanceWindow }}'
+        PromotionTier: '{{ item.PromotionTier }}'
+        PubliclyAccessible: '{{ item.PubliclyAccessible }}'
+        ReadReplicaDBClusterIdentifiers: '{{ item.ReadReplicaDBClusterIdentifiers }}'
+        ReadReplicaDBInstanceIdentifiers: '{{ item.ReadReplicaDBInstanceIdentifiers
+          }}'
+        ReadReplicaSourceDBInstanceIdentifier: '{{ item.ReadReplicaSourceDBInstanceIdentifier
+          }}'
+        SecondaryAvailabilityZone: '{{ item.SecondaryAvailabilityZone }}'
+        StatusInfos: '{{ item.StatusInfos }}'
+        StorageEncrypted: '{{ item.StorageEncrypted }}'
+        StorageType: '{{ item.StorageType }}'
+        TdeCredentialArn: '{{ item.TdeCredentialArn }}'
+        Timezone: '{{ item.Timezone }}'
+        VpcSecurityGroups: '{{ item.VpcSecurityGroups }}'
+      items_for: '{{ response.DBInstances }}'
+  - calls:
+    - action: describe_db_subnet_groups
+      on_error: continue
+      save_as: response
+    discovery_id: aws.neptune.describe_db_subnet_groups
+    emit:
+      as: item
+      item:
+        DBSubnetGroupArn: '{{ item.DBSubnetGroupArn }}'
+        DBSubnetGroupDescription: '{{ item.DBSubnetGroupDescription }}'
+        DBSubnetGroupName: '{{ item.DBSubnetGroupName }}'
+        DBSubnetGroups: '{{ item.DBSubnetGroups }}'
+        SubnetGroupStatus: '{{ item.SubnetGroupStatus }}'
+        Subnets: '{{ item.Subnets }}'
+        VpcId: '{{ item.VpcId }}'
+      items_for: '{{ response.DBSubnetGroups }}'
+  - calls:
+    - action: describe_event_subscriptions
+      on_error: continue
+      save_as: response
+    discovery_id: aws.neptune.describe_event_subscriptions
+    emit:
+      as: item
+      item:
+        CustSubscriptionId: '{{ item.CustSubscriptionId }}'
+        CustomerAwsId: '{{ item.CustomerAwsId }}'
+        Enabled: '{{ item.Enabled }}'
+        EventCategoriesList: '{{ item.EventCategoriesList }}'
+        EventSubscriptionArn: '{{ item.EventSubscriptionArn }}'
+        EventSubscriptionsList: '{{ item.EventSubscriptionsList }}'
+        SnsTopicArn: '{{ item.SnsTopicArn }}'
+        SourceIdsList: '{{ item.SourceIdsList }}'
+        SourceType: '{{ item.SourceType }}'
+        Status: '{{ item.Status }}'
+        SubscriptionCreationTime: '{{ item.SubscriptionCreationTime }}'
+      items_for: '{{ response.EventSubscriptionsList }}'
+  - calls:
+    - action: describe_db_cluster_parameter_groups
+      on_error: continue
+      save_as: response
+    discovery_id: aws.neptune.describe_db_cluster_parameter_groups
+    emit:
+      as: item
+      item:
+        DBClusterParameterGroupArn: '{{ item.DBClusterParameterGroupArn }}'
+        DBClusterParameterGroupName: '{{ item.DBClusterParameterGroupName }}'
+        DBClusterParameterGroups: '{{ item.DBClusterParameterGroups }}'
+        DBParameterGroupFamily: '{{ item.DBParameterGroupFamily }}'
+        Description: '{{ item.Description }}'
+      items_for: '{{ response.DBClusterParameterGroups }}'
+  - calls:
+    - action: describe_db_parameter_groups
+      on_error: continue
+      save_as: response
+    discovery_id: aws.neptune.describe_db_parameter_groups
+    emit:
+      as: item
+      item:
+        DBParameterGroupArn: '{{ item.DBParameterGroupArn }}'
+        DBParameterGroupFamily: '{{ item.DBParameterGroupFamily }}'
+        DBParameterGroupName: '{{ item.DBParameterGroupName }}'
+        Description: '{{ item.Description }}'
+      items_for: '{{ response.DBParameterGroups }}'
+  - calls:
+    - action: describe_global_clusters
+      on_error: continue
+      save_as: response
+    discovery_id: aws.neptune.describe_global_clusters
+    emit:
+      as: item
+      item:
+        DeletionProtection: '{{ item.DeletionProtection }}'
+        Engine: '{{ item.Engine }}'
+        EngineVersion: '{{ item.EngineVersion }}'
+        FailoverState: '{{ item.FailoverState }}'
+        GlobalClusterArn: '{{ item.GlobalClusterArn }}'
+        GlobalClusterIdentifier: '{{ item.GlobalClusterIdentifier }}'
+        GlobalClusterMembers: '{{ item.GlobalClusterMembers }}'
+        GlobalClusterResourceId: '{{ item.GlobalClusterResourceId }}'
+        GlobalClusters: '{{ item.GlobalClusters }}'
+        Status: '{{ item.Status }}'
+        StorageEncrypted: '{{ item.StorageEncrypted }}'
+      items_for: '{{ response.GlobalClusters }}'
+  - calls:
+    - action: describe_events
+      on_error: continue
+      save_as: response
+    discovery_id: aws.neptune.describe_events
+    emit:
+      as: item
+      item:
+        Date: '{{ item.Date }}'
+        EventCategories: '{{ item.EventCategories }}'
+        Events: '{{ item.Events }}'
+        Message: '{{ item.Message }}'
+        SourceArn: '{{ item.SourceArn }}'
+        SourceIdentifier: '{{ item.SourceIdentifier }}'
+        SourceType: '{{ item.SourceType }}'
+      items_for: '{{ response.Events }}'

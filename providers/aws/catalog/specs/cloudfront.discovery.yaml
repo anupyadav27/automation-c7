@@ -1,0 +1,222 @@
+version: '1.0'
+provider: aws
+service: cloudfront
+discovery:
+- calls:
+  - action: list_distributions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.cloudfront.list_distributions
+  emit:
+    as: item
+    item:
+      resource_type: cloudfront_distribution
+      Id: '{{ item.Id }}'
+      ARN: '{{ item.ARN }}'
+      Status: '{{ item.Status }}'
+      DomainName: '{{ item.DomainName }}'
+      Origins: '{{ item.Origins }}'
+      WebACLId: '{{ item.WebACLId }}'
+      HttpVersion: '{{ item.HttpVersion }}'
+      IsIPV6Enabled: '{{ item.IsIPV6Enabled }}'
+      ViewerCertificate: '{{ item.ViewerCertificate }}'
+      Enabled: '{{ item.Enabled }}'
+    items_for: '{{ response.DistributionList.Items }}'
+- calls:
+  - action: get_realtime_log_config
+    on_error: continue
+    save_as: response
+  discovery_id: aws.cloudfront.get_realtime_log_config
+  emit:
+    as: item
+    item:
+      ARN: '{{ response.RealtimeLogConfig.ARN }}'
+      EndPoints: '{{ response.RealtimeLogConfig.EndPoints }}'
+      Fields: '{{ response.RealtimeLogConfig.Fields }}'
+      Name: '{{ response.RealtimeLogConfig.Name }}'
+      RealtimeLogConfig: '{{ response.RealtimeLogConfig.RealtimeLogConfig }}'
+      SamplingRate: '{{ response.RealtimeLogConfig.SamplingRate }}'
+- calls:
+  - action: list_connection_functions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.cloudfront.list_connection_functions
+  emit:
+    as: item
+    item:
+      ConnectionFunctionArn: '{{ item.ConnectionFunctionArn }}'
+      ConnectionFunctionConfig: '{{ item.ConnectionFunctionConfig }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      Id: '{{ item.Id }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      Name: '{{ item.Name }}'
+      Stage: '{{ item.Stage }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.ConnectionFunctions }}'
+- calls:
+  - action: get_origin_request_policy_config
+    on_error: continue
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+  discovery_id: aws.cloudfront.get_origin_request_policy_config
+  emit:
+    as: item
+    item:
+      Comment: '{{ response.OriginRequestPolicyConfig.Comment }}'
+      CookiesConfig: '{{ response.OriginRequestPolicyConfig.CookiesConfig }}'
+      HeadersConfig: '{{ response.OriginRequestPolicyConfig.HeadersConfig }}'
+      Name: '{{ response.OriginRequestPolicyConfig.Name }}'
+      QueryStringsConfig: '{{ response.OriginRequestPolicyConfig.QueryStringsConfig }}'
+      ETag: '{{ response.ETag }}'
+      CookieBehavior: '{{ response.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior }}'
+      Quantity: '{{ response.OriginRequestPolicyConfig.CookiesConfig.Cookies.Quantity }}'
+      HeaderBehavior: '{{ response.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior }}'
+      QueryStringBehavior: '{{ response.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior }}'
+  for_each: aws.cloudfront.list_connection_functions
+- calls:
+  - action: get_field_level_encryption
+    on_error: continue
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+  discovery_id: aws.cloudfront.get_field_level_encryption
+  emit:
+    as: item
+    item:
+      FieldLevelEncryptionConfig: '{{ response.FieldLevelEncryption.FieldLevelEncryptionConfig.Comment }}'
+      Id: '{{ response.FieldLevelEncryption.Id }}'
+      LastModifiedTime: '{{ response.FieldLevelEncryption.LastModifiedTime }}'
+      ETag: '{{ response.ETag }}'
+      CallerReference: '{{ response.FieldLevelEncryption.FieldLevelEncryptionConfig.CallerReference }}'
+      Comment: '{{ response.FieldLevelEncryption.FieldLevelEncryptionConfig.Comment }}'
+      Quantity: '{{ response.FieldLevelEncryption.FieldLevelEncryptionConfig.ContentTypeProfileConfig.ContentTypeProfiles.Quantity }}'
+      ForwardWhenContentTypeIsUnknown: '{{ response.FieldLevelEncryption.FieldLevelEncryptionConfig.ContentTypeProfileConfig.ForwardWhenContentTypeIsUnknown }}'
+      ForwardWhenQueryArgProfileIsUnknown: '{{ response.FieldLevelEncryption.FieldLevelEncryptionConfig.QueryArgProfileConfig.ForwardWhenQueryArgProfileIsUnknown }}'
+  for_each: aws.cloudfront.list_connection_functions
+- calls:
+  - action: get_cache_policy_config
+    on_error: continue
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+  discovery_id: aws.cloudfront.get_cache_policy_config
+  emit:
+    as: item
+    item:
+      Comment: '{{ response.CachePolicyConfig.Comment }}'
+      DefaultTTL: '{{ response.CachePolicyConfig.DefaultTTL }}'
+      MaxTTL: '{{ response.CachePolicyConfig.MaxTTL }}'
+      MinTTL: '{{ response.CachePolicyConfig.MinTTL }}'
+      Name: '{{ response.CachePolicyConfig.Name }}'
+      ParametersInCacheKeyAndForwardedToOrigin: '{{ response.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin }}'
+      CookieBehavior: '{{ response.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior }}'
+      Quantity: '{{ response.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Quantity }}'
+      EnableAcceptEncodingBrotli: '{{ response.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.EnableAcceptEncodingBrotli }}'
+      EnableAcceptEncodingGzip: '{{ response.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.EnableAcceptEncodingGzip }}'
+      HeaderBehavior: '{{ response.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior }}'
+      QueryStringBehavior: '{{ response.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior }}'
+      ETag: '{{ response.ETag }}'
+  for_each: aws.cloudfront.list_connection_functions
+- calls:
+  - action: list_distribution_tenants_by_customization
+    on_error: continue
+    save_as: response
+  discovery_id: aws.cloudfront.list_distribution_tenants_by_customization
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      ConnectionGroupId: '{{ item.ConnectionGroupId }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      Customizations: '{{ item.Customizations }}'
+      DistributionId: '{{ item.DistributionId }}'
+      Domains: '{{ item.Domains }}'
+      ETag: '{{ item.ETag }}'
+      Enabled: '{{ item.Enabled }}'
+      Id: '{{ item.Id }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.DistributionTenantList }}'
+- calls:
+  - action: get_origin_access_control
+    on_error: continue
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+  discovery_id: aws.cloudfront.get_origin_access_control
+  emit:
+    as: item
+    item:
+      Id: '{{ response.OriginAccessControl.Id }}'
+      OriginAccessControlConfig: '{{ response.OriginAccessControl.OriginAccessControlConfig.Name }}'
+      ETag: '{{ response.ETag }}'
+      Description: '{{ response.OriginAccessControl.OriginAccessControlConfig.Description }}'
+      Name: '{{ response.OriginAccessControl.OriginAccessControlConfig.Name }}'
+      OriginAccessControlOriginType: '{{ response.OriginAccessControl.OriginAccessControlConfig.OriginAccessControlOriginType }}'
+      SigningBehavior: '{{ response.OriginAccessControl.OriginAccessControlConfig.SigningBehavior }}'
+      SigningProtocol: '{{ response.OriginAccessControl.OriginAccessControlConfig.SigningProtocol }}'
+  for_each: aws.cloudfront.list_connection_functions
+- calls:
+  - action: get_distribution_config
+    on_error: continue
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+  discovery_id: aws.cloudfront.get_distribution_config
+  emit:
+    as: item
+    item:
+      Aliases: '{{ response.DistributionConfig.Aliases.Quantity }}'
+      AnycastIpListId: '{{ response.DistributionConfig.AnycastIpListId }}'
+      CacheBehaviors: '{{ response.DistributionConfig.CacheBehaviors.Quantity }}'
+      CallerReference: '{{ response.DistributionConfig.CallerReference }}'
+      Comment: '{{ response.DistributionConfig.Comment }}'
+      ConnectionFunctionAssociation: '{{ response.DistributionConfig.ConnectionFunctionAssociation }}'
+      ConnectionMode: '{{ response.DistributionConfig.ConnectionMode }}'
+      ContinuousDeploymentPolicyId: '{{ response.DistributionConfig.ContinuousDeploymentPolicyId }}'
+      CustomErrorResponses: '{{ response.DistributionConfig.CustomErrorResponses.Quantity }}'
+      DefaultCacheBehavior: '{{ response.DistributionConfig.DefaultCacheBehavior.MinTTL }}'
+      DefaultRootObject: '{{ response.DistributionConfig.DefaultRootObject }}'
+      Enabled: '{{ response.DistributionConfig.Enabled }}'
+      HttpVersion: '{{ response.DistributionConfig.HttpVersion }}'
+      IsIPV6Enabled: '{{ response.DistributionConfig.IsIPV6Enabled }}'
+      Logging: '{{ response.DistributionConfig.Staging }}'
+      OriginGroups: '{{ response.DistributionConfig.OriginGroups.Quantity }}'
+      Origins: '{{ response.DistributionConfig.Origins.Quantity }}'
+      PriceClass: '{{ response.DistributionConfig.PriceClass }}'
+      Restrictions: '{{ response.DistributionConfig.Restrictions }}'
+      Staging: '{{ response.DistributionConfig.Staging }}'
+      TenantConfig: '{{ response.DistributionConfig.TenantConfig }}'
+      ViewerCertificate: '{{ response.DistributionConfig.ViewerCertificate.Certificate }}'
+      ViewerMtlsConfig: '{{ response.DistributionConfig.ViewerMtlsConfig }}'
+      WebACLId: '{{ response.DistributionConfig.WebACLId }}'
+      Quantity: '{{ response.DistributionConfig.Aliases.Quantity }}'
+      CachePolicyId: '{{ response.DistributionConfig.DefaultCacheBehavior.CachePolicyId }}'
+      Compress: '{{ response.DistributionConfig.DefaultCacheBehavior.Compress }}'
+      DefaultTTL: '{{ response.DistributionConfig.DefaultCacheBehavior.DefaultTTL }}'
+      FieldLevelEncryptionId: '{{ response.DistributionConfig.DefaultCacheBehavior.FieldLevelEncryptionId }}'
+      Forward: '{{ response.DistributionConfig.DefaultCacheBehavior.ForwardedValues.Cookies.Forward }}'
+      QueryString: '{{ response.DistributionConfig.DefaultCacheBehavior.ForwardedValues.QueryString }}'
+      MaxTTL: '{{ response.DistributionConfig.DefaultCacheBehavior.MaxTTL }}'
+      MinTTL: '{{ response.DistributionConfig.DefaultCacheBehavior.MinTTL }}'
+      OriginRequestPolicyId: '{{ response.DistributionConfig.DefaultCacheBehavior.OriginRequestPolicyId }}'
+      RealtimeLogConfigArn: '{{ response.DistributionConfig.DefaultCacheBehavior.RealtimeLogConfigArn }}'
+      ResponseHeadersPolicyId: '{{ response.DistributionConfig.DefaultCacheBehavior.ResponseHeadersPolicyId }}'
+      SmoothStreaming: '{{ response.DistributionConfig.DefaultCacheBehavior.SmoothStreaming }}'
+      TargetOriginId: '{{ response.DistributionConfig.DefaultCacheBehavior.TargetOriginId }}'
+      ViewerProtocolPolicy: '{{ response.DistributionConfig.DefaultCacheBehavior.ViewerProtocolPolicy }}'
+      Bucket: '{{ response.DistributionConfig.Logging.Bucket }}'
+      IncludeCookies: '{{ response.DistributionConfig.Logging.IncludeCookies }}'
+      Prefix: '{{ response.DistributionConfig.Logging.Prefix }}'
+      RestrictionType: '{{ response.DistributionConfig.Restrictions.GeoRestriction.RestrictionType }}'
+      ACMCertificateArn: '{{ response.DistributionConfig.ViewerCertificate.ACMCertificateArn }}'
+      Certificate: '{{ response.DistributionConfig.ViewerCertificate.Certificate }}'
+      CertificateSource: '{{ response.DistributionConfig.ViewerCertificate.CertificateSource }}'
+      CloudFrontDefaultCertificate: '{{ response.DistributionConfig.ViewerCertificate.CloudFrontDefaultCertificate }}'
+      IAMCertificateId: '{{ response.DistributionConfig.ViewerCertificate.IAMCertificateId }}'
+      MinimumProtocolVersion: '{{ response.DistributionConfig.ViewerCertificate.MinimumProtocolVersion }}'
+      SSLSupportMethod: '{{ response.DistributionConfig.ViewerCertificate.SSLSupportMethod }}'
+      ETag: '{{ response.ETag }}'
+  for_each: aws.cloudfront.list_connection_functions

@@ -1,0 +1,125 @@
+version: '1.0'
+provider: aws
+service: kms
+discovery:
+- calls:
+  - action: list_keys
+    on_error: continue
+    save_as: response
+  discovery_id: aws.kms.list_keys
+  emit:
+    as: item
+    item:
+      KeyArn: '{{ item.KeyArn }}'
+      KeyId: '{{ item.KeyId }}'
+      Truncated: '{{ response.Truncated }}'
+      resource_type: kms_key
+    items_for: '{{ response.Keys }}'
+- calls:
+  - action: get_key_policy
+    on_error: continue
+    params:
+      KeyId: '{{ item.KeyId }}'
+    save_as: response
+  discovery_id: aws.kms.get_key_policy
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+      PolicyName: '{{ response.PolicyName }}'
+  for_each: aws.kms.list_keys
+- calls:
+  - action: describe_key
+    on_error: continue
+    params:
+      KeyId: '{{ item.KeyId }}'
+    save_as: response
+  discovery_id: aws.kms.describe_key
+  emit:
+    as: item
+    item:
+      AWSAccountId: '{{ response.KeyMetadata.AWSAccountId }}'
+      Arn: '{{ response.KeyMetadata.Arn }}'
+      CloudHsmClusterId: '{{ response.KeyMetadata.CloudHsmClusterId }}'
+      CreationDate: '{{ response.KeyMetadata.CreationDate }}'
+      CurrentKeyMaterialId: '{{ response.KeyMetadata.CurrentKeyMaterialId }}'
+      CustomKeyStoreId: '{{ response.KeyMetadata.CustomKeyStoreId }}'
+      CustomerMasterKeySpec: '{{ response.KeyMetadata.CustomerMasterKeySpec }}'
+      DeletionDate: '{{ response.KeyMetadata.DeletionDate }}'
+      Description: '{{ response.KeyMetadata.Description }}'
+      Enabled: '{{ response.KeyMetadata.Enabled }}'
+      EncryptionAlgorithms: '{{ response.KeyMetadata.EncryptionAlgorithms }}'
+      ExpirationModel: '{{ response.KeyMetadata.ExpirationModel }}'
+      KeyAgreementAlgorithms: '{{ response.KeyMetadata.KeyAgreementAlgorithms }}'
+      KeyId: '{{ response.KeyMetadata.KeyId }}'
+      KeyManager: '{{ response.KeyMetadata.KeyManager }}'
+      KeySpec: '{{ response.KeyMetadata.KeySpec }}'
+      KeyState: '{{ response.KeyMetadata.KeyState }}'
+      KeyUsage: '{{ response.KeyMetadata.KeyUsage }}'
+      MacAlgorithms: '{{ response.KeyMetadata.MacAlgorithms }}'
+      MultiRegion: '{{ response.KeyMetadata.MultiRegion }}'
+      MultiRegionConfiguration: '{{ response.KeyMetadata.MultiRegionConfiguration }}'
+      Origin: '{{ response.KeyMetadata.Origin }}'
+      PendingDeletionWindowInDays: '{{ response.KeyMetadata.PendingDeletionWindowInDays }}'
+      SigningAlgorithms: '{{ response.KeyMetadata.SigningAlgorithms }}'
+      ValidTo: '{{ response.KeyMetadata.ValidTo }}'
+      XksKeyConfiguration: '{{ response.KeyMetadata.XksKeyConfiguration.Id }}'
+      MultiRegionKeyType: '{{ response.KeyMetadata.MultiRegionConfiguration.MultiRegionKeyType }}'
+      Region: '{{ response.KeyMetadata.MultiRegionConfiguration.PrimaryKey.Region }}'
+      Id: '{{ response.KeyMetadata.XksKeyConfiguration.Id }}'
+  for_each: aws.kms.list_keys
+- calls:
+  - action: list_aliases
+    on_error: continue
+    save_as: response
+  discovery_id: aws.kms.list_aliases
+  emit:
+    as: item
+    item:
+      AliasArn: '{{ item.AliasArn }}'
+      AliasName: '{{ item.AliasName }}'
+      CreationDate: '{{ item.CreationDate }}'
+      LastUpdatedDate: '{{ item.LastUpdatedDate }}'
+      TargetKeyId: '{{ item.TargetKeyId }}'
+      Truncated: '{{ item.Truncated }}'
+    items_for: '{{ response.Aliases }}'
+- calls:
+  - action: list_grants
+    on_error: continue
+    params:
+      KeyId: '{{ item.KeyId }}'
+    save_as: response
+  discovery_id: aws.kms.list_grants
+  emit:
+    as: item
+    item:
+      Constraints: '{{ item.Constraints }}'
+      CreationDate: '{{ item.CreationDate }}'
+      GrantId: '{{ item.GrantId }}'
+      GranteePrincipal: '{{ item.GranteePrincipal }}'
+      IssuingAccount: '{{ item.IssuingAccount }}'
+      KeyId: '{{ item.KeyId }}'
+      Name: '{{ item.Name }}'
+      Operations: '{{ item.Operations }}'
+      RetiringPrincipal: '{{ item.RetiringPrincipal }}'
+      Truncated: '{{ response.Truncated }}'
+    items_for: '{{ response.Grants }}'
+  for_each: aws.kms.list_keys
+- calls:
+  - action: get_key_rotation_status
+    on_error: continue
+    params:
+      KeyId: '{{ item.KeyId }}'
+    save_as: response
+  discovery_id: aws.kms.get_key_rotation_status
+  emit:
+    as: item
+    item:
+      KeyRotationEnabled: '{{ response.KeyRotationEnabled }}'
+      KeyId: '{{ response.KeyId }}'
+      NextRotationDate: '{{ response.NextRotationDate }}'
+      OnDemandRotationStartDate: '{{ response.OnDemandRotationStartDate }}'
+      RotationPeriodInDays: '{{ response.RotationPeriodInDays }}'
+  for_each: aws.kms.list_keys

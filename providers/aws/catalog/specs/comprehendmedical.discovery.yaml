@@ -1,0 +1,253 @@
+version: '1.0'
+provider: aws
+service: comprehendmedical
+services:
+  client: comprehendmedical
+  module: boto3.client
+discovery:
+- discovery_id: aws.comprehendmedical.list_entities_detection_v2_jobs
+  calls:
+  - action: list_entities_detection_v2_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ComprehendMedicalAsyncJobPropertiesList }}'
+    item:
+      ComprehendMedicalAsyncJobProperties: '{{ item.ComprehendMedicalAsyncJobPropertiesList[].JobId }}'
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      EndTime: '{{ item.EndTime }}'
+      ExpirationTime: '{{ item.ExpirationTime }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      KMSKey: '{{ item.KMSKey }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      ManifestFilePath: '{{ item.ManifestFilePath }}'
+      Message: '{{ item.Message }}'
+      ModelVersion: '{{ item.ModelVersion }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+- discovery_id: aws.comprehendmedical.list_icd10_cm_inference_jobs
+  calls:
+  - action: list_icd10_cm_inference_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ComprehendMedicalAsyncJobPropertiesList }}'
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      EndTime: '{{ item.EndTime }}'
+      ExpirationTime: '{{ item.ExpirationTime }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      KMSKey: '{{ item.KMSKey }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      ManifestFilePath: '{{ item.ManifestFilePath }}'
+      Message: '{{ item.Message }}'
+      ModelVersion: '{{ item.ModelVersion }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+- discovery_id: aws.comprehendmedical.list_phi_detection_jobs
+  calls:
+  - action: list_phi_detection_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ComprehendMedicalAsyncJobPropertiesList }}'
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      EndTime: '{{ item.EndTime }}'
+      ExpirationTime: '{{ item.ExpirationTime }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      KMSKey: '{{ item.KMSKey }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      ManifestFilePath: '{{ item.ManifestFilePath }}'
+      Message: '{{ item.Message }}'
+      ModelVersion: '{{ item.ModelVersion }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+- discovery_id: aws.comprehendmedical.list_rx_norm_inference_jobs
+  calls:
+  - action: list_rx_norm_inference_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ComprehendMedicalAsyncJobPropertiesList }}'
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      EndTime: '{{ item.EndTime }}'
+      ExpirationTime: '{{ item.ExpirationTime }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      KMSKey: '{{ item.KMSKey }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      ManifestFilePath: '{{ item.ManifestFilePath }}'
+      Message: '{{ item.Message }}'
+      ModelVersion: '{{ item.ModelVersion }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+- discovery_id: aws.comprehendmedical.list_snomedct_inference_jobs
+  calls:
+  - action: list_snomedct_inference_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ComprehendMedicalAsyncJobPropertiesList }}'
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      EndTime: '{{ item.EndTime }}'
+      ExpirationTime: '{{ item.ExpirationTime }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      KMSKey: '{{ item.KMSKey }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      ManifestFilePath: '{{ item.ManifestFilePath }}'
+      Message: '{{ item.Message }}'
+      ModelVersion: '{{ item.ModelVersion }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+- discovery_id: aws.comprehendmedical.describe_entities_detection_v2_job
+  for_each: aws.comprehendmedical.list_entities_detection_v2_jobs
+  calls:
+  - action: describe_entities_detection_v2_job
+    params:
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ComprehendMedicalAsyncJobProperties: '{{ response.ComprehendMedicalAsyncJobProperties.ComprehendMedicalAsyncJobProperties }}'
+      DataAccessRoleArn: '{{ response.ComprehendMedicalAsyncJobProperties.DataAccessRoleArn }}'
+      EndTime: '{{ response.ComprehendMedicalAsyncJobProperties.EndTime }}'
+      ExpirationTime: '{{ response.ComprehendMedicalAsyncJobProperties.ExpirationTime }}'
+      InputDataConfig: '{{ response.ComprehendMedicalAsyncJobProperties.InputDataConfig.S3Key }}'
+      JobId: '{{ response.ComprehendMedicalAsyncJobProperties.JobId }}'
+      JobName: '{{ response.ComprehendMedicalAsyncJobProperties.JobName }}'
+      JobStatus: '{{ response.ComprehendMedicalAsyncJobProperties.JobStatus }}'
+      KMSKey: '{{ response.ComprehendMedicalAsyncJobProperties.KMSKey }}'
+      LanguageCode: '{{ response.ComprehendMedicalAsyncJobProperties.LanguageCode }}'
+      ManifestFilePath: '{{ response.ComprehendMedicalAsyncJobProperties.ManifestFilePath }}'
+      Message: '{{ response.ComprehendMedicalAsyncJobProperties.Message }}'
+      ModelVersion: '{{ response.ComprehendMedicalAsyncJobProperties.ModelVersion }}'
+      OutputDataConfig: '{{ response.ComprehendMedicalAsyncJobProperties.OutputDataConfig.S3Key }}'
+      SubmitTime: '{{ response.ComprehendMedicalAsyncJobProperties.SubmitTime }}'
+      S3Bucket: '{{ response.ComprehendMedicalAsyncJobProperties.InputDataConfig.S3Bucket }}'
+      S3Key: '{{ response.ComprehendMedicalAsyncJobProperties.InputDataConfig.S3Key }}'
+- discovery_id: aws.comprehendmedical.describe_icd10_cm_inference_job
+  for_each: aws.comprehendmedical.list_entities_detection_v2_jobs
+  calls:
+  - action: describe_icd10_cm_inference_job
+    params:
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ response.ComprehendMedicalAsyncJobProperties.DataAccessRoleArn }}'
+      EndTime: '{{ response.ComprehendMedicalAsyncJobProperties.EndTime }}'
+      ExpirationTime: '{{ response.ComprehendMedicalAsyncJobProperties.ExpirationTime }}'
+      InputDataConfig: '{{ response.ComprehendMedicalAsyncJobProperties.InputDataConfig }}'
+      JobId: '{{ response.ComprehendMedicalAsyncJobProperties.JobId }}'
+      JobName: '{{ response.ComprehendMedicalAsyncJobProperties.JobName }}'
+      JobStatus: '{{ response.ComprehendMedicalAsyncJobProperties.JobStatus }}'
+      KMSKey: '{{ response.ComprehendMedicalAsyncJobProperties.KMSKey }}'
+      LanguageCode: '{{ response.ComprehendMedicalAsyncJobProperties.LanguageCode }}'
+      ManifestFilePath: '{{ response.ComprehendMedicalAsyncJobProperties.ManifestFilePath }}'
+      Message: '{{ response.ComprehendMedicalAsyncJobProperties.Message }}'
+      ModelVersion: '{{ response.ComprehendMedicalAsyncJobProperties.ModelVersion }}'
+      OutputDataConfig: '{{ response.ComprehendMedicalAsyncJobProperties.OutputDataConfig }}'
+      SubmitTime: '{{ response.ComprehendMedicalAsyncJobProperties.SubmitTime }}'
+- discovery_id: aws.comprehendmedical.describe_phi_detection_job
+  for_each: aws.comprehendmedical.list_entities_detection_v2_jobs
+  calls:
+  - action: describe_phi_detection_job
+    params:
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ response.ComprehendMedicalAsyncJobProperties.DataAccessRoleArn }}'
+      EndTime: '{{ response.ComprehendMedicalAsyncJobProperties.EndTime }}'
+      ExpirationTime: '{{ response.ComprehendMedicalAsyncJobProperties.ExpirationTime }}'
+      InputDataConfig: '{{ response.ComprehendMedicalAsyncJobProperties.InputDataConfig }}'
+      JobId: '{{ response.ComprehendMedicalAsyncJobProperties.JobId }}'
+      JobName: '{{ response.ComprehendMedicalAsyncJobProperties.JobName }}'
+      JobStatus: '{{ response.ComprehendMedicalAsyncJobProperties.JobStatus }}'
+      KMSKey: '{{ response.ComprehendMedicalAsyncJobProperties.KMSKey }}'
+      LanguageCode: '{{ response.ComprehendMedicalAsyncJobProperties.LanguageCode }}'
+      ManifestFilePath: '{{ response.ComprehendMedicalAsyncJobProperties.ManifestFilePath }}'
+      Message: '{{ response.ComprehendMedicalAsyncJobProperties.Message }}'
+      ModelVersion: '{{ response.ComprehendMedicalAsyncJobProperties.ModelVersion }}'
+      OutputDataConfig: '{{ response.ComprehendMedicalAsyncJobProperties.OutputDataConfig }}'
+      SubmitTime: '{{ response.ComprehendMedicalAsyncJobProperties.SubmitTime }}'
+- discovery_id: aws.comprehendmedical.describe_rx_norm_inference_job
+  for_each: aws.comprehendmedical.list_entities_detection_v2_jobs
+  calls:
+  - action: describe_rx_norm_inference_job
+    params:
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ response.ComprehendMedicalAsyncJobProperties.DataAccessRoleArn }}'
+      EndTime: '{{ response.ComprehendMedicalAsyncJobProperties.EndTime }}'
+      ExpirationTime: '{{ response.ComprehendMedicalAsyncJobProperties.ExpirationTime }}'
+      InputDataConfig: '{{ response.ComprehendMedicalAsyncJobProperties.InputDataConfig.S3Key }}'
+      JobId: '{{ response.ComprehendMedicalAsyncJobProperties.JobId }}'
+      JobName: '{{ response.ComprehendMedicalAsyncJobProperties.JobName }}'
+      JobStatus: '{{ response.ComprehendMedicalAsyncJobProperties.JobStatus }}'
+      KMSKey: '{{ response.ComprehendMedicalAsyncJobProperties.KMSKey }}'
+      LanguageCode: '{{ response.ComprehendMedicalAsyncJobProperties.LanguageCode }}'
+      ManifestFilePath: '{{ response.ComprehendMedicalAsyncJobProperties.ManifestFilePath }}'
+      Message: '{{ response.ComprehendMedicalAsyncJobProperties.Message }}'
+      ModelVersion: '{{ response.ComprehendMedicalAsyncJobProperties.ModelVersion }}'
+      OutputDataConfig: '{{ response.ComprehendMedicalAsyncJobProperties.OutputDataConfig.S3Key }}'
+      SubmitTime: '{{ response.ComprehendMedicalAsyncJobProperties.SubmitTime }}'
+      S3Bucket: '{{ response.ComprehendMedicalAsyncJobProperties.InputDataConfig.S3Bucket }}'
+      S3Key: '{{ response.ComprehendMedicalAsyncJobProperties.InputDataConfig.S3Key }}'
+- discovery_id: aws.comprehendmedical.describe_snomedct_inference_job
+  for_each: aws.comprehendmedical.list_entities_detection_v2_jobs
+  calls:
+  - action: describe_snomedct_inference_job
+    params:
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ response.ComprehendMedicalAsyncJobProperties.DataAccessRoleArn }}'
+      EndTime: '{{ response.ComprehendMedicalAsyncJobProperties.EndTime }}'
+      ExpirationTime: '{{ response.ComprehendMedicalAsyncJobProperties.ExpirationTime }}'
+      InputDataConfig: '{{ response.ComprehendMedicalAsyncJobProperties.InputDataConfig }}'
+      JobId: '{{ response.ComprehendMedicalAsyncJobProperties.JobId }}'
+      JobName: '{{ response.ComprehendMedicalAsyncJobProperties.JobName }}'
+      JobStatus: '{{ response.ComprehendMedicalAsyncJobProperties.JobStatus }}'
+      KMSKey: '{{ response.ComprehendMedicalAsyncJobProperties.KMSKey }}'
+      LanguageCode: '{{ response.ComprehendMedicalAsyncJobProperties.LanguageCode }}'
+      ManifestFilePath: '{{ response.ComprehendMedicalAsyncJobProperties.ManifestFilePath }}'
+      Message: '{{ response.ComprehendMedicalAsyncJobProperties.Message }}'
+      ModelVersion: '{{ response.ComprehendMedicalAsyncJobProperties.ModelVersion }}'
+      OutputDataConfig: '{{ response.ComprehendMedicalAsyncJobProperties.OutputDataConfig }}'
+      SubmitTime: '{{ response.ComprehendMedicalAsyncJobProperties.SubmitTime }}'

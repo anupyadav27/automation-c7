@@ -1,0 +1,74 @@
+service,operation,document_path,field,kind,encoding,requires_params,doc
+acm-pca,GetPolicy,Policy,Policy,resource,json,ResourceArn,The policy attached to the private CA as a JSON document.
+apigateway,GetRestApi,policy,policy,resource,json,restApiId,A stringified JSON policy document that applies to this RestApi regardless of the caller and Method configuration.
+apigateway,GetRestApis,items[].policy,policy,resource,json,,A stringified JSON policy document that applies to this RestApi regardless of the caller and Method configuration.
+backup,GetBackupVaultAccessPolicy,Policy,Policy,resource,json,BackupVaultName,The backup vault access policy document in JSON format.
+cloudtrail,GetResourcePolicy,ResourcePolicy,ResourcePolicy,resource,json,ResourceArn,A JSON-formatted string that contains the resource-based policy attached to the CloudTrail channel.
+codeguruprofiler,GetPolicy,policy,policy,resource,json,profilingGroupName,The JSON-formatted resource-based policy attached to the ProfilingGroup.
+comprehend,DescribeResourcePolicy,ResourcePolicy,ResourcePolicy,resource,json,ResourceArn,The JSON body of the resource-based policy.
+ec2,DescribeVpcEndpoints,VpcEndpoints[].PolicyDocument,PolicyDocument,resource,json,,"The policy document associated with the endpoint, if applicable."
+ec2,GetVerifiedAccessEndpointPolicy,PolicyDocument,PolicyDocument,resource,json,VerifiedAccessEndpointId,The Verified Access policy document.
+ec2,GetVerifiedAccessGroupPolicy,PolicyDocument,PolicyDocument,resource,json,VerifiedAccessGroupId,The Verified Access policy document.
+ecr,GetLifecyclePolicy,lifecyclePolicyText,lifecyclePolicyText,resource,json,repositoryName,The JSON lifecycle policy text.
+ecr,GetLifecyclePolicyPreview,lifecyclePolicyText,lifecyclePolicyText,resource,json,repositoryName,The JSON lifecycle policy text.
+ecr,GetRegistryPolicy,policyText,policyText,resource,json,,The JSON text of the permissions policy for a registry.
+ecr,GetRepositoryPolicy,policyText,policyText,resource,json,repositoryName,The JSON repository policy text associated with the repository.
+ecr-public,GetRepositoryPolicy,policyText,policyText,resource,json,repositoryName,The repository policy text that's associated with the repository. The policy text will be in JSON format.
+efs,DescribeFileSystemPolicy,Policy,Policy,resource,json,FileSystemId,The JSON formatted FileSystemPolicy for the EFS file system.
+es,DescribeElasticsearchDomain,DomainStatus.AccessPolicies,AccessPolicies,resource,json,DomainName,IAM access policy as a JSON-formatted string.
+es,DescribeElasticsearchDomains,DomainStatusList[].AccessPolicies,AccessPolicies,resource,json,DomainNames,IAM access policy as a JSON-formatted string.
+events,ListEventBuses,EventBuses[].Policy,Policy,resource,json,,"The permissions policy of the event bus, describing which other Amazon Web Services accounts can write events to this event bus."
+glacier,GetVaultAccessPolicy,policy.Policy,Policy,resource,json,"accountId,vaultName",The vault access policy.
+glacier,GetVaultLock,Policy,Policy,resource,json,"accountId,vaultName","The vault lock policy as a JSON string, which uses ""\"" as an escape character."
+glue,GetResourcePolicies,GetResourcePoliciesResponseList[].PolicyInJson,PolicyInJson,resource,json,,"Contains the requested policy document, in JSON format."
+glue,GetResourcePolicy,PolicyInJson,PolicyInJson,resource,json,,"Contains the requested policy document, in JSON format."
+iam,GetAccountAuthorizationDetails,GroupDetailList[].GroupPolicyList[].PolicyDocument,PolicyDocument,identity,url,,The policy document.
+iam,GetAccountAuthorizationDetails,RoleDetailList[].AssumeRolePolicyDocument,AssumeRolePolicyDocument,trust,url,,The trust policy that grants permission to assume the role.
+iam,GetAccountAuthorizationDetails,RoleDetailList[].InstanceProfileList[].Roles[].AssumeRolePolicyDocument,AssumeRolePolicyDocument,trust,url,,The policy that grants an entity permission to assume the role.
+iam,GetAccountAuthorizationDetails,RoleDetailList[].RolePolicyList[].PolicyDocument,PolicyDocument,identity,url,,The policy document.
+iam,GetAccountAuthorizationDetails,UserDetailList[].UserPolicyList[].PolicyDocument,PolicyDocument,identity,url,,The policy document.
+iam,GetGroupPolicy,PolicyDocument,PolicyDocument,identity,url,"GroupName,PolicyName","The policy document. IAM stores policies in JSON format. However, resources that were created using CloudFormation templates can be formatted in YAML. CloudForm"
+iam,GetInstanceProfile,InstanceProfile.Roles[].AssumeRolePolicyDocument,AssumeRolePolicyDocument,trust,url,InstanceProfileName,The policy that grants an entity permission to assume the role.
+iam,GetRole,Role.AssumeRolePolicyDocument,AssumeRolePolicyDocument,trust,url,RoleName,The policy that grants an entity permission to assume the role.
+iam,GetRolePolicy,PolicyDocument,PolicyDocument,identity,url,"PolicyName,RoleName","The policy document. IAM stores policies in JSON format. However, resources that were created using CloudFormation templates can be formatted in YAML. CloudForm"
+iam,GetUserPolicy,PolicyDocument,PolicyDocument,identity,url,"PolicyName,UserName","The policy document. IAM stores policies in JSON format. However, resources that were created using CloudFormation templates can be formatted in YAML. CloudForm"
+iam,ListInstanceProfiles,InstanceProfiles[].Roles[].AssumeRolePolicyDocument,AssumeRolePolicyDocument,trust,url,,The policy that grants an entity permission to assume the role.
+iam,ListInstanceProfilesForRole,InstanceProfiles[].Roles[].AssumeRolePolicyDocument,AssumeRolePolicyDocument,trust,url,RoleName,The policy that grants an entity permission to assume the role.
+iam,ListRoles,Roles[].AssumeRolePolicyDocument,AssumeRolePolicyDocument,trust,url,,The policy that grants an entity permission to assume the role.
+kinesis,GetResourcePolicy,Policy,Policy,resource,json,ResourceARN,Details of the resource policy. This is formatted as a JSON string.
+kms,GetKeyPolicy,Policy,Policy,resource,json,"KeyId,PolicyName",A key policy document in JSON format.
+lambda,GetLayerVersionPolicy,Policy,Policy,resource,json,"LayerName,VersionNumber",The policy document.
+lambda,GetPolicy,Policy,Policy,resource,json,FunctionName,The resource-based policy.
+lexv2-models,DescribeResourcePolicy,policy,policy,resource,json,resourceArn,"The JSON structure that contains the resource policy. For more information about the contents of a JSON policy document, see  IAM JSON policy reference ."
+lookoutequipment,DescribeResourcePolicy,ResourcePolicy,ResourcePolicy,resource,json,ResourceArn,The resource policy in a JSON-formatted string.
+marketplace-catalog,GetResourcePolicy,Policy,Policy,resource,json,ResourceArn,The policy document to set; formatted in JSON.
+mediastore,GetContainerPolicy,Policy,Policy,resource,json,ContainerName,The contents of the access policy.
+mediatailor,GetChannelPolicy,Policy,Policy,resource,json,ChannelName,The IAM policy for the channel. IAM policies are used to control access to your channel.
+migration-hub-refactor-spaces,GetResourcePolicy,Policy,Policy,resource,json,Identifier,A JSON-formatted string for an Amazon Web Services resource-based policy.
+network-firewall,DescribeResourcePolicy,Policy,Policy,resource,json,ResourceArn,The IAM policy for the resource.
+networkmanager,GetCoreNetworkPolicy,CoreNetworkPolicy.PolicyDocument,PolicyDocument,resource,json,CoreNetworkId,Describes a core network policy.
+networkmanager,GetResourcePolicy,PolicyDocument,PolicyDocument,resource,json,ResourceArn,The resource policy document.
+oam,GetSinkPolicy,Policy,Policy,resource,json,SinkIdentifier,"The policy that you specified, in JSON format."
+opensearch,DescribeDomain,DomainStatus.AccessPolicies,AccessPolicies,resource,json,DomainName,Identity and Access Management (IAM) policy document specifying the access policies for the domain.
+opensearch,DescribeDomains,DomainStatusList[].AccessPolicies,AccessPolicies,resource,json,DomainNames,Identity and Access Management (IAM) policy document specifying the access policies for the domain.
+opensearch,DescribeDryRunProgress,DryRunConfig.AccessPolicies,AccessPolicies,resource,json,DomainName,Identity and Access Management (IAM) policy document specifying the access policies for the domain.
+rekognition,ListProjectPolicies,ProjectPolicies[].PolicyDocument,PolicyDocument,resource,json,ProjectArn,The JSON document for the project policy.
+s3,GetBucketAcl,Grants,Grants,resource,dict,Bucket,Bucket ACL grants; principals without a policy document
+s3,GetBucketPolicy,Policy,Policy,resource,json,Bucket,The bucket policy as a JSON document.
+s3control,GetAccessPointPolicyForObjectLambda,Policy,Policy,resource,json,"AccountId,Name",Object Lambda Access Point resource policy document.
+sagemaker,GetLineageGroupPolicy,ResourcePolicy,ResourcePolicy,resource,json,LineageGroupName,The resource policy that gives access to the lineage group in another account.
+sagemaker,GetModelPackageGroupPolicy,ResourcePolicy,ResourcePolicy,resource,json,ModelPackageGroupName,The resource policy for the model group.
+schemas,GetResourcePolicy,Policy,Policy,resource,json,,The resource-based policy.
+secretsmanager,GetResourcePolicy,ResourcePolicy,ResourcePolicy,resource,json,SecretId,"A JSON-formatted string that contains the permissions policy attached to the secret. For more information about permissions policies, see Authentication and acc"
+securityhub,GetFindings,Findings[].Resources[].Details.AwsElasticsearchDomain.AccessPolicies,AccessPolicies,resource,json,,IAM policy document specifying the access policies for the new Elasticsearch domain.
+securityhub,GetFindings,Findings[].Resources[].Details.AwsIamRole.AssumeRolePolicyDocument,AssumeRolePolicyDocument,trust,json,,The trust policy that grants permission to assume the role.
+securityhub,GetFindings,Findings[].Resources[].Details.AwsOpenSearchServiceDomain.AccessPolicies,AccessPolicies,resource,json,,IAM policy document that specifies the access policies for the OpenSearch Service domain.
+sns,GetDataProtectionPolicy,DataProtectionPolicy,DataProtectionPolicy,resource,json,ResourceArn,Retrieves the DataProtectionPolicy in JSON string format.
+sns,GetTopicAttributes,Attributes.Policy,Policy,resource,json,TopicArn,"Topic access policy, held in the Attributes map"
+sqs,GetQueueAttributes,Attributes.Policy,Policy,resource,json,QueueUrl,"Queue access policy, held in the Attributes map"
+ssm,DescribeParameters,Parameters[].Policies[].PolicyText,PolicyText,resource,json,,The JSON text of the policy.
+ssm,GetParameterHistory,Parameters[].Policies[].PolicyText,PolicyText,resource,json,Name,The JSON text of the policy.
+waf,GetPermissionPolicy,Policy,Policy,resource,json,ResourceArn,The IAM policy attached to the specified RuleGroup.
+waf-regional,GetPermissionPolicy,Policy,Policy,resource,json,ResourceArn,The IAM policy attached to the specified RuleGroup.
+wafv2,GetPermissionPolicy,Policy,Policy,resource,json,ResourceArn,The IAM policy that is attached to the specified rule group.
+xray,ListResourcePolicies,ResourcePolicies[].PolicyDocument,PolicyDocument,resource,json,,"The resource policy document, which can be up to 5kb in size."

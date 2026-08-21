@@ -1,0 +1,37 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: athena
+# 2 ops (1 from checks, +1 for inventory)
+version: '1.0'
+provider: aws
+service: athena
+discovery:
+  - calls:
+    - action: get_work_group
+      on_error: continue
+      save_as: response
+    discovery_id: aws.athena.get_work_group
+    emit:
+      as: item
+      item:
+        Configuration: '{{ response.WorkGroup.Configuration }}'
+        CreationTime: '{{ response.WorkGroup.CreationTime }}'
+        Description: '{{ response.WorkGroup.Description }}'
+        IdentityCenterApplicationArn: '{{ response.WorkGroup.IdentityCenterApplicationArn
+          }}'
+        Name: '{{ response.WorkGroup.Name }}'
+        State: '{{ response.WorkGroup.State }}'
+  - calls:
+    - action: list_work_groups
+      on_error: continue
+      save_as: response
+    discovery_id: aws.athena.list_work_groups
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        Description: '{{ item.Description }}'
+        EngineVersion: '{{ item.EngineVersion }}'
+        IdentityCenterApplicationArn: '{{ item.IdentityCenterApplicationArn }}'
+        Name: '{{ item.Name }}'
+        State: '{{ item.State }}'
+      items_for: '{{ response.WorkGroups }}'

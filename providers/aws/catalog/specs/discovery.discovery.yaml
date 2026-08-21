@@ -1,0 +1,233 @@
+version: '1.0'
+provider: aws
+service: discovery
+services:
+  client: discovery
+  module: boto3.client
+discovery:
+- discovery_id: aws.discovery.describe_agents
+  calls:
+  - action: describe_agents
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.agentsInfo }}'
+    item:
+      agentId: '{{ item.agentId }}'
+      agentNetworkInfoList: '{{ item.agentNetworkInfoList }}'
+      agentType: '{{ item.agentType }}'
+      agentsInfo: '{{ item.agentsInfo }}'
+      collectionStatus: '{{ item.collectionStatus }}'
+      connectorId: '{{ item.connectorId }}'
+      health: '{{ item.health }}'
+      hostName: '{{ item.hostName }}'
+      lastHealthPingTime: '{{ item.lastHealthPingTime }}'
+      registeredTime: '{{ item.registeredTime }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.discovery.describe_continuous_exports
+  calls:
+  - action: describe_continuous_exports
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.descriptions }}'
+    item:
+      dataSource: '{{ item.dataSource }}'
+      descriptions: '{{ item.descriptions }}'
+      exportId: '{{ item.exportId }}'
+      s3Bucket: '{{ item.s3Bucket }}'
+      schemaStorageConfig: '{{ item.schemaStorageConfig }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      statusDetail: '{{ item.statusDetail }}'
+      stopTime: '{{ item.stopTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.discovery.describe_export_configurations
+  calls:
+  - action: describe_export_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.exportsInfo }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      configurationsDownloadUrl: '{{ item.configurationsDownloadUrl }}'
+      exportId: '{{ item.exportId }}'
+      exportRequestTime: '{{ item.exportRequestTime }}'
+      exportStatus: '{{ item.exportStatus }}'
+      exportsInfo: '{{ item.exportsInfo }}'
+      isTruncated: '{{ item.isTruncated }}'
+      requestedEndTime: '{{ item.requestedEndTime }}'
+      requestedStartTime: '{{ item.requestedStartTime }}'
+      statusMessage: '{{ item.statusMessage }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.discovery.describe_export_tasks
+  calls:
+  - action: describe_export_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.exportsInfo }}'
+    item:
+      configurationsDownloadUrl: '{{ item.configurationsDownloadUrl }}'
+      exportId: '{{ item.exportId }}'
+      exportRequestTime: '{{ item.exportRequestTime }}'
+      exportStatus: '{{ item.exportStatus }}'
+      isTruncated: '{{ item.isTruncated }}'
+      requestedEndTime: '{{ item.requestedEndTime }}'
+      requestedStartTime: '{{ item.requestedStartTime }}'
+      statusMessage: '{{ item.statusMessage }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.discovery.describe_import_tasks
+  calls:
+  - action: describe_import_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tasks }}'
+    item:
+      applicationImportFailure: '{{ item.tasks[].applicationImportFailure }}'
+      applicationImportSuccess: '{{ item.tasks[].applicationImportSuccess }}'
+      clientRequestToken: '{{ item.clientRequestToken }}'
+      errorsAndFailedEntriesZip: '{{ item.tasks[].errorsAndFailedEntriesZip }}'
+      fileClassification: '{{ item.fileClassification }}'
+      importCompletionTime: '{{ item.importCompletionTime }}'
+      importDeletedTime: '{{ item.importDeletedTime }}'
+      importRequestTime: '{{ item.importRequestTime }}'
+      importTaskId: '{{ item.importTaskId }}'
+      importUrl: '{{ item.importUrl }}'
+      name: '{{ item.name }}'
+      serverImportFailure: '{{ item.serverImportFailure }}'
+      serverImportSuccess: '{{ item.serverImportSuccess }}'
+      status: '{{ item.status }}'
+      task: '{{ item.task }}'
+      tasks: '{{ item.tasks }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.discovery.describe_tags
+  calls:
+  - action: describe_tags
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      configurationId: '{{ item.configurationId }}'
+      configurationType: '{{ item.configurationType }}'
+      key: '{{ item.key }}'
+      tags: '{{ item.tags }}'
+      timeOfCreation: '{{ item.timeOfCreation }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.discovery.get_discovery_summary
+  calls:
+  - action: get_discovery_summary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      activeAgents: '{{ response.agentSummary.activeAgents }}'
+      agentSummary: '{{ response.agentSummary.agentSummary }}'
+      agentlessCollectorSummary: '{{ response.agentSummary.agentlessCollectorSummary }}'
+      applications: '{{ response.agentSummary.applications }}'
+      blackListedAgents: '{{ response.agentSummary.blackListedAgents }}'
+      connectorSummary: '{{ response.agentSummary.connectorSummary }}'
+      healthyAgents: '{{ response.agentSummary.healthyAgents }}'
+      meCollectorSummary: '{{ response.agentSummary.meCollectorSummary }}'
+      servers: '{{ response.agentSummary.servers }}'
+      serversMappedToApplications: '{{ response.agentSummary.serversMappedToApplications }}'
+      serversMappedtoTags: '{{ response.agentSummary.serversMappedtoTags }}'
+      shutdownAgents: '{{ response.agentSummary.shutdownAgents }}'
+      totalAgents: '{{ response.agentSummary.totalAgents }}'
+      unhealthyAgents: '{{ response.agentSummary.unhealthyAgents }}'
+      unknownAgents: '{{ response.agentSummary.unknownAgents }}'
+      activeAgentlessCollectors: '{{ response.agentlessCollectorSummary.activeAgentlessCollectors }}'
+      denyListedAgentlessCollectors: '{{ response.agentlessCollectorSummary.denyListedAgentlessCollectors }}'
+      healthyAgentlessCollectors: '{{ response.agentlessCollectorSummary.healthyAgentlessCollectors }}'
+      shutdownAgentlessCollectors: '{{ response.agentlessCollectorSummary.shutdownAgentlessCollectors }}'
+      totalAgentlessCollectors: '{{ response.agentlessCollectorSummary.totalAgentlessCollectors }}'
+      unhealthyAgentlessCollectors: '{{ response.agentlessCollectorSummary.unhealthyAgentlessCollectors }}'
+      unknownAgentlessCollectors: '{{ response.agentlessCollectorSummary.unknownAgentlessCollectors }}'
+      activeConnectors: '{{ response.connectorSummary.activeConnectors }}'
+      blackListedConnectors: '{{ response.connectorSummary.blackListedConnectors }}'
+      healthyConnectors: '{{ response.connectorSummary.healthyConnectors }}'
+      shutdownConnectors: '{{ response.connectorSummary.shutdownConnectors }}'
+      totalConnectors: '{{ response.connectorSummary.totalConnectors }}'
+      unhealthyConnectors: '{{ response.connectorSummary.unhealthyConnectors }}'
+      unknownConnectors: '{{ response.connectorSummary.unknownConnectors }}'
+      activeMeCollectors: '{{ response.meCollectorSummary.activeMeCollectors }}'
+      denyListedMeCollectors: '{{ response.meCollectorSummary.denyListedMeCollectors }}'
+      healthyMeCollectors: '{{ response.meCollectorSummary.healthyMeCollectors }}'
+      shutdownMeCollectors: '{{ response.meCollectorSummary.shutdownMeCollectors }}'
+      totalMeCollectors: '{{ response.meCollectorSummary.totalMeCollectors }}'
+      unhealthyMeCollectors: '{{ response.meCollectorSummary.unhealthyMeCollectors }}'
+      unknownMeCollectors: '{{ response.meCollectorSummary.unknownMeCollectors }}'
+- discovery_id: aws.discovery.describe_batch_delete_configuration_task
+  calls:
+  - action: describe_batch_delete_configuration_task
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      configurationType: '{{ response.task.configurationType }}'
+      deletedConfigurations: '{{ response.task.deletedConfigurations }}'
+      deletionWarnings: '{{ response.task.deletionWarnings }}'
+      endTime: '{{ response.task.endTime }}'
+      failedConfigurations: '{{ response.task.failedConfigurations }}'
+      requestedConfigurations: '{{ response.task.requestedConfigurations }}'
+      startTime: '{{ response.task.startTime }}'
+      status: '{{ response.task.status }}'
+      task: '{{ response.task.taskId }}'
+      taskId: '{{ response.task.taskId }}'
+- discovery_id: aws.discovery.describe_configurations
+  calls:
+  - action: describe_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.configurations }}'
+    item:
+      configurations: '{{ item.configurations }}'
+- discovery_id: aws.discovery.list_configurations
+  for_each: aws.discovery.describe_tags
+  calls:
+  - action: list_configurations
+    params:
+      configurationType: '{{ item.configurationType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.configurations }}'
+    item:
+      configurations: '{{ item.configurations }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.discovery.list_server_neighbors
+  for_each: aws.discovery.describe_tags
+  calls:
+  - action: list_server_neighbors
+    params:
+      configurationId: '{{ item.configurationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.neighbors }}'
+    item:
+      connectionsCount: '{{ item.connectionsCount }}'
+      destinationPort: '{{ item.destinationPort }}'
+      destinationServerId: '{{ item.destinationServerId }}'
+      sourceServerId: '{{ item.sourceServerId }}'
+      transportProtocol: '{{ item.transportProtocol }}'
+      knownDependencyCount: '{{ response.knownDependencyCount }}'
+      nextToken: '{{ response.nextToken }}'

@@ -1,0 +1,371 @@
+version: '1.0'
+provider: aws
+service: entityresolution
+services:
+  client: entityresolution
+  module: boto3.client
+discovery:
+- discovery_id: aws.entityresolution.list_id_mapping_workflows
+  calls:
+  - action: list_id_mapping_workflows
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workflowSummaries }}'
+    item:
+      KMSArn: '{{ item.KMSArn }}'
+      applyNormalization: '{{ item.applyNormalization }}'
+      createdAt: '{{ item.createdAt }}'
+      endTime: '{{ item.endTime }}'
+      errorDetails: '{{ item.errorDetails }}'
+      fieldName: '{{ item.fieldName }}'
+      groupName: '{{ item.groupName }}'
+      hashed: '{{ item.hashed }}'
+      idMappingTechniques: '{{ item.idMappingTechniques }}'
+      incrementalRunConfig: '{{ item.incrementalRunConfig }}'
+      inputSourceARN: '{{ item.inputSourceARN }}'
+      inputSourceConfig: '{{ item.inputSourceConfig }}'
+      jobType: '{{ item.jobType }}'
+      mappedInputFields: '{{ item.mappedInputFields }}'
+      matchKey: '{{ item.matchKey }}'
+      metrics: '{{ item.metrics }}'
+      outputS3Path: '{{ item.outputS3Path }}'
+      outputSourceConfig: '{{ item.outputSourceConfig }}'
+      resolutionTechniques: '{{ item.resolutionTechniques }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      subType: '{{ item.subType }}'
+      tags: '{{ item.tags }}'
+      updatedAt: '{{ item.updatedAt }}'
+      workflowArn: '{{ item.workflowArn }}'
+      workflowName: '{{ item.workflowName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.entityresolution.list_id_namespaces
+  calls:
+  - action: list_id_namespaces
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.idNamespaceSummaries }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      idMappingWorkflowProperties: '{{ item.idMappingWorkflowProperties }}'
+      idNamespaceArn: '{{ item.idNamespaceArn }}'
+      idNamespaceName: '{{ item.idNamespaceName }}'
+      type: '{{ item.type }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.entityresolution.list_matching_workflows
+  calls:
+  - action: list_matching_workflows
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workflowSummaries }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      resolutionType: '{{ item.resolutionType }}'
+      updatedAt: '{{ item.updatedAt }}'
+      workflowArn: '{{ item.workflowArn }}'
+      workflowName: '{{ item.workflowName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.entityresolution.list_provider_services
+  calls:
+  - action: list_provider_services
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.providerServiceSummaries }}'
+    item:
+      providerName: '{{ item.providerName }}'
+      providerServiceArn: '{{ item.providerServiceArn }}'
+      providerServiceDisplayName: '{{ item.providerServiceDisplayName }}'
+      providerServiceName: '{{ item.providerServiceName }}'
+      providerServiceType: '{{ item.providerServiceType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.entityresolution.list_schema_mappings
+  calls:
+  - action: list_schema_mappings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.schemaList }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      hasWorkflows: '{{ item.hasWorkflows }}'
+      schemaArn: '{{ item.schemaArn }}'
+      schemaName: '{{ item.schemaName }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.entityresolution.get_id_mapping_job
+  for_each: aws.entityresolution.list_id_mapping_workflows
+  calls:
+  - action: get_id_mapping_job
+    params:
+      workflowName: '{{ item.workflowName }}'
+      jobId: '{{ item.jobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.outputSourceConfig }}'
+    item:
+      KMSArn: '{{ item.KMSArn }}'
+      errorDetails: '{{ item.errorDetails }}'
+      jobType: '{{ item.jobType }}'
+      metrics: '{{ item.metrics }}'
+      outputS3Path: '{{ item.outputS3Path }}'
+      roleArn: '{{ item.roleArn }}'
+      endTime: '{{ response.endTime }}'
+      errorMessage: '{{ response.errorDetails.errorMessage }}'
+      jobId: '{{ response.jobId }}'
+      inputRecords: '{{ response.metrics.inputRecords }}'
+      recordsNotProcessed: '{{ response.metrics.recordsNotProcessed }}'
+      totalMappedRecords: '{{ response.metrics.totalMappedRecords }}'
+      totalMappedSourceRecords: '{{ response.metrics.totalMappedSourceRecords }}'
+      totalMappedTargetRecords: '{{ response.metrics.totalMappedTargetRecords }}'
+      totalRecordsProcessed: '{{ response.metrics.totalRecordsProcessed }}'
+      uniqueRecordsLoaded: '{{ response.metrics.uniqueRecordsLoaded }}'
+      startTime: '{{ response.startTime }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.entityresolution.get_id_mapping_workflow
+  for_each: aws.entityresolution.list_id_mapping_workflows
+  calls:
+  - action: get_id_mapping_workflow
+    params:
+      workflowName: '{{ item.workflowName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.inputSourceConfig }}'
+    item:
+      fieldName: '{{ item.fieldName }}'
+      groupName: '{{ item.groupName }}'
+      hashed: '{{ item.hashed }}'
+      idMappingTechniques: '{{ item.idMappingTechniques }}'
+      incrementalRunConfig: '{{ item.incrementalRunConfig }}'
+      inputSourceARN: '{{ item.inputSourceARN }}'
+      inputSourceConfig: '{{ item.inputSourceConfig }}'
+      mappedInputFields: '{{ item.mappedInputFields }}'
+      matchKey: '{{ item.matchKey }}'
+      metrics: '{{ item.metrics }}'
+      outputSourceConfig: '{{ item.outputSourceConfig }}'
+      schemaName: '{{ item.schemaName }}'
+      subType: '{{ item.subType }}'
+      tags: '{{ item.tags }}'
+      type: '{{ item.type }}'
+      createdAt: '{{ response.createdAt }}'
+      description: '{{ response.description }}'
+      idMappingType: '{{ response.idMappingTechniques.idMappingType }}'
+      intermediateS3Path: '{{ response.idMappingTechniques.providerProperties.intermediateSourceConfiguration.intermediateS3Path }}'
+      providerServiceArn: '{{ response.idMappingTechniques.providerProperties.providerServiceArn }}'
+      attributeMatchingModel: '{{ response.idMappingTechniques.ruleBasedProperties.attributeMatchingModel }}'
+      recordMatchingModel: '{{ response.idMappingTechniques.ruleBasedProperties.recordMatchingModel }}'
+      ruleDefinitionType: '{{ response.idMappingTechniques.ruleBasedProperties.ruleDefinitionType }}'
+      roleArn: '{{ response.roleArn }}'
+      updatedAt: '{{ response.updatedAt }}'
+      workflowArn: '{{ response.workflowArn }}'
+      workflowName: '{{ response.workflowName }}'
+- discovery_id: aws.entityresolution.get_id_namespace
+  for_each: aws.entityresolution.list_id_namespaces
+  calls:
+  - action: get_id_namespace
+    params:
+      idNamespaceName: '{{ item.idNamespaceName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.inputSourceConfig }}'
+    item:
+      inputSourceARN: '{{ item.inputSourceARN }}'
+      schemaName: '{{ item.schemaName }}'
+      createdAt: '{{ response.createdAt }}'
+      description: '{{ response.description }}'
+      idNamespaceArn: '{{ response.idNamespaceArn }}'
+      idNamespaceName: '{{ response.idNamespaceName }}'
+      roleArn: '{{ response.roleArn }}'
+      tags: '{{ response.tags }}'
+      type: '{{ response.type }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.entityresolution.get_match_id
+  calls:
+  - action: get_match_id
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      matchId: '{{ response.matchId }}'
+      matchRule: '{{ response.matchRule }}'
+- discovery_id: aws.entityresolution.get_matching_job
+  for_each: aws.entityresolution.list_id_mapping_workflows
+  calls:
+  - action: get_matching_job
+    params:
+      workflowName: '{{ item.workflowName }}'
+      jobId: '{{ item.jobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.outputSourceConfig }}'
+    item:
+      KMSArn: '{{ item.KMSArn }}'
+      outputS3Path: '{{ item.outputS3Path }}'
+      roleArn: '{{ item.roleArn }}'
+      endTime: '{{ response.endTime }}'
+      errorMessage: '{{ response.errorDetails.errorMessage }}'
+      jobId: '{{ response.jobId }}'
+      inputRecords: '{{ response.metrics.inputRecords }}'
+      matchIDs: '{{ response.metrics.matchIDs }}'
+      recordsNotProcessed: '{{ response.metrics.recordsNotProcessed }}'
+      totalRecordsProcessed: '{{ response.metrics.totalRecordsProcessed }}'
+      startTime: '{{ response.startTime }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.entityresolution.get_matching_workflow
+  for_each: aws.entityresolution.list_id_mapping_workflows
+  calls:
+  - action: get_matching_workflow
+    params:
+      workflowName: '{{ item.workflowName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.inputSourceConfig }}'
+    item:
+      applyNormalization: '{{ item.applyNormalization }}'
+      inputSourceARN: '{{ item.inputSourceARN }}'
+      resolutionTechniques: '{{ item.resolutionTechniques }}'
+      schemaName: '{{ item.schemaName }}'
+      createdAt: '{{ response.createdAt }}'
+      description: '{{ response.description }}'
+      incrementalRunType: '{{ response.incrementalRunConfig.incrementalRunType }}'
+      intermediateS3Path: '{{ response.resolutionTechniques.providerProperties.intermediateSourceConfiguration.intermediateS3Path }}'
+      providerServiceArn: '{{ response.resolutionTechniques.providerProperties.providerServiceArn }}'
+      resolutionType: '{{ response.resolutionTechniques.resolutionType }}'
+      attributeMatchingModel: '{{ response.resolutionTechniques.ruleBasedProperties.attributeMatchingModel }}'
+      matchPurpose: '{{ response.resolutionTechniques.ruleBasedProperties.matchPurpose }}'
+      roleArn: '{{ response.roleArn }}'
+      tags: '{{ response.tags }}'
+      updatedAt: '{{ response.updatedAt }}'
+      workflowArn: '{{ response.workflowArn }}'
+      workflowName: '{{ response.workflowName }}'
+- discovery_id: aws.entityresolution.get_policy
+  calls:
+  - action: get_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.arn }}'
+      policy: '{{ response.policy }}'
+      token: '{{ response.token }}'
+- discovery_id: aws.entityresolution.get_provider_service
+  for_each: aws.entityresolution.list_provider_services
+  calls:
+  - action: get_provider_service
+    params:
+      providerName: '{{ item.providerName }}'
+      providerServiceName: '{{ item.providerServiceName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.providerConfigurationDefinition.Status }}'
+      Enabled: '{{ response.providerConfigurationDefinition.Enabled }}'
+      anonymizedOutput: '{{ response.anonymizedOutput }}'
+      assetId: '{{ response.providerEndpointConfiguration.marketplaceConfiguration.assetId }}'
+      dataSetId: '{{ response.providerEndpointConfiguration.marketplaceConfiguration.dataSetId }}'
+      listingId: '{{ response.providerEndpointConfiguration.marketplaceConfiguration.listingId }}'
+      revisionId: '{{ response.providerEndpointConfiguration.marketplaceConfiguration.revisionId }}'
+      description: '{{ response.providerIdNameSpaceConfiguration.description }}'
+      providerName: '{{ response.providerName }}'
+      providerServiceArn: '{{ response.providerServiceArn }}'
+      providerServiceDisplayName: '{{ response.providerServiceDisplayName }}'
+      providerServiceName: '{{ response.providerServiceName }}'
+      providerServiceType: '{{ response.providerServiceType }}'
+- discovery_id: aws.entityresolution.get_schema_mapping
+  for_each: aws.entityresolution.list_schema_mappings
+  calls:
+  - action: get_schema_mapping
+    params:
+      schemaName: '{{ item.schemaName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.mappedInputFields }}'
+    item:
+      fieldName: '{{ item.fieldName }}'
+      groupName: '{{ item.groupName }}'
+      hashed: '{{ item.hashed }}'
+      mappedInputFields: '{{ item.mappedInputFields }}'
+      matchKey: '{{ item.matchKey }}'
+      subType: '{{ item.subType }}'
+      type: '{{ item.type }}'
+      createdAt: '{{ response.createdAt }}'
+      description: '{{ response.description }}'
+      hasWorkflows: '{{ response.hasWorkflows }}'
+      schemaArn: '{{ response.schemaArn }}'
+      schemaName: '{{ response.schemaName }}'
+      tags: '{{ response.tags }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.entityresolution.list_id_mapping_jobs
+  for_each: aws.entityresolution.list_id_mapping_workflows
+  calls:
+  - action: list_id_mapping_jobs
+    params:
+      workflowName: '{{ item.workflowName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.jobs }}'
+    item:
+      KMSArn: '{{ item.KMSArn }}'
+      endTime: '{{ item.endTime }}'
+      errorDetails: '{{ item.errorDetails }}'
+      jobId: '{{ item.jobId }}'
+      jobType: '{{ item.jobType }}'
+      metrics: '{{ item.metrics }}'
+      outputS3Path: '{{ item.outputS3Path }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.entityresolution.list_matching_jobs
+  for_each: aws.entityresolution.list_id_mapping_workflows
+  calls:
+  - action: list_matching_jobs
+    params:
+      workflowName: '{{ item.workflowName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.jobs }}'
+    item:
+      endTime: '{{ item.endTime }}'
+      jobId: '{{ item.jobId }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.entityresolution.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

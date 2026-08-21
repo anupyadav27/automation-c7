@@ -1,0 +1,14 @@
+version: '1.0'
+provider: aws
+service: keyspaces
+discovery:
+- calls:
+  - action: list_keyspaces
+    on_error: continue
+    save_as: response
+  discovery_id: aws.keyspaces.list_keyspaces
+  emit:
+    as: item
+    items_for: '{{ response.keyspaces }}'
+    item:
+      nextToken: '{{ response.nextToken }}'

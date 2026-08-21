@@ -1,0 +1,993 @@
+# The universal topology model — one diagram grammar for every cloud.
+#
+# Why this is provider-neutral
+# ----------------------------
+# AWS, Azure, GCP, OCI and IBM disagree about names and about almost nothing
+# else. Every one of them has an account boundary, a region, a software-defined
+# network, a zone, a segment of that network, a workload in it and things bound
+# to that workload. The words differ; the shape does not.
+#
+#     role        AWS          Azure            GCP              OCI
+#     ─────────────────────────────────────────────────────────────────────
+#     account     Account      Subscription     Project          Compartment
+#     network     VPC          VNet             VPC network      VCN
+#     zone        AZ           Availability Zone Zone            Availability Domain
+#     segment     Subnet       Subnet           Subnetwork       Subnet
+#     workload    EC2, RDS     VM, SQL DB       GCE, Cloud SQL   Instance
+#     attachment  EBS, ENI     Disk, NIC        PD, NIC          Block Volume, VNIC
+#
+# So the layout grammar is defined ONCE here, against roles. A provider ships a
+# `topology_binding.yaml` that says which of its types play which role, and
+# inherits every placement rule for free. A new provider is a binding file, not
+# a new renderer.
+#
+# What this file does NOT contain
+# -------------------------------
+# Provider type names. Not one. If a service name appears here the model has
+# leaked and the next cloud will need a fork. Bindings own that mapping.
+#
+# The two axioms every rank below is derived from
+# -----------------------------------------------
+#   A1  the VERTICAL axis is the traffic path.  Above means upstream.
+#   A2  the HORIZONTAL axis is redundancy.      Beside means peer or replica.
+#
+# And their corollaries:
+#   C1  cross-cutting things leave the flow. Something that applies to
+#       EVERYTHING in a container has no position in the traffic path, so it
+#       renders on a border RAIL rather than in a band.
+#   C2  boundary objects sit on the boundary. An internet gateway is not IN a
+#       network, it IS the network's edge, so it straddles the border line.
+#
+# See docs/diagram-layout-spec.md for the full derivation.
+
+version: 1
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 1. THE SPINE — containers, in nesting order
+# ══════════════════════════════════════════════════════════════════════
+#
+#   axis        how this container arranges its children.
+#                 band = stacked vertically, ordered by rank   (A1)
+#                 lane = side by side, ordered by rank         (A2)
+#   rails       which borders accept cross-cutting groups      (C1)
+#   scope       default extent. A binding MAY override per provider - GCP's
+#               network is global where AWS's is regional, and that is a real
+#               difference the model has to carry rather than hide.
+#   rank        nesting depth. Ordering of the spine itself.
+#   band        the slot this container occupies in its PARENT's flow, and
+#   band_rank   where in that flow it sits. A container is a child too: a
+#               network has to sort against its region's other bands, so it
+#               needs a band of its own or it falls out of the ordering
+#               entirely and lands in `unplaced` - which is exactly what
+#               happened before these two fields existed.
+
+containers:
+
+  - role: org
+    kind: boundary
+    rank: 0
+    band: org
+    band_rank: 10
+    axis: band
+    scope: global
+    rails: []
+    note: absent in providers with no org layer; collapses away (§5)
+
+  - role: account
+    kind: boundary
+    rank: 10
+    band: account
+    band_rank: 10
+    axis: band
+    scope: global
+    rails: [w]
+    note: the billing and identity boundary
+
+  - role: region
+    kind: boundary
+    rank: 20
+    band: region
+    band_rank: 20
+    axis: band
+    scope: regional
+    rails: [e]
+
+  - role: network
+    kind: boundary
+    rank: 30
+    band: network
+    band_rank: 20
+    axis: band
+    scope: regional
+    rails: [s]
+    note: >
+      the outermost drawn box inside a region. Spans zones - it is NOT inside
+      one. Where a provider makes this global (GCP), the binding sets
+      scope: global and the engine draws it spanning the region boxes instead.
+
+  - role: zone
+    kind: boundary
+    rank: 40
+    band: zones
+    band_rank: 20
+    axis: lane
+    scope: zonal
+    rails: []
+    note: >
+      the ONLY container that lays its children out as lanes. Zones are
+      parallel copies of one tier, which is exactly A2.
+
+  - role: segment
+    kind: boundary
+    rank: 50
+    band: segments
+    band_rank: 10
+    axis: band
+    scope: zonal
+    rails: []
+    note: the intersection of a zone and a network - belongs to exactly one of each
+
+  - role: workload
+    rank: 60
+    band: compute
+    band_rank: 20
+    axis: band
+    scope: zonal
+    rails: [s]
+    note: rail carries the cross-cutting codes - security groups, routes, identity
+
+  - role: attachment
+    rank: 70
+    band: attachments
+    band_rank: 10
+    axis: band
+    scope: zonal
+    rails: []
+    note: bound to a workload rather than to the network; nests so it reads as containment
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 2. ANCHORS — position relative to a container's border
+# ══════════════════════════════════════════════════════════════════════
+
+anchors:
+  in:      inside the container, participating in band/lane flow. The default.
+  edge.n:  straddles the north border line. Boundary objects only (C2).
+           Scoped to a NETWORK or SEGMENT until `door.ingress`, which puts the
+           account's own ways in on the account's own top line. The constraint
+           was never that a door must live in a network - it was that whatever
+           sits on a border must BE a way through the thing it borders.
+  edge.s:  straddles the south border line.
+  edge.e:  straddles the east border line.
+  edge.w:  straddles the west border line.
+  rail.n:  a strip along the inside of the north border, outside band flow (C1).
+  rail.s:  a strip along the inside of the south border.
+  rail.e:  a strip along the inside of the east border.
+  rail.w:  a strip along the inside of the west border.
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 2b. KINDS — what this thing IS, relative to its boundary
+# ══════════════════════════════════════════════════════════════════════
+#
+# Six kinds, and every node is exactly one. The kind decides HOW a thing is
+# placed; the role decides WHERE. Each answers the same question - what is my
+# relationship to the boundary I am drawn in? - which is why six is enough and
+# why they form a family rather than a list.
+#
+# Without the distinction a security group, an internet gateway and a database
+# are all just "contents", differing only in which band they land in. That is
+# what let a network ACL governing four subnets render inside one of them.
+#
+#   boundary   I AM one.
+#              Account, region, network, zone, segment.
+#              -> the SPINE. Everything else is placed relative to one of these.
+#
+#   resident   I live inside it and hold an address; traffic terminates at me.
+#              Instances, databases, caches, balancers - and VPC-attached
+#              functions, tasks and cluster nodes, which hold an address in a
+#              segment exactly like an instance does.
+#              -> INLINE, in a band.
+#
+#   part       I belong to exactly one resident.
+#              Interfaces, volumes, listeners, target groups.
+#              -> NESTS inside its host. With no host it is dangling, which is
+#                 a finding as much as a placement question.
+#
+#   door       I am a way through the boundary.
+#              Gateways, endpoints, peerings, interconnects.
+#              -> EDGE straddling the border line. A door sits IN the boundary;
+#                 a rule sits AGAINST it. That is the whole difference.
+#
+#   rule       I govern everything inside it, and hold no address.
+#              Security groups, ACLs, route tables, roles, keys.
+#              -> RAIL just inside the border of the container it is scoped to,
+#                 on the arm that matches the question it answers (see §4d-ii).
+#                 Scope wins over containment: a VPC-scoped ACL belongs to the
+#                 VPC however many subnets it is associated with.
+#
+#   record     I am not in the picture. I describe something that is.
+#              Images, snapshots, key pairs, launch templates, versions, log
+#              groups - provenance and saved settings.
+#              -> NOT DRAWN. Real, collected and countable, reachable from the
+#                 panel of whatever they describe. Drawing them inline buries
+#                 the estate in provenance; drawing them on a border claims a
+#                 control they do not have.
+#
+# A NAT gateway is a door, not a resident, even though it lives in a segment
+# and owns an interface. What it IS is the way out - drawing it inline buries
+# the single most important egress path among the workloads it serves.
+#
+# NAMING RULE: a role name is its kind, optionally followed by `.` and a
+# qualifier - `record`, `part`, `door.egress`, `rule.identity`,
+# `resident.compute`. Enforced by test, so a role can no longer claim to be one
+# thing and behave as another, which `flow.egress` (a door) did for months.
+
+kinds: [boundary, resident, part, door, rule, record]
+
+
+# ── the placement decision, as a table ────────────────────────────────
+#
+# Three facts decide where anything goes, and only three:
+#
+#   scope        the container the resource belongs to. An interface is scoped
+#                to a segment, a security group to a network.
+#   cardinality  how many things it can be attached to. `one` or `many`.
+#                A fact about the TYPE, not about today's configuration.
+#   attached     whether it is, right now, attached to something we collected.
+#                A fact about the INSTANCE.
+#
+#   scope   cardinality  attached   ->  placement
+#   ─────────────────────────────────────────────────────────────────────
+#   any     one          yes        ->  INSIDE its host
+#   any     one          no         ->  on its SCOPE container's border
+#   any     many         (ignored)  ->  on its SCOPE container's border,
+#                                       association shown as a tag on each
+#                                       resource it governs
+#   any     none         -          ->  INLINE - it is a resident, it holds an
+#                                       address, it is not attached to anything
+#
+# Why cardinality decides it rather than the current attachment: a thing that
+# can only ever serve one host belongs WITH that host, so drawing it separately
+# would split one unit in two. A thing that serves many belongs to none of them,
+# so drawing it inside any one would be a lie - which is how a network ACL
+# governing four subnets came to be drawn inside one of them.
+#
+# The `many` row deliberately ignores attachment. A security group attached to
+# nothing is still a security group of that network, and an unused one is worth
+# seeing, not hiding.
+
+#   scope   cardinality  attached   ->  placement
+#   ─────────────────────────────────────────────────────────────────────
+#   any     one          yes        ->  INSIDE its host
+#   any     one          no         ->  on its SCOPE container's border
+#   any     many         (ignored)  ->  on its SCOPE container's border
+#   any     none         -          ->  INLINE, in its band
+#
+# One pass reads this table. It used to be three - one for a flow role outside
+# a network, one for an attachment with no host, one for a binding outside its
+# scope - each doing the same thing ("declared placement disagrees with where
+# containment put it, so correct it") in its own way, in an order that mattered
+# and was never written down.
+
+attachment_rule:
+  one_attached:    host
+  # Its scope container's border. This was inline for a while, because a
+  # segment measured 130px and a strip there had room for a label and nothing
+  # else. Bottom-up sizing removed that objection: a container is now as wide
+  # as what it must carry, INCLUDING its border strip, so the strip fits by
+  # construction rather than by luck.
+  one_unattached:  scope_border
+  many:            scope_border
+  none:            inline
+  artifact:        band
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 2c. EDGE ORDER — which door sits where along a border
+# ══════════════════════════════════════════════════════════════════════
+#
+# The south border is where a private network reaches everything outside it, so
+# it is ordered CENTRE-OUT by how public the destination is: the way to the open
+# internet takes the middle, private service access flanks it, and the links to
+# your own datacentre sit at the ends. North, east and west read left to right.
+
+edge_order:
+  centre_out: [s]
+  note: >
+    lower edge_rank is more central on a centre-out border, and earlier on any
+    other. Ties break on the node sort key, so two endpoints never swap places
+    between runs.
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 2d. TAXONOMY — what KIND OF SERVICE this is
+# ══════════════════════════════════════════════════════════════════════
+#
+# Independent of placement, and the independence is the point. Placement asks
+# "where does this draw" and answers with a class, an anchor and a scope.
+# Taxonomy asks "what sort of service is this" and answers with a category and
+# a sub-category. A security group is a `binding` that draws on the network's
+# rail AND a `network · firewall` service; neither fact implies the other.
+#
+# They were the same field for a while - `rule.network` was doing both jobs -
+# which is why the filter could only ever be as granular as the placement
+# happened to be, and why 354 resources collapsed into three rows.
+#
+# Two levels. The category is the coarse cut a reader scans; the sub-category
+# is the one they act on. Provider-neutral, because every cloud has object
+# storage and an identity service; which of ITS services fills each slot is
+# the binding's business.
+
+# ORDER IS MEANING. The sequence a category is written in, and the sequence its
+# subcategories are written in, IS the order they draw in when several land in
+# the same place - and several do: thirteen subcategories share the region's
+# north rail. Before this the tie-break was the alphabet, which put
+# `ai.training` first on a governance rail for no reason anyone could defend.
+#
+# So do not alphabetise this block. Moving a line moves a box.
+
+taxonomy:
+  compute:      [instances, serverless, containers, batch, edge]
+  storage:      [object, file, block, backup, transfer]
+  database:     [relational, nosql, cache, warehouse, graph, document, timeseries]
+  # `delivery` held a global CDN and an in-subnet balancer together, which is
+  # too coarse to filter on: they are both "getting traffic to things" and
+  # nothing else. Split by WHAT THE THING DOES, never by where it is deployed -
+  # the container already says region, subnet or account, and a domain that
+  # depended on placement would move an ALB to another category the day AWS
+  # made it regional.
+  network:      [igw, nat, tgw, direct-connect, vpn, peering, private-link,
+                 interface, security-group, nacl, firewall, routing,
+                 dns-zones, dns-resolver, dns-discovery,
+                 loadbalancing, proxy, delivery, connectivity]
+  # `identity` is WHO may act; `policy` is WHAT they may do. One subcategory
+  # held both, so a single rail tab read `identity 251` over 116 roles, 20
+  # instance profiles, one group and 104 permission documents — four kinds of
+  # object under one noun, and the two questions an access review actually asks
+  # ("who exists" and "what are they allowed") could not be told apart on the
+  # map. `policy` sits next to `identity` because they are read together.
+  security:     [identity, policy, encryption, secrets, certificates, detection, posture]
+  governance:   [audit, flow-logs, logs, metrics, alarms, traces, synthetics,
+                 observability, provisioning, cost, config]
+  integration:  [messaging, events, workflow, api, streaming]
+  analytics:    [query, etl, search, bi]
+  ai:           [training, inference, foundation]
+  devops:       [repo, build, artifact, pipeline, deploy]
+  migration:    [transfer, replication]
+  management:   [account, quota, catalog]
+  # Services AWS runs FOR you, rather than primitives you build one FROM. The
+  # other twelve categories are infrastructure, so there was nowhere to put a
+  # contact centre - and 320 services classified in bulk went to the nearest
+  # infrastructure slot, which put 290 non-messaging types into
+  # `integration.messaging` and made a filter on "integration" useless.
+  #
+  # The line against compute.edge is whether the service runs YOUR code
+  # somewhere else: Greengrass does and stays edge, IoT Core is a platform you
+  # talk to and comes here.
+  application:  [communications, devices, media, business, enduser]
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 3. ROLES — the placement vocabulary a binding maps onto
+# ══════════════════════════════════════════════════════════════════════
+#
+# Every role below answers exactly one question: where does this draw, and in
+# what order among its peers. A binding never invents a role; if a service does
+# not fit one of these, that is a gap in the MODEL and gets fixed here, once,
+# for every cloud.
+
+roles:
+
+  # ── boundary: things that ARE a border, not things inside one (C2) ──
+  door.internet:
+    kind: door
+    anchor: edge.n
+    edge_rank: 10
+    container: network
+    note: internet gateway / egress-only gateway. The public edge of the network.
+
+  door.onprem:
+    kind: door
+    anchor: edge.n
+    edge_rank: 30
+    container: network
+    note: >
+      VPN gateway, dedicated interconnect. Points at the datacentre, which is
+      the least public destination on the south border, so it sits outermost.
+
+  door.lateral:
+    kind: door
+    anchor: edge.n
+    edge_rank: 10
+    container: network
+    note: >
+      transit gateway and network peering. These carry traffic OUT of the
+      network to other networks, which is the same job the internet gateway
+      does, so they share its border rather than taking a side of their own.
+      Grouping the ways out together is what makes the top edge readable as
+      "everything that leaves here".
+
+  door.ingress:
+    kind: door
+    anchor: edge.n
+    container: account
+    edge_rank: 10
+    edge_align: right
+    note: >
+      CDN and public DNS. These were resident.edge - drawn inline at the top of
+      the account, among the things they are upstream OF - and the kind test in
+      4b is what settles it: a resident lives inside a boundary and holds an
+      address; a door IS the way through one. A distribution and a hosted zone
+      are how traffic from the internet finds this account at all, so they
+      belong ON its border rather than inside it.
+
+      Right-aligned, opposite the org tab, so the account's top line reads
+      "who owns this" on one end and "how you get in" on the other.
+
+      NOT a home for global WAF, Shield or Global Accelerator, which shared
+      resident.edge and are staying there: a WAF governs a way through without
+      being one, which makes it a rule, not a door.
+
+  door.service:
+    kind: door
+    anchor: edge.n
+    edge_rank: 20
+    container: network
+    note: >
+      private service access implemented as a ROUTE rather than an interface -
+      it has no address inside the network, so it is a border, not a resident.
+      The interface-backed variant is resident.ingress and draws in a segment. Same
+      product name, two placements, decided by the resource's own data.
+
+  # ── EXPOSURE — how far from the internet, in hops ──
+  #
+  # `exposure` is the reader-facing name for what the band ranks already
+  # encode: L1 is on the open internet by definition, L4 cannot be reached from
+  # it at all. It is a property of the ROLE, so it is declared once here rather
+  # than recomputed per resource, and it holds for every cloud - a CDN is L1 on
+  # AWS, Azure and GCP alike.
+  #
+  #   L1  internet     public by definition, with no network to hide behind.
+  #                    CDN, global WAF, global accelerator, public DNS.
+  #   L2  entry        terminates inbound traffic AT the boundary. Load
+  #                    balancers, API gateways, internet gateways.
+  #   L3  conditional  reachable from outside only if something grants it - a
+  #                    public address plus a gateway, a balancer in front, or a
+  #                    resource policy. Instances, tasks, buckets.
+  #   L4  internal     no path from the internet exists. Databases, caches,
+  #                    file systems in private segments.
+  #
+  # Bindings, doors, components and artifacts carry NO exposure. They are not
+  # on the traffic path - a policy is not nearer or further from the internet,
+  # it applies - and giving them a level would say something false.
+
+  # ── flow: the traffic path, top to bottom (A1) ──
+  resident.edge:
+    kind: resident
+    exposure: 1
+    band: edge
+    rank: 10
+    container: account
+    note: CDN, global WAF, global accelerator. Upstream of every region.
+
+  resident.ingress:
+    kind: resident
+    exposure: 2
+    band: ingress
+    rank: 10
+    container: [region, segment]
+    note: API gateways, interface-backed private endpoints, ENI-only appliances.
+
+  resident.balancer:
+    kind: resident
+    exposure: 2
+    band: balancer
+    rank: 10
+    container: network
+    spans: zone
+    note: >
+      a load balancer has one interface PER ZONE it is enabled in. Drawing it
+      inside a single segment is factually wrong, so it spans the zone lanes -
+      but only those it actually occupies.
+
+  door.egress:
+    kind: door
+    anchor: edge.n
+    edge_rank: 10
+    container: segment
+    note: >
+      NAT. A door, not a resident: it lives in exactly one segment and owns an
+      interface there, but what it IS is the way from private address space to
+      the open internet. Drawn inline it would be buried among the workloads it
+      serves, so it sits on its segment's south border - and because the open
+      internet is the most public destination on that border, it takes the
+      centre. Genuinely zonal, so unlike a balancer it does NOT span.
+
+  resident.compute:
+    kind: resident
+    exposure: 3
+    band: compute
+    rank: 20
+    container: segment
+
+  resident.data:
+    kind: resident
+    exposure: 4
+    band: data
+    rank: 30
+    container: segment
+    note: databases, caches, file systems. Downstream of compute (A1).
+
+  # ── THE FOUR ARMS — which border a rule rides, and why ──
+  #
+  # A rule applies to everything inside a boundary, so it has no position in
+  # the traffic path - but it still has to go SOMEWHERE, and picking the side
+  # by hand meant one arm became a bin. East held secrets, encryption, config,
+  # deploy, posture, provisioning and observability at once: seven different
+  # questions stacked on one border because nothing said they were different.
+  #
+  # The axioms already decide it. A1 makes the vertical axis the traffic path,
+  # so north and south are about FLOW. A2 makes the horizontal axis peers, so
+  # east and west are for what applies regardless of where in the flow you are.
+  # That yields four distinct questions, one per arm:
+  #
+  #   north  WHO AND WHAT PROTECTS   identity, keys, secrets, certificates
+  #   east   HOW IT IS RUN           audit, config, observability, deploy,
+  #                                  provisioning, orchestration, scaling
+  #   west   HOW TRAFFIC MOVES       firewall, routing, dns, connectivity
+  #   south  ATTACHED TO NOTHING     unattached interfaces and volumes, and
+  #                                  the endpoints that are ways out
+  #
+  # North carries identity and encryption together because they answer one
+  # question between them - who may act, and what protects what they act on -
+  # and because the north EDGE already holds the ways in, so the rail just
+  # inside it is where controls over arrival belong.
+  #
+  # A rail groups by SUBCATEGORY, so 331 identity resources are one chip
+  # reading `identity 331`, not 331 chips. That is what makes a horizontal arm
+  # viable for the largest family in the estate.
+  #
+  # North reads as oversight because it sits above the box, looking down on it -
+  # and because the north EDGE already holds the ways in, so the rail just
+  # inside it is where the controls over arrival naturally belong.
+  #
+  # Declared per role rather than derived, so each assignment is arguable in
+  # review. The test asserts every rail role names one of the four.
+
+  # ── parts: bound to one resident, not to the network ──
+  part:
+    kind: part
+    cardinality: one
+    band: attachments
+    rank: 10
+    anchor: in
+    container: workload
+    note: >
+      a volume, an interface, a listener, a target group. It belongs to exactly
+      one resident, so it nests inside that resident rather than sitting beside
+      it as a peer - four boxes in a subnet where there is one machine reads as
+      four machines.
+
+      Attached, it nests. Unattached, the placement table sends it to its scope
+      container's border and flags it, because an interface attached to nothing
+      is a cost finding as much as a placement question.
+
+      Declared here rather than patched into the role table in code, which is
+      where it lived while it was called `attachment` and collided with the
+      spine layer of the same name.
+
+  # ── planes: cross-cutting, so rails not bands (C1) ──
+  resident.regional:
+    kind: resident
+    exposure: 3
+    band: services
+    rank: 30
+    container: region
+    note: >
+      in-region services that sit in no network. These ARE in the traffic path,
+      so they get a band. Sub-ordered by the lanes below.
+
+      Named `regional` rather than `application` because that is what it means -
+      an in-region service outside any network - and because `application` is
+      needed for the lane that holds the services which ARE the application.
+
+  rule.platform:
+    kind: rule
+    cardinality: many
+    # WHAT PROTECTS. Keys, secrets, certificates - north, beside identity.
+    anchor: rail.n
+    container: region
+    rank: 10
+    note: encryption, secrets, certificates, identity, delivery pipelines.
+
+  rule.orchestration:
+    kind: rule
+    cardinality: many
+    # HOW IT IS RUN. A control plane answers "what put this here", the same
+    # question an audit trail answers about a change.
+    anchor: rail.e
+    container: region
+    rank: 5
+    note: >
+      control planes. A container orchestrator, a workflow engine, a training
+      service and a scaling group all DRIVE compute rather than being it - what
+      actually runs is an instance, a task or a function, and those are already
+      drawn. Given a band of their own they read as a second set of workloads
+      sitting beside the real ones, doubling the apparent size of the estate.
+
+      So: scope decides where, exactly as it does for any other binding. A
+      regional orchestrator rides the region rail; one scoped to a network
+      rides the network's. What it governs is an edge, not a container - which
+      is also the honest shape, because an orchestrator's members frequently
+      live somewhere it does not.
+
+  record:
+    kind: record
+    render: detail
+    band: artifacts
+    rank: 40
+    container: region
+    collapsed: true
+    note: >
+      images, snapshots, key pairs, templates, versions, logs. Configuration
+      and provenance - NOT architecture. An image belongs in the detail of the
+      instance it launched, not beside that instance as a peer, so these are
+      not drawn on the canvas at all.
+
+      They keep a band definition because the canvas can be asked to show them,
+      and they stay in the scene graph because they are real and worth
+      counting. Only 37 of 133 are reachable from a resource by an edge, so
+      detail alone would hide the rest - the filter lists every one of them.
+
+  rule.governance:
+    kind: rule
+    cardinality: many
+    # HOW IT IS RUN. Audit, config, posture, provisioning - east.
+    anchor: rail.e
+    container: region
+    rank: 20
+    collapsed: true
+    note: observability, audit, configuration, backup. Collapsed by default.
+
+  rule.identity:
+    kind: rule
+    cardinality: many
+    # WHO. North with encryption - together they answer who may act and what
+    # protects what they act on.
+    anchor: rail.n
+    container: account
+    note: >
+      identity applies to everything in the account equally, so by C1 it cannot
+      sit in the flow. This is why IAM is a rail and not a box at the top.
+
+  rule.scaling:
+    kind: rule
+    cardinality: many
+    # HOW IT IS RUN. A scaling group decides how many instances exist; it
+    # governs no traffic, so it is not the path arm.
+    anchor: rail.e
+    container: network
+    collapsed: true
+    note: >
+      autoscaling groups and capacity providers. These govern WORKLOADS rather
+      than the network, but they are bindings all the same: they own one or
+      more instances and hold no address themselves, so traffic never arrives
+      at one. That is why they belong on the rail and not on the border line -
+      the border means "this is how traffic enters or leaves", and an
+      autoscaling group is not a way in. Its members carry its name as a badge,
+      the same way a security group's members carry its code.
+
+  rule.network:
+    kind: rule
+    cardinality: many
+    # HOW TRAFFIC MOVES. West - firewall, routing, dns.
+    anchor: rail.w
+    container: network
+    collapsed: true
+    note: >
+      firewall rules, ACLs, route tables. Network-scoped but each one spans
+      segments and zones, so they are grouped on a rail rather than nested.
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 4. CATEGORIES — lanes inside resident.application
+# ══════════════════════════════════════════════════════════════════════
+#
+# Ordered by proximity to the traffic path (A1 applied sideways). Wrapping to a
+# new row is derived, not declared: see `columnBudget` and `packRows` in
+# console-app/src/components/console/pack.ts.
+#
+# There WAS a `wrap: 4` here, meaning "start a new row after four lanes". It was
+# written when a lane was one fixed-width column, so four lanes was a statement
+# about width - four columns and their gaps. A lane is now as many columns as
+# its content earns, so the same four lanes are anywhere from one column to
+# twelve, and a count can no longer say what it was written to say. Nothing ever
+# read it in any case.
+#
+# Do not re-add it. The row breaks where the container runs out of width, which
+# is a measurement, and measurements do not belong in this file.
+
+categories:
+  lanes:
+    # An API gateway terminates inbound traffic at the boundary exactly as a
+    # load balancer does, so it is L2 whatever band it draws in.
+    - {role: resident.api,          rank: 10, exposure: 2, note: managed APIs, GraphQL, app hosting}
+    - {role: resident.integration,  rank: 20, note: queues, topics, event buses, workflow}
+    # The application itself - contact centres, mail, media, device platforms.
+    # Sits just after integration because it is what integration connects.
+    - {role: resident.application,  rank: 25, note: managed applications rather than primitives}
+    - {role: resident.serverless,   rank: 30, note: functions and serverless containers with no network presence}
+    - {role: resident.containers,   rank: 40, note: registries and container control planes}
+    - {role: resident.datastore,    rank: 50, note: object, key-value, wide-column, time-series}
+    - {role: resident.analytics,    rank: 60, note: query engines, ETL, warehouses, search}
+    - {role: resident.ai,           rank: 70, note: model hosting, training, inference APIs}
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 5. SEGMENT TIERS — derived, never labelled
+# ══════════════════════════════════════════════════════════════════════
+#
+# A segment's tier comes from its ROUTES, not from its name or its tags. A
+# segment named "private" holding a default route to the internet gateway is a
+# PUBLIC segment, and the diagram must say so - the discrepancy is a finding,
+# not a labelling preference.
+
+segment_tiers:
+  - tier: public
+    rank: 10
+    test: {default_route_to: door.internet}
+  - tier: private
+    rank: 20
+    test: {default_route_to: door.egress}
+  - tier: isolated
+    rank: 30
+    test: {no_default_route: true}
+  # No routing data collected at all is NOT a tier - it is an absence. Those
+  # segments rank between private and isolated and are flagged `assumed`, so a
+  # reader can tell a derived tier from a fallback rather than being shown a
+  # guess wearing the same clothes as a fact.
+  - tier: unknown
+    rank: 25
+    test: {no_route_data: true}
+    assumed: true
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 6. ENTRY POINT — presence-ordered, first match wins
+# ══════════════════════════════════════════════════════════════════════
+#
+# The "users / internet" marker attaches to the first of these that EXISTS.
+# This is §5 collapsing applied to the top of the diagram: if the first is
+# absent we fall through to the next, so every estate gets a front door without
+# per-account configuration. Losers still draw in their own band - they are
+# present, just not the entry point.
+
+entry_points:
+  # The front door is a DOOR. This list began at `resident.edge` because a CDN
+  # was one, and when CloudFront and Route 53 became `door.ingress` the estate
+  # lost its entry marker entirely - caught by
+  # `test_entry_point_prefers_the_edge_and_falls_through_when_absent`, which is
+  # the whole reason that test exists.
+  #
+  # `resident.edge` stays, and below this rather than above it: Global
+  # Accelerator, Shield and the WAFs still live there and an accelerator IS a
+  # legitimate front door for an estate with no CDN.
+  - {role: door.ingress,      rank: 5}
+  - {role: resident.edge,     rank: 10}
+  # `conditional: true` means "this role qualifies only if the provider's
+  # binding says so", and the binding carries the actual test in `entry_when` -
+  # the field that proves it is public differs per cloud, so the condition
+  # cannot live in a provider-neutral model.
+  #
+  # It used to read `where: {internet_facing: true}`, which looked like the
+  # condition and was only a boolean. Nothing consulted the contents.
+  - {role: resident.ingress,  rank: 20, conditional: true}
+  - {role: resident.balancer, rank: 30, conditional: true}
+  - {role: resident.compute,  rank: 40, conditional: true}
+  # none present -> the diagram opens at the region box.
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 7. OWNERSHIP CLUSTERING — precedence, highest first
+# ══════════════════════════════════════════════════════════════════════
+#
+# A workload can be claimed by several owners at once - a Kubernetes node is
+# also in an autoscaling group. Without a fixed precedence the owner is
+# nondeterministic and the diagram flips between runs. Highest wins; every
+# loser becomes a BADGE on the box border, never a second container.
+
+cluster_precedence:
+  - kubernetes      # managed Kubernetes node pools
+  - bigdata         # Hadoop/Spark style managed clusters
+  - ml              # managed training and notebook fleets
+  - containers      # container-orchestrator hosts
+  - batch           # managed batch compute environments
+  - autoscaling     # plain autoscaling groups
+  # unclaimed -> draws as a standalone workload
+
+# Prose, deliberately: the behaviour it describes is implemented in
+# _resolve_clusters and cluster_precedence above. Kept as a `note` so nobody
+# reads `spans:` and `band_from:` as switches they can turn.
+cluster_placement:
+  note: >
+    a cluster spans the zone lanes at the segment tier where its members
+    actually live (`spans: zone`, `band_from: members`), and never a lane it
+    has no member in.
+    a cluster box spans the zone lanes at the segment tier where its members
+    actually live, and never a lane it has no member in. The control plane is
+    provider-managed and reached over the network boundary, so it anchors to
+    edge.n rather than sitting in a segment.
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 8. DETERMINISM
+# ══════════════════════════════════════════════════════════════════════
+#
+# A diagram that changes when nothing changed is not a diagram, it is noise.
+
+# ══════════════════════════════════════════════════════════════════════
+# DEMOTION — a flow role only makes sense inside a network
+# ══════════════════════════════════════════════════════════════════════
+#
+# `flow.*` describes a NETWORK RESIDENT: something traffic reaches at an address
+# inside a segment. But most services also emit regional artefacts - parameter
+# groups, subnet groups, option groups, snapshots - that carry the same type
+# prefix and live in no network at all.
+#
+# Left alone those artefacts keep the flow role and sort by ITS rank, which put
+# four stray database groups between `integration` and `serverless` in the
+# region band. They are not in the traffic path; they are configuration. So a
+# flow role held by a node that is not inside a network is demoted to the
+# application-plane category its service belongs to.
+
+demotion:
+  # The default for a role that declares no container of its own. A role that
+  # DOES declare one is judged against that, because a global list can only
+  # ever agree with some of them - this one contradicted `resident.ingress`,
+  # whose containers are [region, segment], and demoted every API gateway.
+  requires_container: [network, zone, segment]
+  fallback:
+    resident.compute: resident.serverless
+    resident.data: resident.datastore
+    resident.ingress: resident.api
+    door.egress: resident.integration
+
+# Edge types that mean "these two networks are peers". Union-find over these
+# produces the connectivity groups that decide which networks draw side by side
+# (A2) and which stack. Listed here rather than hardcoded because the set is a
+# modelling decision, not an implementation detail.
+network_grouping:
+  lateral_edges: [peers-with, attached-to-transit, routes-to]
+
+ordering:
+  sort_key: [rank, service, name, id]
+  note: >
+    never count, never insertion order, never a hash. `id` is unique, so the key
+    is total and ties are impossible. Two runs on the same input produce
+    identical output, and a real change shows up in a diff as exactly that
+    change.
+
+  zone_order_by: zone_id
+  zone_order_note: >
+    order zones by their STABLE id, not their display name. Several providers
+    shuffle the user-facing zone letter per account, so name-ordering makes two
+    accounts disagree about the same physical zone.
+
+unplaced:
+  band: unplaced
+  container: region
+  fail_loud: true
+  note: >
+    a type with no binding renders in a visible `unplaced` band carrying its
+    type name. It is never silently absorbed into a default bucket - silence is
+    how thousands of types accumulate unnoticed in one undifferentiated blob.
+
+# ══════════════════════════════════════════════════════════════════════
+# 11. RAIL SLOTS — where a supporting domain draws, on every box
+# ══════════════════════════════════════════════════════════════════════
+#
+# A supporting service sits on a border rail. WHICH border used to come from its
+# role, and role is assigned per service — so the same domain landed on two arms
+# depending on which service happened to carry it. `network.firewall` was on the
+# north arm as WAF Regional and on the west as WAF; `devtools.deploy` was north
+# as CodePipeline and east as CodeDeploy. Five of twelve categories were in two
+# places, and a reader asking "where is security" had to check both.
+#
+# The arm now comes from the DOMAIN, which is the thing a reader is actually
+# looking for. A domain has exactly one slot, so it cannot be in two places by
+# construction, and the same slot applies on every box — account, region, VPC,
+# zone, subnet. Learn the compass once.
+#
+# WHICH BOX a rail hangs on is still the role's `container`, and deliberately so:
+# identity belongs to the account, firewall to the network. Position and scope
+# answer different questions and are kept apart.
+#
+#                      N — doors only, no rule tabs
+#          ╭───────────────────────────────────╮  NE ── dns
+#   layer2 │                                   │
+#   layer1 │            the container          │  E ─── identity · encryption
+#          │                                   │        certificates · secrets
+#          ╰───────────────────────────────────╯
+#      SW ─────────── S-middle ─────────── SE
+#   governance      connectivity        firewall
+#   detection        (outbound)          routing
+#   posture
+
+rail_slots:
+  # `along` orders slots down a wall or across a line: start, middle, end.
+  # `layers` is how many deep the slot may stack before it must summarise —
+  # the west wall carries the most tabs of any arm and one column of ten is a
+  # wall of text, so it runs two deep and halves to five.
+  slots:
+    ne:       {arm: e, along: start,  layers: 1}
+    # `sw` is declared and currently holds nothing: the south line carries
+    # traffic only. Kept because an estate with more governance than this one
+    # will want somewhere to put it, and a slot costs nothing until used.
+    sw:       {arm: s, along: start,  layers: 2}
+    e-upper:  {arm: e, along: middle, layers: 1}
+    w-upper:  {arm: w, along: start,  layers: 2}
+    w-middle: {arm: w, along: middle, layers: 2}
+    w-bottom: {arm: w, along: end,    layers: 2}
+    s-middle: {arm: s, along: middle, layers: 2}
+    se:       {arm: s, along: end,    layers: 2}
+
+  # A `category.subcategory` key wins over a bare `category` key, so a category
+  # can send most of itself to one slot and split out the parts that differ.
+  # `security` does: access control east, monitoring south.
+  of:
+    security.identity:     e-upper     # who may act
+    security.policy:       e-upper     # what they may do
+    security.encryption:   e-upper     # what is sealed
+    security.certificates: e-upper
+    security.secrets:      e-upper
+    security.detection:    w-middle    # would we notice - an ops question
+    security.posture:      w-middle
+    # Names resolve before anything moves, so DNS takes the corner. Split by
+    # what it IS, which is also where it lives: zones are account-wide, a
+    # resolver belongs to one VPC.
+    network.dns-zones:     ne
+    network.dns-resolver:  ne
+    network.dns-discovery: ne
+    # Both decide a packet's fate, so both sit at the east end of the south line.
+    network.security-group: se
+    network.nacl:          se
+    network.firewall:      se
+    network.routing:       se
+    # The ways out of the box, along the middle of the south line.
+    network.igw:           s-middle
+    network.nat:           s-middle
+    network.tgw:           s-middle
+    network.direct-connect: s-middle
+    network.vpn:           s-middle
+    network.peering:       s-middle
+    network.private-link:  s-middle
+    network.interface:     s-middle
+    network.connectivity:  s-middle
+    governance:            w-middle    # config, observability, audit, cost
+    devops:                w-upper     # how it was built
+    management:            w-bottom    # who owns it and what it costs
+
+  # Everything else: orchestration, scaling, storage ops, migration. West means
+  # "how it is run", and that is what the remainder is.
+  default: w-middle
+
+# ── one tab, several domains ──────────────────────────────────────────
+#
+# A VPC flow log, a load-balancer access log, a CloudWatch alarm and an X-Ray
+# trace are four things to QUERY and one thing to LOOK at: all of them answer
+# "what is watching this". Kept apart in the data so a filter can pick one, and
+# rolled together on the border so it does not carry five tabs saying the same
+# word in five ways.
+#
+# The rollup is display only. It never changes which slot a domain draws in, so
+# two domains that roll up together must already share a slot — checked by test,
+# because a rollup spanning two arms would draw one tab in two places.
+rollup:
+  governance.flow-logs:  observability
+  governance.logs:       observability
+  governance.metrics:    observability
+  governance.alarms:     observability
+  governance.traces:     observability
+  governance.synthetics: observability

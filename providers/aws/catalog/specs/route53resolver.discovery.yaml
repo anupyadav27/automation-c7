@@ -1,0 +1,560 @@
+version: '1.0'
+provider: aws
+service: route53resolver
+services:
+  client: route53resolver
+  module: boto3.client
+discovery:
+- discovery_id: aws.route53resolver.list_firewall_configs
+  calls:
+  - action: list_firewall_configs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.FirewallConfigs }}'
+    item:
+      Id: '{{ item.Id }}'
+      OwnerId: '{{ item.OwnerId }}'
+      ResourceId: '{{ item.ResourceId }}'
+      FirewallConfig: '{{ item.FirewallConfig }}'
+      FirewallFailOpen: '{{ item.FirewallFailOpen }}'
+      ResolverConfig: '{{ item.ResolverConfig }}'
+      ResolverDNSSECConfig: '{{ item.ResolverDNSSECConfig }}'
+- discovery_id: aws.route53resolver.list_firewall_domain_lists
+  calls:
+  - action: list_firewall_domain_lists
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.FirewallDomainLists }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      CreatorRequestId: '{{ item.CreatorRequestId }}'
+      ManagedOwnerName: '{{ item.ManagedOwnerName }}'
+- discovery_id: aws.route53resolver.list_firewall_rule_group_associations
+  calls:
+  - action: list_firewall_rule_group_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.FirewallRuleGroupAssociations }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      VpcId: '{{ item.VpcId }}'
+      CreatorRequestId: '{{ item.CreatorRequestId }}'
+      FirewallRuleGroupId: '{{ item.FirewallRuleGroupId }}'
+      ManagedOwnerName: '{{ item.ManagedOwnerName }}'
+      ModificationTime: '{{ item.ModificationTime }}'
+      MutationProtection: '{{ item.MutationProtection }}'
+      Priority: '{{ item.Priority }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+- discovery_id: aws.route53resolver.list_firewall_rule_groups
+  calls:
+  - action: list_firewall_rule_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.FirewallRuleGroups }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      OwnerId: '{{ item.OwnerId }}'
+      CreatorRequestId: '{{ item.CreatorRequestId }}'
+      ShareStatus: '{{ item.ShareStatus }}'
+- discovery_id: aws.route53resolver.list_outpost_resolvers
+  calls:
+  - action: list_outpost_resolvers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.OutpostResolvers }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      CreatorRequestId: '{{ item.CreatorRequestId }}'
+      InstanceCount: '{{ item.InstanceCount }}'
+      ModificationTime: '{{ item.ModificationTime }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      PreferredInstanceType: '{{ item.PreferredInstanceType }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+- discovery_id: aws.route53resolver.list_resolver_configs
+  calls:
+  - action: list_resolver_configs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResolverConfigs }}'
+    item:
+      Id: '{{ item.Id }}'
+      OwnerId: '{{ item.OwnerId }}'
+      ResourceId: '{{ item.ResourceId }}'
+      AutodefinedReverse: '{{ item.AutodefinedReverse }}'
+      ResolverConfig: '{{ item.ResolverConfig }}'
+- discovery_id: aws.route53resolver.list_resolver_dnssec_configs
+  calls:
+  - action: list_resolver_dnssec_configs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResolverDnssecConfigs }}'
+    item:
+      Id: '{{ item.Id }}'
+      OwnerId: '{{ item.OwnerId }}'
+      ResourceId: '{{ item.ResourceId }}'
+      ResolverDNSSECConfig: '{{ item.ResolverDNSSECConfig }}'
+      ValidationStatus: '{{ item.ValidationStatus }}'
+- discovery_id: aws.route53resolver.list_resolver_endpoints
+  calls:
+  - action: list_resolver_endpoints
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResolverEndpoints }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      SecurityGroupIds: '{{ item.SecurityGroupIds }}'
+      Status: '{{ item.Status }}'
+      CreatorRequestId: '{{ item.CreatorRequestId }}'
+      Direction: '{{ item.Direction }}'
+      HostVPCId: '{{ item.HostVPCId }}'
+      IpAddressCount: '{{ item.IpAddressCount }}'
+      ModificationTime: '{{ item.ModificationTime }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      PreferredInstanceType: '{{ item.PreferredInstanceType }}'
+      Protocols: '{{ item.Protocols }}'
+      ResolverEndpointType: '{{ item.ResolverEndpointType }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      MaxResults: '{{ response.MaxResults }}'
+- discovery_id: aws.route53resolver.list_resolver_query_log_config_associations
+  calls:
+  - action: list_resolver_query_log_config_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResolverQueryLogConfigAssociations }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      Id: '{{ item.Id }}'
+      ResourceId: '{{ item.ResourceId }}'
+      Status: '{{ item.Status }}'
+      Error: '{{ item.Error }}'
+      ErrorMessage: '{{ item.ErrorMessage }}'
+      ResolverQueryLogConfigId: '{{ item.ResolverQueryLogConfigId }}'
+      TotalCount: '{{ response.TotalCount }}'
+      TotalFilteredCount: '{{ response.TotalFilteredCount }}'
+- discovery_id: aws.route53resolver.list_resolver_query_log_configs
+  calls:
+  - action: list_resolver_query_log_configs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResolverQueryLogConfigs }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      OwnerId: '{{ item.OwnerId }}'
+      Status: '{{ item.Status }}'
+      AssociationCount: '{{ item.AssociationCount }}'
+      CreatorRequestId: '{{ item.CreatorRequestId }}'
+      DestinationArn: '{{ item.DestinationArn }}'
+      ShareStatus: '{{ item.ShareStatus }}'
+      TotalCount: '{{ response.TotalCount }}'
+      TotalFilteredCount: '{{ response.TotalFilteredCount }}'
+- discovery_id: aws.route53resolver.list_resolver_rule_associations
+  calls:
+  - action: list_resolver_rule_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResolverRuleAssociations }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      ResolverRuleId: '{{ item.ResolverRuleId }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      VPCId: '{{ item.VPCId }}'
+      MaxResults: '{{ response.MaxResults }}'
+- discovery_id: aws.route53resolver.list_resolver_rules
+  calls:
+  - action: list_resolver_rules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResolverRules }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      OwnerId: '{{ item.OwnerId }}'
+      Status: '{{ item.Status }}'
+      CreatorRequestId: '{{ item.CreatorRequestId }}'
+      DelegationRecord: '{{ item.DelegationRecord }}'
+      DomainName: '{{ item.DomainName }}'
+      ModificationTime: '{{ item.ModificationTime }}'
+      ResolverEndpointId: '{{ item.ResolverEndpointId }}'
+      RuleType: '{{ item.RuleType }}'
+      ShareStatus: '{{ item.ShareStatus }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      TargetIps: '{{ item.TargetIps }}'
+      MaxResults: '{{ response.MaxResults }}'
+- discovery_id: aws.route53resolver.get_firewall_config
+  for_each: aws.route53resolver.list_firewall_configs
+  calls:
+  - action: get_firewall_config
+    params:
+      ResourceId: '{{ item.ResourceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.FirewallConfig.Id }}'
+      OwnerId: '{{ response.FirewallConfig.OwnerId }}'
+      ResourceId: '{{ response.FirewallConfig.ResourceId }}'
+      FirewallConfig: '{{ response.FirewallConfig.FirewallConfig }}'
+      FirewallFailOpen: '{{ response.FirewallConfig.FirewallFailOpen }}'
+- discovery_id: aws.route53resolver.get_firewall_domain_list
+  calls:
+  - action: get_firewall_domain_list
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.FirewallDomainList.Arn }}'
+      CreationTime: '{{ response.FirewallDomainList.CreationTime }}'
+      Id: '{{ response.FirewallDomainList.Id }}'
+      Name: '{{ response.FirewallDomainList.Name }}'
+      Status: '{{ response.FirewallDomainList.Status }}'
+      CreatorRequestId: '{{ response.FirewallDomainList.CreatorRequestId }}'
+      DomainCount: '{{ response.FirewallDomainList.DomainCount }}'
+      ManagedOwnerName: '{{ response.FirewallDomainList.ManagedOwnerName }}'
+      ModificationTime: '{{ response.FirewallDomainList.ModificationTime }}'
+      StatusMessage: '{{ response.FirewallDomainList.StatusMessage }}'
+- discovery_id: aws.route53resolver.get_firewall_rule_group
+  for_each: aws.route53resolver.list_firewall_rule_group_associations
+  calls:
+  - action: get_firewall_rule_group
+    params:
+      FirewallRuleGroupId: '{{ item.FirewallRuleGroupId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.FirewallRuleGroup.Arn }}'
+      CreationTime: '{{ response.FirewallRuleGroup.CreationTime }}'
+      Id: '{{ response.FirewallRuleGroup.Id }}'
+      Name: '{{ response.FirewallRuleGroup.Name }}'
+      OwnerId: '{{ response.FirewallRuleGroup.OwnerId }}'
+      Status: '{{ response.FirewallRuleGroup.Status }}'
+      CreatorRequestId: '{{ response.FirewallRuleGroup.CreatorRequestId }}'
+      ModificationTime: '{{ response.FirewallRuleGroup.ModificationTime }}'
+      RuleCount: '{{ response.FirewallRuleGroup.RuleCount }}'
+      ShareStatus: '{{ response.FirewallRuleGroup.ShareStatus }}'
+      StatusMessage: '{{ response.FirewallRuleGroup.StatusMessage }}'
+- discovery_id: aws.route53resolver.get_firewall_rule_group_association
+  calls:
+  - action: get_firewall_rule_group_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.FirewallRuleGroupAssociation.Arn }}'
+      CreationTime: '{{ response.FirewallRuleGroupAssociation.CreationTime }}'
+      Id: '{{ response.FirewallRuleGroupAssociation.Id }}'
+      Name: '{{ response.FirewallRuleGroupAssociation.Name }}'
+      Status: '{{ response.FirewallRuleGroupAssociation.Status }}'
+      VpcId: '{{ response.FirewallRuleGroupAssociation.VpcId }}'
+      CreatorRequestId: '{{ response.FirewallRuleGroupAssociation.CreatorRequestId }}'
+      FirewallRuleGroupId: '{{ response.FirewallRuleGroupAssociation.FirewallRuleGroupId }}'
+      ManagedOwnerName: '{{ response.FirewallRuleGroupAssociation.ManagedOwnerName }}'
+      ModificationTime: '{{ response.FirewallRuleGroupAssociation.ModificationTime }}'
+      MutationProtection: '{{ response.FirewallRuleGroupAssociation.MutationProtection }}'
+      Priority: '{{ response.FirewallRuleGroupAssociation.Priority }}'
+      StatusMessage: '{{ response.FirewallRuleGroupAssociation.StatusMessage }}'
+- discovery_id: aws.route53resolver.get_firewall_rule_group_policy
+  calls:
+  - action: get_firewall_rule_group_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+      FirewallRuleGroupPolicy: '{{ response.FirewallRuleGroupPolicy }}'
+- discovery_id: aws.route53resolver.get_outpost_resolver
+  for_each: aws.route53resolver.list_firewall_configs
+  calls:
+  - action: get_outpost_resolver
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.OutpostResolver.Arn }}'
+      CreationTime: '{{ response.OutpostResolver.CreationTime }}'
+      Id: '{{ response.OutpostResolver.Id }}'
+      Name: '{{ response.OutpostResolver.Name }}'
+      Status: '{{ response.OutpostResolver.Status }}'
+      CreatorRequestId: '{{ response.OutpostResolver.CreatorRequestId }}'
+      InstanceCount: '{{ response.OutpostResolver.InstanceCount }}'
+      ModificationTime: '{{ response.OutpostResolver.ModificationTime }}'
+      OutpostArn: '{{ response.OutpostResolver.OutpostArn }}'
+      PreferredInstanceType: '{{ response.OutpostResolver.PreferredInstanceType }}'
+      StatusMessage: '{{ response.OutpostResolver.StatusMessage }}'
+- discovery_id: aws.route53resolver.get_resolver_config
+  for_each: aws.route53resolver.list_firewall_configs
+  calls:
+  - action: get_resolver_config
+    params:
+      ResourceId: '{{ item.ResourceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.ResolverConfig.Id }}'
+      OwnerId: '{{ response.ResolverConfig.OwnerId }}'
+      ResourceId: '{{ response.ResolverConfig.ResourceId }}'
+      AutodefinedReverse: '{{ response.ResolverConfig.AutodefinedReverse }}'
+      ResolverConfig: '{{ response.ResolverConfig.ResolverConfig }}'
+- discovery_id: aws.route53resolver.get_resolver_dnssec_config
+  for_each: aws.route53resolver.list_firewall_configs
+  calls:
+  - action: get_resolver_dnssec_config
+    params:
+      ResourceId: '{{ item.ResourceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.ResolverDNSSECConfig.Id }}'
+      OwnerId: '{{ response.ResolverDNSSECConfig.OwnerId }}'
+      ResourceId: '{{ response.ResolverDNSSECConfig.ResourceId }}'
+      ResolverDNSSECConfig: '{{ response.ResolverDNSSECConfig.ResolverDNSSECConfig }}'
+      ValidationStatus: '{{ response.ResolverDNSSECConfig.ValidationStatus }}'
+- discovery_id: aws.route53resolver.get_resolver_endpoint
+  for_each: aws.route53resolver.list_resolver_rules
+  calls:
+  - action: get_resolver_endpoint
+    params:
+      ResolverEndpointId: '{{ item.ResolverEndpointId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.ResolverEndpoint.Arn }}'
+      CreationTime: '{{ response.ResolverEndpoint.CreationTime }}'
+      Id: '{{ response.ResolverEndpoint.Id }}'
+      Name: '{{ response.ResolverEndpoint.Name }}'
+      SecurityGroupIds: '{{ response.ResolverEndpoint.SecurityGroupIds }}'
+      Status: '{{ response.ResolverEndpoint.Status }}'
+      CreatorRequestId: '{{ response.ResolverEndpoint.CreatorRequestId }}'
+      Direction: '{{ response.ResolverEndpoint.Direction }}'
+      HostVPCId: '{{ response.ResolverEndpoint.HostVPCId }}'
+      IpAddressCount: '{{ response.ResolverEndpoint.IpAddressCount }}'
+      ModificationTime: '{{ response.ResolverEndpoint.ModificationTime }}'
+      OutpostArn: '{{ response.ResolverEndpoint.OutpostArn }}'
+      PreferredInstanceType: '{{ response.ResolverEndpoint.PreferredInstanceType }}'
+      Protocols: '{{ response.ResolverEndpoint.Protocols }}'
+      ResolverEndpointType: '{{ response.ResolverEndpoint.ResolverEndpointType }}'
+      StatusMessage: '{{ response.ResolverEndpoint.StatusMessage }}'
+- discovery_id: aws.route53resolver.get_resolver_query_log_config
+  for_each: aws.route53resolver.list_resolver_query_log_config_associations
+  calls:
+  - action: get_resolver_query_log_config
+    params:
+      ResolverQueryLogConfigId: '{{ item.ResolverQueryLogConfigId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.ResolverQueryLogConfig.Arn }}'
+      CreationTime: '{{ response.ResolverQueryLogConfig.CreationTime }}'
+      Id: '{{ response.ResolverQueryLogConfig.Id }}'
+      Name: '{{ response.ResolverQueryLogConfig.Name }}'
+      OwnerId: '{{ response.ResolverQueryLogConfig.OwnerId }}'
+      Status: '{{ response.ResolverQueryLogConfig.Status }}'
+      AssociationCount: '{{ response.ResolverQueryLogConfig.AssociationCount }}'
+      CreatorRequestId: '{{ response.ResolverQueryLogConfig.CreatorRequestId }}'
+      DestinationArn: '{{ response.ResolverQueryLogConfig.DestinationArn }}'
+      ShareStatus: '{{ response.ResolverQueryLogConfig.ShareStatus }}'
+- discovery_id: aws.route53resolver.get_resolver_query_log_config_association
+  calls:
+  - action: get_resolver_query_log_config_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ response.ResolverQueryLogConfigAssociation.CreationTime }}'
+      Id: '{{ response.ResolverQueryLogConfigAssociation.Id }}'
+      ResourceId: '{{ response.ResolverQueryLogConfigAssociation.ResourceId }}'
+      Status: '{{ response.ResolverQueryLogConfigAssociation.Status }}'
+      Error: '{{ response.ResolverQueryLogConfigAssociation.Error }}'
+      ErrorMessage: '{{ response.ResolverQueryLogConfigAssociation.ErrorMessage }}'
+      ResolverQueryLogConfigId: '{{ response.ResolverQueryLogConfigAssociation.ResolverQueryLogConfigId }}'
+- discovery_id: aws.route53resolver.get_resolver_query_log_config_policy
+  calls:
+  - action: get_resolver_query_log_config_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ResolverQueryLogConfigPolicy: '{{ response.ResolverQueryLogConfigPolicy }}'
+- discovery_id: aws.route53resolver.get_resolver_rule
+  for_each: aws.route53resolver.list_resolver_rule_associations
+  calls:
+  - action: get_resolver_rule
+    params:
+      ResolverRuleId: '{{ item.ResolverRuleId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.ResolverRule.Arn }}'
+      CreationTime: '{{ response.ResolverRule.CreationTime }}'
+      Id: '{{ response.ResolverRule.Id }}'
+      Name: '{{ response.ResolverRule.Name }}'
+      OwnerId: '{{ response.ResolverRule.OwnerId }}'
+      Status: '{{ response.ResolverRule.Status }}'
+      CreatorRequestId: '{{ response.ResolverRule.CreatorRequestId }}'
+      DelegationRecord: '{{ response.ResolverRule.DelegationRecord }}'
+      DomainName: '{{ response.ResolverRule.DomainName }}'
+      ModificationTime: '{{ response.ResolverRule.ModificationTime }}'
+      ResolverEndpointId: '{{ response.ResolverRule.ResolverEndpointId }}'
+      RuleType: '{{ response.ResolverRule.RuleType }}'
+      ShareStatus: '{{ response.ResolverRule.ShareStatus }}'
+      StatusMessage: '{{ response.ResolverRule.StatusMessage }}'
+      TargetIps: '{{ response.ResolverRule.TargetIps[].Ip }}'
+- discovery_id: aws.route53resolver.get_resolver_rule_association
+  calls:
+  - action: get_resolver_rule_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.ResolverRuleAssociation.Id }}'
+      Name: '{{ response.ResolverRuleAssociation.Name }}'
+      Status: '{{ response.ResolverRuleAssociation.Status }}'
+      ResolverRuleId: '{{ response.ResolverRuleAssociation.ResolverRuleId }}'
+      StatusMessage: '{{ response.ResolverRuleAssociation.StatusMessage }}'
+      VPCId: '{{ response.ResolverRuleAssociation.VPCId }}'
+- discovery_id: aws.route53resolver.get_resolver_rule_policy
+  calls:
+  - action: get_resolver_rule_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ResolverRulePolicy: '{{ response.ResolverRulePolicy }}'
+- discovery_id: aws.route53resolver.list_firewall_domains
+  calls:
+  - action: list_firewall_domains
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Domains }}'
+- discovery_id: aws.route53resolver.list_firewall_rules
+  for_each: aws.route53resolver.list_firewall_rule_group_associations
+  calls:
+  - action: list_firewall_rules
+    params:
+      FirewallRuleGroupId: '{{ item.FirewallRuleGroupId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.FirewallRules }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      Name: '{{ item.Name }}'
+      Action: '{{ item.Action }}'
+      BlockOverrideDnsType: '{{ item.BlockOverrideDnsType }}'
+      BlockOverrideDomain: '{{ item.BlockOverrideDomain }}'
+      BlockOverrideTtl: '{{ item.BlockOverrideTtl }}'
+      BlockResponse: '{{ item.BlockResponse }}'
+      ConfidenceThreshold: '{{ item.ConfidenceThreshold }}'
+      CreatorRequestId: '{{ item.CreatorRequestId }}'
+      DnsThreatProtection: '{{ item.DnsThreatProtection }}'
+      FirewallDomainListId: '{{ item.FirewallDomainListId }}'
+      FirewallDomainRedirectionAction: '{{ item.FirewallDomainRedirectionAction }}'
+      FirewallRuleGroupId: '{{ item.FirewallRuleGroupId }}'
+      FirewallThreatProtectionId: '{{ item.FirewallThreatProtectionId }}'
+      ModificationTime: '{{ item.ModificationTime }}'
+      Priority: '{{ item.Priority }}'
+      Qtype: '{{ item.Qtype }}'
+- discovery_id: aws.route53resolver.list_resolver_endpoint_ip_addresses
+  for_each: aws.route53resolver.list_resolver_rules
+  calls:
+  - action: list_resolver_endpoint_ip_addresses
+    params:
+      ResolverEndpointId: '{{ item.ResolverEndpointId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.IpAddresses }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      Status: '{{ item.Status }}'
+      SubnetId: '{{ item.SubnetId }}'
+      Ip: '{{ item.Ip }}'
+      IpId: '{{ item.IpId }}'
+      Ipv6: '{{ item.Ipv6 }}'
+      ModificationTime: '{{ item.ModificationTime }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      MaxResults: '{{ response.MaxResults }}'
+- discovery_id: aws.route53resolver.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

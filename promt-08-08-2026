@@ -1,0 +1,9 @@
+1) Noe the ecs , stepfunctions, ecr , sagemake these all are config and orchestrator but actual resources are ec2 or lambda only right 
+so ideally we have those these and we can define the orchestration name for all these and we can keep them based on scope and HTMLOptGroupElement.apply. right
+
+2) we have places the az horizontal parell, i think keep that in vertical parreelling only 
+
+3) The postion of each group also need to define based on which comes first from internet and label them like few services liek cf i alaways internet so keeep them 1
+services which are continational like lb will be second , services need conditional ro may also be depend on l2 so keep them l3 like ec2 it can be though public eni an digw and through lb as WEBGL_lose_context.. 
+
+4) teh stoarge and vpc services or public services would be beding the vpc so keep them there and lable them accrodigly -- what label we should call these as we have multiple labeling and each label need to plan and designproperly 

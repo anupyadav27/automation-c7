@@ -1,0 +1,577 @@
+version: '1.0'
+provider: aws
+service: ce
+services:
+  client: ce
+  module: boto3.client
+discovery:
+- discovery_id: aws.ce.get_anomaly_monitors
+  calls:
+  - action: get_anomaly_monitors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AnomalyMonitors }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      AnomalyMonitors: '{{ item.AnomalyMonitors }}'
+      DimensionalValueCount: '{{ item.DimensionalValueCount }}'
+      LastEvaluatedDate: '{{ item.LastEvaluatedDate }}'
+      LastUpdatedDate: '{{ item.LastUpdatedDate }}'
+      MonitorArn: '{{ item.MonitorArn }}'
+      MonitorDimension: '{{ item.MonitorDimension }}'
+      MonitorName: '{{ item.MonitorName }}'
+      MonitorSpecification: '{{ item.MonitorSpecification }}'
+      MonitorType: '{{ item.MonitorType }}'
+      NextPageToken: '{{ item.NextPageToken }}'
+- discovery_id: aws.ce.get_anomaly_subscriptions
+  calls:
+  - action: get_anomaly_subscriptions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AnomalySubscriptions }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      AnomalySubscriptions: '{{ item.AnomalySubscriptions }}'
+      Frequency: '{{ item.Frequency }}'
+      MonitorArnList: '{{ item.MonitorArnList }}'
+      Subscribers: '{{ item.Subscribers }}'
+      SubscriptionArn: '{{ item.SubscriptionArn }}'
+      SubscriptionName: '{{ item.SubscriptionName }}'
+      Threshold: '{{ item.Threshold }}'
+      ThresholdExpression: '{{ item.ThresholdExpression }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+- discovery_id: aws.ce.list_commitment_purchase_analyses
+  calls:
+  - action: list_commitment_purchase_analyses
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AnalysisSummaryList }}'
+    item:
+      AnalysisCompletionTime: '{{ item.AnalysisCompletionTime }}'
+      AnalysisDetails: '{{ item.AnalysisDetails }}'
+      AnalysisId: '{{ item.AnalysisId }}'
+      AnalysisStartedTime: '{{ item.AnalysisStartedTime }}'
+      AnalysisStatus: '{{ item.AnalysisStatus }}'
+      CommitmentPurchaseAnalysisConfiguration: '{{ item.CommitmentPurchaseAnalysisConfiguration }}'
+      Enabled: '{{ item.Enabled }}'
+      ErrorCode: '{{ item.ErrorCode }}'
+      EstimatedCompletionTime: '{{ item.EstimatedCompletionTime }}'
+      NextPageToken: '{{ item.NextPageToken }}'
+- discovery_id: aws.ce.list_cost_allocation_tag_backfill_history
+  calls:
+  - action: list_cost_allocation_tag_backfill_history
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.BackfillRequests }}'
+    item:
+      BackfillFrom: '{{ item.BackfillFrom }}'
+      BackfillStatus: '{{ item.BackfillStatus }}'
+      CompletedAt: '{{ item.CompletedAt }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      RequestedAt: '{{ item.RequestedAt }}'
+- discovery_id: aws.ce.list_cost_allocation_tags
+  calls:
+  - action: list_cost_allocation_tags
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CostAllocationTags }}'
+    item:
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      LastUpdatedDate: '{{ item.LastUpdatedDate }}'
+      LastUsedDate: '{{ item.LastUsedDate }}'
+      TagKey: '{{ item.TagKey }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.ce.list_cost_category_definitions
+  calls:
+  - action: list_cost_category_definitions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CostCategoryReferences }}'
+    item:
+      Name: '{{ item.Name }}'
+      CostCategoryArn: '{{ item.CostCategoryArn }}'
+      DefaultValue: '{{ item.DefaultValue }}'
+      EffectiveEnd: '{{ item.EffectiveEnd }}'
+      EffectiveStart: '{{ item.EffectiveStart }}'
+      NumberOfRules: '{{ item.NumberOfRules }}'
+      ProcessingStatus: '{{ item.ProcessingStatus }}'
+      Values: '{{ item.Values }}'
+- discovery_id: aws.ce.list_savings_plans_purchase_recommendation_generation
+  calls:
+  - action: list_savings_plans_purchase_recommendation_generation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.GenerationSummaryList }}'
+    item:
+      EstimatedCompletionTime: '{{ item.EstimatedCompletionTime }}'
+      GenerationCompletionTime: '{{ item.GenerationCompletionTime }}'
+      GenerationStartedTime: '{{ item.GenerationStartedTime }}'
+      GenerationStatus: '{{ item.GenerationStatus }}'
+      RecommendationId: '{{ item.RecommendationId }}'
+      Recommendations: '{{ item.Recommendations }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+- discovery_id: aws.ce.describe_cost_category_definition
+  for_each: aws.ce.list_cost_category_definitions
+  calls:
+  - action: describe_cost_category_definition
+    params:
+      CostCategoryArn: '{{ item.CostCategoryArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.CostCategory.Name }}'
+      CostCategoryArn: '{{ response.CostCategory.CostCategoryArn }}'
+      DefaultValue: '{{ response.CostCategory.DefaultValue }}'
+      EffectiveEnd: '{{ response.CostCategory.EffectiveEnd }}'
+      EffectiveStart: '{{ response.CostCategory.EffectiveStart }}'
+      ProcessingStatus: '{{ response.CostCategory.ProcessingStatus[].Status }}'
+      RuleVersion: '{{ response.CostCategory.RuleVersion }}'
+      Rules: '{{ response.CostCategory.RuleVersion }}'
+      SplitChargeRules: '{{ response.CostCategory.SplitChargeRules[].Source }}'
+- discovery_id: aws.ce.get_anomalies
+  calls:
+  - action: get_anomalies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Anomalies }}'
+    item:
+      Anomalies: '{{ item.Anomalies }}'
+      AnomalyEndDate: '{{ item.AnomalyEndDate }}'
+      AnomalyId: '{{ item.AnomalyId }}'
+      AnomalyScore: '{{ item.AnomalyScore }}'
+      AnomalyStartDate: '{{ item.AnomalyStartDate }}'
+      DimensionValue: '{{ item.DimensionValue }}'
+      Feedback: '{{ item.Feedback }}'
+      Impact: '{{ item.Impact }}'
+      MonitorArn: '{{ item.MonitorArn }}'
+      RootCauses: '{{ item.RootCauses }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+- discovery_id: aws.ce.get_approximate_usage_records
+  calls:
+  - action: get_approximate_usage_records
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      End: '{{ response.LookbackPeriod.End }}'
+      Services: '{{ response.LookbackPeriod.Services }}'
+      Start: '{{ response.LookbackPeriod.Start }}'
+      TotalRecords: '{{ response.TotalRecords }}'
+- discovery_id: aws.ce.get_commitment_purchase_analysis
+  for_each: aws.ce.list_commitment_purchase_analyses
+  calls:
+  - action: get_commitment_purchase_analysis
+    params:
+      AnalysisId: '{{ item.AnalysisId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AnalysisDetails: '{{ response.AnalysisDetails.AnalysisDetails }}'
+      SavingsPlansPurchaseAnalysisDetails: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.UpfrontCost }}'
+      AnalysisCompletionTime: '{{ response.AnalysisCompletionTime }}'
+      AdditionalMetadata: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.AdditionalMetadata }}'
+      CurrencyCode: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.CurrencyCode }}'
+      CurrentAverageCoverage: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.CurrentAverageCoverage }}'
+      CurrentAverageHourlyOnDemandSpend: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.CurrentAverageHourlyOnDemandSpend }}'
+      CurrentMaximumHourlyOnDemandSpend: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.CurrentMaximumHourlyOnDemandSpend }}'
+      CurrentMinimumHourlyOnDemandSpend: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.CurrentMinimumHourlyOnDemandSpend }}'
+      CurrentOnDemandSpend: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.CurrentOnDemandSpend }}'
+      EstimatedAverageCoverage: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.EstimatedAverageCoverage }}'
+      EstimatedAverageUtilization: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.EstimatedAverageUtilization }}'
+      EstimatedCommitmentCost: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.EstimatedCommitmentCost }}'
+      EstimatedMonthlySavingsAmount: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.EstimatedMonthlySavingsAmount }}'
+      EstimatedOnDemandCost: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.EstimatedOnDemandCost }}'
+      EstimatedOnDemandCostWithCurrentCommitment: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.EstimatedOnDemandCostWithCurrentCommitment }}'
+      EstimatedROI: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.EstimatedROI }}'
+      EstimatedSavingsAmount: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.EstimatedSavingsAmount }}'
+      EstimatedSavingsPercentage: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.EstimatedSavingsPercentage }}'
+      ExistingHourlyCommitment: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.ExistingHourlyCommitment }}'
+      HourlyCommitmentToPurchase: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.HourlyCommitmentToPurchase }}'
+      LatestUsageTimestamp: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.LatestUsageTimestamp }}'
+      LookbackPeriodInHours: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.LookbackPeriodInHours }}'
+      UpfrontCost: '{{ response.AnalysisDetails.SavingsPlansPurchaseAnalysisDetails.UpfrontCost }}'
+      AnalysisId: '{{ response.AnalysisId }}'
+      AnalysisStartedTime: '{{ response.AnalysisStartedTime }}'
+      AnalysisStatus: '{{ response.AnalysisStatus }}'
+      AccountId: '{{ response.CommitmentPurchaseAnalysisConfiguration.SavingsPlansPurchaseAnalysisConfiguration.AccountId }}'
+      AccountScope: '{{ response.CommitmentPurchaseAnalysisConfiguration.SavingsPlansPurchaseAnalysisConfiguration.AccountScope }}'
+      AnalysisType: '{{ response.CommitmentPurchaseAnalysisConfiguration.SavingsPlansPurchaseAnalysisConfiguration.AnalysisType }}'
+      End: '{{ response.CommitmentPurchaseAnalysisConfiguration.SavingsPlansPurchaseAnalysisConfiguration.LookBackTimePeriod.End }}'
+      Start: '{{ response.CommitmentPurchaseAnalysisConfiguration.SavingsPlansPurchaseAnalysisConfiguration.LookBackTimePeriod.Start }}'
+      ErrorCode: '{{ response.ErrorCode }}'
+      EstimatedCompletionTime: '{{ response.EstimatedCompletionTime }}'
+- discovery_id: aws.ce.get_cost_and_usage
+  calls:
+  - action: get_cost_and_usage
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.GroupDefinitions }}'
+    item:
+      Key: '{{ item.Key }}'
+      Type: '{{ item.Type }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+- discovery_id: aws.ce.get_cost_and_usage_comparisons
+  calls:
+  - action: get_cost_and_usage_comparisons
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CostAndUsageComparisons }}'
+    item:
+      CostAndUsageSelector: '{{ item.CostAndUsageSelector }}'
+      Metrics: '{{ item.Metrics }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+      TotalCostAndUsage: '{{ response.TotalCostAndUsage }}'
+- discovery_id: aws.ce.get_cost_and_usage_with_resources
+  calls:
+  - action: get_cost_and_usage_with_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.GroupDefinitions }}'
+    item:
+      Key: '{{ item.Key }}'
+      Type: '{{ item.Type }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+- discovery_id: aws.ce.get_cost_categories
+  calls:
+  - action: get_cost_categories
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CostCategoryNames }}'
+    item:
+      NextPageToken: '{{ response.NextPageToken }}'
+      ReturnSize: '{{ response.ReturnSize }}'
+      TotalSize: '{{ response.TotalSize }}'
+- discovery_id: aws.ce.get_cost_comparison_drivers
+  calls:
+  - action: get_cost_comparison_drivers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CostComparisonDrivers }}'
+    item:
+      CostDrivers: '{{ item.CostDrivers }}'
+      CostSelector: '{{ item.CostSelector }}'
+      Metrics: '{{ item.Metrics }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+- discovery_id: aws.ce.get_cost_forecast
+  calls:
+  - action: get_cost_forecast
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ForecastResultsByTime }}'
+    item:
+      MeanValue: '{{ item.MeanValue }}'
+      PredictionIntervalLowerBound: '{{ item.PredictionIntervalLowerBound }}'
+      PredictionIntervalUpperBound: '{{ item.PredictionIntervalUpperBound }}'
+      TimePeriod: '{{ item.TimePeriod }}'
+      Amount: '{{ response.Total.Amount }}'
+      Unit: '{{ response.Total.Unit }}'
+- discovery_id: aws.ce.get_dimension_values
+  calls:
+  - action: get_dimension_values
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DimensionValues }}'
+    item:
+      Attributes: '{{ item.Attributes }}'
+      Value: '{{ item.Value }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+      ReturnSize: '{{ response.ReturnSize }}'
+      TotalSize: '{{ response.TotalSize }}'
+- discovery_id: aws.ce.get_reservation_coverage
+  calls:
+  - action: get_reservation_coverage
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CoveragesByTime }}'
+    item:
+      Groups: '{{ item.Groups }}'
+      TimePeriod: '{{ item.TimePeriod }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+      OnDemandCost: '{{ response.Total.CoverageCost.OnDemandCost }}'
+      CoverageHoursPercentage: '{{ response.Total.CoverageHours.CoverageHoursPercentage }}'
+      OnDemandHours: '{{ response.Total.CoverageHours.OnDemandHours }}'
+      ReservedHours: '{{ response.Total.CoverageHours.ReservedHours }}'
+      TotalRunningHours: '{{ response.Total.CoverageHours.TotalRunningHours }}'
+      CoverageNormalizedUnitsPercentage: '{{ response.Total.CoverageNormalizedUnits.CoverageNormalizedUnitsPercentage }}'
+      OnDemandNormalizedUnits: '{{ response.Total.CoverageNormalizedUnits.OnDemandNormalizedUnits }}'
+      ReservedNormalizedUnits: '{{ response.Total.CoverageNormalizedUnits.ReservedNormalizedUnits }}'
+      TotalRunningNormalizedUnits: '{{ response.Total.CoverageNormalizedUnits.TotalRunningNormalizedUnits }}'
+- discovery_id: aws.ce.get_reservation_purchase_recommendation
+  calls:
+  - action: get_reservation_purchase_recommendation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Recommendations }}'
+    item:
+      AccountScope: '{{ item.AccountScope }}'
+      LookbackPeriodInDays: '{{ item.LookbackPeriodInDays }}'
+      PaymentOption: '{{ item.PaymentOption }}'
+      RecommendationDetails: '{{ item.RecommendationDetails }}'
+      RecommendationSummary: '{{ item.RecommendationSummary }}'
+      Recommendations: '{{ item.Recommendations }}'
+      ServiceSpecification: '{{ item.ServiceSpecification }}'
+      TermInYears: '{{ item.TermInYears }}'
+      AdditionalMetadata: '{{ response.Metadata.AdditionalMetadata }}'
+      GenerationTimestamp: '{{ response.Metadata.GenerationTimestamp }}'
+      RecommendationId: '{{ response.Metadata.RecommendationId }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+- discovery_id: aws.ce.get_reservation_utilization
+  calls:
+  - action: get_reservation_utilization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UtilizationsByTime }}'
+    item:
+      Groups: '{{ item.Groups }}'
+      TimePeriod: '{{ item.TimePeriod }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+      AmortizedRecurringFee: '{{ response.Total.AmortizedRecurringFee }}'
+      AmortizedUpfrontFee: '{{ response.Total.AmortizedUpfrontFee }}'
+      NetRISavings: '{{ response.Total.NetRISavings }}'
+      OnDemandCostOfRIHoursUsed: '{{ response.Total.OnDemandCostOfRIHoursUsed }}'
+      PurchasedHours: '{{ response.Total.PurchasedHours }}'
+      PurchasedUnits: '{{ response.Total.PurchasedUnits }}'
+      RICostForUnusedHours: '{{ response.Total.RICostForUnusedHours }}'
+      RealizedSavings: '{{ response.Total.RealizedSavings }}'
+      TotalActualHours: '{{ response.Total.TotalActualHours }}'
+      TotalActualUnits: '{{ response.Total.TotalActualUnits }}'
+      TotalAmortizedFee: '{{ response.Total.TotalAmortizedFee }}'
+      TotalPotentialRISavings: '{{ response.Total.TotalPotentialRISavings }}'
+      UnrealizedSavings: '{{ response.Total.UnrealizedSavings }}'
+      UnusedHours: '{{ response.Total.UnusedHours }}'
+      UnusedUnits: '{{ response.Total.UnusedUnits }}'
+      UtilizationPercentage: '{{ response.Total.UtilizationPercentage }}'
+      UtilizationPercentageInUnits: '{{ response.Total.UtilizationPercentageInUnits }}'
+- discovery_id: aws.ce.get_rightsizing_recommendation
+  calls:
+  - action: get_rightsizing_recommendation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RightsizingRecommendations }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      CurrentInstance: '{{ item.CurrentInstance }}'
+      FindingReasonCodes: '{{ item.FindingReasonCodes }}'
+      ModifyRecommendationDetail: '{{ item.ModifyRecommendationDetail }}'
+      RightsizingType: '{{ item.RightsizingType }}'
+      TerminateRecommendationDetail: '{{ item.TerminateRecommendationDetail }}'
+      BenefitsConsidered: '{{ response.Configuration.BenefitsConsidered }}'
+      RecommendationTarget: '{{ response.Configuration.RecommendationTarget }}'
+      AdditionalMetadata: '{{ response.Metadata.AdditionalMetadata }}'
+      GenerationTimestamp: '{{ response.Metadata.GenerationTimestamp }}'
+      LookbackPeriodInDays: '{{ response.Metadata.LookbackPeriodInDays }}'
+      RecommendationId: '{{ response.Metadata.RecommendationId }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+      EstimatedTotalMonthlySavingsAmount: '{{ response.Summary.EstimatedTotalMonthlySavingsAmount }}'
+      SavingsCurrencyCode: '{{ response.Summary.SavingsCurrencyCode }}'
+      SavingsPercentage: '{{ response.Summary.SavingsPercentage }}'
+      TotalRecommendationCount: '{{ response.Summary.TotalRecommendationCount }}'
+- discovery_id: aws.ce.get_savings_plan_purchase_recommendation_details
+  calls:
+  - action: get_savings_plan_purchase_recommendation_details
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccountId: '{{ response.RecommendationDetailData.AccountId }}'
+      Region: '{{ response.RecommendationDetailData.Region }}'
+      AccountScope: '{{ response.RecommendationDetailData.AccountScope }}'
+      CurrencyCode: '{{ response.RecommendationDetailData.CurrencyCode }}'
+      CurrentAverageCoverage: '{{ response.RecommendationDetailData.CurrentAverageCoverage }}'
+      CurrentAverageHourlyOnDemandSpend: '{{ response.RecommendationDetailData.CurrentAverageHourlyOnDemandSpend }}'
+      CurrentMaximumHourlyOnDemandSpend: '{{ response.RecommendationDetailData.CurrentMaximumHourlyOnDemandSpend }}'
+      CurrentMinimumHourlyOnDemandSpend: '{{ response.RecommendationDetailData.CurrentMinimumHourlyOnDemandSpend }}'
+      EstimatedAverageCoverage: '{{ response.RecommendationDetailData.EstimatedAverageCoverage }}'
+      EstimatedAverageUtilization: '{{ response.RecommendationDetailData.EstimatedAverageUtilization }}'
+      EstimatedMonthlySavingsAmount: '{{ response.RecommendationDetailData.EstimatedMonthlySavingsAmount }}'
+      EstimatedOnDemandCost: '{{ response.RecommendationDetailData.EstimatedOnDemandCost }}'
+      EstimatedOnDemandCostWithCurrentCommitment: '{{ response.RecommendationDetailData.EstimatedOnDemandCostWithCurrentCommitment }}'
+      EstimatedROI: '{{ response.RecommendationDetailData.EstimatedROI }}'
+      EstimatedSPCost: '{{ response.RecommendationDetailData.EstimatedSPCost }}'
+      EstimatedSavingsAmount: '{{ response.RecommendationDetailData.EstimatedSavingsAmount }}'
+      EstimatedSavingsPercentage: '{{ response.RecommendationDetailData.EstimatedSavingsPercentage }}'
+      ExistingHourlyCommitment: '{{ response.RecommendationDetailData.ExistingHourlyCommitment }}'
+      GenerationTimestamp: '{{ response.RecommendationDetailData.GenerationTimestamp }}'
+      HourlyCommitmentToPurchase: '{{ response.RecommendationDetailData.HourlyCommitmentToPurchase }}'
+      InstanceFamily: '{{ response.RecommendationDetailData.InstanceFamily }}'
+      LatestUsageTimestamp: '{{ response.RecommendationDetailData.LatestUsageTimestamp }}'
+      LookbackPeriodInDays: '{{ response.RecommendationDetailData.LookbackPeriodInDays }}'
+      MetricsOverLookbackPeriod: '{{ response.RecommendationDetailData.MetricsOverLookbackPeriod[].StartTime }}'
+      OfferingId: '{{ response.RecommendationDetailData.OfferingId }}'
+      PaymentOption: '{{ response.RecommendationDetailData.PaymentOption }}'
+      RecommendationDetailData: '{{ response.RecommendationDetailData.RecommendationDetailData }}'
+      RecommendationDetailId: '{{ response.RecommendationDetailData.RecommendationDetailId }}'
+      SavingsPlansType: '{{ response.RecommendationDetailData.SavingsPlansType }}'
+      TermInYears: '{{ response.RecommendationDetailData.TermInYears }}'
+      UpfrontCost: '{{ response.RecommendationDetailData.UpfrontCost }}'
+- discovery_id: aws.ce.get_savings_plans_coverage
+  calls:
+  - action: get_savings_plans_coverage
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SavingsPlansCoverages }}'
+    item:
+      Attributes: '{{ item.Attributes }}'
+      Coverage: '{{ item.Coverage }}'
+      TimePeriod: '{{ item.TimePeriod }}'
+- discovery_id: aws.ce.get_savings_plans_purchase_recommendation
+  calls:
+  - action: get_savings_plans_purchase_recommendation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AdditionalMetadata: '{{ response.Metadata.AdditionalMetadata }}'
+      GenerationTimestamp: '{{ response.Metadata.GenerationTimestamp }}'
+      RecommendationId: '{{ response.Metadata.RecommendationId }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+      AccountScope: '{{ response.SavingsPlansPurchaseRecommendation.AccountScope }}'
+      LookbackPeriodInDays: '{{ response.SavingsPlansPurchaseRecommendation.LookbackPeriodInDays }}'
+      PaymentOption: '{{ response.SavingsPlansPurchaseRecommendation.PaymentOption }}'
+      CurrencyCode: '{{ response.SavingsPlansPurchaseRecommendation.SavingsPlansPurchaseRecommendationSummary.CurrencyCode }}'
+      CurrentOnDemandSpend: '{{ response.SavingsPlansPurchaseRecommendation.SavingsPlansPurchaseRecommendationSummary.CurrentOnDemandSpend }}'
+      DailyCommitmentToPurchase: '{{ response.SavingsPlansPurchaseRecommendation.SavingsPlansPurchaseRecommendationSummary.DailyCommitmentToPurchase }}'
+      EstimatedMonthlySavingsAmount: '{{ response.SavingsPlansPurchaseRecommendation.SavingsPlansPurchaseRecommendationSummary.EstimatedMonthlySavingsAmount }}'
+      EstimatedOnDemandCostWithCurrentCommitment: '{{ response.SavingsPlansPurchaseRecommendation.SavingsPlansPurchaseRecommendationSummary.EstimatedOnDemandCostWithCurrentCommitment }}'
+      EstimatedROI: '{{ response.SavingsPlansPurchaseRecommendation.SavingsPlansPurchaseRecommendationSummary.EstimatedROI }}'
+      EstimatedSavingsAmount: '{{ response.SavingsPlansPurchaseRecommendation.SavingsPlansPurchaseRecommendationSummary.EstimatedSavingsAmount }}'
+      EstimatedSavingsPercentage: '{{ response.SavingsPlansPurchaseRecommendation.SavingsPlansPurchaseRecommendationSummary.EstimatedSavingsPercentage }}'
+      EstimatedTotalCost: '{{ response.SavingsPlansPurchaseRecommendation.SavingsPlansPurchaseRecommendationSummary.EstimatedTotalCost }}'
+      HourlyCommitmentToPurchase: '{{ response.SavingsPlansPurchaseRecommendation.SavingsPlansPurchaseRecommendationSummary.HourlyCommitmentToPurchase }}'
+      TotalRecommendationCount: '{{ response.SavingsPlansPurchaseRecommendation.SavingsPlansPurchaseRecommendationSummary.TotalRecommendationCount }}'
+      SavingsPlansType: '{{ response.SavingsPlansPurchaseRecommendation.SavingsPlansType }}'
+      TermInYears: '{{ response.SavingsPlansPurchaseRecommendation.TermInYears }}'
+- discovery_id: aws.ce.get_savings_plans_utilization
+  calls:
+  - action: get_savings_plans_utilization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SavingsPlansUtilizationsByTime }}'
+    item:
+      AmortizedCommitment: '{{ item.AmortizedCommitment }}'
+      Savings: '{{ item.Savings }}'
+      TimePeriod: '{{ item.TimePeriod }}'
+      Utilization: '{{ item.Utilization }}'
+      AmortizedRecurringCommitment: '{{ response.Total.AmortizedCommitment.AmortizedRecurringCommitment }}'
+      AmortizedUpfrontCommitment: '{{ response.Total.AmortizedCommitment.AmortizedUpfrontCommitment }}'
+      TotalAmortizedCommitment: '{{ response.Total.AmortizedCommitment.TotalAmortizedCommitment }}'
+      NetSavings: '{{ response.Total.Savings.NetSavings }}'
+      OnDemandCostEquivalent: '{{ response.Total.Savings.OnDemandCostEquivalent }}'
+      TotalCommitment: '{{ response.Total.Utilization.TotalCommitment }}'
+      UnusedCommitment: '{{ response.Total.Utilization.UnusedCommitment }}'
+      UsedCommitment: '{{ response.Total.Utilization.UsedCommitment }}'
+      UtilizationPercentage: '{{ response.Total.Utilization.UtilizationPercentage }}'
+- discovery_id: aws.ce.get_savings_plans_utilization_details
+  calls:
+  - action: get_savings_plans_utilization_details
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SavingsPlansUtilizationDetails }}'
+    item:
+      AmortizedCommitment: '{{ item.AmortizedCommitment }}'
+      Attributes: '{{ item.Attributes }}'
+      Savings: '{{ item.Savings }}'
+      SavingsPlanArn: '{{ item.SavingsPlanArn }}'
+      Utilization: '{{ item.Utilization }}'
+      End: '{{ response.TimePeriod.End }}'
+      Start: '{{ response.TimePeriod.Start }}'
+      AmortizedRecurringCommitment: '{{ response.Total.AmortizedCommitment.AmortizedRecurringCommitment }}'
+      AmortizedUpfrontCommitment: '{{ response.Total.AmortizedCommitment.AmortizedUpfrontCommitment }}'
+      TotalAmortizedCommitment: '{{ response.Total.AmortizedCommitment.TotalAmortizedCommitment }}'
+      NetSavings: '{{ response.Total.Savings.NetSavings }}'
+      OnDemandCostEquivalent: '{{ response.Total.Savings.OnDemandCostEquivalent }}'
+      TotalCommitment: '{{ response.Total.Utilization.TotalCommitment }}'
+      UnusedCommitment: '{{ response.Total.Utilization.UnusedCommitment }}'
+      UsedCommitment: '{{ response.Total.Utilization.UsedCommitment }}'
+      UtilizationPercentage: '{{ response.Total.Utilization.UtilizationPercentage }}'
+- discovery_id: aws.ce.get_tags
+  calls:
+  - action: get_tags
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+      ReturnSize: '{{ response.ReturnSize }}'
+      TotalSize: '{{ response.TotalSize }}'
+- discovery_id: aws.ce.get_usage_forecast
+  calls:
+  - action: get_usage_forecast
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ForecastResultsByTime }}'
+    item:
+      MeanValue: '{{ item.MeanValue }}'
+      PredictionIntervalLowerBound: '{{ item.PredictionIntervalLowerBound }}'
+      PredictionIntervalUpperBound: '{{ item.PredictionIntervalUpperBound }}'
+      TimePeriod: '{{ item.TimePeriod }}'
+      Amount: '{{ response.Total.Amount }}'
+      Unit: '{{ response.Total.Unit }}'
+- discovery_id: aws.ce.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceTags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

@@ -1,0 +1,336 @@
+version: '1.0'
+provider: aws
+service: chime-sdk-messaging
+services:
+  client: chime-sdk-messaging
+  module: boto3.client
+discovery:
+- discovery_id: aws.chime-sdk-messaging.get_messaging_session_endpoint
+  calls:
+  - action: get_messaging_session_endpoint
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Endpoint: '{{ response.Endpoint.Endpoint }}'
+      Url: '{{ response.Endpoint.Url }}'
+- discovery_id: aws.chime-sdk-messaging.describe_channel
+  calls:
+  - action: describe_channel
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ChannelFlowArn: '{{ response.Channel.ChannelFlowArn }}'
+      CreatedBy: '{{ response.Channel.CreatedBy.Arn }}'
+      CreatedTimestamp: '{{ response.Channel.CreatedTimestamp }}'
+      DestinationArn: '{{ response.Channel.DestinationArn }}'
+      ElasticChannelConfiguration: '{{ response.Channel.ElasticChannelConfiguration }}'
+      Enabled: '{{ response.Channel.Enabled }}'
+      ExpirationSettings: '{{ response.Channel.ExpirationSettings }}'
+      Format: '{{ response.Channel.Format }}'
+      LastUpdatedTimestamp: '{{ response.Channel.LastUpdatedTimestamp }}'
+      Level: '{{ response.Channel.Level }}'
+      ChannelArn: '{{ response.Channel.ChannelArn }}'
+      Arn: '{{ response.Channel.CreatedBy.Arn }}'
+      Name: '{{ response.Channel.CreatedBy.Name }}'
+      MaximumSubChannels: '{{ response.Channel.ElasticChannelConfiguration.MaximumSubChannels }}'
+      MinimumMembershipPercentage: '{{ response.Channel.ElasticChannelConfiguration.MinimumMembershipPercentage }}'
+      TargetMembershipsPerSubChannel: '{{ response.Channel.ElasticChannelConfiguration.TargetMembershipsPerSubChannel }}'
+      ExpirationCriterion: '{{ response.Channel.ExpirationSettings.ExpirationCriterion }}'
+      ExpirationDays: '{{ response.Channel.ExpirationSettings.ExpirationDays }}'
+      LastMessageTimestamp: '{{ response.Channel.LastMessageTimestamp }}'
+      Metadata: '{{ response.Channel.Metadata }}'
+      Mode: '{{ response.Channel.Mode }}'
+      Privacy: '{{ response.Channel.Privacy }}'
+- discovery_id: aws.chime-sdk-messaging.describe_channel_ban
+  calls:
+  - action: describe_channel_ban
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedBy: '{{ response.ChannelBan.CreatedBy.Arn }}'
+      CreatedTimestamp: '{{ response.ChannelBan.CreatedTimestamp }}'
+      Member: '{{ response.ChannelBan.Member.Arn }}'
+      ChannelArn: '{{ response.ChannelBan.ChannelArn }}'
+      Arn: '{{ response.ChannelBan.CreatedBy.Arn }}'
+      Name: '{{ response.ChannelBan.CreatedBy.Name }}'
+- discovery_id: aws.chime-sdk-messaging.describe_channel_flow
+  calls:
+  - action: describe_channel_flow
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ChannelFlowArn: '{{ response.ChannelFlow.ChannelFlowArn }}'
+      CreatedTimestamp: '{{ response.ChannelFlow.CreatedTimestamp }}'
+      LastUpdatedTimestamp: '{{ response.ChannelFlow.LastUpdatedTimestamp }}'
+      Processors: '{{ response.ChannelFlow.Processors[].Name }}'
+      Name: '{{ response.ChannelFlow.Name }}'
+- discovery_id: aws.chime-sdk-messaging.describe_channel_membership
+  calls:
+  - action: describe_channel_membership
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedTimestamp: '{{ response.ChannelMembership.CreatedTimestamp }}'
+      InvitedBy: '{{ response.ChannelMembership.InvitedBy.Arn }}'
+      LastUpdatedTimestamp: '{{ response.ChannelMembership.LastUpdatedTimestamp }}'
+      Member: '{{ response.ChannelMembership.Member.Arn }}'
+      SubChannelId: '{{ response.ChannelMembership.SubChannelId }}'
+      Type: '{{ response.ChannelMembership.Type }}'
+      ChannelArn: '{{ response.ChannelMembership.ChannelArn }}'
+      Arn: '{{ response.ChannelMembership.InvitedBy.Arn }}'
+      Name: '{{ response.ChannelMembership.InvitedBy.Name }}'
+- discovery_id: aws.chime-sdk-messaging.describe_channel_membership_for_app_instance_user
+  calls:
+  - action: describe_channel_membership_for_app_instance_user
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AppInstanceUserMembershipSummary: '{{ response.ChannelMembership.AppInstanceUserMembershipSummary.Type }}'
+      ChannelSummary: '{{ response.ChannelMembership.ChannelSummary.Name }}'
+      ReadMarkerTimestamp: '{{ response.ChannelMembership.AppInstanceUserMembershipSummary.ReadMarkerTimestamp }}'
+      SubChannelId: '{{ response.ChannelMembership.AppInstanceUserMembershipSummary.SubChannelId }}'
+      Type: '{{ response.ChannelMembership.AppInstanceUserMembershipSummary.Type }}'
+      ChannelArn: '{{ response.ChannelMembership.ChannelSummary.ChannelArn }}'
+      LastMessageTimestamp: '{{ response.ChannelMembership.ChannelSummary.LastMessageTimestamp }}'
+      Metadata: '{{ response.ChannelMembership.ChannelSummary.Metadata }}'
+      Mode: '{{ response.ChannelMembership.ChannelSummary.Mode }}'
+      Name: '{{ response.ChannelMembership.ChannelSummary.Name }}'
+      Privacy: '{{ response.ChannelMembership.ChannelSummary.Privacy }}'
+- discovery_id: aws.chime-sdk-messaging.describe_channel_moderated_by_app_instance_user
+  calls:
+  - action: describe_channel_moderated_by_app_instance_user
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ChannelSummary: '{{ response.Channel.ChannelSummary.Name }}'
+      ChannelArn: '{{ response.Channel.ChannelSummary.ChannelArn }}'
+      LastMessageTimestamp: '{{ response.Channel.ChannelSummary.LastMessageTimestamp }}'
+      Metadata: '{{ response.Channel.ChannelSummary.Metadata }}'
+      Mode: '{{ response.Channel.ChannelSummary.Mode }}'
+      Name: '{{ response.Channel.ChannelSummary.Name }}'
+      Privacy: '{{ response.Channel.ChannelSummary.Privacy }}'
+- discovery_id: aws.chime-sdk-messaging.describe_channel_moderator
+  calls:
+  - action: describe_channel_moderator
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedBy: '{{ response.ChannelModerator.CreatedBy.Arn }}'
+      CreatedTimestamp: '{{ response.ChannelModerator.CreatedTimestamp }}'
+      Moderator: '{{ response.ChannelModerator.Moderator.Arn }}'
+      ChannelArn: '{{ response.ChannelModerator.ChannelArn }}'
+      Arn: '{{ response.ChannelModerator.CreatedBy.Arn }}'
+      Name: '{{ response.ChannelModerator.CreatedBy.Name }}'
+- discovery_id: aws.chime-sdk-messaging.get_channel_membership_preferences
+  calls:
+  - action: get_channel_membership_preferences
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Member.Arn }}'
+      ChannelArn: '{{ response.ChannelArn }}'
+      Name: '{{ response.Member.Name }}'
+      AllowNotifications: '{{ response.Preferences.PushNotifications.AllowNotifications }}'
+      FilterRule: '{{ response.Preferences.PushNotifications.FilterRule }}'
+- discovery_id: aws.chime-sdk-messaging.get_channel_message
+  calls:
+  - action: get_channel_message
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.ChannelMessage.Status.Value }}'
+      Content: '{{ response.ChannelMessage.Content }}'
+      ContentType: '{{ response.ChannelMessage.ContentType }}'
+      CreatedTimestamp: '{{ response.ChannelMessage.CreatedTimestamp }}'
+      LastEditedTimestamp: '{{ response.ChannelMessage.LastEditedTimestamp }}'
+      LastUpdatedTimestamp: '{{ response.ChannelMessage.LastUpdatedTimestamp }}'
+      MessageAttributes: '{{ response.ChannelMessage.MessageAttributes }}'
+      MessageId: '{{ response.ChannelMessage.MessageId }}'
+      Persistence: '{{ response.ChannelMessage.Persistence }}'
+      Redacted: '{{ response.ChannelMessage.Redacted }}'
+      Sender: '{{ response.ChannelMessage.Sender.Arn }}'
+      SubChannelId: '{{ response.ChannelMessage.SubChannelId }}'
+      Target: '{{ response.ChannelMessage.Type }}'
+      Type: '{{ response.ChannelMessage.Type }}'
+      ChannelArn: '{{ response.ChannelMessage.ChannelArn }}'
+      Metadata: '{{ response.ChannelMessage.Metadata }}'
+      Arn: '{{ response.ChannelMessage.Sender.Arn }}'
+      Name: '{{ response.ChannelMessage.Sender.Name }}'
+      Detail: '{{ response.ChannelMessage.Status.Detail }}'
+      Value: '{{ response.ChannelMessage.Status.Value }}'
+- discovery_id: aws.chime-sdk-messaging.get_channel_message_status
+  calls:
+  - action: get_channel_message_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Detail: '{{ response.Status.Detail }}'
+      Value: '{{ response.Status.Value }}'
+- discovery_id: aws.chime-sdk-messaging.get_messaging_streaming_configurations
+  calls:
+  - action: get_messaging_streaming_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.StreamingConfigurations }}'
+    item:
+      ResourceArn: '{{ item.ResourceArn }}'
+      DataType: '{{ item.DataType }}'
+- discovery_id: aws.chime-sdk-messaging.list_channel_bans
+  calls:
+  - action: list_channel_bans
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ChannelBans }}'
+    item:
+      Member: '{{ item.Member }}'
+      ChannelArn: '{{ response.ChannelArn }}'
+- discovery_id: aws.chime-sdk-messaging.list_channel_flows
+  calls:
+  - action: list_channel_flows
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ChannelFlows }}'
+    item:
+      ChannelFlowArn: '{{ item.ChannelFlowArn }}'
+      Processors: '{{ item.Processors }}'
+- discovery_id: aws.chime-sdk-messaging.list_channel_memberships
+  calls:
+  - action: list_channel_memberships
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ChannelMemberships }}'
+    item:
+      Member: '{{ item.Member }}'
+      ChannelArn: '{{ response.ChannelArn }}'
+- discovery_id: aws.chime-sdk-messaging.list_channel_memberships_for_app_instance_user
+  calls:
+  - action: list_channel_memberships_for_app_instance_user
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ChannelMemberships }}'
+    item:
+      AppInstanceUserMembershipSummary: '{{ item.AppInstanceUserMembershipSummary }}'
+      ChannelSummary: '{{ item.ChannelSummary }}'
+- discovery_id: aws.chime-sdk-messaging.list_channel_messages
+  calls:
+  - action: list_channel_messages
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ChannelMessages }}'
+    item:
+      Status: '{{ item.Status }}'
+      Content: '{{ item.Content }}'
+      ContentType: '{{ item.ContentType }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      LastEditedTimestamp: '{{ item.LastEditedTimestamp }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+      MessageAttributes: '{{ item.MessageAttributes }}'
+      MessageId: '{{ item.MessageId }}'
+      Redacted: '{{ item.Redacted }}'
+      Sender: '{{ item.Sender }}'
+      Target: '{{ item.Target }}'
+      Type: '{{ item.Type }}'
+      ChannelArn: '{{ response.ChannelArn }}'
+      SubChannelId: '{{ response.SubChannelId }}'
+- discovery_id: aws.chime-sdk-messaging.list_channel_moderators
+  calls:
+  - action: list_channel_moderators
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ChannelModerators }}'
+    item:
+      Moderator: '{{ item.Moderator }}'
+      ChannelArn: '{{ response.ChannelArn }}'
+- discovery_id: aws.chime-sdk-messaging.list_channels
+  calls:
+  - action: list_channels
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Channels }}'
+- discovery_id: aws.chime-sdk-messaging.list_channels_associated_with_channel_flow
+  calls:
+  - action: list_channels_associated_with_channel_flow
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Channels }}'
+- discovery_id: aws.chime-sdk-messaging.list_channels_moderated_by_app_instance_user
+  calls:
+  - action: list_channels_moderated_by_app_instance_user
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Channels }}'
+    item:
+      ChannelSummary: '{{ item.ChannelSummary }}'
+- discovery_id: aws.chime-sdk-messaging.list_sub_channels
+  calls:
+  - action: list_sub_channels
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SubChannels }}'
+    item:
+      MembershipCount: '{{ item.MembershipCount }}'
+      SubChannelId: '{{ item.SubChannelId }}'
+      ChannelArn: '{{ response.ChannelArn }}'
+- discovery_id: aws.chime-sdk-messaging.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.chime-sdk-messaging.search_channels
+  calls:
+  - action: search_channels
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Channels }}'

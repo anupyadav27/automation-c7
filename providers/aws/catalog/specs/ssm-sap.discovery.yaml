@@ -1,0 +1,312 @@
+version: '1.0'
+provider: aws
+service: ssm-sap
+services:
+  client: ssm-sap
+  module: boto3.client
+discovery:
+- discovery_id: aws.ssm-sap.get_application
+  calls:
+  - action: get_application
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ResourceId: '{{ response.Application.ResourceId }}'
+      Status: '{{ response.Application.Status }}'
+      AppRegistryArn: '{{ response.Application.AppRegistryArn }}'
+      Application: '{{ response.Application.Application }}'
+      AssociatedApplicationArns: '{{ response.Application.AssociatedApplicationArns }}'
+      Components: '{{ response.Application.Components }}'
+      ConfigurationCheckDescription: '{{ response.Application.ConfigurationCheckDescription }}'
+      ConfigurationCheckId: '{{ response.Application.ConfigurationCheckId }}'
+      ConfigurationCheckName: '{{ response.Application.ConfigurationCheckName }}'
+      ConfigurationCheckOperation: '{{ response.Application.ConfigurationCheckOperation }}'
+      EndTime: '{{ response.Application.EndTime }}'
+      LastUpdated: '{{ response.Application.LastUpdated }}'
+      LastUpdatedTime: '{{ response.Application.LastUpdated }}'
+      Operation: '{{ response.Application.Operation }}'
+      Properties: '{{ response.Application.Properties }}'
+      References: '{{ response.Application.References }}'
+      Resource: '{{ response.Application.Resource }}'
+      ResourceType: '{{ response.Application.ResourceType }}'
+      RuleStatusCounts: '{{ response.Application.RuleStatusCounts }}'
+      StartTime: '{{ response.Application.StartTime }}'
+      StatusMessage: '{{ response.Application.StatusMessage }}'
+      Timestamp: '{{ response.Application.Timestamp }}'
+      Arn: '{{ response.Application.Arn }}'
+      DiscoveryStatus: '{{ response.Application.DiscoveryStatus }}'
+      Id: '{{ response.Application.Id }}'
+      Type: '{{ response.Application.Type }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.ssm-sap.get_database
+  calls:
+  - action: get_database
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Database.Arn }}'
+      Status: '{{ response.Database.Status }}'
+      ApplicationId: '{{ response.Database.ApplicationId }}'
+      ComponentId: '{{ response.Database.ComponentId }}'
+      ConnectedComponentArns: '{{ response.Database.ConnectedComponentArns }}'
+      Credentials: '{{ response.Database.Credentials }}'
+      Database: '{{ response.Database.DatabaseId }}'
+      DatabaseId: '{{ response.Database.DatabaseId }}'
+      DatabaseName: '{{ response.Database.DatabaseName }}'
+      DatabaseType: '{{ response.Database.DatabaseType }}'
+      LastUpdated: '{{ response.Database.LastUpdated }}'
+      PrimaryHost: '{{ response.Database.PrimaryHost }}'
+      SQLPort: '{{ response.Database.SQLPort }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.ssm-sap.list_applications
+  calls:
+  - action: list_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Applications }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Tags: '{{ item.Tags }}'
+      Application: '{{ item.Application }}'
+      DiscoveryStatus: '{{ item.DiscoveryStatus }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.ssm-sap.list_components
+  calls:
+  - action: list_components
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Components }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Tags: '{{ item.Tags }}'
+      ApplicationId: '{{ item.ApplicationId }}'
+      Component: '{{ item.Component }}'
+      ComponentId: '{{ item.ComponentId }}'
+      ComponentType: '{{ item.ComponentType }}'
+- discovery_id: aws.ssm-sap.list_configuration_check_definitions
+  calls:
+  - action: list_configuration_check_definitions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ConfigurationChecks }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      ApplicableApplicationTypes: '{{ item.ApplicableApplicationTypes }}'
+      Description: '{{ item.Description }}'
+      Enabled: '{{ item.Enabled }}'
+- discovery_id: aws.ssm-sap.list_databases
+  calls:
+  - action: list_databases
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Databases }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Tags: '{{ item.Tags }}'
+      ApplicationId: '{{ item.ApplicationId }}'
+      ComponentId: '{{ item.ComponentId }}'
+      Database: '{{ item.Database }}'
+      DatabaseId: '{{ item.DatabaseId }}'
+      DatabaseType: '{{ item.DatabaseType }}'
+- discovery_id: aws.ssm-sap.get_component
+  for_each: aws.ssm-sap.get_application
+  calls:
+  - action: get_component
+    params:
+      ApplicationId: '{{ item.ApplicationId }}'
+      ComponentId: '{{ item.ComponentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Component.Arn }}'
+      Status: '{{ response.Component.Status }}'
+      ApplicationId: '{{ response.Component.ApplicationId }}'
+      AssociatedHost: '{{ response.Component.AssociatedHost }}'
+      ChildComponents: '{{ response.Component.ChildComponents }}'
+      Component: '{{ response.Component.ComponentId }}'
+      ComponentId: '{{ response.Component.ComponentId }}'
+      ComponentType: '{{ response.Component.ComponentType }}'
+      DatabaseConnection: '{{ response.Component.DatabaseConnection }}'
+      Databases: '{{ response.Component.Databases }}'
+      HdbVersion: '{{ response.Component.HdbVersion }}'
+      Hosts: '{{ response.Component.Hosts }}'
+      LastUpdated: '{{ response.Component.LastUpdated }}'
+      ParentComponent: '{{ response.Component.ParentComponent }}'
+      PrimaryHost: '{{ response.Component.PrimaryHost }}'
+      Resilience: '{{ response.Component.Resilience }}'
+      SapFeature: '{{ response.Component.SapFeature }}'
+      SapHostname: '{{ response.Component.SapHostname }}'
+      SapKernelVersion: '{{ response.Component.SapKernelVersion }}'
+      Sid: '{{ response.Component.Sid }}'
+      SystemNumber: '{{ response.Component.SystemNumber }}'
+      Ec2InstanceId: '{{ response.Component.AssociatedHost.Ec2InstanceId }}'
+      Hostname: '{{ response.Component.AssociatedHost.Hostname }}'
+      OsVersion: '{{ response.Component.AssociatedHost.OsVersion }}'
+      ConnectionIp: '{{ response.Component.DatabaseConnection.ConnectionIp }}'
+      DatabaseArn: '{{ response.Component.DatabaseConnection.DatabaseArn }}'
+      DatabaseConnectionMethod: '{{ response.Component.DatabaseConnection.DatabaseConnectionMethod }}'
+      ClusterStatus: '{{ response.Component.Resilience.ClusterStatus }}'
+      EnqueueReplication: '{{ response.Component.Resilience.EnqueueReplication }}'
+      HsrOperationMode: '{{ response.Component.Resilience.HsrOperationMode }}'
+      HsrReplicationMode: '{{ response.Component.Resilience.HsrReplicationMode }}'
+      HsrTier: '{{ response.Component.Resilience.HsrTier }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.ssm-sap.get_configuration_check_operation
+  calls:
+  - action: get_configuration_check_operation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.ConfigurationCheckOperation.Id }}'
+      Status: '{{ response.ConfigurationCheckOperation.Status }}'
+      ApplicationId: '{{ response.ConfigurationCheckOperation.ApplicationId }}'
+      ConfigurationCheckOperation: '{{ response.ConfigurationCheckOperation.ConfigurationCheckOperation }}'
+      StatusMessage: '{{ response.ConfigurationCheckOperation.StatusMessage }}'
+- discovery_id: aws.ssm-sap.get_operation
+  calls:
+  - action: get_operation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.Operation.Id }}'
+      ResourceArn: '{{ response.Operation.ResourceArn }}'
+      Status: '{{ response.Operation.Status }}'
+      EndTime: '{{ response.Operation.EndTime }}'
+      Operation: '{{ response.Operation.Operation }}'
+      StartTime: '{{ response.Operation.StartTime }}'
+      StatusMessage: '{{ response.Operation.StatusMessage }}'
+      Type: '{{ response.Operation.Type }}'
+      LastUpdatedTime: '{{ response.Operation.LastUpdatedTime }}'
+      Properties: '{{ response.Operation.Properties }}'
+      ResourceId: '{{ response.Operation.ResourceId }}'
+      ResourceType: '{{ response.Operation.ResourceType }}'
+- discovery_id: aws.ssm-sap.get_resource_permission
+  calls:
+  - action: get_resource_permission
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+- discovery_id: aws.ssm-sap.list_configuration_check_operations
+  for_each: aws.ssm-sap.get_application
+  calls:
+  - action: list_configuration_check_operations
+    params:
+      ApplicationId: '{{ item.ApplicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ConfigurationCheckOperations }}'
+    item:
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      ApplicationId: '{{ item.ApplicationId }}'
+      ConfigurationCheckDescription: '{{ item.ConfigurationCheckDescription }}'
+      ConfigurationCheckId: '{{ item.ConfigurationCheckId }}'
+      ConfigurationCheckName: '{{ item.ConfigurationCheckName }}'
+      ConfigurationCheckOperation: '{{ item.ConfigurationCheckOperation }}'
+      EndTime: '{{ item.EndTime }}'
+      Operation: '{{ item.Operation }}'
+      References: '{{ item.References }}'
+      Resource: '{{ item.Resource }}'
+      RuleStatusCounts: '{{ item.RuleStatusCounts }}'
+      StartTime: '{{ item.StartTime }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      Timestamp: '{{ item.Timestamp }}'
+- discovery_id: aws.ssm-sap.list_operation_events
+  calls:
+  - action: list_operation_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.OperationEvents }}'
+    item:
+      Status: '{{ item.Status }}'
+      Description: '{{ item.Description }}'
+      Resource: '{{ item.Resource }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      Timestamp: '{{ item.Timestamp }}'
+- discovery_id: aws.ssm-sap.list_operations
+  for_each: aws.ssm-sap.get_application
+  calls:
+  - action: list_operations
+    params:
+      ApplicationId: '{{ item.ApplicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Operations }}'
+    item:
+      Id: '{{ item.Id }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      ResourceId: '{{ item.ResourceId }}'
+      Status: '{{ item.Status }}'
+      EndTime: '{{ item.EndTime }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      Operation: '{{ item.Operation }}'
+      Properties: '{{ item.Properties }}'
+      ResourceType: '{{ item.ResourceType }}'
+      StartTime: '{{ item.StartTime }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.ssm-sap.list_sub_check_results
+  calls:
+  - action: list_sub_check_results
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SubCheckResults }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Description: '{{ item.Description }}'
+      References: '{{ item.References }}'
+- discovery_id: aws.ssm-sap.list_sub_check_rule_results
+  calls:
+  - action: list_sub_check_rule_results
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RuleResults }}'
+    item:
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      Description: '{{ item.Description }}'
+      Message: '{{ item.Message }}'
+      Metadata: '{{ item.Metadata }}'
+- discovery_id: aws.ssm-sap.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

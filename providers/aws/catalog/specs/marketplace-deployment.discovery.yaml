@@ -1,0 +1,23 @@
+# ============================================================
+# Discovery YAML — marketplace-deployment (AWS)
+# Generated: 2026-02-21T04:56:59Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: marketplace-deployment
+services:
+  client: marketplace-deployment
+  module: boto3.client
+discovery:
+  # ── Dependent read operations (require identifiers) ──
+  # ── ListTagsForResource ──
+  - discovery_id: aws.marketplace-deployment.list_tags_for_resource
+    calls:
+      - action: list_tags_for_resource
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        tags: '{{ response.tags }}'

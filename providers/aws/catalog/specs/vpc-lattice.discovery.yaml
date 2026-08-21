@@ -1,0 +1,583 @@
+version: '1.0'
+provider: aws
+service: vpc-lattice
+services:
+  client: vpc-lattice
+  module: boto3.client
+discovery:
+- discovery_id: aws.vpc-lattice.list_domain_verifications
+  calls:
+  - action: list_domain_verifications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      domainName: '{{ item.domainName }}'
+      id: '{{ item.id }}'
+      lastVerifiedTime: '{{ item.lastVerifiedTime }}'
+      status: '{{ item.status }}'
+      tags: '{{ item.tags }}'
+      txtMethodConfig: '{{ item.txtMethodConfig }}'
+- discovery_id: aws.vpc-lattice.list_resource_configurations
+  calls:
+  - action: list_resource_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      amazonManaged: '{{ item.amazonManaged }}'
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      customDomainName: '{{ item.customDomainName }}'
+      domainVerificationId: '{{ item.domainVerificationId }}'
+      groupDomain: '{{ item.groupDomain }}'
+      id: '{{ item.id }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      name: '{{ item.name }}'
+      resourceConfigurationGroupId: '{{ item.items[].resourceConfigurationGroupId }}'
+      resourceGatewayId: '{{ item.resourceGatewayId }}'
+      status: '{{ item.status }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.vpc-lattice.list_resource_gateways
+  calls:
+  - action: list_resource_gateways
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      id: '{{ item.id }}'
+      ipAddressType: '{{ item.ipAddressType }}'
+      ipv4AddressesPerEni: '{{ item.ipv4AddressesPerEni }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      name: '{{ item.name }}'
+      securityGroupIds: '{{ item.securityGroupIds }}'
+      status: '{{ item.status }}'
+      subnetIds: '{{ item.subnetIds }}'
+      vpcIdentifier: '{{ item.vpcIdentifier }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.vpc-lattice.list_service_network_resource_associations
+  calls:
+  - action: list_service_network_resource_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      dnsEntry: '{{ item.dnsEntry }}'
+      failureCode: '{{ item.failureCode }}'
+      id: '{{ item.id }}'
+      isManagedAssociation: '{{ item.isManagedAssociation }}'
+      privateDnsEnabled: '{{ item.privateDnsEnabled }}'
+      privateDnsEntry: '{{ item.privateDnsEntry }}'
+      resourceConfigurationArn: '{{ item.items[].resourceConfigurationArn }}'
+      resourceConfigurationId: '{{ item.items[].resourceConfigurationId }}'
+      resourceConfigurationName: '{{ item.items[].resourceConfigurationName }}'
+      serviceNetworkArn: '{{ item.serviceNetworkArn }}'
+      serviceNetworkId: '{{ item.serviceNetworkId }}'
+      serviceNetworkName: '{{ item.serviceNetworkName }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.vpc-lattice.list_service_network_service_associations
+  calls:
+  - action: list_service_network_service_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      customDomainName: '{{ item.customDomainName }}'
+      dnsEntry: '{{ item.dnsEntry }}'
+      id: '{{ item.id }}'
+      serviceArn: '{{ item.serviceArn }}'
+      serviceId: '{{ item.serviceId }}'
+      serviceName: '{{ item.serviceName }}'
+      serviceNetworkArn: '{{ item.serviceNetworkArn }}'
+      serviceNetworkId: '{{ item.serviceNetworkId }}'
+      serviceNetworkName: '{{ item.serviceNetworkName }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.vpc-lattice.list_service_network_vpc_associations
+  calls:
+  - action: list_service_network_vpc_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      dnsOptions: '{{ item.dnsOptions }}'
+      id: '{{ item.id }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      privateDnsEnabled: '{{ item.privateDnsEnabled }}'
+      serviceNetworkArn: '{{ item.serviceNetworkArn }}'
+      serviceNetworkId: '{{ item.serviceNetworkId }}'
+      serviceNetworkName: '{{ item.serviceNetworkName }}'
+      status: '{{ item.status }}'
+      vpcId: '{{ item.vpcId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.vpc-lattice.list_service_networks
+  calls:
+  - action: list_service_networks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      id: '{{ item.id }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      name: '{{ item.name }}'
+      numberOfAssociatedResourceConfigurations: '{{ item.items[].numberOfAssociatedResourceConfigurations }}'
+      numberOfAssociatedServices: '{{ item.items[].numberOfAssociatedServices }}'
+      numberOfAssociatedVPCs: '{{ item.numberOfAssociatedVPCs }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.vpc-lattice.list_services
+  calls:
+  - action: list_services
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      customDomainName: '{{ item.customDomainName }}'
+      dnsEntry: '{{ item.dnsEntry }}'
+      id: '{{ item.id }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.vpc-lattice.list_target_groups
+  calls:
+  - action: list_target_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      id: '{{ item.id }}'
+      ipAddressType: '{{ item.ipAddressType }}'
+      lambdaEventStructureVersion: '{{ item.items[].lambdaEventStructureVersion }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      name: '{{ item.name }}'
+      port: '{{ item.port }}'
+      protocol: '{{ item.protocol }}'
+      serviceArns: '{{ item.serviceArns }}'
+      status: '{{ item.status }}'
+      type: '{{ item.type }}'
+      vpcIdentifier: '{{ item.vpcIdentifier }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.vpc-lattice.get_access_log_subscription
+  calls:
+  - action: get_access_log_subscription
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.arn }}'
+      createdAt: '{{ response.createdAt }}'
+      destinationArn: '{{ response.destinationArn }}'
+      id: '{{ response.id }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      resourceArn: '{{ response.resourceArn }}'
+      resourceId: '{{ response.resourceId }}'
+      serviceNetworkLogType: '{{ response.serviceNetworkLogType }}'
+- discovery_id: aws.vpc-lattice.get_auth_policy
+  calls:
+  - action: get_auth_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+      policy: '{{ response.policy }}'
+      createdAt: '{{ response.createdAt }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      state: '{{ response.state }}'
+- discovery_id: aws.vpc-lattice.get_domain_verification
+  calls:
+  - action: get_domain_verification
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      name: '{{ response.txtMethodConfig.name }}'
+      value: '{{ response.txtMethodConfig.value }}'
+- discovery_id: aws.vpc-lattice.get_listener
+  calls:
+  - action: get_listener
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      fixedResponse: '{{ response.defaultAction.fixedResponse }}'
+      forward: '{{ response.defaultAction.forward }}'
+      arn: '{{ response.arn }}'
+      createdAt: '{{ response.createdAt }}'
+      statusCode: '{{ response.defaultAction.fixedResponse.statusCode }}'
+      id: '{{ response.id }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      name: '{{ response.name }}'
+      port: '{{ response.port }}'
+      protocol: '{{ response.protocol }}'
+      serviceArn: '{{ response.serviceArn }}'
+      serviceId: '{{ response.serviceId }}'
+- discovery_id: aws.vpc-lattice.get_resource_configuration
+  calls:
+  - action: get_resource_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.portRanges }}'
+    item:
+      allowAssociationToShareableServiceNetwork: '{{ response.allowAssociationToShareableServiceNetwork }}'
+      amazonManaged: '{{ response.amazonManaged }}'
+      arn: '{{ response.arn }}'
+      createdAt: '{{ response.createdAt }}'
+      customDomainName: '{{ response.customDomainName }}'
+      failureReason: '{{ response.failureReason }}'
+      id: '{{ response.id }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      name: '{{ response.name }}'
+      protocol: '{{ response.protocol }}'
+      domainName: '{{ response.resourceConfigurationDefinition.dnsResource.domainName }}'
+      ipAddressType: '{{ response.resourceConfigurationDefinition.dnsResource.ipAddressType }}'
+      ipAddress: '{{ response.resourceConfigurationDefinition.ipResource.ipAddress }}'
+      resourceConfigurationGroupId: '{{ response.resourceConfigurationGroupId }}'
+      resourceGatewayId: '{{ response.resourceGatewayId }}'
+      status: '{{ response.status }}'
+      type: '{{ response.type }}'
+- discovery_id: aws.vpc-lattice.get_resource_gateway
+  calls:
+  - action: get_resource_gateway
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.subnetIds }}'
+    item:
+      arn: '{{ response.arn }}'
+      createdAt: '{{ response.createdAt }}'
+      id: '{{ response.id }}'
+      ipAddressType: '{{ response.ipAddressType }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+      vpcId: '{{ response.vpcId }}'
+- discovery_id: aws.vpc-lattice.get_resource_policy
+  calls:
+  - action: get_resource_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      policy: '{{ response.policy }}'
+- discovery_id: aws.vpc-lattice.get_rule
+  calls:
+  - action: get_rule
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      httpMatch: '{{ response.match.httpMatch }}'
+      statusCode: '{{ response.action.fixedResponse.statusCode }}'
+      arn: '{{ response.arn }}'
+      createdAt: '{{ response.createdAt }}'
+      id: '{{ response.id }}'
+      isDefault: '{{ response.isDefault }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      method: '{{ response.match.httpMatch.method }}'
+      caseSensitive: '{{ response.match.httpMatch.pathMatch.caseSensitive }}'
+      exact: '{{ response.match.httpMatch.pathMatch.match.exact }}'
+      prefix: '{{ response.match.httpMatch.pathMatch.match.prefix }}'
+      name: '{{ response.name }}'
+      priority: '{{ response.priority }}'
+- discovery_id: aws.vpc-lattice.get_service
+  calls:
+  - action: get_service
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      domainName: '{{ response.dnsEntry.domainName }}'
+      hostedZoneId: '{{ response.dnsEntry.hostedZoneId }}'
+      arn: '{{ response.arn }}'
+      authType: '{{ response.authType }}'
+      certificateArn: '{{ response.certificateArn }}'
+      createdAt: '{{ response.createdAt }}'
+      customDomainName: '{{ response.customDomainName }}'
+      failureCode: '{{ response.failureCode }}'
+      failureMessage: '{{ response.failureMessage }}'
+      id: '{{ response.id }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.vpc-lattice.get_service_network
+  calls:
+  - action: get_service_network
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      enabled: '{{ response.sharingConfig.enabled }}'
+      arn: '{{ response.arn }}'
+      authType: '{{ response.authType }}'
+      createdAt: '{{ response.createdAt }}'
+      id: '{{ response.id }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      name: '{{ response.name }}'
+      numberOfAssociatedServices: '{{ response.numberOfAssociatedServices }}'
+      numberOfAssociatedVPCs: '{{ response.numberOfAssociatedVPCs }}'
+- discovery_id: aws.vpc-lattice.get_service_network_resource_association
+  calls:
+  - action: get_service_network_resource_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      domainName: '{{ response.privateDnsEntry.domainName }}'
+      hostedZoneId: '{{ response.privateDnsEntry.hostedZoneId }}'
+      arn: '{{ response.arn }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      failureCode: '{{ response.failureCode }}'
+      failureReason: '{{ response.failureReason }}'
+      id: '{{ response.id }}'
+      isManagedAssociation: '{{ response.isManagedAssociation }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      resourceConfigurationArn: '{{ response.resourceConfigurationArn }}'
+      resourceConfigurationId: '{{ response.resourceConfigurationId }}'
+      resourceConfigurationName: '{{ response.resourceConfigurationName }}'
+      serviceNetworkArn: '{{ response.serviceNetworkArn }}'
+      serviceNetworkId: '{{ response.serviceNetworkId }}'
+      serviceNetworkName: '{{ response.serviceNetworkName }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.vpc-lattice.get_service_network_service_association
+  calls:
+  - action: get_service_network_service_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      domainName: '{{ response.dnsEntry.domainName }}'
+      hostedZoneId: '{{ response.dnsEntry.hostedZoneId }}'
+      arn: '{{ response.arn }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      customDomainName: '{{ response.customDomainName }}'
+      failureCode: '{{ response.failureCode }}'
+      failureMessage: '{{ response.failureMessage }}'
+      id: '{{ response.id }}'
+      serviceArn: '{{ response.serviceArn }}'
+      serviceId: '{{ response.serviceId }}'
+      serviceName: '{{ response.serviceName }}'
+      serviceNetworkArn: '{{ response.serviceNetworkArn }}'
+      serviceNetworkId: '{{ response.serviceNetworkId }}'
+      serviceNetworkName: '{{ response.serviceNetworkName }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.vpc-lattice.get_service_network_vpc_association
+  calls:
+  - action: get_service_network_vpc_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.securityGroupIds }}'
+    item:
+      arn: '{{ response.arn }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      failureCode: '{{ response.failureCode }}'
+      failureMessage: '{{ response.failureMessage }}'
+      id: '{{ response.id }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      serviceNetworkArn: '{{ response.serviceNetworkArn }}'
+      serviceNetworkId: '{{ response.serviceNetworkId }}'
+      serviceNetworkName: '{{ response.serviceNetworkName }}'
+      status: '{{ response.status }}'
+      vpcId: '{{ response.vpcId }}'
+- discovery_id: aws.vpc-lattice.get_target_group
+  calls:
+  - action: get_target_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.serviceArns }}'
+    item:
+      arn: '{{ response.arn }}'
+      enabled: '{{ response.config.healthCheck.enabled }}'
+      healthCheckIntervalSeconds: '{{ response.config.healthCheck.healthCheckIntervalSeconds }}'
+      healthCheckTimeoutSeconds: '{{ response.config.healthCheck.healthCheckTimeoutSeconds }}'
+      healthyThresholdCount: '{{ response.config.healthCheck.healthyThresholdCount }}'
+      httpCode: '{{ response.config.healthCheck.matcher.httpCode }}'
+      path: '{{ response.config.healthCheck.path }}'
+      port: '{{ response.config.healthCheck.port }}'
+      protocol: '{{ response.config.healthCheck.protocol }}'
+      protocolVersion: '{{ response.config.healthCheck.protocolVersion }}'
+      unhealthyThresholdCount: '{{ response.config.healthCheck.unhealthyThresholdCount }}'
+      ipAddressType: '{{ response.config.ipAddressType }}'
+      lambdaEventStructureVersion: '{{ response.config.lambdaEventStructureVersion }}'
+      vpcIdentifier: '{{ response.config.vpcIdentifier }}'
+      createdAt: '{{ response.createdAt }}'
+      failureCode: '{{ response.failureCode }}'
+      failureMessage: '{{ response.failureMessage }}'
+      id: '{{ response.id }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+      type: '{{ response.type }}'
+- discovery_id: aws.vpc-lattice.list_access_log_subscriptions
+  calls:
+  - action: list_access_log_subscriptions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      destinationArn: '{{ item.destinationArn }}'
+      id: '{{ item.id }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      resourceArn: '{{ item.resourceArn }}'
+      resourceId: '{{ item.resourceId }}'
+      serviceNetworkLogType: '{{ item.serviceNetworkLogType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.vpc-lattice.list_listeners
+  calls:
+  - action: list_listeners
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      id: '{{ item.id }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      name: '{{ item.name }}'
+      port: '{{ item.port }}'
+      protocol: '{{ item.protocol }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.vpc-lattice.list_resource_endpoint_associations
+  calls:
+  - action: list_resource_endpoint_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      id: '{{ item.id }}'
+      resourceConfigurationArn: '{{ item.items[].resourceConfigurationArn }}'
+      resourceConfigurationId: '{{ item.items[].resourceConfigurationId }}'
+      resourceConfigurationName: '{{ item.items[].resourceConfigurationName }}'
+      vpcEndpointId: '{{ item.vpcEndpointId }}'
+      vpcEndpointOwner: '{{ item.vpcEndpointOwner }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.vpc-lattice.list_rules
+  calls:
+  - action: list_rules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      id: '{{ item.id }}'
+      isDefault: '{{ item.isDefault }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      name: '{{ item.name }}'
+      priority: '{{ item.priority }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.vpc-lattice.list_service_network_vpc_endpoint_associations
+  calls:
+  - action: list_service_network_vpc_endpoint_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      id: '{{ item.id }}'
+      serviceNetworkArn: '{{ item.serviceNetworkArn }}'
+      state: '{{ item.state }}'
+      vpcEndpointId: '{{ item.vpcEndpointId }}'
+      vpcEndpointOwnerId: '{{ item.vpcEndpointOwnerId }}'
+      vpcId: '{{ item.vpcId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.vpc-lattice.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.vpc-lattice.list_targets
+  calls:
+  - action: list_targets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      id: '{{ item.id }}'
+      port: '{{ item.port }}'
+      reasonCode: '{{ item.reasonCode }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'

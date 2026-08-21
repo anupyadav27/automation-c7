@@ -1,0 +1,296 @@
+version: '1.0'
+provider: aws
+service: voice-id
+services:
+  client: voice-id
+  module: boto3.client
+discovery:
+- discovery_id: aws.voice-id.list_domains
+  calls:
+  - action: list_domains
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DomainSummaries }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      DefaultWatchlist: '{{ item.DefaultWatchlist }}'
+      Description: '{{ item.Description }}'
+      Domain: '{{ item.Domain }}'
+      DomainId: '{{ item.DomainId }}'
+      DomainStatus: '{{ item.DomainStatus }}'
+      Enabled: '{{ item.Enabled }}'
+      EndedAt: '{{ item.EndedAt }}'
+      EnrollmentConfig: '{{ item.EnrollmentConfig }}'
+      FailureDetails: '{{ item.FailureDetails }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      LastAccessedAt: '{{ item.LastAccessedAt }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      RegistrationConfig: '{{ item.RegistrationConfig }}'
+      ServerSideEncryptionConfiguration: '{{ item.ServerSideEncryptionConfiguration }}'
+      ServerSideEncryptionUpdateDetails: '{{ item.ServerSideEncryptionUpdateDetails }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+      Watchlist: '{{ item.Watchlist }}'
+      WatchlistDetails: '{{ item.WatchlistDetails }}'
+      WatchlistIds: '{{ item.WatchlistIds }}'
+- discovery_id: aws.voice-id.describe_domain
+  for_each: aws.voice-id.list_domains
+  calls:
+  - action: describe_domain
+    params:
+      DomainId: '{{ item.DomainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Domain.Arn }}'
+      Name: '{{ response.Domain.Name }}'
+      CreatedAt: '{{ response.Domain.CreatedAt }}'
+      Description: '{{ response.Domain.Description }}'
+      DomainId: '{{ response.Domain.DomainId }}'
+      DomainStatus: '{{ response.Domain.DomainStatus }}'
+      ServerSideEncryptionConfiguration: '{{ response.Domain.ServerSideEncryptionConfiguration.KmsKeyId }}'
+      ServerSideEncryptionUpdateDetails: '{{ response.Domain.ServerSideEncryptionUpdateDetails.Message }}'
+      UpdatedAt: '{{ response.Domain.UpdatedAt }}'
+      WatchlistDetails: '{{ response.Domain.WatchlistDetails }}'
+      KmsKeyId: '{{ response.Domain.ServerSideEncryptionConfiguration.KmsKeyId }}'
+      Message: '{{ response.Domain.ServerSideEncryptionUpdateDetails.Message }}'
+      OldKmsKeyId: '{{ response.Domain.ServerSideEncryptionUpdateDetails.OldKmsKeyId }}'
+      UpdateStatus: '{{ response.Domain.ServerSideEncryptionUpdateDetails.UpdateStatus }}'
+      DefaultWatchlistId: '{{ response.Domain.WatchlistDetails.DefaultWatchlistId }}'
+- discovery_id: aws.voice-id.describe_fraudster
+  for_each: aws.voice-id.list_domains
+  calls:
+  - action: describe_fraudster
+    params:
+      DomainId: '{{ item.DomainId }}'
+      FraudsterId: '{{ item.FraudsterId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedAt: '{{ response.Fraudster.CreatedAt }}'
+      DomainId: '{{ response.Fraudster.DomainId }}'
+      GeneratedFraudsterId: '{{ response.Fraudster.GeneratedFraudsterId }}'
+- discovery_id: aws.voice-id.describe_fraudster_registration_job
+  for_each: aws.voice-id.list_domains
+  calls:
+  - action: describe_fraudster_registration_job
+    params:
+      DomainId: '{{ item.DomainId }}'
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedAt: '{{ response.Job.CreatedAt }}'
+      DataAccessRoleArn: '{{ response.Job.DataAccessRoleArn }}'
+      DomainId: '{{ response.Job.DomainId }}'
+      InputDataConfig: '{{ response.Job.InputDataConfig.S3Uri }}'
+      Job: '{{ response.Job.JobId }}'
+      JobId: '{{ response.Job.JobId }}'
+      JobName: '{{ response.Job.JobName }}'
+      JobProgress: '{{ response.Job.JobProgress }}'
+      JobStatus: '{{ response.Job.JobStatus }}'
+      OutputDataConfig: '{{ response.Job.OutputDataConfig.S3Uri }}'
+      RegistrationConfig: '{{ response.Job.RegistrationConfig }}'
+      EndedAt: '{{ response.Job.EndedAt }}'
+      Message: '{{ response.Job.FailureDetails.Message }}'
+      StatusCode: '{{ response.Job.FailureDetails.StatusCode }}'
+      S3Uri: '{{ response.Job.InputDataConfig.S3Uri }}'
+      PercentComplete: '{{ response.Job.JobProgress.PercentComplete }}'
+      KmsKeyId: '{{ response.Job.OutputDataConfig.KmsKeyId }}'
+      DuplicateRegistrationAction: '{{ response.Job.RegistrationConfig.DuplicateRegistrationAction }}'
+      FraudsterSimilarityThreshold: '{{ response.Job.RegistrationConfig.FraudsterSimilarityThreshold }}'
+- discovery_id: aws.voice-id.describe_speaker
+  for_each: aws.voice-id.list_domains
+  calls:
+  - action: describe_speaker
+    params:
+      DomainId: '{{ item.DomainId }}'
+      SpeakerId: '{{ item.SpeakerId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedAt: '{{ response.Speaker.CreatedAt }}'
+      CustomerSpeakerId: '{{ response.Speaker.CustomerSpeakerId }}'
+      DomainId: '{{ response.Speaker.DomainId }}'
+      GeneratedSpeakerId: '{{ response.Speaker.GeneratedSpeakerId }}'
+      Speaker: '{{ response.Speaker.Speaker }}'
+      UpdatedAt: '{{ response.Speaker.UpdatedAt }}'
+      LastAccessedAt: '{{ response.Speaker.LastAccessedAt }}'
+      Status: '{{ response.Speaker.Status }}'
+- discovery_id: aws.voice-id.describe_speaker_enrollment_job
+  for_each: aws.voice-id.list_domains
+  calls:
+  - action: describe_speaker_enrollment_job
+    params:
+      DomainId: '{{ item.DomainId }}'
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedAt: '{{ response.Job.CreatedAt }}'
+      DataAccessRoleArn: '{{ response.Job.DataAccessRoleArn }}'
+      DomainId: '{{ response.Job.DomainId }}'
+      EndedAt: '{{ response.Job.EndedAt }}'
+      EnrollmentConfig: '{{ response.Job.EnrollmentConfig }}'
+      FailureDetails: '{{ response.Job.FailureDetails }}'
+      InputDataConfig: '{{ response.Job.InputDataConfig.S3Uri }}'
+      JobId: '{{ response.Job.JobId }}'
+      JobName: '{{ response.Job.JobName }}'
+      JobProgress: '{{ response.Job.JobProgress }}'
+      JobStatus: '{{ response.Job.JobStatus }}'
+      OutputDataConfig: '{{ response.Job.OutputDataConfig.S3Uri }}'
+      ExistingEnrollmentAction: '{{ response.Job.EnrollmentConfig.ExistingEnrollmentAction }}'
+      FraudDetectionAction: '{{ response.Job.EnrollmentConfig.FraudDetectionConfig.FraudDetectionAction }}'
+      RiskThreshold: '{{ response.Job.EnrollmentConfig.FraudDetectionConfig.RiskThreshold }}'
+      Message: '{{ response.Job.FailureDetails.Message }}'
+      StatusCode: '{{ response.Job.FailureDetails.StatusCode }}'
+      S3Uri: '{{ response.Job.InputDataConfig.S3Uri }}'
+      PercentComplete: '{{ response.Job.JobProgress.PercentComplete }}'
+      KmsKeyId: '{{ response.Job.OutputDataConfig.KmsKeyId }}'
+- discovery_id: aws.voice-id.describe_watchlist
+  for_each: aws.voice-id.list_domains
+  calls:
+  - action: describe_watchlist
+    params:
+      DomainId: '{{ item.DomainId }}'
+      WatchlistId: '{{ item.WatchlistId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.Watchlist.Name }}'
+      CreatedAt: '{{ response.Watchlist.CreatedAt }}'
+      Description: '{{ response.Watchlist.Description }}'
+      DomainId: '{{ response.Watchlist.DomainId }}'
+      UpdatedAt: '{{ response.Watchlist.UpdatedAt }}'
+      WatchlistId: '{{ response.Watchlist.WatchlistId }}'
+      DefaultWatchlist: '{{ response.Watchlist.DefaultWatchlist }}'
+- discovery_id: aws.voice-id.list_fraudster_registration_jobs
+  for_each: aws.voice-id.list_domains
+  calls:
+  - action: list_fraudster_registration_jobs
+    params:
+      DomainId: '{{ item.DomainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.JobSummaries }}'
+    item:
+      CreatedAt: '{{ item.CreatedAt }}'
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      DomainId: '{{ item.DomainId }}'
+      EndedAt: '{{ item.EndedAt }}'
+      EnrollmentConfig: '{{ item.EnrollmentConfig }}'
+      FailureDetails: '{{ item.FailureDetails }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      Job: '{{ item.Job }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobProgress: '{{ item.JobProgress }}'
+      JobStatus: '{{ item.JobStatus }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      RegistrationConfig: '{{ item.RegistrationConfig }}'
+- discovery_id: aws.voice-id.list_fraudsters
+  for_each: aws.voice-id.list_domains
+  calls:
+  - action: list_fraudsters
+    params:
+      DomainId: '{{ item.DomainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.FraudsterSummaries }}'
+    item:
+      CreatedAt: '{{ item.CreatedAt }}'
+      DomainId: '{{ item.DomainId }}'
+      GeneratedFraudsterId: '{{ item.GeneratedFraudsterId }}'
+      WatchlistIds: '{{ item.WatchlistIds }}'
+- discovery_id: aws.voice-id.list_speaker_enrollment_jobs
+  for_each: aws.voice-id.list_domains
+  calls:
+  - action: list_speaker_enrollment_jobs
+    params:
+      DomainId: '{{ item.DomainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.JobSummaries }}'
+    item:
+      CreatedAt: '{{ item.CreatedAt }}'
+      DomainId: '{{ item.DomainId }}'
+      EndedAt: '{{ item.EndedAt }}'
+      FailureDetails: '{{ item.FailureDetails }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobProgress: '{{ item.JobProgress }}'
+      JobStatus: '{{ item.JobStatus }}'
+      Speaker: '{{ item.Speaker }}'
+- discovery_id: aws.voice-id.list_speakers
+  for_each: aws.voice-id.list_domains
+  calls:
+  - action: list_speakers
+    params:
+      DomainId: '{{ item.DomainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SpeakerSummaries }}'
+    item:
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      CustomerSpeakerId: '{{ item.CustomerSpeakerId }}'
+      DomainId: '{{ item.DomainId }}'
+      GeneratedSpeakerId: '{{ item.GeneratedSpeakerId }}'
+      LastAccessedAt: '{{ item.LastAccessedAt }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.voice-id.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.voice-id.list_watchlists
+  for_each: aws.voice-id.list_domains
+  calls:
+  - action: list_watchlists
+    params:
+      DomainId: '{{ item.DomainId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.WatchlistSummaries }}'
+    item:
+      Name: '{{ item.Name }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DefaultWatchlist: '{{ item.DefaultWatchlist }}'
+      Description: '{{ item.Description }}'
+      DomainId: '{{ item.DomainId }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+      Watchlist: '{{ item.Watchlist }}'
+      WatchlistId: '{{ item.WatchlistId }}'

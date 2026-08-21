@@ -26,9 +26,9 @@ from datetime import datetime, timezone
 def _now():
     return datetime.now(timezone.utc)
 
-# Point to policies relative to this file
+# Point to policies relative to this file (moved under engines/ in the merge)
 HERE = os.path.dirname(os.path.abspath(__file__))
-os.environ.setdefault("POLICY_DIR", os.path.join(HERE, "policies"))
+os.environ.setdefault("POLICY_DIR", os.path.join(HERE, "engines", "compliance", "policies"))
 os.environ.setdefault("C7N_REGION", os.environ.get("AWS_DEFAULT_REGION", "ap-south-1"))
 
 # Reuse all logic from handler.py
@@ -164,10 +164,10 @@ class Handler(BaseHTTPRequestHandler):
             requested_label = policy_input
             log.info("policy=%s  dryrun=%s  region=%s", policy_input, dryrun, region)
 
-        results = []
-        for item in resolved:
-            result = h._run_policy(item["file"], item.get("filter_name"), dryrun, region)
-            results.append(result)
+        # One custodian invocation for the whole selection — policies sharing
+        # a resource type reuse a single API sweep (see handler.CACHE_PERIOD).
+        results = h._run_policies_grouped(resolved, dryrun, region)
+        for result in results:
             log.info("  %-45s  %s  resources=%s",
                      result["policy"], result["status"],
                      result.get("resources_found", {}))

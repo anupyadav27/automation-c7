@@ -1,0 +1,506 @@
+version: '1.0'
+provider: aws
+service: ds
+services:
+  client: ds
+  module: boto3.client
+discovery:
+- discovery_id: aws.ds.describe_directories
+  calls:
+  - action: describe_directories
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DirectoryDescriptions }}'
+    item:
+      Name: '{{ item.Name }}'
+      Region: '{{ item.Region }}'
+      SubnetId: '{{ item.SubnetId }}'
+      VpcId: '{{ item.VpcId }}'
+      AccessUrl: '{{ item.AccessUrl }}'
+      Alias: '{{ item.Alias }}'
+      AllowedValues: '{{ item.AllowedValues }}'
+      AppliedValue: '{{ item.AppliedValue }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      CaEnrollmentPolicyStatus: '{{ item.CaEnrollmentPolicyStatus }}'
+      CaEnrollmentPolicyStatusReason: '{{ item.CaEnrollmentPolicyStatusReason }}'
+      ClientAuthenticationSettingsInfo: '{{ item.ClientAuthenticationSettingsInfo }}'
+      ConditionalForwarders: '{{ item.ConditionalForwarders }}'
+      ConnectSettings: '{{ item.ConnectSettings }}'
+      DataAccessStatus: '{{ item.DataAccessStatus }}'
+      Description: '{{ item.Description }}'
+      DesiredNumberOfDomainControllers: '{{ item.DesiredNumberOfDomainControllers }}'
+      DestinationArn: '{{ item.DestinationArn }}'
+      DirectoryDescriptions: '{{ item.DirectoryDescriptions[].Type }}'
+      DirectoryId: '{{ item.DirectoryId }}'
+      DnsIpAddr: '{{ item.DnsIpAddr }}'
+      DnsIpAddrs: '{{ item.DnsIpAddrs }}'
+      DnsIpv6Addr: '{{ item.DnsIpv6Addr }}'
+      DnsIpv6Addrs: '{{ item.DnsIpv6Addrs }}'
+      DomainControllers: '{{ item.DomainControllers }}'
+      Edition: '{{ item.Edition }}'
+      Enabled: '{{ item.Enabled }}'
+      Format: '{{ item.Format }}'
+      HybridAdministratorAccount: '{{ item.HybridAdministratorAccount }}'
+      HybridSettings: '{{ item.HybridSettings }}'
+      InitiatedBy: '{{ item.InitiatedBy }}'
+      LDAPSSettingsInfo: '{{ item.LDAPSSettingsInfo }}'
+      LastRequestedDateTime: '{{ item.LastRequestedDateTime }}'
+      LaunchTime: '{{ item.LaunchTime }}'
+      Level: '{{ item.Level }}'
+      ManualSnapshotsCurrentCount: '{{ item.ManualSnapshotsCurrentCount }}'
+      ManualSnapshotsLimit: '{{ item.ManualSnapshotsLimit }}'
+      ManualSnapshotsLimitReached: '{{ item.ManualSnapshotsLimitReached }}'
+      NetworkType: '{{ item.NetworkType }}'
+      NewValue: '{{ item.NewValue }}'
+      OsVersion: '{{ item.OsVersion }}'
+      OwnerDirectoryDescription: '{{ item.OwnerDirectoryDescription }}'
+      PcaConnectorArn: '{{ item.PcaConnectorArn }}'
+      PreviousValue: '{{ item.PreviousValue }}'
+      RadiusSettings: '{{ item.RadiusSettings }}'
+      RadiusStatus: '{{ item.RadiusStatus }}'
+      RegionType: '{{ item.RegionType }}'
+      RegionsDescription: '{{ item.RegionsDescription }}'
+      RegionsInfo: '{{ item.RegionsInfo }}'
+      ReplicationScope: '{{ item.ReplicationScope }}'
+      RequestDetailedStatus: '{{ item.RequestDetailedStatus }}'
+      RequestStatus: '{{ item.RequestStatus }}'
+      RequestStatusMessage: '{{ item.RequestStatusMessage }}'
+      RequestedValue: '{{ item.RequestedValue }}'
+      SelfManagedInstances: '{{ item.SelfManagedInstances }}'
+      SettingEntries: '{{ item.SettingEntries }}'
+      ShareMethod: '{{ item.ShareMethod }}'
+      ShareNotes: '{{ item.ShareNotes }}'
+      ShareStatus: '{{ item.ShareStatus }}'
+      ShortName: '{{ item.ShortName }}'
+      Size: '{{ item.Size }}'
+      SnapshotLimits: '{{ item.SnapshotLimits }}'
+      SsoEnabled: '{{ item.SsoEnabled }}'
+      Stage: '{{ item.Stage }}'
+      StageLastUpdatedDateTime: '{{ item.StageLastUpdatedDateTime }}'
+      StageReason: '{{ item.StageReason }}'
+      StatusLastUpdatedDateTime: '{{ item.StatusLastUpdatedDateTime }}'
+      StatusReason: '{{ item.StatusReason }}'
+      Type: '{{ item.Type }}'
+      UpdateActivities: '{{ item.UpdateActivities }}'
+      VpcSettings: '{{ item.VpcSettings }}'
+- discovery_id: aws.ds.describe_event_topics
+  calls:
+  - action: describe_event_topics
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EventTopics }}'
+    item:
+      Status: '{{ item.Status }}'
+      CreatedDateTime: '{{ item.CreatedDateTime }}'
+      DirectoryId: '{{ item.DirectoryId }}'
+      EventTopics: '{{ item.EventTopics }}'
+      TopicArn: '{{ item.TopicArn }}'
+      TopicName: '{{ item.TopicName }}'
+- discovery_id: aws.ds.describe_snapshots
+  calls:
+  - action: describe_snapshots
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Snapshots }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      DirectoryId: '{{ item.DirectoryId }}'
+      SnapshotId: '{{ item.SnapshotId }}'
+      Snapshots: '{{ item.Snapshots }}'
+      StartTime: '{{ item.StartTime }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.ds.describe_trusts
+  calls:
+  - action: describe_trusts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Trusts }}'
+    item:
+      CreatedDateTime: '{{ item.CreatedDateTime }}'
+      DirectoryId: '{{ item.DirectoryId }}'
+      LastUpdatedDateTime: '{{ item.LastUpdatedDateTime }}'
+      RemoteDomainName: '{{ item.RemoteDomainName }}'
+      SelectiveAuth: '{{ item.SelectiveAuth }}'
+      StateLastUpdatedDateTime: '{{ item.StateLastUpdatedDateTime }}'
+      TrustDirection: '{{ item.TrustDirection }}'
+      TrustId: '{{ item.TrustId }}'
+      TrustState: '{{ item.TrustState }}'
+      TrustStateReason: '{{ item.TrustStateReason }}'
+      TrustType: '{{ item.TrustType }}'
+      Trusts: '{{ item.Trusts }}'
+- discovery_id: aws.ds.get_directory_limits
+  calls:
+  - action: get_directory_limits
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CloudOnlyDirectoriesCurrentCount: '{{ response.DirectoryLimits.CloudOnlyDirectoriesCurrentCount }}'
+      CloudOnlyDirectoriesLimit: '{{ response.DirectoryLimits.CloudOnlyDirectoriesLimit }}'
+      CloudOnlyDirectoriesLimitReached: '{{ response.DirectoryLimits.CloudOnlyDirectoriesLimitReached }}'
+      CloudOnlyMicrosoftADCurrentCount: '{{ response.DirectoryLimits.CloudOnlyMicrosoftADCurrentCount }}'
+      CloudOnlyMicrosoftADLimit: '{{ response.DirectoryLimits.CloudOnlyMicrosoftADLimit }}'
+      CloudOnlyMicrosoftADLimitReached: '{{ response.DirectoryLimits.CloudOnlyMicrosoftADLimitReached }}'
+      ConnectedDirectoriesCurrentCount: '{{ response.DirectoryLimits.ConnectedDirectoriesCurrentCount }}'
+      ConnectedDirectoriesLimit: '{{ response.DirectoryLimits.ConnectedDirectoriesLimit }}'
+      ConnectedDirectoriesLimitReached: '{{ response.DirectoryLimits.ConnectedDirectoriesLimitReached }}'
+      DirectoryLimits: '{{ response.DirectoryLimits.DirectoryLimits }}'
+- discovery_id: aws.ds.list_ad_assessments
+  calls:
+  - action: list_ad_assessments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Assessments }}'
+    item:
+      Status: '{{ item.Status }}'
+      AssessmentId: '{{ item.AssessmentId }}'
+      CustomerDnsIps: '{{ item.CustomerDnsIps }}'
+      DirectoryId: '{{ item.DirectoryId }}'
+      DnsName: '{{ item.DnsName }}'
+      LastUpdateDateTime: '{{ item.LastUpdateDateTime }}'
+      ReportType: '{{ item.ReportType }}'
+      StartTime: '{{ item.StartTime }}'
+- discovery_id: aws.ds.list_log_subscriptions
+  calls:
+  - action: list_log_subscriptions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LogSubscriptions }}'
+    item:
+      DirectoryId: '{{ item.DirectoryId }}'
+      LogGroupName: '{{ item.LogGroupName }}'
+      SubscriptionCreatedDateTime: '{{ item.SubscriptionCreatedDateTime }}'
+- discovery_id: aws.ds.describe_ad_assessment
+  for_each: aws.ds.list_ad_assessments
+  calls:
+  - action: describe_ad_assessment
+    params:
+      AssessmentId: '{{ item.AssessmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AssessmentReports }}'
+    item:
+      DomainControllerIp: '{{ item.DomainControllerIp }}'
+      Validations: '{{ item.Validations }}'
+- discovery_id: aws.ds.describe_ca_enrollment_policy
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: describe_ca_enrollment_policy
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CaEnrollmentPolicyStatus: '{{ response.CaEnrollmentPolicyStatus }}'
+      CaEnrollmentPolicyStatusReason: '{{ response.CaEnrollmentPolicyStatusReason }}'
+      PcaConnectorArn: '{{ response.PcaConnectorArn }}'
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.ds.describe_certificate
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: describe_certificate
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+      CertificateId: '{{ item.CertificateId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      State: '{{ response.Certificate.State }}'
+      Certificate: '{{ response.Certificate.CertificateId }}'
+      CertificateId: '{{ response.Certificate.CertificateId }}'
+      ClientCertAuthSettings: '{{ response.Certificate.ClientCertAuthSettings.OCSPUrl }}'
+      CommonName: '{{ response.Certificate.CommonName }}'
+      ExpiryDateTime: '{{ response.Certificate.ExpiryDateTime }}'
+      RegisteredDateTime: '{{ response.Certificate.RegisteredDateTime }}'
+      StateReason: '{{ response.Certificate.StateReason }}'
+      Type: '{{ response.Certificate.Type }}'
+      OCSPUrl: '{{ response.Certificate.ClientCertAuthSettings.OCSPUrl }}'
+- discovery_id: aws.ds.describe_client_authentication_settings
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: describe_client_authentication_settings
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ClientAuthenticationSettingsInfo }}'
+    item:
+      Status: '{{ item.Status }}'
+      ClientAuthenticationSettingsInfo: '{{ item.ClientAuthenticationSettingsInfo[].Type }}'
+      LastUpdatedDateTime: '{{ item.LastUpdatedDateTime }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.ds.describe_conditional_forwarders
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: describe_conditional_forwarders
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ConditionalForwarders }}'
+    item:
+      ConditionalForwarders: '{{ item.ConditionalForwarders }}'
+      DnsIpAddrs: '{{ item.DnsIpAddrs }}'
+      DnsIpv6Addrs: '{{ item.DnsIpv6Addrs }}'
+      RemoteDomainName: '{{ item.RemoteDomainName }}'
+      ReplicationScope: '{{ item.ReplicationScope }}'
+- discovery_id: aws.ds.describe_directory_data_access
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: describe_directory_data_access
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DataAccessStatus: '{{ response.DataAccessStatus }}'
+- discovery_id: aws.ds.describe_domain_controllers
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: describe_domain_controllers
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DomainControllers }}'
+    item:
+      Status: '{{ item.Status }}'
+      SubnetId: '{{ item.SubnetId }}'
+      VpcId: '{{ item.VpcId }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      DirectoryId: '{{ item.DirectoryId }}'
+      DnsIpAddr: '{{ item.DnsIpAddr }}'
+      DnsIpv6Addr: '{{ item.DnsIpv6Addr }}'
+      DomainControllerId: '{{ item.DomainControllerId }}'
+      DomainControllers: '{{ item.DomainControllers }}'
+      LaunchTime: '{{ item.LaunchTime }}'
+      StatusLastUpdatedDateTime: '{{ item.StatusLastUpdatedDateTime }}'
+      StatusReason: '{{ item.StatusReason }}'
+- discovery_id: aws.ds.describe_hybrid_ad_update
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: describe_hybrid_ad_update
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      HybridAdministratorAccount: '{{ response.UpdateActivities.HybridAdministratorAccount }}'
+      SelfManagedInstances: '{{ response.UpdateActivities.SelfManagedInstances }}'
+      UpdateActivities: '{{ response.UpdateActivities.UpdateActivities }}'
+- discovery_id: aws.ds.describe_ldaps_settings
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: describe_ldaps_settings
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LDAPSSettingsInfo }}'
+    item:
+      LDAPSSettingsInfo: '{{ item.LDAPSSettingsInfo }}'
+      LDAPSStatus: '{{ item.LDAPSStatus }}'
+      LDAPSStatusReason: '{{ item.LDAPSStatusReason }}'
+      LastUpdatedDateTime: '{{ item.LastUpdatedDateTime }}'
+- discovery_id: aws.ds.describe_regions
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: describe_regions
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RegionsDescription }}'
+    item:
+      Status: '{{ item.Status }}'
+      DesiredNumberOfDomainControllers: '{{ item.DesiredNumberOfDomainControllers }}'
+      DirectoryId: '{{ item.DirectoryId }}'
+      DomainControllers: '{{ item.DomainControllers }}'
+      LastUpdatedDateTime: '{{ item.LastUpdatedDateTime }}'
+      LaunchTime: '{{ item.LaunchTime }}'
+      RegionName: '{{ item.RegionName }}'
+      RegionType: '{{ item.RegionType }}'
+      RegionsDescription: '{{ item.RegionsDescription }}'
+      StatusLastUpdatedDateTime: '{{ item.StatusLastUpdatedDateTime }}'
+      VpcSettings: '{{ item.VpcSettings }}'
+- discovery_id: aws.ds.describe_settings
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: describe_settings
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SettingEntries }}'
+    item:
+      Name: '{{ item.Name }}'
+      AllowedValues: '{{ item.AllowedValues }}'
+      AppliedValue: '{{ item.AppliedValue }}'
+      DataType: '{{ item.DataType }}'
+      LastRequestedDateTime: '{{ item.LastRequestedDateTime }}'
+      LastUpdatedDateTime: '{{ item.LastUpdatedDateTime }}'
+      RequestDetailedStatus: '{{ item.RequestDetailedStatus }}'
+      RequestStatus: '{{ item.RequestStatus }}'
+      RequestStatusMessage: '{{ item.RequestStatusMessage }}'
+      RequestedValue: '{{ item.RequestedValue }}'
+      SettingEntries: '{{ item.SettingEntries }}'
+      Type: '{{ item.Type }}'
+      DirectoryId: '{{ response.DirectoryId }}'
+- discovery_id: aws.ds.describe_shared_directories
+  calls:
+  - action: describe_shared_directories
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SharedDirectories }}'
+    item:
+      CreatedDateTime: '{{ item.CreatedDateTime }}'
+      LastUpdatedDateTime: '{{ item.LastUpdatedDateTime }}'
+      OwnerAccountId: '{{ item.OwnerAccountId }}'
+      OwnerDirectoryId: '{{ item.OwnerDirectoryId }}'
+      ShareMethod: '{{ item.ShareMethod }}'
+      ShareNotes: '{{ item.ShareNotes }}'
+      ShareStatus: '{{ item.ShareStatus }}'
+      SharedAccountId: '{{ item.SharedAccountId }}'
+      SharedDirectoryId: '{{ item.SharedDirectoryId }}'
+- discovery_id: aws.ds.describe_update_directory
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: describe_update_directory
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+      UpdateType: '{{ item.UpdateType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UpdateActivities }}'
+    item:
+      Region: '{{ item.Region }}'
+      Status: '{{ item.Status }}'
+      InitiatedBy: '{{ item.InitiatedBy }}'
+      LastUpdatedDateTime: '{{ item.LastUpdatedDateTime }}'
+      NewValue: '{{ item.NewValue }}'
+      PreviousValue: '{{ item.PreviousValue }}'
+      StartTime: '{{ item.StartTime }}'
+      StatusReason: '{{ item.StatusReason }}'
+- discovery_id: aws.ds.get_snapshot_limits
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: get_snapshot_limits
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ManualSnapshotsCurrentCount: '{{ response.SnapshotLimits.ManualSnapshotsCurrentCount }}'
+      ManualSnapshotsLimit: '{{ response.SnapshotLimits.ManualSnapshotsLimit }}'
+      ManualSnapshotsLimitReached: '{{ response.SnapshotLimits.ManualSnapshotsLimitReached }}'
+      SnapshotLimits: '{{ response.SnapshotLimits.ManualSnapshotsLimit }}'
+- discovery_id: aws.ds.list_certificates
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: list_certificates
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CertificatesInfo }}'
+    item:
+      State: '{{ item.State }}'
+      Certificate: '{{ item.Certificate }}'
+      CertificateId: '{{ item.CertificateId }}'
+      CommonName: '{{ item.CommonName }}'
+      ExpiryDateTime: '{{ item.ExpiryDateTime }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.ds.list_ip_routes
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: list_ip_routes
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.IpRoutesInfo }}'
+    item:
+      AddedDateTime: '{{ item.AddedDateTime }}'
+      CidrIp: '{{ item.CidrIp }}'
+      CidrIpv6: '{{ item.CidrIpv6 }}'
+      Description: '{{ item.Description }}'
+      DirectoryId: '{{ item.DirectoryId }}'
+      IpRouteStatusMsg: '{{ item.IpRouteStatusMsg }}'
+      IpRouteStatusReason: '{{ item.IpRouteStatusReason }}'
+- discovery_id: aws.ds.list_schema_extensions
+  for_each: aws.ds.describe_directories
+  calls:
+  - action: list_schema_extensions
+    params:
+      DirectoryId: '{{ item.DirectoryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SchemaExtensionsInfo }}'
+    item:
+      Description: '{{ item.Description }}'
+      DirectoryId: '{{ item.DirectoryId }}'
+      EndDateTime: '{{ item.EndDateTime }}'
+      SchemaExtensionId: '{{ item.SchemaExtensionId }}'
+      SchemaExtensionStatus: '{{ item.SchemaExtensionStatus }}'
+      SchemaExtensionStatusReason: '{{ item.SchemaExtensionStatusReason }}'
+      StartDateTime: '{{ item.StartDateTime }}'
+- discovery_id: aws.ds.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

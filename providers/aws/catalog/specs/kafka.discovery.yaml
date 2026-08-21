@@ -1,0 +1,136 @@
+version: '1.0'
+provider: aws
+service: kafka
+discovery:
+- calls:
+  - action: list_vpc_connections
+    on_error: continue
+    save_as: response
+  discovery_id: aws.kafka.list_vpc_connections
+  emit:
+    as: item
+    item:
+      Authentication: '{{ item.Authentication }}'
+      CreationTime: '{{ item.CreationTime }}'
+      State: '{{ item.State }}'
+      Subnets: '{{ item.Subnets }}'
+      TargetClusterArn: '{{ item.TargetClusterArn }}'
+      VpcConnectionArn: '{{ item.VpcConnectionArn }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.VpcConnections }}'
+- calls:
+  - action: list_configurations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.kafka.list_configurations
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Description: '{{ item.Description }}'
+      Enabled: '{{ item.Enabled }}'
+      KafkaVersions: '{{ item.KafkaVersions }}'
+      LatestRevision: '{{ item.LatestRevision }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+    items_for: '{{ response.Configurations }}'
+- calls:
+  - action: list_clusters
+    on_error: continue
+    save_as: response
+  discovery_id: aws.kafka.list_clusters
+  emit:
+    as: item
+    item:
+      ActiveOperationArn: '{{ item.ActiveOperationArn }}'
+      BrokerNodeGroupInfo: '{{ item.BrokerNodeGroupInfo }}'
+      ClientAuthentication: '{{ item.ClientAuthentication }}'
+      ClusterArn: '{{ item.ClusterArn }}'
+      ClusterInfo: '{{ item.ClusterInfo }}'
+      ClusterName: '{{ item.ClusterName }}'
+      CreationTime: '{{ item.CreationTime }}'
+      CurrentBrokerSoftwareInfo: '{{ item.CurrentBrokerSoftwareInfo }}'
+      CurrentVersion: '{{ item.CurrentVersion }}'
+      CustomerActionStatus: '{{ item.CustomerActionStatus }}'
+      EncryptionInfo: '{{ item.EncryptionInfo }}'
+      EnhancedMonitoring: '{{ item.EnhancedMonitoring }}'
+      LoggingInfo: '{{ item.LoggingInfo }}'
+      NumberOfBrokerNodes: '{{ item.NumberOfBrokerNodes }}'
+      OpenMonitoring: '{{ item.OpenMonitoring }}'
+      Rebalancing: '{{ item.Rebalancing }}'
+      State: '{{ item.State }}'
+      StateInfo: '{{ item.StateInfo }}'
+      StorageMode: '{{ item.StorageMode }}'
+      Tags: '{{ item.Tags }}'
+      ZookeeperConnectString: '{{ item.ZookeeperConnectString }}'
+      ZookeeperConnectStringTls: '{{ item.ZookeeperConnectStringTls }}'
+    items_for: '{{ response.ClusterInfoList }}'
+- calls:
+  - action: describe_cluster
+    on_error: continue
+    params:
+      ClusterArn: '{{ item.ClusterArn }}'
+    save_as: response
+  discovery_id: aws.kafka.describe_cluster
+  emit:
+    as: item
+    item:
+      ActiveOperationArn: '{{ response.ClusterInfo.ActiveOperationArn }}'
+      BrokerNodeGroupInfo: '{{ response.ClusterInfo.BrokerNodeGroupInfo }}'
+      ClientAuthentication: '{{ response.ClusterInfo.ClientAuthentication }}'
+      ClusterArn: '{{ response.ClusterInfo.ClusterArn }}'
+      ClusterName: '{{ response.ClusterInfo.ClusterName }}'
+      CreationTime: '{{ response.ClusterInfo.CreationTime }}'
+      CurrentBrokerSoftwareInfo: '{{ response.ClusterInfo.CurrentBrokerSoftwareInfo.KafkaVersion }}'
+      CurrentVersion: '{{ response.ClusterInfo.CurrentVersion }}'
+      CustomerActionStatus: '{{ response.ClusterInfo.CustomerActionStatus }}'
+      EncryptionInfo: '{{ response.ClusterInfo.EncryptionInfo }}'
+      EnhancedMonitoring: '{{ response.ClusterInfo.EnhancedMonitoring }}'
+      LoggingInfo: '{{ response.ClusterInfo.LoggingInfo }}'
+      NumberOfBrokerNodes: '{{ response.ClusterInfo.NumberOfBrokerNodes }}'
+      OpenMonitoring: '{{ response.ClusterInfo.OpenMonitoring }}'
+      Rebalancing: '{{ response.ClusterInfo.Rebalancing }}'
+      State: '{{ response.ClusterInfo.State }}'
+      StateInfo: '{{ response.ClusterInfo.State }}'
+      StorageMode: '{{ response.ClusterInfo.StorageMode }}'
+      Tags: '{{ response.ClusterInfo.Tags }}'
+      ZookeeperConnectString: '{{ response.ClusterInfo.ZookeeperConnectString }}'
+      ZookeeperConnectStringTls: '{{ response.ClusterInfo.ZookeeperConnectStringTls }}'
+      BrokerAZDistribution: '{{ response.ClusterInfo.BrokerNodeGroupInfo.BrokerAZDistribution }}'
+      Type: '{{ response.ClusterInfo.BrokerNodeGroupInfo.ConnectivityInfo.PublicAccess.Type }}'
+      InstanceType: '{{ response.ClusterInfo.BrokerNodeGroupInfo.InstanceType }}'
+      VolumeSize: '{{ response.ClusterInfo.BrokerNodeGroupInfo.StorageInfo.EbsStorageInfo.VolumeSize }}'
+      Enabled: '{{ response.ClusterInfo.ClientAuthentication.Sasl.Iam.Enabled }}'
+      ConfigurationArn: '{{ response.ClusterInfo.CurrentBrokerSoftwareInfo.ConfigurationArn }}'
+      ConfigurationRevision: '{{ response.ClusterInfo.CurrentBrokerSoftwareInfo.ConfigurationRevision }}'
+      KafkaVersion: '{{ response.ClusterInfo.CurrentBrokerSoftwareInfo.KafkaVersion }}'
+      DataVolumeKMSKeyId: '{{ response.ClusterInfo.EncryptionInfo.EncryptionAtRest.DataVolumeKMSKeyId }}'
+      ClientBroker: '{{ response.ClusterInfo.EncryptionInfo.EncryptionInTransit.ClientBroker }}'
+      InCluster: '{{ response.ClusterInfo.EncryptionInfo.EncryptionInTransit.InCluster }}'
+      LogGroup: '{{ response.ClusterInfo.LoggingInfo.BrokerLogs.CloudWatchLogs.LogGroup }}'
+      DeliveryStream: '{{ response.ClusterInfo.LoggingInfo.BrokerLogs.Firehose.DeliveryStream }}'
+      Bucket: '{{ response.ClusterInfo.LoggingInfo.BrokerLogs.S3.Bucket }}'
+      Prefix: '{{ response.ClusterInfo.LoggingInfo.BrokerLogs.S3.Prefix }}'
+      EnabledInBroker: '{{ response.ClusterInfo.OpenMonitoring.Prometheus.JmxExporter.EnabledInBroker }}'
+      Code: '{{ response.ClusterInfo.StateInfo.Code }}'
+      Message: '{{ response.ClusterInfo.StateInfo.Message }}'
+  for_each: aws.kafka.list_clusters
+- calls:
+  - action: list_replicators
+    on_error: continue
+    save_as: response
+  discovery_id: aws.kafka.list_replicators
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      CurrentVersion: '{{ item.CurrentVersion }}'
+      IsReplicatorReference: '{{ item.IsReplicatorReference }}'
+      KafkaClustersSummary: '{{ item.KafkaClustersSummary }}'
+      ReplicationInfoSummaryList: '{{ item.ReplicationInfoSummaryList }}'
+      ReplicatorArn: '{{ item.ReplicatorArn }}'
+      ReplicatorName: '{{ item.ReplicatorName }}'
+      ReplicatorResourceArn: '{{ item.ReplicatorResourceArn }}'
+      ReplicatorState: '{{ item.ReplicatorState }}'
+    items_for: '{{ response.Replicators }}'

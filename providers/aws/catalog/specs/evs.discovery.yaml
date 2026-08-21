@@ -1,0 +1,136 @@
+version: '1.0'
+provider: aws
+service: evs
+services:
+  client: evs
+  module: boto3.client
+discovery:
+- discovery_id: aws.evs.list_environments
+  calls:
+  - action: list_environments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.environmentSummaries }}'
+    item:
+      availabilityZone: '{{ item.availabilityZone }}'
+      checks: '{{ item.checks }}'
+      cidr: '{{ item.cidr }}'
+      connectivityInfo: '{{ item.connectivityInfo }}'
+      createdAt: '{{ item.createdAt }}'
+      credentials: '{{ item.credentials }}'
+      dedicatedHostId: '{{ item.dedicatedHostId }}'
+      ec2InstanceId: '{{ item.ec2InstanceId }}'
+      eipAssociations: '{{ item.eipAssociations }}'
+      environment: '{{ item.environment }}'
+      environmentArn: '{{ item.environmentArn }}'
+      environmentId: '{{ item.environmentId }}'
+      environmentName: '{{ item.environmentName }}'
+      environmentState: '{{ item.environmentState }}'
+      environmentStatus: '{{ item.environmentStatus }}'
+      hostState: '{{ item.hostState }}'
+      instanceType: '{{ item.instanceType }}'
+      ipAddress: '{{ item.ipAddress }}'
+      isPublic: '{{ item.isPublic }}'
+      keyName: '{{ item.keyName }}'
+      kmsKeyId: '{{ item.kmsKeyId }}'
+      licenseInfo: '{{ item.licenseInfo }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      networkInterfaces: '{{ item.networkInterfaces }}'
+      placementGroupId: '{{ item.placementGroupId }}'
+      serviceAccessSecurityGroups: '{{ item.serviceAccessSecurityGroups }}'
+      serviceAccessSubnetId: '{{ item.serviceAccessSubnetId }}'
+      termsAccepted: '{{ item.termsAccepted }}'
+      vcfHostnames: '{{ item.vcfHostnames }}'
+      vcfVersion: '{{ item.vcfVersion }}'
+      vlanState: '{{ item.vlanState }}'
+- discovery_id: aws.evs.get_environment
+  for_each: aws.evs.list_environments
+  calls:
+  - action: get_environment
+    params:
+      environmentId: '{{ item.environmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      checks: '{{ response.environment.checks }}'
+      connectivityInfo: '{{ response.environment.connectivityInfo }}'
+      createdAt: '{{ response.environment.createdAt }}'
+      credentials: '{{ response.environment.credentials }}'
+      environmentArn: '{{ response.environment.environmentArn }}'
+      environmentId: '{{ response.environment.environmentId }}'
+      environmentName: '{{ response.environment.environmentName }}'
+      environmentState: '{{ response.environment.environmentState }}'
+      environmentStatus: '{{ response.environment.environmentStatus }}'
+      kmsKeyId: '{{ response.environment.kmsKeyId }}'
+      licenseInfo: '{{ response.environment.licenseInfo }}'
+      modifiedAt: '{{ response.environment.modifiedAt }}'
+      serviceAccessSecurityGroups: '{{ response.environment.serviceAccessSecurityGroups
+        }}'
+      serviceAccessSubnetId: '{{ response.environment.serviceAccessSubnetId }}'
+      siteId: '{{ response.environment.siteId }}'
+      stateDetails: '{{ response.environment.stateDetails }}'
+      termsAccepted: '{{ response.environment.termsAccepted }}'
+      vcfHostnames: '{{ response.environment.vcfHostnames }}'
+      vcfVersion: '{{ response.environment.vcfVersion }}'
+      vpcId: '{{ response.environment.vpcId }}'
+- discovery_id: aws.evs.list_environment_hosts
+  for_each: aws.evs.list_environments
+  calls:
+  - action: list_environment_hosts
+    params:
+      environmentId: '{{ item.environmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.environmentHosts }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      dedicatedHostId: '{{ item.dedicatedHostId }}'
+      ec2InstanceId: '{{ item.ec2InstanceId }}'
+      hostName: '{{ item.hostName }}'
+      hostState: '{{ item.hostState }}'
+      instanceType: '{{ item.instanceType }}'
+      ipAddress: '{{ item.ipAddress }}'
+      keyName: '{{ item.keyName }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      networkInterfaces: '{{ item.networkInterfaces }}'
+      placementGroupId: '{{ item.placementGroupId }}'
+      stateDetails: '{{ item.stateDetails }}'
+- discovery_id: aws.evs.list_environment_vlans
+  for_each: aws.evs.list_environments
+  calls:
+  - action: list_environment_vlans
+    params:
+      environmentId: '{{ item.environmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.environmentVlans }}'
+    item:
+      availabilityZone: '{{ item.availabilityZone }}'
+      cidr: '{{ item.cidr }}'
+      createdAt: '{{ item.createdAt }}'
+      eipAssociations: '{{ item.eipAssociations }}'
+      functionName: '{{ item.functionName }}'
+      isPublic: '{{ item.isPublic }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      networkAclId: '{{ item.networkAclId }}'
+      stateDetails: '{{ item.stateDetails }}'
+      subnetId: '{{ item.subnetId }}'
+      vlanId: '{{ item.vlanId }}'
+      vlanState: '{{ item.vlanState }}'
+- discovery_id: aws.evs.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

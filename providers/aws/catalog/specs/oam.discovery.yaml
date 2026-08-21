@@ -1,0 +1,95 @@
+version: '1.0'
+provider: aws
+service: oam
+services:
+  client: oam
+  module: boto3.client
+discovery:
+- discovery_id: aws.oam.list_links
+  calls:
+  - action: list_links
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Label: '{{ item.Label }}'
+      ResourceTypes: '{{ item.ResourceTypes }}'
+      SinkArn: '{{ item.SinkArn }}'
+- discovery_id: aws.oam.list_sinks
+  calls:
+  - action: list_sinks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+- discovery_id: aws.oam.get_link
+  calls:
+  - action: get_link
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceTypes }}'
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Label: '{{ response.Label }}'
+      LabelTemplate: '{{ response.LabelTemplate }}'
+      Filter: '{{ response.LinkConfiguration.LogGroupConfiguration.Filter }}'
+      SinkArn: '{{ response.SinkArn }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.oam.get_sink
+  calls:
+  - action: get_sink
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.oam.get_sink_policy
+  calls:
+  - action: get_sink_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+      SinkArn: '{{ response.SinkArn }}'
+      SinkId: '{{ response.SinkId }}'
+- discovery_id: aws.oam.list_attached_links
+  calls:
+  - action: list_attached_links
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Label: '{{ item.Label }}'
+      LinkArn: '{{ item.LinkArn }}'
+      ResourceTypes: '{{ item.ResourceTypes }}'
+- discovery_id: aws.oam.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

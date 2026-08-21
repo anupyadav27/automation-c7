@@ -1,0 +1,322 @@
+version: '1.0'
+provider: aws
+service: notifications
+services:
+  client: notifications
+  module: boto3.client
+discovery:
+- discovery_id: aws.notifications.get_notifications_access_for_organization
+  calls:
+  - action: get_notifications_access_for_organization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      accessStatus: '{{ response.notificationsAccessForOrganization.accessStatus }}'
+      notificationsAccessForOrganization: '{{ response.notificationsAccessForOrganization.notificationsAccessForOrganization
+        }}'
+- discovery_id: aws.notifications.list_managed_notification_configurations
+  calls:
+  - action: list_managed_notification_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.managedNotificationConfigurations }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      arn: '{{ item.arn }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+- discovery_id: aws.notifications.list_managed_notification_events
+  calls:
+  - action: list_managed_notification_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.managedNotificationEvents }}'
+    item:
+      aggregatedNotificationRegions: '{{ item.aggregatedNotificationRegions }}'
+      aggregationEventType: '{{ item.aggregationEventType }}'
+      aggregationSummary: '{{ item.aggregationSummary }}'
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      managedNotificationConfigurationArn: '{{ item.managedNotificationConfigurationArn
+        }}'
+      notificationEvent: '{{ item.notificationEvent }}'
+      organizationalUnitId: '{{ item.organizationalUnitId }}'
+      relatedAccount: '{{ item.relatedAccount }}'
+- discovery_id: aws.notifications.list_notification_configurations
+  calls:
+  - action: list_notification_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.notificationConfigurations }}'
+    item:
+      aggregationDuration: '{{ item.aggregationDuration }}'
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      subtype: '{{ item.subtype }}'
+- discovery_id: aws.notifications.list_notification_events
+  calls:
+  - action: list_notification_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.notificationEvents }}'
+    item:
+      aggregateNotificationEventArn: '{{ item.aggregateNotificationEventArn }}'
+      aggregationEventType: '{{ item.aggregationEventType }}'
+      aggregationSummary: '{{ item.aggregationSummary }}'
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      notificationConfigurationArn: '{{ item.notificationConfigurationArn }}'
+      notificationEvent: '{{ item.notificationEvent }}'
+      organizationalUnitId: '{{ item.organizationalUnitId }}'
+      relatedAccount: '{{ item.relatedAccount }}'
+- discovery_id: aws.notifications.list_notification_hubs
+  calls:
+  - action: list_notification_hubs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.notificationHubs }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      lastActivationTime: '{{ item.lastActivationTime }}'
+      notificationHubRegion: '{{ item.notificationHubRegion }}'
+      statusSummary: '{{ item.statusSummary }}'
+- discovery_id: aws.notifications.get_event_rule
+  for_each: aws.notifications.list_managed_notification_configurations
+  calls:
+  - action: get_event_rule
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.regions }}'
+- discovery_id: aws.notifications.get_managed_notification_child_event
+  for_each: aws.notifications.list_managed_notification_configurations
+  calls:
+  - action: get_managed_notification_child_event
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      aggregateManagedNotificationEventArn: '{{ response.content.aggregateManagedNotificationEventArn
+        }}'
+      aggregationDetail: '{{ response.content.aggregationDetail }}'
+      content: '{{ response.content.content }}'
+      endTime: '{{ response.content.endTime }}'
+      eventStatus: '{{ response.content.eventStatus }}'
+      id: '{{ response.content.id }}'
+      messageComponents: '{{ response.content.messageComponents }}'
+      notificationType: '{{ response.content.notificationType }}'
+      organizationalUnitId: '{{ response.content.organizationalUnitId }}'
+      schemaVersion: '{{ response.content.schemaVersion }}'
+      sourceEventDetailUrl: '{{ response.content.sourceEventDetailUrl }}'
+      sourceEventDetailUrlDisplayText: '{{ response.content.sourceEventDetailUrlDisplayText
+        }}'
+      startTime: '{{ response.content.startTime }}'
+      textParts: '{{ response.content.textParts }}'
+- discovery_id: aws.notifications.get_managed_notification_configuration
+  for_each: aws.notifications.list_managed_notification_configurations
+  calls:
+  - action: get_managed_notification_configuration
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.arn }}'
+      category: '{{ response.category }}'
+      description: '{{ response.description }}'
+      name: '{{ response.name }}'
+      subCategory: '{{ response.subCategory }}'
+- discovery_id: aws.notifications.get_managed_notification_event
+  for_each: aws.notifications.list_managed_notification_configurations
+  calls:
+  - action: get_managed_notification_event
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      aggregationEventType: '{{ response.content.aggregationEventType }}'
+      aggregationSummary: '{{ response.content.aggregationSummary }}'
+      endTime: '{{ response.content.endTime }}'
+      eventStatus: '{{ response.content.eventStatus }}'
+      id: '{{ response.content.id }}'
+      messageComponents: '{{ response.content.messageComponents }}'
+      notificationType: '{{ response.content.notificationType }}'
+      organizationalUnitId: '{{ response.content.organizationalUnitId }}'
+      schemaVersion: '{{ response.content.schemaVersion }}'
+      sourceEventDetailUrl: '{{ response.content.sourceEventDetailUrl }}'
+      sourceEventDetailUrlDisplayText: '{{ response.content.sourceEventDetailUrlDisplayText
+        }}'
+      startTime: '{{ response.content.startTime }}'
+      textParts: '{{ response.content.textParts }}'
+- discovery_id: aws.notifications.get_notification_configuration
+  for_each: aws.notifications.list_managed_notification_configurations
+  calls:
+  - action: get_notification_configuration
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      aggregationDuration: '{{ response.aggregationDuration }}'
+      arn: '{{ response.arn }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+      subtype: '{{ response.subtype }}'
+- discovery_id: aws.notifications.get_notification_event
+  for_each: aws.notifications.list_managed_notification_configurations
+  calls:
+  - action: get_notification_event
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      aggregateNotificationEventArn: '{{ response.content.aggregateNotificationEventArn
+        }}'
+      aggregationEventType: '{{ response.content.aggregationEventType }}'
+      aggregationSummary: '{{ response.content.aggregationSummary }}'
+      endTime: '{{ response.content.endTime }}'
+      eventStatus: '{{ response.content.eventStatus }}'
+      id: '{{ response.content.id }}'
+      media: '{{ response.content.media }}'
+      messageComponents: '{{ response.content.messageComponents }}'
+      notificationType: '{{ response.content.notificationType }}'
+      organizationalUnitId: '{{ response.content.organizationalUnitId }}'
+      schemaVersion: '{{ response.content.schemaVersion }}'
+      sourceEventDetailUrl: '{{ response.content.sourceEventDetailUrl }}'
+      sourceEventDetailUrlDisplayText: '{{ response.content.sourceEventDetailUrlDisplayText
+        }}'
+      sourceEventMetadata: '{{ response.content.sourceEventMetadata }}'
+      startTime: '{{ response.content.startTime }}'
+      textParts: '{{ response.content.textParts }}'
+- discovery_id: aws.notifications.list_channels
+  calls:
+  - action: list_channels
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.channels }}'
+- discovery_id: aws.notifications.list_event_rules
+  for_each: aws.notifications.list_notification_events
+  calls:
+  - action: list_event_rules
+    params:
+      notificationConfigurationArn: '{{ item.notificationConfigurationArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.eventRules }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      eventPattern: '{{ item.eventPattern }}'
+      eventType: '{{ item.eventType }}'
+      managedRules: '{{ item.managedRules }}'
+      notificationConfigurationArn: '{{ item.notificationConfigurationArn }}'
+      regions: '{{ item.regions }}'
+      source: '{{ item.source }}'
+      statusSummaryByRegion: '{{ item.statusSummaryByRegion }}'
+- discovery_id: aws.notifications.list_managed_notification_channel_associations
+  for_each: aws.notifications.list_managed_notification_configurations
+  calls:
+  - action: list_managed_notification_channel_associations
+    params:
+      managedNotificationConfigurationArn: '{{ item.managedNotificationConfigurationArn
+        }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.channelAssociations }}'
+    item:
+      channelIdentifier: '{{ item.channelIdentifier }}'
+      channelType: '{{ item.channelType }}'
+      overrideOption: '{{ item.overrideOption }}'
+- discovery_id: aws.notifications.list_managed_notification_child_events
+  calls:
+  - action: list_managed_notification_child_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.managedNotificationChildEvents }}'
+    item:
+      aggregateManagedNotificationEventArn: '{{ item.aggregateManagedNotificationEventArn
+        }}'
+      arn: '{{ item.arn }}'
+      childEvent: '{{ item.childEvent }}'
+      content: '{{ item.content }}'
+      creationTime: '{{ item.creationTime }}'
+      managedNotificationConfigurationArn: '{{ item.managedNotificationConfigurationArn
+        }}'
+      organizationalUnitId: '{{ item.organizationalUnitId }}'
+      relatedAccount: '{{ item.relatedAccount }}'
+- discovery_id: aws.notifications.list_member_accounts
+  for_each: aws.notifications.list_notification_events
+  calls:
+  - action: list_member_accounts
+    params:
+      notificationConfigurationArn: '{{ item.notificationConfigurationArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.memberAccounts }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      notificationConfigurationArn: '{{ item.notificationConfigurationArn }}'
+      organizationalUnitId: '{{ item.organizationalUnitId }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+- discovery_id: aws.notifications.list_organizational_units
+  calls:
+  - action: list_organizational_units
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.organizationalUnits }}'
+- discovery_id: aws.notifications.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

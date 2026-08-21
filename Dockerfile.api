@@ -1,0 +1,19 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir \
+      fastapi==0.115.* "uvicorn[standard]==0.34.*" \
+      psycopg2-binary==2.9.* pyyaml>=6.0 requests>=2.31
+
+COPY cspm/ ./cspm/
+COPY store/ ./store/
+COPY api/ ./api/
+COPY db/ ./db/
+COPY posture/ ./posture/
+COPY engines/ ./engines/
+COPY providers/aws/catalog/ ./providers/aws/catalog/
+COPY STRUCTURE.md setup.py ./
+
+EXPOSE 8090
+CMD ["uvicorn", "api.server:app", "--host", "0.0.0.0", "--port", "8090"]

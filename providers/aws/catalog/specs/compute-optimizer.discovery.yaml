@@ -1,0 +1,372 @@
+version: '1.0'
+provider: aws
+service: compute-optimizer
+services:
+  client: compute-optimizer
+  module: boto3.client
+discovery:
+- discovery_id: aws.compute-optimizer.describe_recommendation_export_jobs
+  calls:
+  - action: describe_recommendation_export_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recommendationExportJobs }}'
+    item:
+      creationTimestamp: '{{ item.creationTimestamp }}'
+      destination: '{{ item.destination }}'
+      failureReason: '{{ item.failureReason }}'
+      jobId: '{{ item.jobId }}'
+      lastUpdatedTimestamp: '{{ item.lastUpdatedTimestamp }}'
+      recommendationExportJobs: '{{ item.recommendationExportJobs[].jobId }}'
+      resourceType: '{{ item.resourceType }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.compute-optimizer.get_auto_scaling_group_recommendations
+  calls:
+  - action: get_auto_scaling_group_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.autoScalingGroupRecommendations }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      accountId: '{{ item.accountId }}'
+      autoScalingGroupArn: '{{ item.autoScalingGroupArn }}'
+      autoScalingGroupName: '{{ item.autoScalingGroupName }}'
+      autoScalingGroupRecommendations: '{{ item.autoScalingGroupRecommendations[].finding }}'
+      currentConfiguration: '{{ item.currentConfiguration }}'
+      currentInstanceGpuInfo: '{{ item.currentInstanceGpuInfo }}'
+      currentPerformanceRisk: '{{ item.currentPerformanceRisk }}'
+      effectiveRecommendationPreferences: '{{ item.effectiveRecommendationPreferences }}'
+      errors: '{{ item.errors }}'
+      finding: '{{ item.finding }}'
+      inferredWorkloadTypes: '{{ item.inferredWorkloadTypes }}'
+      lastRefreshTimestamp: '{{ item.lastRefreshTimestamp }}'
+      lookBackPeriodInDays: '{{ item.lookBackPeriodInDays }}'
+      recommendationOptions: '{{ item.recommendationOptions }}'
+      utilizationMetrics: '{{ item.utilizationMetrics }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.compute-optimizer.get_ebs_volume_recommendations
+  calls:
+  - action: get_ebs_volume_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.volumeRecommendations }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      currentConfiguration: '{{ item.currentConfiguration }}'
+      currentPerformanceRisk: '{{ item.currentPerformanceRisk }}'
+      effectiveRecommendationPreferences: '{{ item.effectiveRecommendationPreferences }}'
+      finding: '{{ item.finding }}'
+      lastRefreshTimestamp: '{{ item.lastRefreshTimestamp }}'
+      lookBackPeriodInDays: '{{ item.lookBackPeriodInDays }}'
+      tags: '{{ item.tags }}'
+      utilizationMetrics: '{{ item.utilizationMetrics }}'
+      volumeArn: '{{ item.volumeArn }}'
+      volumeRecommendationOptions: '{{ item.volumeRecommendationOptions }}'
+      volumeRecommendations: '{{ item.volumeRecommendations }}'
+- discovery_id: aws.compute-optimizer.get_ec2_instance_recommendations
+  calls:
+  - action: get_ec2_instance_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.instanceRecommendations }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      currentInstanceGpuInfo: '{{ item.currentInstanceGpuInfo }}'
+      currentInstanceType: '{{ item.currentInstanceType }}'
+      currentPerformanceRisk: '{{ item.currentPerformanceRisk }}'
+      effectiveRecommendationPreferences: '{{ item.effectiveRecommendationPreferences }}'
+      externalMetricStatus: '{{ item.externalMetricStatus }}'
+      finding: '{{ item.finding }}'
+      findingReasonCodes: '{{ item.findingReasonCodes }}'
+      idle: '{{ item.idle }}'
+      inferredWorkloadTypes: '{{ item.inferredWorkloadTypes }}'
+      instanceArn: '{{ item.instanceArn }}'
+      instanceName: '{{ item.instanceName }}'
+      instanceRecommendations: '{{ item.instanceRecommendations }}'
+      instanceState: '{{ item.instanceState }}'
+      lastRefreshTimestamp: '{{ item.lastRefreshTimestamp }}'
+      lookBackPeriodInDays: '{{ item.lookBackPeriodInDays }}'
+      recommendationOptions: '{{ item.recommendationOptions }}'
+      recommendationSources: '{{ item.recommendationSources }}'
+      tags: '{{ item.tags }}'
+      utilizationMetrics: '{{ item.utilizationMetrics }}'
+- discovery_id: aws.compute-optimizer.get_ecs_service_recommendations
+  calls:
+  - action: get_ecs_service_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ecsServiceRecommendations }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      currentPerformanceRisk: '{{ item.currentPerformanceRisk }}'
+      currentServiceConfiguration: '{{ item.currentServiceConfiguration }}'
+      ecsServiceRecommendations: '{{ item.ecsServiceRecommendations }}'
+      effectiveRecommendationPreferences: '{{ item.effectiveRecommendationPreferences }}'
+      finding: '{{ item.finding }}'
+      findingReasonCodes: '{{ item.findingReasonCodes }}'
+      lastRefreshTimestamp: '{{ item.lastRefreshTimestamp }}'
+      launchType: '{{ item.launchType }}'
+      lookbackPeriodInDays: '{{ item.lookbackPeriodInDays }}'
+      serviceArn: '{{ item.serviceArn }}'
+      serviceRecommendationOptions: '{{ item.serviceRecommendationOptions }}'
+      tags: '{{ item.tags }}'
+      utilizationMetrics: '{{ item.utilizationMetrics }}'
+- discovery_id: aws.compute-optimizer.get_enrollment_status
+  calls:
+  - action: get_enrollment_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      memberAccountsEnrolled: '{{ response.memberAccountsEnrolled }}'
+      numberOfMemberAccountsOptedIn: '{{ response.numberOfMemberAccountsOptedIn }}'
+      lastUpdatedTimestamp: '{{ response.lastUpdatedTimestamp }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+- discovery_id: aws.compute-optimizer.get_enrollment_statuses_for_organization
+  calls:
+  - action: get_enrollment_statuses_for_organization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.accountEnrollmentStatuses }}'
+    item:
+      accountEnrollmentStatuses: '{{ item.accountEnrollmentStatuses }}'
+      accountId: '{{ item.accountId }}'
+      lastUpdatedTimestamp: '{{ item.lastUpdatedTimestamp }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.compute-optimizer.get_idle_recommendations
+  calls:
+  - action: get_idle_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.idleRecommendations }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      finding: '{{ item.finding }}'
+      findingDescription: '{{ item.findingDescription }}'
+      idleRecommendations: '{{ item.idleRecommendations }}'
+      lastRefreshTimestamp: '{{ item.lastRefreshTimestamp }}'
+      lookBackPeriodInDays: '{{ item.lookBackPeriodInDays }}'
+      resourceArn: '{{ item.resourceArn }}'
+      resourceId: '{{ item.resourceId }}'
+      resourceType: '{{ item.resourceType }}'
+      savingsOpportunity: '{{ item.savingsOpportunity }}'
+      savingsOpportunityAfterDiscounts: '{{ item.savingsOpportunityAfterDiscounts }}'
+      tags: '{{ item.tags }}'
+      utilizationMetrics: '{{ item.utilizationMetrics }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.compute-optimizer.get_lambda_function_recommendations
+  calls:
+  - action: get_lambda_function_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.lambdaFunctionRecommendations }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      currentMemorySize: '{{ item.currentMemorySize }}'
+      currentPerformanceRisk: '{{ item.currentPerformanceRisk }}'
+      effectiveRecommendationPreferences: '{{ item.effectiveRecommendationPreferences }}'
+      finding: '{{ item.finding }}'
+      findingReasonCodes: '{{ item.findingReasonCodes }}'
+      functionArn: '{{ item.functionArn }}'
+      functionVersion: '{{ item.functionVersion }}'
+      lambdaFunctionRecommendations: '{{ item.lambdaFunctionRecommendations[].finding }}'
+      lastRefreshTimestamp: '{{ item.lastRefreshTimestamp }}'
+      lookbackPeriodInDays: '{{ item.lookbackPeriodInDays }}'
+      memorySizeRecommendationOptions: '{{ item.memorySizeRecommendationOptions }}'
+      numberOfInvocations: '{{ item.numberOfInvocations }}'
+      tags: '{{ item.tags }}'
+      utilizationMetrics: '{{ item.utilizationMetrics }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.compute-optimizer.get_license_recommendations
+  calls:
+  - action: get_license_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.licenseRecommendations }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      currentLicenseConfiguration: '{{ item.currentLicenseConfiguration }}'
+      finding: '{{ item.finding }}'
+      findingReasonCodes: '{{ item.findingReasonCodes }}'
+      lastRefreshTimestamp: '{{ item.lastRefreshTimestamp }}'
+      licenseRecommendationOptions: '{{ item.licenseRecommendationOptions }}'
+      licenseRecommendations: '{{ item.licenseRecommendations }}'
+      lookbackPeriodInDays: '{{ item.lookbackPeriodInDays }}'
+      resourceArn: '{{ item.resourceArn }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.compute-optimizer.get_rds_database_recommendations
+  calls:
+  - action: get_rds_database_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.rdsDBRecommendations }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      currentDBInstanceClass: '{{ item.currentDBInstanceClass }}'
+      currentInstancePerformanceRisk: '{{ item.currentInstancePerformanceRisk }}'
+      currentStorageConfiguration: '{{ item.currentStorageConfiguration }}'
+      currentStorageEstimatedMonthlyVolumeIOPsCostVariation: '{{ item.currentStorageEstimatedMonthlyVolumeIOPsCostVariation }}'
+      dbClusterIdentifier: '{{ item.dbClusterIdentifier }}'
+      effectiveRecommendationPreferences: '{{ item.effectiveRecommendationPreferences }}'
+      engine: '{{ item.engine }}'
+      engineVersion: '{{ item.engineVersion }}'
+      idle: '{{ item.idle }}'
+      instanceFinding: '{{ item.instanceFinding }}'
+      instanceFindingReasonCodes: '{{ item.instanceFindingReasonCodes }}'
+      instanceRecommendationOptions: '{{ item.instanceRecommendationOptions }}'
+      lastRefreshTimestamp: '{{ item.lastRefreshTimestamp }}'
+      lookbackPeriodInDays: '{{ item.lookbackPeriodInDays }}'
+      promotionTier: '{{ item.promotionTier }}'
+      rdsDBRecommendations: '{{ item.rdsDBRecommendations }}'
+      resourceArn: '{{ item.resourceArn }}'
+      storageFinding: '{{ item.storageFinding }}'
+      storageFindingReasonCodes: '{{ item.storageFindingReasonCodes }}'
+      storageRecommendationOptions: '{{ item.storageRecommendationOptions }}'
+      tags: '{{ item.tags }}'
+      utilizationMetrics: '{{ item.utilizationMetrics }}'
+- discovery_id: aws.compute-optimizer.get_recommendation_summaries
+  calls:
+  - action: get_recommendation_summaries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recommendationSummaries }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      aggregatedSavingsOpportunity: '{{ item.aggregatedSavingsOpportunity }}'
+      currentPerformanceRiskRatings: '{{ item.currentPerformanceRiskRatings }}'
+      idleSavingsOpportunity: '{{ item.idleSavingsOpportunity }}'
+      idleSummaries: '{{ item.idleSummaries }}'
+      inferredWorkloadSavings: '{{ item.inferredWorkloadSavings }}'
+      recommendationResourceType: '{{ item.recommendationResourceType }}'
+      recommendationSummaries: '{{ item.recommendationSummaries }}'
+      savingsOpportunity: '{{ item.savingsOpportunity }}'
+      summaries: '{{ item.summaries }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.compute-optimizer.get_ec2_recommendation_projected_metrics
+  for_each: aws.compute-optimizer.get_ec2_instance_recommendations
+  calls:
+  - action: get_ec2_recommendation_projected_metrics
+    params:
+      instanceArn: '{{ item.instanceArn }}'
+      stat: '{{ item.stat }}'
+      period: '{{ item.period }}'
+      startTime: '{{ item.startTime }}'
+      endTime: '{{ item.endTime }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recommendedOptionProjectedMetrics }}'
+    item:
+      projectedMetrics: '{{ item.projectedMetrics }}'
+      rank: '{{ item.rank }}'
+      recommendedInstanceType: '{{ item.recommendedInstanceType }}'
+      recommendedOptionProjectedMetrics: '{{ item.recommendedOptionProjectedMetrics }}'
+- discovery_id: aws.compute-optimizer.get_ecs_service_recommendation_projected_metrics
+  for_each: aws.compute-optimizer.get_ecs_service_recommendations
+  calls:
+  - action: get_ecs_service_recommendation_projected_metrics
+    params:
+      serviceArn: '{{ item.serviceArn }}'
+      stat: '{{ item.stat }}'
+      period: '{{ item.period }}'
+      startTime: '{{ item.startTime }}'
+      endTime: '{{ item.endTime }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recommendedOptionProjectedMetrics }}'
+    item:
+      projectedMetrics: '{{ item.projectedMetrics }}'
+      recommendedCpuUnits: '{{ item.recommendedCpuUnits }}'
+      recommendedMemorySize: '{{ item.recommendedMemorySize }}'
+- discovery_id: aws.compute-optimizer.get_effective_recommendation_preferences
+  for_each: aws.compute-optimizer.get_idle_recommendations
+  calls:
+  - action: get_effective_recommendation_preferences
+    params:
+      resourceArn: '{{ item.resourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.utilizationPreferences }}'
+    item:
+      effectiveIncludeList: '{{ item.effectiveIncludeList }}'
+      excludeList: '{{ item.excludeList }}'
+      includeList: '{{ item.includeList }}'
+      name: '{{ item.name }}'
+      enhancedInfrastructureMetrics: '{{ response.enhancedInfrastructureMetrics }}'
+      source: '{{ response.externalMetricsPreference.source }}'
+      lookBackPeriod: '{{ response.lookBackPeriod }}'
+- discovery_id: aws.compute-optimizer.get_rds_database_recommendation_projected_metrics
+  for_each: aws.compute-optimizer.get_idle_recommendations
+  calls:
+  - action: get_rds_database_recommendation_projected_metrics
+    params:
+      resourceArn: '{{ item.resourceArn }}'
+      stat: '{{ item.stat }}'
+      period: '{{ item.period }}'
+      startTime: '{{ item.startTime }}'
+      endTime: '{{ item.endTime }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recommendedOptionProjectedMetrics }}'
+    item:
+      projectedMetrics: '{{ item.projectedMetrics }}'
+      rank: '{{ item.rank }}'
+      recommendedDBInstanceClass: '{{ item.recommendedDBInstanceClass }}'
+- discovery_id: aws.compute-optimizer.get_recommendation_preferences
+  for_each: aws.compute-optimizer.describe_recommendation_export_jobs
+  calls:
+  - action: get_recommendation_preferences
+    params:
+      resourceType: '{{ item.resourceType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recommendationPreferencesDetails }}'
+    item:
+      enhancedInfrastructureMetrics: '{{ item.enhancedInfrastructureMetrics }}'
+      externalMetricsPreference: '{{ item.externalMetricsPreference }}'
+      inferredWorkloadTypes: '{{ item.inferredWorkloadTypes }}'
+      lookBackPeriod: '{{ item.lookBackPeriod }}'
+      preferredResources: '{{ item.preferredResources }}'
+      resourceType: '{{ item.resourceType }}'
+      savingsEstimationMode: '{{ item.savingsEstimationMode }}'
+      scope: '{{ item.scope }}'
+      utilizationPreferences: '{{ item.utilizationPreferences }}'
+      nextToken: '{{ response.nextToken }}'

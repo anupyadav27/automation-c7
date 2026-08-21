@@ -1,0 +1,146 @@
+version: '1.0'
+provider: aws
+service: cloudhsm
+services:
+  client: cloudhsm
+  module: boto3.client
+discovery:
+- discovery_id: aws.cloudhsm.describe_hsm
+  calls:
+  - action: describe_hsm
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Partitions }}'
+    item:
+      Status: '{{ item.Status }}'
+      SubnetId: '{{ item.SubnetId }}'
+      VpcId: '{{ item.VpcId }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      EniId: '{{ item.EniId }}'
+      EniIp: '{{ item.EniIp }}'
+      HsmArn: '{{ item.HsmArn }}'
+      HsmType: '{{ item.HsmType }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      Partitions: '{{ item.Partitions }}'
+      SerialNumber: '{{ item.SerialNumber }}'
+      ServerCertLastUpdated: '{{ item.ServerCertLastUpdated }}'
+      ServerCertUri: '{{ item.ServerCertUri }}'
+      SoftwareVersion: '{{ item.SoftwareVersion }}'
+      SshKeyLastUpdated: '{{ item.SshKeyLastUpdated }}'
+      SshPublicKey: '{{ item.SshPublicKey }}'
+      StatusDetails: '{{ item.StatusDetails }}'
+      SubscriptionEndDate: '{{ item.SubscriptionEndDate }}'
+      SubscriptionStartDate: '{{ item.SubscriptionStartDate }}'
+      SubscriptionType: '{{ item.SubscriptionType }}'
+      VendorName: '{{ item.VendorName }}'
+- discovery_id: aws.cloudhsm.describe_luna_client
+  calls:
+  - action: describe_luna_client
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Certificate: '{{ response.Certificate }}'
+      CertificateFingerprint: '{{ response.CertificateFingerprint }}'
+      ClientArn: '{{ response.ClientArn }}'
+      Label: '{{ response.Label }}'
+      LastModifiedTimestamp: '{{ response.LastModifiedTimestamp }}'
+- discovery_id: aws.cloudhsm.list_available_zones
+  calls:
+  - action: list_available_zones
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AZList }}'
+- discovery_id: aws.cloudhsm.list_hapgs
+  calls:
+  - action: list_hapgs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HapgList }}'
+- discovery_id: aws.cloudhsm.list_hsms
+  calls:
+  - action: list_hsms
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HsmList }}'
+    item:
+      Status: '{{ item.Status }}'
+      SubnetId: '{{ item.SubnetId }}'
+      VpcId: '{{ item.VpcId }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      EniId: '{{ item.EniId }}'
+      EniIp: '{{ item.EniIp }}'
+      HsmArn: '{{ item.HsmArn }}'
+      HsmType: '{{ item.HsmType }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      Partitions: '{{ item.Partitions }}'
+      SerialNumber: '{{ item.SerialNumber }}'
+      ServerCertLastUpdated: '{{ item.ServerCertLastUpdated }}'
+      ServerCertUri: '{{ item.ServerCertUri }}'
+      SoftwareVersion: '{{ item.SoftwareVersion }}'
+      SshKeyLastUpdated: '{{ item.SshKeyLastUpdated }}'
+      SshPublicKey: '{{ item.SshPublicKey }}'
+      StatusDetails: '{{ item.StatusDetails }}'
+      SubscriptionEndDate: '{{ item.SubscriptionEndDate }}'
+      SubscriptionStartDate: '{{ item.SubscriptionStartDate }}'
+      SubscriptionType: '{{ item.SubscriptionType }}'
+      VendorName: '{{ item.VendorName }}'
+- discovery_id: aws.cloudhsm.list_luna_clients
+  calls:
+  - action: list_luna_clients
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ClientList }}'
+    item:
+      Certificate: '{{ item.Certificate }}'
+      CertificateFingerprint: '{{ item.CertificateFingerprint }}'
+      ClientArn: '{{ item.ClientArn }}'
+      Label: '{{ item.Label }}'
+      LastModifiedTimestamp: '{{ item.LastModifiedTimestamp }}'
+- discovery_id: aws.cloudhsm.describe_hapg
+  calls:
+  - action: describe_hapg
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HsmsLastActionFailed }}'
+    item:
+      HapgArn: '{{ response.HapgArn }}'
+      HapgSerial: '{{ response.HapgSerial }}'
+      Label: '{{ response.Label }}'
+      LastModifiedTimestamp: '{{ response.LastModifiedTimestamp }}'
+      State: '{{ response.State }}'
+- discovery_id: aws.cloudhsm.get_config
+  calls:
+  - action: get_config
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ConfigCred: '{{ response.ConfigCred }}'
+      ConfigFile: '{{ response.ConfigFile }}'
+      ConfigType: '{{ response.ConfigType }}'
+- discovery_id: aws.cloudhsm.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TagList }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

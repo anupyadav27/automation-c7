@@ -1,0 +1,140 @@
+version: '1.0'
+provider: aws
+service: timestream-query
+services:
+  client: timestream-query
+  module: boto3.client
+discovery:
+- discovery_id: aws.timestream-query.describe_account_settings
+  calls:
+  - action: describe_account_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ComputeMode: '{{ response.QueryCompute.ComputeMode }}'
+      MaxQueryTCU: '{{ response.QueryCompute.MaxQueryTCU }}'
+      ProvisionedCapacity: '{{ response.QueryCompute.ProvisionedCapacity }}'
+      QueryCompute: '{{ response.QueryCompute.QueryCompute }}'
+      QueryPricingModel: '{{ response.QueryCompute.QueryPricingModel }}'
+      ActiveQueryTCU: '{{ response.QueryCompute.ProvisionedCapacity.ActiveQueryTCU }}'
+      Status: '{{ response.QueryCompute.ProvisionedCapacity.LastUpdate.Status }}'
+      StatusMessage: '{{ response.QueryCompute.ProvisionedCapacity.LastUpdate.StatusMessage }}'
+      TargetQueryTCU: '{{ response.QueryCompute.ProvisionedCapacity.LastUpdate.TargetQueryTCU }}'
+      RoleArn: '{{ response.QueryCompute.ProvisionedCapacity.NotificationConfiguration.RoleArn }}'
+      TopicArn: '{{ response.QueryCompute.ProvisionedCapacity.NotificationConfiguration.SnsConfiguration.TopicArn }}'
+- discovery_id: aws.timestream-query.describe_endpoints
+  calls:
+  - action: describe_endpoints
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Endpoints }}'
+    item:
+      Address: '{{ item.Address }}'
+      CachePeriodInMinutes: '{{ item.CachePeriodInMinutes }}'
+      Endpoints: '{{ item.Endpoints }}'
+- discovery_id: aws.timestream-query.list_scheduled_queries
+  calls:
+  - action: list_scheduled_queries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ScheduledQueries }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      ErrorReportConfiguration: '{{ item.ErrorReportConfiguration }}'
+      LastRunStatus: '{{ item.LastRunStatus }}'
+      NextInvocationTime: '{{ item.NextInvocationTime }}'
+      PreviousInvocationTime: '{{ item.PreviousInvocationTime }}'
+      TargetDestination: '{{ item.TargetDestination }}'
+- discovery_id: aws.timestream-query.describe_scheduled_query
+  for_each: aws.timestream-query.list_scheduled_queries
+  calls:
+  - action: describe_scheduled_query
+    params:
+      ScheduledQueryArn: '{{ item.ScheduledQueryArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.ScheduledQuery.Arn }}'
+      CreationTime: '{{ response.ScheduledQuery.CreationTime }}'
+      KmsKeyId: '{{ response.ScheduledQuery.KmsKeyId }}'
+      Name: '{{ response.ScheduledQuery.Name }}'
+      State: '{{ response.ScheduledQuery.State }}'
+      ErrorReportConfiguration: '{{ response.ScheduledQuery.ErrorReportConfiguration }}'
+      LastRunSummary: '{{ response.ScheduledQuery.LastRunSummary.RunStatus }}'
+      NextInvocationTime: '{{ response.ScheduledQuery.NextInvocationTime }}'
+      NotificationConfiguration: '{{ response.ScheduledQuery.NotificationConfiguration }}'
+      PreviousInvocationTime: '{{ response.ScheduledQuery.PreviousInvocationTime }}'
+      QueryString: '{{ response.ScheduledQuery.QueryString }}'
+      RecentlyFailedRuns: '{{ response.ScheduledQuery.RecentlyFailedRuns }}'
+      ScheduleConfiguration: '{{ response.ScheduledQuery.ScheduleConfiguration }}'
+      ScheduledQueryExecutionRoleArn: '{{ response.ScheduledQuery.ScheduledQueryExecutionRoleArn }}'
+      TargetConfiguration: '{{ response.ScheduledQuery.TargetConfiguration }}'
+      BucketName: '{{ response.ScheduledQuery.ErrorReportConfiguration.S3Configuration.BucketName }}'
+      EncryptionOption: '{{ response.ScheduledQuery.ErrorReportConfiguration.S3Configuration.EncryptionOption }}'
+      ObjectKeyPrefix: '{{ response.ScheduledQuery.ErrorReportConfiguration.S3Configuration.ObjectKeyPrefix }}'
+      ObjectKey: '{{ response.ScheduledQuery.LastRunSummary.ErrorReportLocation.S3ReportLocation.ObjectKey }}'
+      BytesMetered: '{{ response.ScheduledQuery.LastRunSummary.ExecutionStats.BytesMetered }}'
+      CumulativeBytesScanned: '{{ response.ScheduledQuery.LastRunSummary.ExecutionStats.CumulativeBytesScanned }}'
+      DataWrites: '{{ response.ScheduledQuery.LastRunSummary.ExecutionStats.DataWrites }}'
+      ExecutionTimeInMillis: '{{ response.ScheduledQuery.LastRunSummary.ExecutionStats.ExecutionTimeInMillis }}'
+      QueryResultRows: '{{ response.ScheduledQuery.LastRunSummary.ExecutionStats.QueryResultRows }}'
+      RecordsIngested: '{{ response.ScheduledQuery.LastRunSummary.ExecutionStats.RecordsIngested }}'
+      FailureReason: '{{ response.ScheduledQuery.LastRunSummary.FailureReason }}'
+      InvocationTime: '{{ response.ScheduledQuery.LastRunSummary.InvocationTime }}'
+      OutputBytes: '{{ response.ScheduledQuery.LastRunSummary.QueryInsightsResponse.OutputBytes }}'
+      OutputRows: '{{ response.ScheduledQuery.LastRunSummary.QueryInsightsResponse.OutputRows }}'
+      QueryTableCount: '{{ response.ScheduledQuery.LastRunSummary.QueryInsightsResponse.QueryTableCount }}'
+      RunStatus: '{{ response.ScheduledQuery.LastRunSummary.RunStatus }}'
+      TriggerTime: '{{ response.ScheduledQuery.LastRunSummary.TriggerTime }}'
+      TopicArn: '{{ response.ScheduledQuery.NotificationConfiguration.SnsConfiguration.TopicArn }}'
+      ScheduleExpression: '{{ response.ScheduledQuery.ScheduleConfiguration.ScheduleExpression }}'
+      DatabaseName: '{{ response.ScheduledQuery.TargetConfiguration.TimestreamConfiguration.DatabaseName }}'
+      MeasureNameColumn: '{{ response.ScheduledQuery.TargetConfiguration.TimestreamConfiguration.MeasureNameColumn }}'
+      TargetMultiMeasureName: '{{ response.ScheduledQuery.TargetConfiguration.TimestreamConfiguration.MultiMeasureMappings.TargetMultiMeasureName }}'
+      TableName: '{{ response.ScheduledQuery.TargetConfiguration.TimestreamConfiguration.TableName }}'
+      TimeColumn: '{{ response.ScheduledQuery.TargetConfiguration.TimestreamConfiguration.TimeColumn }}'
+- discovery_id: aws.timestream-query.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.timestream-query.query
+  calls:
+  - action: query
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Rows }}'
+    item:
+      QueryId: '{{ response.QueryId }}'
+      OutputBytes: '{{ response.QueryInsightsResponse.OutputBytes }}'
+      OutputRows: '{{ response.QueryInsightsResponse.OutputRows }}'
+      TableArn: '{{ response.QueryInsightsResponse.QuerySpatialCoverage.Max.TableArn }}'
+      Value: '{{ response.QueryInsightsResponse.QuerySpatialCoverage.Max.Value }}'
+      QueryTableCount: '{{ response.QueryInsightsResponse.QueryTableCount }}'
+      UnloadPartitionCount: '{{ response.QueryInsightsResponse.UnloadPartitionCount }}'
+      UnloadWrittenBytes: '{{ response.QueryInsightsResponse.UnloadWrittenBytes }}'
+      UnloadWrittenRows: '{{ response.QueryInsightsResponse.UnloadWrittenRows }}'
+      CumulativeBytesMetered: '{{ response.QueryStatus.CumulativeBytesMetered }}'
+      CumulativeBytesScanned: '{{ response.QueryStatus.CumulativeBytesScanned }}'
+      ProgressPercentage: '{{ response.QueryStatus.ProgressPercentage }}'

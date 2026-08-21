@@ -1,0 +1,134 @@
+version: '1.0'
+provider: aws
+service: docdb-elastic
+services:
+  client: docdb-elastic
+  module: boto3.client
+discovery:
+- discovery_id: aws.docdb-elastic.list_cluster_snapshots
+  calls:
+  - action: list_cluster_snapshots
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.snapshots }}'
+    item:
+      adminUserName: '{{ item.adminUserName }}'
+      authType: '{{ item.authType }}'
+      backupRetentionPeriod: '{{ item.backupRetentionPeriod }}'
+      clusterArn: '{{ item.clusterArn }}'
+      clusterCreationTime: '{{ item.clusterCreationTime }}'
+      createTime: '{{ item.createTime }}'
+      kmsKeyId: '{{ item.kmsKeyId }}'
+      preferredBackupWindow: '{{ item.preferredBackupWindow }}'
+      preferredMaintenanceWindow: '{{ item.preferredMaintenanceWindow }}'
+      shardCapacity: '{{ item.shardCapacity }}'
+      shardCount: '{{ item.shardCount }}'
+      shardInstanceCount: '{{ item.shardInstanceCount }}'
+      shards: '{{ item.shards }}'
+      snapshot: '{{ item.snapshot }}'
+      snapshotArn: '{{ item.snapshotArn }}'
+      snapshotCreationTime: '{{ item.snapshotCreationTime }}'
+      snapshotName: '{{ item.snapshotName }}'
+      status: '{{ item.status }}'
+      subnetIds: '{{ item.subnetIds }}'
+      vpcSecurityGroupIds: '{{ item.vpcSecurityGroupIds }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.docdb-elastic.list_clusters
+  calls:
+  - action: list_clusters
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.clusters }}'
+    item:
+      clusterArn: '{{ item.clusterArn }}'
+      clusterName: '{{ item.clusterName }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.docdb-elastic.list_pending_maintenance_actions
+  calls:
+  - action: list_pending_maintenance_actions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.resourcePendingMaintenanceActions }}'
+    item:
+      pendingMaintenanceActionDetails: '{{ item.pendingMaintenanceActionDetails }}'
+      resourceArn: '{{ item.resourceArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.docdb-elastic.get_cluster
+  for_each: aws.docdb-elastic.list_cluster_snapshots
+  calls:
+  - action: get_cluster
+    params:
+      clusterArn: '{{ item.clusterArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      adminUserName: '{{ response.cluster.adminUserName }}'
+      authType: '{{ response.cluster.authType }}'
+      backupRetentionPeriod: '{{ response.cluster.backupRetentionPeriod }}'
+      clusterArn: '{{ response.cluster.clusterArn }}'
+      clusterEndpoint: '{{ response.cluster.clusterEndpoint }}'
+      clusterName: '{{ response.cluster.clusterName }}'
+      createTime: '{{ response.cluster.createTime }}'
+      kmsKeyId: '{{ response.cluster.kmsKeyId }}'
+      preferredBackupWindow: '{{ response.cluster.preferredBackupWindow }}'
+      preferredMaintenanceWindow: '{{ response.cluster.preferredMaintenanceWindow }}'
+      shardCapacity: '{{ response.cluster.shardCapacity }}'
+      shardCount: '{{ response.cluster.shardCount }}'
+      shardInstanceCount: '{{ response.cluster.shardInstanceCount }}'
+      shards: '{{ response.cluster.shards }}'
+      status: '{{ response.cluster.status }}'
+      subnetIds: '{{ response.cluster.subnetIds }}'
+      vpcSecurityGroupIds: '{{ response.cluster.vpcSecurityGroupIds }}'
+- discovery_id: aws.docdb-elastic.get_cluster_snapshot
+  for_each: aws.docdb-elastic.list_cluster_snapshots
+  calls:
+  - action: get_cluster_snapshot
+    params:
+      snapshotArn: '{{ item.snapshotArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      adminUserName: '{{ response.snapshot.adminUserName }}'
+      clusterArn: '{{ response.snapshot.clusterArn }}'
+      clusterCreationTime: '{{ response.snapshot.clusterCreationTime }}'
+      kmsKeyId: '{{ response.snapshot.kmsKeyId }}'
+      snapshotArn: '{{ response.snapshot.snapshotArn }}'
+      snapshotCreationTime: '{{ response.snapshot.snapshotCreationTime }}'
+      snapshotName: '{{ response.snapshot.snapshotName }}'
+      snapshotType: '{{ response.snapshot.snapshotType }}'
+      status: '{{ response.snapshot.status }}'
+      subnetIds: '{{ response.snapshot.subnetIds }}'
+      vpcSecurityGroupIds: '{{ response.snapshot.vpcSecurityGroupIds }}'
+- discovery_id: aws.docdb-elastic.get_pending_maintenance_action
+  for_each: aws.docdb-elastic.list_pending_maintenance_actions
+  calls:
+  - action: get_pending_maintenance_action
+    params:
+      resourceArn: '{{ item.resourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      pendingMaintenanceActionDetails: '{{ response.resourcePendingMaintenanceAction.pendingMaintenanceActionDetails[].action }}'
+      resourceArn: '{{ response.resourcePendingMaintenanceAction.resourceArn }}'
+- discovery_id: aws.docdb-elastic.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

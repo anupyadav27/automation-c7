@@ -1,0 +1,305 @@
+version: '1.0'
+provider: aws
+service: appconfig
+services:
+  client: appconfig
+  module: boto3.client
+discovery:
+- discovery_id: aws.appconfig.get_account_settings
+  calls:
+  - action: get_account_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DeletionProtection: '{{ response.DeletionProtection.DeletionProtection }}'
+      Enabled: '{{ response.DeletionProtection.Enabled }}'
+      ProtectionPeriodInMinutes: '{{ response.DeletionProtection.ProtectionPeriodInMinutes }}'
+- discovery_id: aws.appconfig.list_applications
+  calls:
+  - action: list_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Description: '{{ item.Description }}'
+- discovery_id: aws.appconfig.list_deployment_strategies
+  calls:
+  - action: list_deployment_strategies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      DeploymentDurationInMinutes: '{{ item.Items[].DeploymentDurationInMinutes }}'
+      Description: '{{ item.Description }}'
+      FinalBakeTimeInMinutes: '{{ item.FinalBakeTimeInMinutes }}'
+      GrowthFactor: '{{ item.GrowthFactor }}'
+      GrowthType: '{{ item.GrowthType }}'
+      ReplicateTo: '{{ item.ReplicateTo }}'
+- discovery_id: aws.appconfig.list_extension_associations
+  calls:
+  - action: list_extension_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Id: '{{ item.Id }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      ExtensionArn: '{{ item.ExtensionArn }}'
+- discovery_id: aws.appconfig.list_extensions
+  calls:
+  - action: list_extensions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Description: '{{ item.Description }}'
+      VersionNumber: '{{ item.VersionNumber }}'
+- discovery_id: aws.appconfig.get_application
+  calls:
+  - action: get_application
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      Description: '{{ response.Description }}'
+- discovery_id: aws.appconfig.get_configuration
+  calls:
+  - action: get_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ConfigurationVersion: '{{ response.ConfigurationVersion }}'
+      Content: '{{ response.Content }}'
+      ContentType: '{{ response.ContentType }}'
+- discovery_id: aws.appconfig.get_configuration_profile
+  calls:
+  - action: get_configuration_profile
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Validators }}'
+    item:
+      Content: '{{ item.Content }}'
+      Type: '{{ item.Type }}'
+      ApplicationId: '{{ response.ApplicationId }}'
+      Description: '{{ response.Description }}'
+      Id: '{{ response.Id }}'
+      KmsKeyArn: '{{ response.KmsKeyArn }}'
+      KmsKeyIdentifier: '{{ response.KmsKeyIdentifier }}'
+      LocationUri: '{{ response.LocationUri }}'
+      Name: '{{ response.Name }}'
+      RetrievalRoleArn: '{{ response.RetrievalRoleArn }}'
+- discovery_id: aws.appconfig.get_deployment
+  calls:
+  - action: get_deployment
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EventLog }}'
+    item:
+      ActionInvocations: '{{ item.ActionInvocations }}'
+      Description: '{{ item.Description }}'
+      EventType: '{{ item.EventType }}'
+      OccurredAt: '{{ item.OccurredAt }}'
+      TriggeredBy: '{{ item.TriggeredBy }}'
+      ApplicationId: '{{ response.ApplicationId }}'
+      CompletedAt: '{{ response.CompletedAt }}'
+      ConfigurationLocationUri: '{{ response.ConfigurationLocationUri }}'
+      ConfigurationName: '{{ response.ConfigurationName }}'
+      ConfigurationProfileId: '{{ response.ConfigurationProfileId }}'
+      ConfigurationVersion: '{{ response.ConfigurationVersion }}'
+      DeploymentDurationInMinutes: '{{ response.DeploymentDurationInMinutes }}'
+      DeploymentNumber: '{{ response.DeploymentNumber }}'
+      DeploymentStrategyId: '{{ response.DeploymentStrategyId }}'
+      EnvironmentId: '{{ response.EnvironmentId }}'
+      FinalBakeTimeInMinutes: '{{ response.FinalBakeTimeInMinutes }}'
+      GrowthFactor: '{{ response.GrowthFactor }}'
+      GrowthType: '{{ response.GrowthType }}'
+      KmsKeyArn: '{{ response.KmsKeyArn }}'
+      KmsKeyIdentifier: '{{ response.KmsKeyIdentifier }}'
+      PercentageComplete: '{{ response.PercentageComplete }}'
+      StartedAt: '{{ response.StartedAt }}'
+      State: '{{ response.State }}'
+      VersionLabel: '{{ response.VersionLabel }}'
+- discovery_id: aws.appconfig.get_deployment_strategy
+  calls:
+  - action: get_deployment_strategy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      DeploymentDurationInMinutes: '{{ response.DeploymentDurationInMinutes }}'
+      Description: '{{ response.Description }}'
+      FinalBakeTimeInMinutes: '{{ response.FinalBakeTimeInMinutes }}'
+      GrowthFactor: '{{ response.GrowthFactor }}'
+      GrowthType: '{{ response.GrowthType }}'
+      ReplicateTo: '{{ response.ReplicateTo }}'
+- discovery_id: aws.appconfig.get_environment
+  calls:
+  - action: get_environment
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Monitors }}'
+    item:
+      AlarmArn: '{{ item.AlarmArn }}'
+      AlarmRoleArn: '{{ item.AlarmRoleArn }}'
+      ApplicationId: '{{ response.ApplicationId }}'
+      Description: '{{ response.Description }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      State: '{{ response.State }}'
+- discovery_id: aws.appconfig.get_extension
+  calls:
+  - action: get_extension
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      Actions: '{{ response.Actions }}'
+      Description: '{{ response.Description }}'
+      Parameters: '{{ response.Parameters }}'
+      VersionNumber: '{{ response.VersionNumber }}'
+- discovery_id: aws.appconfig.get_extension_association
+  calls:
+  - action: get_extension_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      ResourceArn: '{{ response.ResourceArn }}'
+      ExtensionArn: '{{ response.ExtensionArn }}'
+      ExtensionVersionNumber: '{{ response.ExtensionVersionNumber }}'
+      Parameters: '{{ response.Parameters }}'
+- discovery_id: aws.appconfig.get_hosted_configuration_version
+  for_each: aws.appconfig.list_extensions
+  calls:
+  - action: get_hosted_configuration_version
+    params:
+      ApplicationId: '{{ item.ApplicationId }}'
+      ConfigurationProfileId: '{{ item.ConfigurationProfileId }}'
+      VersionNumber: '{{ item.VersionNumber }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ApplicationId: '{{ response.ApplicationId }}'
+      ConfigurationProfileId: '{{ response.ConfigurationProfileId }}'
+      Content: '{{ response.Content }}'
+      ContentType: '{{ response.ContentType }}'
+      Description: '{{ response.Description }}'
+      KmsKeyArn: '{{ response.KmsKeyArn }}'
+      VersionLabel: '{{ response.VersionLabel }}'
+      VersionNumber: '{{ response.VersionNumber }}'
+- discovery_id: aws.appconfig.list_configuration_profiles
+  calls:
+  - action: list_configuration_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      ApplicationId: '{{ item.ApplicationId }}'
+      LocationUri: '{{ item.LocationUri }}'
+      Type: '{{ item.Type }}'
+      ValidatorTypes: '{{ item.ValidatorTypes }}'
+- discovery_id: aws.appconfig.list_deployments
+  calls:
+  - action: list_deployments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      State: '{{ item.State }}'
+      CompletedAt: '{{ item.CompletedAt }}'
+      ConfigurationName: '{{ item.ConfigurationName }}'
+      ConfigurationVersion: '{{ item.ConfigurationVersion }}'
+      DeploymentDurationInMinutes: '{{ item.Items[].DeploymentDurationInMinutes }}'
+      DeploymentNumber: '{{ item.DeploymentNumber }}'
+      FinalBakeTimeInMinutes: '{{ item.FinalBakeTimeInMinutes }}'
+      GrowthFactor: '{{ item.GrowthFactor }}'
+      GrowthType: '{{ item.GrowthType }}'
+      PercentageComplete: '{{ item.PercentageComplete }}'
+      StartedAt: '{{ item.StartedAt }}'
+      VersionLabel: '{{ item.VersionLabel }}'
+- discovery_id: aws.appconfig.list_environments
+  calls:
+  - action: list_environments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      ApplicationId: '{{ item.ApplicationId }}'
+      Description: '{{ item.Description }}'
+      Monitors: '{{ item.Monitors }}'
+- discovery_id: aws.appconfig.list_hosted_configuration_versions
+  calls:
+  - action: list_hosted_configuration_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      ApplicationId: '{{ item.ApplicationId }}'
+      ConfigurationProfileId: '{{ item.ConfigurationProfileId }}'
+      ContentType: '{{ item.ContentType }}'
+      Description: '{{ item.Description }}'
+      KmsKeyArn: '{{ item.KmsKeyArn }}'
+      VersionLabel: '{{ item.VersionLabel }}'
+      VersionNumber: '{{ item.VersionNumber }}'
+- discovery_id: aws.appconfig.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

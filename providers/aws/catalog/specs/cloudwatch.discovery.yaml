@@ -1,0 +1,182 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: cloudwatch
+# 8 ops (8 from checks, +0 for inventory)
+version: '1.0'
+provider: aws
+service: cloudwatch
+discovery:
+  - calls:
+    - action: list_tags_for_resource
+      on_error: continue
+      save_as: response
+    discovery_id: aws.cloudwatch.list_tags_for_resource
+    emit:
+      as: item
+      item:
+        Key: '{{ item.Key }}'
+        Value: '{{ item.Value }}'
+      items_for: '{{ response.Tags }}'
+  - calls:
+    - action: describe_anomaly_detectors
+      on_error: continue
+      save_as: response
+    discovery_id: aws.cloudwatch.describe_anomaly_detectors
+    emit:
+      as: item
+      item:
+        AnomalyDetectors: '{{ item.AnomalyDetectors }}'
+        Configuration: '{{ item.Configuration }}'
+        Dimensions: '{{ item.Dimensions }}'
+        MetricCharacteristics: '{{ item.MetricCharacteristics }}'
+        MetricMathAnomalyDetector: '{{ item.MetricMathAnomalyDetector }}'
+        MetricName: '{{ item.MetricName }}'
+        Namespace: '{{ item.Namespace }}'
+        SingleMetricAnomalyDetector: '{{ item.SingleMetricAnomalyDetector }}'
+        Stat: '{{ item.Stat }}'
+        StateValue: '{{ item.StateValue }}'
+      items_for: '{{ response.AnomalyDetectors }}'
+  - calls:
+    - action: list_dashboards
+      on_error: continue
+      save_as: response
+    discovery_id: aws.cloudwatch.list_dashboards
+    emit:
+      as: item
+      item:
+        DashboardArn: '{{ item.DashboardArn }}'
+        DashboardName: '{{ item.DashboardName }}'
+        LastModified: '{{ item.LastModified }}'
+        Size: '{{ item.Size }}'
+      items_for: '{{ response.DashboardEntries }}'
+  - calls:
+    - action: describe_alarms
+      on_error: continue
+      save_as: response
+    discovery_id: aws.cloudwatch.describe_alarms
+    emit:
+      as: item
+      item:
+        ActionsEnabled: '{{ item.ActionsEnabled }}'
+        ActionsSuppressedBy: '{{ item.ActionsSuppressedBy }}'
+        ActionsSuppressedReason: '{{ item.ActionsSuppressedReason }}'
+        ActionsSuppressor: '{{ item.ActionsSuppressor }}'
+        ActionsSuppressorExtensionPeriod: '{{ item.ActionsSuppressorExtensionPeriod
+          }}'
+        ActionsSuppressorWaitPeriod: '{{ item.ActionsSuppressorWaitPeriod }}'
+        AlarmActions: '{{ item.AlarmActions }}'
+        AlarmArn: '{{ item.AlarmArn }}'
+        AlarmConfigurationUpdatedTimestamp: '{{ item.AlarmConfigurationUpdatedTimestamp
+          }}'
+        AlarmDescription: '{{ item.AlarmDescription }}'
+        AlarmName: '{{ item.AlarmName }}'
+        AlarmRule: '{{ item.AlarmRule }}'
+        CompositeAlarms: '{{ item.CompositeAlarms }}'
+        Enabled: '{{ item.Enabled }}'
+        InsufficientDataActions: '{{ item.InsufficientDataActions }}'
+        MetricAlarms: '{{ item.MetricAlarms }}'
+        OKActions: '{{ item.OKActions }}'
+        StateReason: '{{ item.StateReason }}'
+        StateReasonData: '{{ item.StateReasonData }}'
+        StateTransitionedTimestamp: '{{ item.StateTransitionedTimestamp }}'
+        StateUpdatedTimestamp: '{{ item.StateUpdatedTimestamp }}'
+        StateValue: '{{ item.StateValue }}'
+        Status: '{{ item.Status }}'
+      items_for: '{{ response.CompositeAlarms }}'
+  - calls:
+    - action: describe_alarms_for_metric
+      on_error: continue
+      params:
+        MetricName: '{{ item.MetricName }}'
+        Namespace: '{{ item.Namespace }}'
+      save_as: response
+    discovery_id: aws.cloudwatch.describe_alarms_for_metric
+    emit:
+      as: item
+      item:
+        ActionsEnabled: '{{ item.ActionsEnabled }}'
+        AlarmActions: '{{ item.AlarmActions }}'
+        AlarmArn: '{{ item.AlarmArn }}'
+        AlarmConfigurationUpdatedTimestamp: '{{ item.AlarmConfigurationUpdatedTimestamp
+          }}'
+        AlarmDescription: '{{ item.AlarmDescription }}'
+        AlarmName: '{{ item.AlarmName }}'
+        ComparisonOperator: '{{ item.ComparisonOperator }}'
+        DatapointsToAlarm: '{{ item.DatapointsToAlarm }}'
+        Dimensions: '{{ item.Dimensions }}'
+        EvaluateLowSampleCountPercentile: '{{ item.EvaluateLowSampleCountPercentile
+          }}'
+        EvaluationPeriods: '{{ item.EvaluationPeriods }}'
+        EvaluationState: '{{ item.EvaluationState }}'
+        ExtendedStatistic: '{{ item.ExtendedStatistic }}'
+        InsufficientDataActions: '{{ item.InsufficientDataActions }}'
+        MetricName: '{{ item.MetricName }}'
+        Metrics: '{{ item.Metrics }}'
+        Namespace: '{{ item.Namespace }}'
+        OKActions: '{{ item.OKActions }}'
+        Period: '{{ item.Period }}'
+        StateReason: '{{ item.StateReason }}'
+        StateReasonData: '{{ item.StateReasonData }}'
+        StateTransitionedTimestamp: '{{ item.StateTransitionedTimestamp }}'
+        StateUpdatedTimestamp: '{{ item.StateUpdatedTimestamp }}'
+        StateValue: '{{ item.StateValue }}'
+        Statistic: '{{ item.Statistic }}'
+        Threshold: '{{ item.Threshold }}'
+        ThresholdMetricId: '{{ item.ThresholdMetricId }}'
+        TreatMissingData: '{{ item.TreatMissingData }}'
+        Unit: '{{ item.Unit }}'
+      items_for: '{{ response.MetricAlarms }}'
+    for_each: aws.cloudwatch.describe_anomaly_detectors
+  - calls:
+    - action: describe_alarm_history
+      on_error: continue
+      save_as: response
+    discovery_id: aws.cloudwatch.describe_alarm_history
+    emit:
+      as: item
+      item:
+        AlarmContributorAttributes: '{{ item.AlarmContributorAttributes }}'
+        AlarmContributorId: '{{ item.AlarmContributorId }}'
+        AlarmContributors: '{{ item.AlarmContributors }}'
+        AlarmHistoryItems: '{{ item.AlarmHistoryItems }}'
+        AlarmName: '{{ item.AlarmName }}'
+        AlarmType: '{{ item.AlarmType }}'
+        ContributorAttributes: '{{ item.ContributorAttributes }}'
+        ContributorId: '{{ item.ContributorId }}'
+        Contributors: '{{ item.Contributors }}'
+        HistoryData: '{{ item.HistoryData }}'
+        HistoryItemType: '{{ item.HistoryItemType }}'
+        HistorySummary: '{{ item.HistorySummary }}'
+        Timestamp: '{{ item.Timestamp }}'
+      items_for: '{{ response.AlarmHistoryItems }}'
+  - calls:
+    - action: describe_insight_rules
+      on_error: continue
+      save_as: response
+    discovery_id: aws.cloudwatch.describe_insight_rules
+    emit:
+      as: item
+      item:
+        ApplyOnTransformedLogs: '{{ item.ApplyOnTransformedLogs }}'
+        Definition: '{{ item.Definition }}'
+        InsightRules: '{{ item.InsightRules }}'
+        ManagedRule: '{{ item.ManagedRule }}'
+        Name: '{{ item.Name }}'
+        Schema: '{{ item.Schema }}'
+        State: '{{ item.State }}'
+      items_for: '{{ response.InsightRules }}'
+  - calls:
+    - action: list_metric_streams
+      on_error: continue
+      save_as: response
+    discovery_id: aws.cloudwatch.list_metric_streams
+    emit:
+      as: item
+      item:
+        Arn: '{{ item.Arn }}'
+        CreationDate: '{{ item.CreationDate }}'
+        FirehoseArn: '{{ item.FirehoseArn }}'
+        LastUpdateDate: '{{ item.LastUpdateDate }}'
+        Name: '{{ item.Name }}'
+        OutputFormat: '{{ item.OutputFormat }}'
+        State: '{{ item.State }}'
+      items_for: '{{ response.Entries }}'

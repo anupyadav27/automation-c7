@@ -1,0 +1,208 @@
+version: '1.0'
+provider: aws
+service: ssm-incidents
+services:
+  client: ssm-incidents
+  module: boto3.client
+discovery:
+- discovery_id: aws.ssm-incidents.list_incident_records
+  calls:
+  - action: list_incident_records
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.incidentRecordSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      automationExecutions: '{{ item.automationExecutions }}'
+      chatChannel: '{{ item.chatChannel }}'
+      creationTime: '{{ item.creationTime }}'
+      dedupeString: '{{ item.dedupeString }}'
+      impact: '{{ item.impact }}'
+      incidentRecord: '{{ item.incidentRecord }}'
+      incidentRecordSource: '{{ item.incidentRecordSource }}'
+      lastModifiedBy: '{{ item.lastModifiedBy }}'
+      lastModifiedTime: '{{ item.lastModifiedTime }}'
+      notificationTargets: '{{ item.notificationTargets }}'
+      resolvedTime: '{{ item.resolvedTime }}'
+      status: '{{ item.status }}'
+      title: '{{ item.title }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ssm-incidents.list_replication_sets
+  calls:
+  - action: list_replication_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.replicationSetArns }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ssm-incidents.list_response_plans
+  calls:
+  - action: list_response_plans
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.responsePlanSummaries }}'
+    item:
+      actions: '{{ item.actions }}'
+      arn: '{{ item.arn }}'
+      displayName: '{{ item.displayName }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ssm-incidents.get_incident_record
+  for_each: aws.ssm-incidents.list_incident_records
+  calls:
+  - action: get_incident_record
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.incidentRecord.arn }}'
+      automationExecutions: '{{ response.incidentRecord.automationExecutions }}'
+      chatChannel: '{{ response.incidentRecord.chatChannel }}'
+      creationTime: '{{ response.incidentRecord.creationTime }}'
+      dedupeString: '{{ response.incidentRecord.dedupeString }}'
+      impact: '{{ response.incidentRecord.impact }}'
+      incidentRecord: '{{ response.incidentRecord.incidentRecord }}'
+      incidentRecordSource: '{{ response.incidentRecord.incidentRecordSource.source }}'
+      lastModifiedBy: '{{ response.incidentRecord.lastModifiedBy }}'
+      lastModifiedTime: '{{ response.incidentRecord.lastModifiedTime }}'
+      notificationTargets: '{{ response.incidentRecord.notificationTargets }}'
+      resolvedTime: '{{ response.incidentRecord.resolvedTime }}'
+      status: '{{ response.incidentRecord.status }}'
+      summary: '{{ response.incidentRecord.summary }}'
+      title: '{{ response.incidentRecord.title }}'
+      createdBy: '{{ response.incidentRecord.incidentRecordSource.createdBy }}'
+      invokedBy: '{{ response.incidentRecord.incidentRecordSource.invokedBy }}'
+      resourceArn: '{{ response.incidentRecord.incidentRecordSource.resourceArn }}'
+      source: '{{ response.incidentRecord.incidentRecordSource.source }}'
+- discovery_id: aws.ssm-incidents.get_replication_set
+  for_each: aws.ssm-incidents.list_incident_records
+  calls:
+  - action: get_replication_set
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.replicationSet.arn }}'
+      createdBy: '{{ response.replicationSet.createdBy }}'
+      createdTime: '{{ response.replicationSet.createdTime }}'
+      deletionProtected: '{{ response.replicationSet.deletionProtected }}'
+      lastModifiedBy: '{{ response.replicationSet.lastModifiedBy }}'
+      lastModifiedTime: '{{ response.replicationSet.lastModifiedTime }}'
+      regionMap: '{{ response.replicationSet.regionMap }}'
+      status: '{{ response.replicationSet.status }}'
+- discovery_id: aws.ssm-incidents.get_resource_policies
+  calls:
+  - action: get_resource_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.resourcePolicies }}'
+    item:
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+      policyDocument: '{{ item.policyDocument }}'
+      policyId: '{{ item.policyId }}'
+      ramResourceShareRegion: '{{ item.ramResourceShareRegion }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ssm-incidents.get_response_plan
+  for_each: aws.ssm-incidents.list_incident_records
+  calls:
+  - action: get_response_plan
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.actions }}'
+    item:
+      actions: '{{ item.actions }}'
+      ssmAutomation: '{{ item.ssmAutomation }}'
+      arn: '{{ response.arn }}'
+      displayName: '{{ response.displayName }}'
+      dedupeString: '{{ response.incidentTemplate.dedupeString }}'
+      impact: '{{ response.incidentTemplate.impact }}'
+      incidentTags: '{{ response.incidentTemplate.incidentTags }}'
+      summary: '{{ response.incidentTemplate.summary }}'
+      title: '{{ response.incidentTemplate.title }}'
+      name: '{{ response.name }}'
+- discovery_id: aws.ssm-incidents.get_timeline_event
+  calls:
+  - action: get_timeline_event
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      event: '{{ response.event.eventId }}'
+      eventData: '{{ response.event.eventData }}'
+      eventId: '{{ response.event.eventId }}'
+      eventReferences: '{{ response.event.eventReferences }}'
+      eventTime: '{{ response.event.eventTime }}'
+      eventType: '{{ response.event.eventType }}'
+      eventUpdatedTime: '{{ response.event.eventUpdatedTime }}'
+      incidentRecordArn: '{{ response.event.incidentRecordArn }}'
+- discovery_id: aws.ssm-incidents.list_incident_findings
+  calls:
+  - action: list_incident_findings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.findings }}'
+    item:
+      id: '{{ item.id }}'
+      lastModifiedTime: '{{ item.lastModifiedTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ssm-incidents.list_related_items
+  calls:
+  - action: list_related_items
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.relatedItems }}'
+    item:
+      generatedId: '{{ item.generatedId }}'
+      identifier: '{{ item.identifier }}'
+      title: '{{ item.title }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.ssm-incidents.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.ssm-incidents.list_timeline_events
+  calls:
+  - action: list_timeline_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.eventSummaries }}'
+    item:
+      event: '{{ item.event }}'
+      eventId: '{{ item.eventId }}'
+      eventReferences: '{{ item.eventReferences }}'
+      eventTime: '{{ item.eventTime }}'
+      eventType: '{{ item.eventType }}'
+      eventUpdatedTime: '{{ item.eventUpdatedTime }}'
+      incidentRecordArn: '{{ item.incidentRecordArn }}'
+      nextToken: '{{ response.nextToken }}'

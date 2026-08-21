@@ -2,11 +2,10 @@ click>=8.0
 pydantic>=2.0
 pyyaml>=6.0
 
-# Cloud providers (install as needed)
-# boto3>=1.28          # AWS
-# azure-identity>=1.15 # Azure
-# azure-mgmt-resource>=23.0
-# google-cloud-asset>=3.0  # GCP
+# AWS Lambda runtime + Cloud Custodian (required by handler.py in the container)
+awslambdaric>=2.0
+c7n==0.9.35
+boto3>=1.28
 
 # Dev
 pytest>=7.0

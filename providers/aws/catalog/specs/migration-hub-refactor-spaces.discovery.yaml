@@ -1,0 +1,191 @@
+version: '1.0'
+provider: aws
+service: migration-hub-refactor-spaces
+services:
+  client: migration-hub-refactor-spaces
+  module: boto3.client
+discovery:
+- discovery_id: aws.migration-hub-refactor-spaces.list_environments
+  calls:
+  - action: list_environments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EnvironmentSummaryList }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      Description: '{{ item.Description }}'
+      EnvironmentId: '{{ item.EnvironmentId }}'
+      Error: '{{ item.Error }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      NetworkFabricType: '{{ item.NetworkFabricType }}'
+      OwnerAccountId: '{{ item.OwnerAccountId }}'
+      TransitGatewayId: '{{ item.TransitGatewayId }}'
+- discovery_id: aws.migration-hub-refactor-spaces.get_application
+  calls:
+  - action: get_application
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ApiGatewayId: '{{ response.ApiGatewayProxy.ApiGatewayId }}'
+      EndpointType: '{{ response.ApiGatewayProxy.EndpointType }}'
+      NlbArn: '{{ response.ApiGatewayProxy.NlbArn }}'
+      NlbName: '{{ response.ApiGatewayProxy.NlbName }}'
+      ProxyUrl: '{{ response.ApiGatewayProxy.ProxyUrl }}'
+      StageName: '{{ response.ApiGatewayProxy.StageName }}'
+      VpcLinkId: '{{ response.ApiGatewayProxy.VpcLinkId }}'
+- discovery_id: aws.migration-hub-refactor-spaces.get_environment
+  calls:
+  - action: get_environment
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccountId: '{{ response.Error.AccountId }}'
+      AdditionalDetails: '{{ response.Error.AdditionalDetails }}'
+      Code: '{{ response.Error.Code }}'
+      Message: '{{ response.Error.Message }}'
+      ResourceIdentifier: '{{ response.Error.ResourceIdentifier }}'
+      ResourceType: '{{ response.Error.ResourceType }}'
+- discovery_id: aws.migration-hub-refactor-spaces.get_resource_policy
+  calls:
+  - action: get_resource_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.migration-hub-refactor-spaces.get_route
+  calls:
+  - action: get_route
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Methods }}'
+- discovery_id: aws.migration-hub-refactor-spaces.get_service
+  calls:
+  - action: get_service
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccountId: '{{ response.Error.AccountId }}'
+      AdditionalDetails: '{{ response.Error.AdditionalDetails }}'
+      Code: '{{ response.Error.Code }}'
+      Message: '{{ response.Error.Message }}'
+      ResourceIdentifier: '{{ response.Error.ResourceIdentifier }}'
+      ResourceType: '{{ response.Error.ResourceType }}'
+- discovery_id: aws.migration-hub-refactor-spaces.list_applications
+  calls:
+  - action: list_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ApplicationSummaryList }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      VpcId: '{{ item.VpcId }}'
+      ApiGatewayProxy: '{{ item.ApiGatewayProxy }}'
+      ApplicationId: '{{ item.ApplicationId }}'
+      CreatedByAccountId: '{{ item.CreatedByAccountId }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      EnvironmentId: '{{ item.EnvironmentId }}'
+      Error: '{{ item.Error }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      OwnerAccountId: '{{ item.OwnerAccountId }}'
+      ProxyType: '{{ item.ProxyType }}'
+- discovery_id: aws.migration-hub-refactor-spaces.list_environment_vpcs
+  calls:
+  - action: list_environment_vpcs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EnvironmentVpcList }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      VpcId: '{{ item.VpcId }}'
+      CidrBlocks: '{{ item.CidrBlocks }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      EnvironmentId: '{{ item.EnvironmentId }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      VpcName: '{{ item.VpcName }}'
+- discovery_id: aws.migration-hub-refactor-spaces.list_routes
+  calls:
+  - action: list_routes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RouteSummaryList }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      AppendSourcePath: '{{ item.AppendSourcePath }}'
+      ApplicationId: '{{ item.ApplicationId }}'
+      CreatedByAccountId: '{{ item.CreatedByAccountId }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      EnvironmentId: '{{ item.EnvironmentId }}'
+      Error: '{{ item.Error }}'
+      IncludeChildPaths: '{{ item.IncludeChildPaths }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      Methods: '{{ item.Methods }}'
+      OwnerAccountId: '{{ item.OwnerAccountId }}'
+      PathResourceToId: '{{ item.PathResourceToId }}'
+      RouteId: '{{ item.RouteId }}'
+      RouteType: '{{ item.RouteType }}'
+      ServiceId: '{{ item.ServiceId }}'
+      SourcePath: '{{ item.SourcePath }}'
+- discovery_id: aws.migration-hub-refactor-spaces.list_services
+  calls:
+  - action: list_services
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ServiceSummaryList }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      VpcId: '{{ item.VpcId }}'
+      ApplicationId: '{{ item.ApplicationId }}'
+      CreatedByAccountId: '{{ item.CreatedByAccountId }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      Description: '{{ item.Description }}'
+      EndpointType: '{{ item.EndpointType }}'
+      EnvironmentId: '{{ item.EnvironmentId }}'
+      Error: '{{ item.Error }}'
+      LambdaEndpoint: '{{ item.LambdaEndpoint }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      OwnerAccountId: '{{ item.OwnerAccountId }}'
+      ServiceId: '{{ item.ServiceId }}'
+      UrlEndpoint: '{{ item.UrlEndpoint }}'
+- discovery_id: aws.migration-hub-refactor-spaces.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

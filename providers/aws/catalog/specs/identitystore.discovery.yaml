@@ -1,0 +1,58 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: identitystore
+# 2 ops (2 from checks, +0 for inventory)
+version: '1.0'
+provider: aws
+service: identitystore
+discovery:
+  - calls:
+    - action: list_users
+      on_error: continue
+      save_as: response
+    discovery_id: aws.identitystore.list_users
+    emit:
+      as: item
+      item:
+        Addresses: '{{ item.Addresses }}'
+        Birthdate: '{{ item.Birthdate }}'
+        CreatedAt: '{{ item.CreatedAt }}'
+        CreatedBy: '{{ item.CreatedBy }}'
+        DisplayName: '{{ item.DisplayName }}'
+        Emails: '{{ item.Emails }}'
+        ExternalIds: '{{ item.ExternalIds }}'
+        IdentityStoreId: '{{ item.IdentityStoreId }}'
+        Locale: '{{ item.Locale }}'
+        Name: '{{ item.Name }}'
+        NickName: '{{ item.NickName }}'
+        PhoneNumbers: '{{ item.PhoneNumbers }}'
+        Photos: '{{ item.Photos }}'
+        PreferredLanguage: '{{ item.PreferredLanguage }}'
+        ProfileUrl: '{{ item.ProfileUrl }}'
+        Timezone: '{{ item.Timezone }}'
+        Title: '{{ item.Title }}'
+        UpdatedAt: '{{ item.UpdatedAt }}'
+        UpdatedBy: '{{ item.UpdatedBy }}'
+        UserId: '{{ item.UserId }}'
+        UserName: '{{ item.UserName }}'
+        UserStatus: '{{ item.UserStatus }}'
+        UserType: '{{ item.UserType }}'
+        Website: '{{ item.Website }}'
+      items_for: '{{ response.Users }}'
+  - calls:
+    - action: list_groups
+      on_error: continue
+      save_as: response
+    discovery_id: aws.identitystore.list_groups
+    emit:
+      as: item
+      item:
+        CreatedAt: '{{ item.CreatedAt }}'
+        CreatedBy: '{{ item.CreatedBy }}'
+        Description: '{{ item.Description }}'
+        DisplayName: '{{ item.DisplayName }}'
+        ExternalIds: '{{ item.ExternalIds }}'
+        GroupId: '{{ item.GroupId }}'
+        IdentityStoreId: '{{ item.IdentityStoreId }}'
+        UpdatedAt: '{{ item.UpdatedAt }}'
+        UpdatedBy: '{{ item.UpdatedBy }}'
+      items_for: '{{ response.Groups }}'

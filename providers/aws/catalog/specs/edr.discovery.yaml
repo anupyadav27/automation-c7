@@ -1,0 +1,63 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: edr
+# 2 ops (1 from checks, +1 for inventory)
+version: '1.0'
+provider: aws
+service: edr
+discovery:
+  - calls:
+    - action: list_cases
+      on_error: continue
+      save_as: response
+    discovery_id: aws.edr.list_cases
+    emit:
+      as: item
+      item:
+        action: '{{ response.action }}'
+        actionType: '{{ response.actionType }}'
+        actualIncidentStartDate: '{{ response.actualIncidentStartDate }}'
+        attachmentPresignedUrl: '{{ response.attachmentPresignedUrl }}'
+        body: '{{ response.body }}'
+        caseArn: '{{ response.caseArn }}'
+        caseAttachments: '{{ response.caseAttachments }}'
+        caseId: '{{ response.caseId }}'
+        caseMetadata: '{{ response.caseMetadata }}'
+        caseStatus: '{{ response.caseStatus }}'
+        closedDate: '{{ response.closedDate }}'
+        closureCode: '{{ response.closureCode }}'
+        content: '{{ response.content }}'
+        createdDate: '{{ response.createdDate }}'
+        creator: '{{ response.creator }}'
+        description: '{{ response.description }}'
+        engagementType: '{{ response.engagementType }}'
+        eventTimestamp: '{{ response.eventTimestamp }}'
+        feedback: '{{ response.feedback }}'
+        impactedAccounts: '{{ response.impactedAccounts }}'
+        impactedAwsRegions: '{{ response.impactedAwsRegions }}'
+        impactedServices: '{{ response.impactedServices }}'
+        investigationId: '{{ response.investigationId }}'
+        lastUpdated: '{{ response.lastUpdated }}'
+        lastUpdatedBy: '{{ response.lastUpdatedBy }}'
+        lastUpdatedDate: '{{ response.lastUpdatedDate }}'
+        message: '{{ response.message }}'
+        pendingAction: '{{ response.pendingAction }}'
+        principal: '{{ response.principal }}'
+        reportedIncidentStartDate: '{{ response.reportedIncidentStartDate }}'
+        resolverType: '{{ response.resolverType }}'
+        status: '{{ response.status }}'
+        threatActorIpAddresses: '{{ response.threatActorIpAddresses }}'
+        title: '{{ response.title }}'
+        watchers: '{{ response.watchers }}'
+  - calls:
+    - action: list_memberships
+      on_error: continue
+      save_as: response
+    discovery_id: aws.edr.list_memberships
+    emit:
+      as: item
+      item:
+        accountId: '{{ response.accountId }}'
+        membershipArn: '{{ response.membershipArn }}'
+        membershipId: '{{ response.membershipId }}'
+        membershipStatus: '{{ response.membershipStatus }}'
+        region: '{{ response.region }}'

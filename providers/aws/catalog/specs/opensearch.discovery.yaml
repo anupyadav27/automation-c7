@@ -1,0 +1,179 @@
+version: '1.0'
+provider: aws
+service: opensearch
+discovery:
+- calls:
+  - action: get_default_application_setting
+    on_error: continue
+    save_as: response
+  discovery_id: aws.opensearch.get_default_application_setting
+  emit:
+    as: item
+    item:
+      applicationArn: '{{ response.applicationArn }}'
+- calls:
+  - action: list_domain_names
+    on_error: continue
+    save_as: response
+  discovery_id: aws.opensearch.list_domain_names
+  emit:
+    as: item
+    item:
+      DomainName: '{{ item.DomainName }}'
+      EngineType: '{{ item.EngineType }}'
+    items_for: '{{ response.DomainNames }}'
+- calls:
+  - action: describe_domain
+    on_error: continue
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+  discovery_id: aws.opensearch.describe_domain
+  emit:
+    as: item
+    item:
+      AIMLOptions: '{{ response.DomainStatus.AIMLOptions }}'
+      ARN: '{{ response.DomainStatus.ARN }}'
+      AccessPolicies: '{{ response.DomainStatus.AccessPolicies }}'
+      AdvancedOptions: '{{ response.DomainStatus.AdvancedOptions }}'
+      AdvancedSecurityOptions: '{{ response.DomainStatus.AdvancedSecurityOptions.Enabled }}'
+      AutoTuneOptions: '{{ response.DomainStatus.AutoTuneOptions.State }}'
+      ChangeProgressDetails: '{{ response.DomainStatus.ChangeProgressDetails.Message }}'
+      ClusterConfig: '{{ response.DomainStatus.ClusterConfig.WarmType }}'
+      CognitoOptions: '{{ response.DomainStatus.CognitoOptions.RoleArn }}'
+      Created: '{{ response.DomainStatus.Created }}'
+      Deleted: '{{ response.DomainStatus.Deleted }}'
+      DomainEndpointOptions: '{{ response.DomainStatus.DomainEndpointOptions }}'
+      DomainEndpointV2HostedZoneId: '{{ response.DomainStatus.DomainEndpointV2HostedZoneId }}'
+      DomainId: '{{ response.DomainStatus.DomainId }}'
+      DomainName: '{{ response.DomainStatus.DomainName }}'
+      DomainProcessingStatus: '{{ response.DomainStatus.DomainProcessingStatus }}'
+      EBSOptions: '{{ response.DomainStatus.EBSOptions.Iops }}'
+      EncryptionAtRestOptions: '{{ response.DomainStatus.EncryptionAtRestOptions.Enabled }}'
+      Endpoint: '{{ response.DomainStatus.Endpoint }}'
+      EndpointOptions: '{{ response.DomainStatus.DomainEndpointOptions }}'
+      EndpointV2: '{{ response.DomainStatus.EndpointV2 }}'
+      Endpoints: '{{ response.DomainStatus.Endpoints }}'
+      EngineVersion: '{{ response.DomainStatus.EngineVersion }}'
+      IPAddressType: '{{ response.DomainStatus.IPAddressType }}'
+      IdentityCenterOptions: '{{ response.DomainStatus.IdentityCenterOptions.RolesKey }}'
+      LogPublishingOptions: '{{ response.DomainStatus.LogPublishingOptions }}'
+      ModifyingProperties: '{{ response.DomainStatus.ModifyingProperties[].Name }}'
+      NodeToNodeEncryptionOptions: '{{ response.DomainStatus.NodeToNodeEncryptionOptions.Enabled }}'
+      OffPeakWindowOptions: '{{ response.DomainStatus.OffPeakWindowOptions.Enabled }}'
+      Processing: '{{ response.DomainStatus.Processing }}'
+      ServiceSoftwareOptions: '{{ response.DomainStatus.ServiceSoftwareOptions.NewVersion }}'
+      SnapshotOptions: '{{ response.DomainStatus.SnapshotOptions }}'
+      SoftwareUpdateOptions: '{{ response.DomainStatus.SoftwareUpdateOptions }}'
+      UpgradeProcessing: '{{ response.DomainStatus.UpgradeProcessing }}'
+      VPCOptions: '{{ response.DomainStatus.VPCOptions.VPCId }}'
+      CurrentState: '{{ response.DomainStatus.AIMLOptions.NaturalLanguageQueryGenerationOptions.CurrentState }}'
+      DesiredState: '{{ response.DomainStatus.AIMLOptions.NaturalLanguageQueryGenerationOptions.DesiredState }}'
+      AnonymousAuthDisableDate: '{{ response.DomainStatus.AdvancedSecurityOptions.AnonymousAuthDisableDate }}'
+      AnonymousAuthEnabled: '{{ response.DomainStatus.AdvancedSecurityOptions.AnonymousAuthEnabled }}'
+      Enabled: '{{ response.DomainStatus.AdvancedSecurityOptions.Enabled }}'
+      InternalUserDatabaseEnabled: '{{ response.DomainStatus.AdvancedSecurityOptions.InternalUserDatabaseEnabled }}'
+      PublicKey: '{{ response.DomainStatus.AdvancedSecurityOptions.JWTOptions.PublicKey }}'
+      RolesKey: '{{ response.DomainStatus.AdvancedSecurityOptions.JWTOptions.RolesKey }}'
+      SubjectKey: '{{ response.DomainStatus.AdvancedSecurityOptions.JWTOptions.SubjectKey }}'
+      EntityId: '{{ response.DomainStatus.AdvancedSecurityOptions.SAMLOptions.Idp.EntityId }}'
+      MetadataContent: '{{ response.DomainStatus.AdvancedSecurityOptions.SAMLOptions.Idp.MetadataContent }}'
+      SessionTimeoutMinutes: '{{ response.DomainStatus.AdvancedSecurityOptions.SAMLOptions.SessionTimeoutMinutes }}'
+      ErrorMessage: '{{ response.DomainStatus.AutoTuneOptions.ErrorMessage }}'
+      State: '{{ response.DomainStatus.AutoTuneOptions.State }}'
+      UseOffPeakWindow: '{{ response.DomainStatus.AutoTuneOptions.UseOffPeakWindow }}'
+      ChangeId: '{{ response.DomainStatus.ChangeProgressDetails.ChangeId }}'
+      ConfigChangeStatus: '{{ response.DomainStatus.ChangeProgressDetails.ConfigChangeStatus }}'
+      InitiatedBy: '{{ response.DomainStatus.ChangeProgressDetails.InitiatedBy }}'
+      LastUpdatedTime: '{{ response.DomainStatus.ChangeProgressDetails.LastUpdatedTime }}'
+      Message: '{{ response.DomainStatus.ChangeProgressDetails.Message }}'
+      StartTime: '{{ response.DomainStatus.ChangeProgressDetails.StartTime }}'
+      DedicatedMasterCount: '{{ response.DomainStatus.ClusterConfig.DedicatedMasterCount }}'
+      DedicatedMasterEnabled: '{{ response.DomainStatus.ClusterConfig.DedicatedMasterEnabled }}'
+      DedicatedMasterType: '{{ response.DomainStatus.ClusterConfig.DedicatedMasterType }}'
+      InstanceCount: '{{ response.DomainStatus.ClusterConfig.InstanceCount }}'
+      InstanceType: '{{ response.DomainStatus.ClusterConfig.InstanceType }}'
+      MultiAZWithStandbyEnabled: '{{ response.DomainStatus.ClusterConfig.MultiAZWithStandbyEnabled }}'
+      WarmCount: '{{ response.DomainStatus.ClusterConfig.WarmCount }}'
+      WarmEnabled: '{{ response.DomainStatus.ClusterConfig.WarmEnabled }}'
+      WarmType: '{{ response.DomainStatus.ClusterConfig.WarmType }}'
+      AvailabilityZoneCount: '{{ response.DomainStatus.ClusterConfig.ZoneAwarenessConfig.AvailabilityZoneCount }}'
+      ZoneAwarenessEnabled: '{{ response.DomainStatus.ClusterConfig.ZoneAwarenessEnabled }}'
+      IdentityPoolId: '{{ response.DomainStatus.CognitoOptions.IdentityPoolId }}'
+      RoleArn: '{{ response.DomainStatus.CognitoOptions.RoleArn }}'
+      UserPoolId: '{{ response.DomainStatus.CognitoOptions.UserPoolId }}'
+      CustomEndpoint: '{{ response.DomainStatus.DomainEndpointOptions.CustomEndpoint }}'
+      CustomEndpointCertificateArn: '{{ response.DomainStatus.DomainEndpointOptions.CustomEndpointCertificateArn }}'
+      CustomEndpointEnabled: '{{ response.DomainStatus.DomainEndpointOptions.CustomEndpointEnabled }}'
+      EnforceHTTPS: '{{ response.DomainStatus.DomainEndpointOptions.EnforceHTTPS }}'
+      TLSSecurityPolicy: '{{ response.DomainStatus.DomainEndpointOptions.TLSSecurityPolicy }}'
+      EBSEnabled: '{{ response.DomainStatus.EBSOptions.EBSEnabled }}'
+      Iops: '{{ response.DomainStatus.EBSOptions.Iops }}'
+      Throughput: '{{ response.DomainStatus.EBSOptions.Throughput }}'
+      VolumeSize: '{{ response.DomainStatus.EBSOptions.VolumeSize }}'
+      VolumeType: '{{ response.DomainStatus.EBSOptions.VolumeType }}'
+      KmsKeyId: '{{ response.DomainStatus.EncryptionAtRestOptions.KmsKeyId }}'
+      EnabledAPIAccess: '{{ response.DomainStatus.IdentityCenterOptions.EnabledAPIAccess }}'
+      IdentityCenterApplicationARN: '{{ response.DomainStatus.IdentityCenterOptions.IdentityCenterApplicationARN }}'
+      IdentityCenterInstanceARN: '{{ response.DomainStatus.IdentityCenterOptions.IdentityCenterInstanceARN }}'
+      IdentityStoreId: '{{ response.DomainStatus.IdentityCenterOptions.IdentityStoreId }}'
+      Hours: '{{ response.DomainStatus.OffPeakWindowOptions.OffPeakWindow.WindowStartTime.Hours }}'
+      Minutes: '{{ response.DomainStatus.OffPeakWindowOptions.OffPeakWindow.WindowStartTime.Minutes }}'
+      AutomatedUpdateDate: '{{ response.DomainStatus.ServiceSoftwareOptions.AutomatedUpdateDate }}'
+      Cancellable: '{{ response.DomainStatus.ServiceSoftwareOptions.Cancellable }}'
+      CurrentVersion: '{{ response.DomainStatus.ServiceSoftwareOptions.CurrentVersion }}'
+      Description: '{{ response.DomainStatus.ServiceSoftwareOptions.Description }}'
+      NewVersion: '{{ response.DomainStatus.ServiceSoftwareOptions.NewVersion }}'
+      OptionalDeployment: '{{ response.DomainStatus.ServiceSoftwareOptions.OptionalDeployment }}'
+      UpdateAvailable: '{{ response.DomainStatus.ServiceSoftwareOptions.UpdateAvailable }}'
+      UpdateStatus: '{{ response.DomainStatus.ServiceSoftwareOptions.UpdateStatus }}'
+      AutomatedSnapshotStartHour: '{{ response.DomainStatus.SnapshotOptions.AutomatedSnapshotStartHour }}'
+      AutoSoftwareUpdateEnabled: '{{ response.DomainStatus.SoftwareUpdateOptions.AutoSoftwareUpdateEnabled }}'
+      VPCId: '{{ response.DomainStatus.VPCOptions.VPCId }}'
+  for_each: aws.opensearch.list_domain_names
+- calls:
+  - action: list_direct_query_data_sources
+    on_error: continue
+    save_as: response
+  discovery_id: aws.opensearch.list_direct_query_data_sources
+  emit:
+    as: item
+    item:
+      DataSourceArn: '{{ item.DataSourceArn }}'
+      DataSourceName: '{{ item.DataSourceName }}'
+      DataSourceType: '{{ item.DataSourceType }}'
+      Description: '{{ item.Description }}'
+      OpenSearchArns: '{{ item.OpenSearchArns }}'
+      TagList: '{{ item.TagList }}'
+    items_for: '{{ response.DirectQueryDataSources }}'
+- calls:
+  - action: list_vpc_endpoints
+    on_error: continue
+    save_as: response
+  discovery_id: aws.opensearch.list_vpc_endpoints
+  emit:
+    as: item
+    item:
+      DomainArn: '{{ item.DomainArn }}'
+      Status: '{{ item.Status }}'
+      VpcEndpointId: '{{ item.VpcEndpointId }}'
+      VpcEndpointOwner: '{{ item.VpcEndpointOwner }}'
+    items_for: '{{ response.VpcEndpointSummaryList }}'
+- calls:
+  - action: list_applications
+    on_error: continue
+    save_as: response
+  discovery_id: aws.opensearch.list_applications
+  emit:
+    as: item
+    item:
+      applicationArn: '{{ item.applicationArn }}'
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      endpoint: '{{ item.endpoint }}'
+      id: '{{ item.id }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.ApplicationSummaries }}'

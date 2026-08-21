@@ -1,0 +1,138 @@
+version: '1.0'
+provider: aws
+service: socialmessaging
+services:
+  client: socialmessaging
+  module: boto3.client
+discovery:
+- discovery_id: aws.socialmessaging.list_linked_whats_app_business_accounts
+  calls:
+  - action: list_linked_whats_app_business_accounts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.linkedAccounts }}'
+    item:
+      account: '{{ item.account }}'
+      arn: '{{ item.arn }}'
+      eventDestinations: '{{ item.eventDestinations }}'
+      id: '{{ item.id }}'
+      linkDate: '{{ item.linkDate }}'
+      linkedWhatsAppBusinessAccountId: '{{ item.linkedWhatsAppBusinessAccountId }}'
+      phoneNumbers: '{{ item.phoneNumbers }}'
+      registrationStatus: '{{ item.registrationStatus }}'
+      wabaId: '{{ item.wabaId }}'
+      wabaName: '{{ item.wabaName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.socialmessaging.get_linked_whats_app_business_account
+  for_each: aws.socialmessaging.list_linked_whats_app_business_accounts
+  calls:
+  - action: get_linked_whats_app_business_account
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      account: '{{ response.account.account }}'
+      arn: '{{ response.account.arn }}'
+      eventDestinations: '{{ response.account.eventDestinations }}'
+      id: '{{ response.account.id }}'
+      linkDate: '{{ response.account.linkDate }}'
+      phoneNumbers: '{{ response.account.phoneNumbers[].arn }}'
+      registrationStatus: '{{ response.account.registrationStatus }}'
+      wabaId: '{{ response.account.wabaId }}'
+      wabaName: '{{ response.account.wabaName }}'
+- discovery_id: aws.socialmessaging.get_linked_whats_app_business_account_phone_number
+  for_each: aws.socialmessaging.list_linked_whats_app_business_accounts
+  calls:
+  - action: get_linked_whats_app_business_account_phone_number
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.phoneNumber.arn }}'
+      dataLocalizationRegion: '{{ response.phoneNumber.dataLocalizationRegion }}'
+      displayPhoneNumber: '{{ response.phoneNumber.displayPhoneNumber }}'
+      displayPhoneNumberName: '{{ response.phoneNumber.displayPhoneNumberName }}'
+      linkedWhatsAppBusinessAccountId: '{{ response.phoneNumber.linkedWhatsAppBusinessAccountId }}'
+      metaPhoneNumberId: '{{ response.phoneNumber.metaPhoneNumberId }}'
+      phoneNumber: '{{ response.phoneNumber.phoneNumber }}'
+      phoneNumberId: '{{ response.phoneNumber.phoneNumberId }}'
+      qualityRating: '{{ response.phoneNumber.qualityRating }}'
+- discovery_id: aws.socialmessaging.get_whats_app_message_media
+  calls:
+  - action: get_whats_app_message_media
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      fileSize: '{{ response.fileSize }}'
+      mimeType: '{{ response.mimeType }}'
+- discovery_id: aws.socialmessaging.get_whats_app_message_template
+  calls:
+  - action: get_whats_app_message_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      template: '{{ response.template }}'
+- discovery_id: aws.socialmessaging.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'
+      statusCode: '{{ response.statusCode }}'
+- discovery_id: aws.socialmessaging.list_whats_app_message_templates
+  for_each: aws.socialmessaging.list_linked_whats_app_business_accounts
+  calls:
+  - action: list_whats_app_message_templates
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.templates }}'
+    item:
+      metaTemplateId: '{{ item.metaTemplateId }}'
+      templateCategory: '{{ item.templateCategory }}'
+      templateLanguage: '{{ item.templateLanguage }}'
+      templateName: '{{ item.templateName }}'
+      templateQualityScore: '{{ item.templateQualityScore }}'
+      templateStatus: '{{ item.templateStatus }}'
+- discovery_id: aws.socialmessaging.list_whats_app_template_library
+  for_each: aws.socialmessaging.list_linked_whats_app_business_accounts
+  calls:
+  - action: list_whats_app_template_library
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.metaLibraryTemplates }}'
+    item:
+      templateBody: '{{ item.templateBody }}'
+      templateButtons: '{{ item.templateButtons }}'
+      templateCategory: '{{ item.templateCategory }}'
+      templateHeader: '{{ item.templateHeader }}'
+      templateId: '{{ item.templateId }}'
+      templateIndustry: '{{ item.templateIndustry }}'
+      templateLanguage: '{{ item.templateLanguage }}'
+      templateName: '{{ item.templateName }}'
+      templateTopic: '{{ item.templateTopic }}'
+      templateUseCase: '{{ item.templateUseCase }}'

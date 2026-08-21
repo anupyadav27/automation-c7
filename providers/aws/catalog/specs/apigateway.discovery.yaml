@@ -1,0 +1,244 @@
+version: '1.0'
+provider: aws
+service: apigateway
+discovery:
+- calls:
+  - action: get_vpc_links
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigateway.get_vpc_links
+  emit:
+    as: item
+    item:
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      tags: '{{ item.tags }}'
+      targetArns: '{{ item.targetArns }}'
+    items_for: '{{ response.items }}'
+- calls:
+  - action: get_api_keys
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigateway.get_api_keys
+  emit:
+    as: item
+    item:
+      createdDate: '{{ item.createdDate }}'
+      customerId: '{{ item.customerId }}'
+      description: '{{ item.description }}'
+      enabled: '{{ item.enabled }}'
+      id: '{{ item.id }}'
+      items: '{{ item["items"] }}'
+      lastUpdatedDate: '{{ item.lastUpdatedDate }}'
+      name: '{{ item.name }}'
+      position: '{{ item.position }}'
+      stageKeys: '{{ item.stageKeys }}'
+      tags: '{{ item.tags }}'
+      value: '{{ item.value }}'
+    items_for: '{{ response.warnings }}'
+- calls:
+  - action: get_domain_name_access_associations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigateway.get_domain_name_access_associations
+  emit:
+    as: item
+    item:
+      accessAssociationSource: '{{ item.accessAssociationSource }}'
+      accessAssociationSourceType: '{{ item.accessAssociationSourceType }}'
+      domainNameAccessAssociationArn: '{{ item.domainNameAccessAssociationArn }}'
+      domainNameArn: '{{ item.domainNameArn }}'
+      tags: '{{ item.tags }}'
+    items_for: '{{ response.items }}'
+- calls:
+  - action: get_rest_apis
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigateway.get_rest_apis
+  emit:
+    as: item
+    item:
+      apiKeySource: '{{ item.apiKeySource }}'
+      apiStatus: '{{ item.apiStatus }}'
+      apiStatusMessage: '{{ item.apiStatusMessage }}'
+      binaryMediaTypes: '{{ item.binaryMediaTypes }}'
+      createdDate: '{{ item.createdDate }}'
+      description: '{{ item.description }}'
+      disableExecuteApiEndpoint: '{{ item.disableExecuteApiEndpoint }}'
+      endpointAccessMode: '{{ item.endpointAccessMode }}'
+      endpointConfiguration: '{{ item.endpointConfiguration }}'
+      id: '{{ item.id }}'
+      minimumCompressionSize: '{{ item.minimumCompressionSize }}'
+      name: '{{ item.name }}'
+      policy: '{{ item.policy }}'
+      rootResourceId: '{{ item.rootResourceId }}'
+      securityPolicy: '{{ item.securityPolicy }}'
+      tags: '{{ item.tags }}'
+      version: '{{ item.version }}'
+      warnings: '{{ item.warnings }}'
+    items_for: '{{ response.items }}'
+- calls:
+  - action: get_authorizers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigateway.get_authorizers
+  emit:
+    as: item
+    item:
+      authType: '{{ item.authType }}'
+      authorizerCredentials: '{{ item.authorizerCredentials }}'
+      authorizerResultTtlInSeconds: '{{ item.authorizerResultTtlInSeconds }}'
+      authorizerUri: '{{ item.authorizerUri }}'
+      id: '{{ item.id }}'
+      identitySource: '{{ item.identitySource }}'
+      identityValidationExpression: '{{ item.identityValidationExpression }}'
+      item: '{{ item.item }}'
+      name: '{{ item.name }}'
+      providerARNs: '{{ item.providerARNs }}'
+      type: '{{ item.type }}'
+    items_for: '{{ response.items }}'
+- calls:
+  - action: get_method
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigateway.get_method
+  emit:
+    as: item
+    item:
+      apiKeyRequired: '{{ response.apiKeyRequired }}'
+      authorizationScopes: '{{ response.authorizationScopes }}'
+      authorizationType: '{{ response.authorizationType }}'
+      authorizerId: '{{ response.authorizerId }}'
+      httpMethod: '{{ response.httpMethod }}'
+      methodIntegration: '{{ response.methodIntegration }}'
+      methodResponses: '{{ response.methodResponses }}'
+      requestModels: '{{ response.requestModels }}'
+      requestParameters: '{{ response.requestParameters }}'
+      requestValidatorId: '{{ response.requestValidatorId }}'
+- calls:
+  - action: get_stages
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigateway.get_stages
+  emit:
+    as: item
+    item:
+      accessLogSettings: '{{ item.accessLogSettings }}'
+      cacheClusterEnabled: '{{ item.cacheClusterEnabled }}'
+      cacheClusterSize: '{{ item.cacheClusterSize }}'
+      cacheClusterStatus: '{{ item.cacheClusterStatus }}'
+      canarySettings: '{{ item.canarySettings }}'
+      clientCertificateId: '{{ item.clientCertificateId }}'
+      createdDate: '{{ item.createdDate }}'
+      deploymentId: '{{ item.deploymentId }}'
+      description: '{{ item.description }}'
+      documentationVersion: '{{ item.documentationVersion }}'
+      item: '{{ item.item }}'
+      lastUpdatedDate: '{{ item.lastUpdatedDate }}'
+      methodSettings: '{{ item.methodSettings }}'
+      stageName: '{{ item.stageName }}'
+      tags: '{{ item.tags }}'
+      tracingEnabled: '{{ item.tracingEnabled }}'
+      variables: '{{ item.variables }}'
+      webAclArn: '{{ item.webAclArn }}'
+    items_for: '{{ response.item }}'
+- calls:
+  - action: get_request_validators
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigateway.get_request_validators
+  emit:
+    as: item
+    item:
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      validateRequestBody: '{{ item.validateRequestBody }}'
+      validateRequestParameters: '{{ item.validateRequestParameters }}'
+    items_for: '{{ response.items }}'
+- calls:
+  - action: get_resources
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigateway.get_resources
+  emit:
+    as: item
+    item:
+      id: '{{ item.id }}'
+      parentId: '{{ item.parentId }}'
+      path: '{{ item.path }}'
+      pathPart: '{{ item.pathPart }}'
+      resourceMethods: '{{ item.resourceMethods }}'
+    items_for: '{{ response.items }}'
+- calls:
+  - action: get_domain_names
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigateway.get_domain_names
+  emit:
+    as: item
+    item:
+      Statement: '{{ item.Statement }}'
+      Status: '{{ item.Status }}'
+      Version: '{{ item.Version }}'
+      certificateArn: '{{ item.certificateArn }}'
+      certificateName: '{{ item.certificateName }}'
+      certificateUploadDate: '{{ item.certificateUploadDate }}'
+      distributionDomainName: '{{ item.distributionDomainName }}'
+      distributionHostedZoneId: '{{ item.distributionHostedZoneId }}'
+      domainName: '{{ item.domainName }}'
+      domainNameArn: '{{ item.domainNameArn }}'
+      domainNameId: '{{ item.domainNameId }}'
+      domainNameStatus: '{{ item.domainNameStatus }}'
+      domainNameStatusMessage: '{{ item.domainNameStatusMessage }}'
+      endpointAccessMode: '{{ item.endpointAccessMode }}'
+      endpointConfiguration: '{{ item.endpointConfiguration }}'
+      managementPolicy: '{{ item.managementPolicy }}'
+      mutualTlsAuthentication: '{{ item.mutualTlsAuthentication }}'
+      ownershipVerificationCertificateArn: '{{ item.ownershipVerificationCertificateArn
+        }}'
+      policy: '{{ item.policy }}'
+      regionalCertificateArn: '{{ item.regionalCertificateArn }}'
+      regionalCertificateName: '{{ item.regionalCertificateName }}'
+      regionalDomainName: '{{ item.regionalDomainName }}'
+      regionalHostedZoneId: '{{ item.regionalHostedZoneId }}'
+      routingMode: '{{ item.routingMode }}'
+      securityPolicy: '{{ item.securityPolicy }}'
+      tags: '{{ item.tags }}'
+    items_for: '{{ response.items }}'
+- calls:
+  - action: get_stage
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigateway.get_stage
+  emit:
+    as: item
+    item:
+      cacheClusterEnabled: '{{ response.cacheClusterEnabled }}'
+      cacheClusterSize: '{{ response.cacheClusterSize }}'
+      deploymentId: '{{ response.deploymentId }}'
+      description: '{{ response.description }}'
+      destinationArn: '{{ response.accessLogSettings.destinationArn }}'
+      format: '{{ response.accessLogSettings.format }}'
+      stageName: '{{ response.stageName }}'
+      tracingEnabled: '{{ response.tracingEnabled }}'
+      variables: '{{ response.variables }}'
+- calls:
+  - action: get_usage_plans
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigateway.get_usage_plans
+  emit:
+    as: item
+    item:
+      apiStages: '{{ item.apiStages }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      productCode: '{{ item.productCode }}'
+      quota: '{{ item.quota }}'
+      tags: '{{ item.tags }}'
+      throttle: '{{ item.throttle }}'
+    items_for: '{{ response.items }}'

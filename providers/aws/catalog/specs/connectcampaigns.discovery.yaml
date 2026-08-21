@@ -1,0 +1,129 @@
+version: '1.0'
+provider: aws
+service: connectcampaigns
+services:
+  client: connectcampaigns
+  module: boto3.client
+discovery:
+- discovery_id: aws.connectcampaigns.list_campaigns
+  calls:
+  - action: list_campaigns
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.campaignSummaryList }}'
+    item:
+      arn: '{{ item.arn }}'
+      campaign: '{{ item.campaign }}'
+      connectInstanceId: '{{ item.connectInstanceId }}'
+      dialerConfig: '{{ item.dialerConfig }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      outboundCallConfig: '{{ item.outboundCallConfig }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.connectcampaigns.describe_campaign
+  for_each: aws.connectcampaigns.list_campaigns
+  calls:
+  - action: describe_campaign
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.campaign.arn }}'
+      campaign: '{{ response.campaign.campaign }}'
+      connectInstanceId: '{{ response.campaign.connectInstanceId }}'
+      dialerConfig: '{{ response.campaign.dialerConfig }}'
+      id: '{{ response.campaign.id }}'
+      name: '{{ response.campaign.name }}'
+      outboundCallConfig: '{{ response.campaign.outboundCallConfig }}'
+      tags: '{{ response.campaign.tags }}'
+      dialingCapacity: '{{ response.campaign.dialerConfig.agentlessDialerConfig.dialingCapacity
+        }}'
+      bandwidthAllocation: '{{ response.campaign.dialerConfig.predictiveDialerConfig.bandwidthAllocation
+        }}'
+      awaitAnswerMachinePrompt: '{{ response.campaign.outboundCallConfig.answerMachineDetectionConfig.awaitAnswerMachinePrompt
+        }}'
+      enableAnswerMachineDetection: '{{ response.campaign.outboundCallConfig.answerMachineDetectionConfig.enableAnswerMachineDetection
+        }}'
+      connectContactFlowId: '{{ response.campaign.outboundCallConfig.connectContactFlowId
+        }}'
+      connectQueueId: '{{ response.campaign.outboundCallConfig.connectQueueId }}'
+      connectSourcePhoneNumber: '{{ response.campaign.outboundCallConfig.connectSourcePhoneNumber
+        }}'
+- discovery_id: aws.connectcampaigns.get_campaign_state
+  for_each: aws.connectcampaigns.list_campaigns
+  calls:
+  - action: get_campaign_state
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      state: '{{ response.state }}'
+- discovery_id: aws.connectcampaigns.get_campaign_state_batch
+  calls:
+  - action: get_campaign_state_batch
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.successfulRequests }}'
+    item:
+      campaignId: '{{ item.campaignId }}'
+      state: '{{ item.state }}'
+- discovery_id: aws.connectcampaigns.get_connect_instance_config
+  for_each: aws.connectcampaigns.list_campaigns
+  calls:
+  - action: get_connect_instance_config
+    params:
+      connectInstanceId: '{{ item.connectInstanceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      connectInstanceId: '{{ response.connectInstanceConfig.connectInstanceId }}'
+      encryptionConfig: '{{ response.connectInstanceConfig.encryptionConfig.keyArn
+        }}'
+      serviceLinkedRoleArn: '{{ response.connectInstanceConfig.serviceLinkedRoleArn
+        }}'
+      enabled: '{{ response.connectInstanceConfig.encryptionConfig.enabled }}'
+      encryptionType: '{{ response.connectInstanceConfig.encryptionConfig.encryptionType
+        }}'
+      keyArn: '{{ response.connectInstanceConfig.encryptionConfig.keyArn }}'
+- discovery_id: aws.connectcampaigns.get_instance_onboarding_job_status
+  for_each: aws.connectcampaigns.list_campaigns
+  calls:
+  - action: get_instance_onboarding_job_status
+    params:
+      connectInstanceId: '{{ item.connectInstanceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      connectInstanceId: '{{ response.connectInstanceOnboardingJobStatus.connectInstanceId
+        }}'
+      failureCode: '{{ response.connectInstanceOnboardingJobStatus.failureCode }}'
+      status: '{{ response.connectInstanceOnboardingJobStatus.status }}'
+      connectInstanceOnboardingJobStatus: '{{ response.connectInstanceOnboardingJobStatus.status
+        }}'
+- discovery_id: aws.connectcampaigns.list_tags_for_resource
+  for_each: aws.connectcampaigns.list_campaigns
+  calls:
+  - action: list_tags_for_resource
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

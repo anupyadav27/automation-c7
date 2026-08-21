@@ -1,0 +1,165 @@
+version: '1.0'
+provider: aws
+service: observabilityadmin
+services:
+  client: observabilityadmin
+  module: boto3.client
+discovery:
+- discovery_id: aws.observabilityadmin.get_telemetry_enrichment_status
+  calls:
+  - action: get_telemetry_enrichment_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AwsResourceExplorerManagedViewArn: '{{ response.AwsResourceExplorerManagedViewArn
+        }}'
+- discovery_id: aws.observabilityadmin.get_telemetry_evaluation_status
+  calls:
+  - action: get_telemetry_evaluation_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+      FailureReason: '{{ response.FailureReason }}'
+- discovery_id: aws.observabilityadmin.get_telemetry_evaluation_status_for_organization
+  calls:
+  - action: get_telemetry_evaluation_status_for_organization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+      FailureReason: '{{ response.FailureReason }}'
+- discovery_id: aws.observabilityadmin.list_centralization_rules_for_organization
+  calls:
+  - action: list_centralization_rules_for_organization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CentralizationRuleSummaries }}'
+    item:
+      CreatedRegion: '{{ item.CreatedRegion }}'
+      CreatedTimeStamp: '{{ item.CreatedTimeStamp }}'
+      CreatorAccountId: '{{ item.CreatorAccountId }}'
+      DestinationAccountId: '{{ item.DestinationAccountId }}'
+      DestinationRegion: '{{ item.DestinationRegion }}'
+      FailureReason: '{{ item.FailureReason }}'
+      LastUpdateTimeStamp: '{{ item.LastUpdateTimeStamp }}'
+      RuleArn: '{{ item.RuleArn }}'
+      RuleHealth: '{{ item.RuleHealth }}'
+      RuleName: '{{ item.RuleName }}'
+- discovery_id: aws.observabilityadmin.list_resource_telemetry
+  calls:
+  - action: list_resource_telemetry
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TelemetryConfigurations }}'
+    item:
+      Status: '{{ item.Status }}'
+      AccountIdentifier: '{{ item.AccountIdentifier }}'
+      Enabled: '{{ item.Enabled }}'
+      LastUpdateTimeStamp: '{{ item.LastUpdateTimeStamp }}'
+      ResourceIdentifier: '{{ item.ResourceIdentifier }}'
+      ResourceTags: '{{ item.ResourceTags }}'
+      ResourceType: '{{ item.ResourceType }}'
+      TelemetryConfigurationState: '{{ item.TelemetryConfigurationState }}'
+- discovery_id: aws.observabilityadmin.list_resource_telemetry_for_organization
+  calls:
+  - action: list_resource_telemetry_for_organization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TelemetryConfigurations }}'
+    item:
+      AccountIdentifier: '{{ item.AccountIdentifier }}'
+      LastUpdateTimeStamp: '{{ item.LastUpdateTimeStamp }}'
+      ResourceIdentifier: '{{ item.ResourceIdentifier }}'
+      ResourceTags: '{{ item.ResourceTags }}'
+      ResourceType: '{{ item.ResourceType }}'
+      TelemetryConfigurationState: '{{ item.TelemetryConfigurationState }}'
+- discovery_id: aws.observabilityadmin.list_telemetry_rules
+  calls:
+  - action: list_telemetry_rules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TelemetryRuleSummaries }}'
+    item:
+      CreatedTimeStamp: '{{ item.CreatedTimeStamp }}'
+      LastUpdateTimeStamp: '{{ item.LastUpdateTimeStamp }}'
+      ResourceType: '{{ item.ResourceType }}'
+      RuleArn: '{{ item.RuleArn }}'
+      RuleName: '{{ item.RuleName }}'
+      TelemetryType: '{{ item.TelemetryType }}'
+- discovery_id: aws.observabilityadmin.list_telemetry_rules_for_organization
+  calls:
+  - action: list_telemetry_rules_for_organization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TelemetryRuleSummaries }}'
+    item:
+      CreatedTimeStamp: '{{ item.CreatedTimeStamp }}'
+      LastUpdateTimeStamp: '{{ item.LastUpdateTimeStamp }}'
+      ResourceType: '{{ item.ResourceType }}'
+      RuleArn: '{{ item.RuleArn }}'
+      RuleName: '{{ item.RuleName }}'
+      TelemetryType: '{{ item.TelemetryType }}'
+- discovery_id: aws.observabilityadmin.get_centralization_rule_for_organization
+  calls:
+  - action: get_centralization_rule_for_organization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Destination: '{{ response.CentralizationRule.Destination }}'
+      Source: '{{ response.CentralizationRule.Source }}'
+- discovery_id: aws.observabilityadmin.get_telemetry_rule
+  calls:
+  - action: get_telemetry_rule
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DestinationConfiguration: '{{ response.TelemetryRule.DestinationConfiguration
+        }}'
+      ResourceType: '{{ response.TelemetryRule.ResourceType }}'
+      Scope: '{{ response.TelemetryRule.Scope }}'
+      SelectionCriteria: '{{ response.TelemetryRule.SelectionCriteria }}'
+      TelemetryType: '{{ response.TelemetryRule.TelemetryType }}'
+- discovery_id: aws.observabilityadmin.get_telemetry_rule_for_organization
+  calls:
+  - action: get_telemetry_rule_for_organization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DestinationConfiguration: '{{ response.TelemetryRule.DestinationConfiguration
+        }}'
+      ResourceType: '{{ response.TelemetryRule.ResourceType }}'
+      Scope: '{{ response.TelemetryRule.Scope }}'
+      SelectionCriteria: '{{ response.TelemetryRule.SelectionCriteria }}'
+      TelemetryType: '{{ response.TelemetryRule.TelemetryType }}'
+- discovery_id: aws.observabilityadmin.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

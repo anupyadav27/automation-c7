@@ -1,0 +1,138 @@
+version: '1.0'
+provider: aws
+service: pipes
+services:
+  client: pipes
+  module: boto3.client
+discovery:
+- discovery_id: aws.pipes.list_pipes
+  calls:
+  - action: list_pipes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Pipes }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      Name: '{{ item.Name }}'
+      CurrentState: '{{ item.CurrentState }}'
+      Description: '{{ item.Description }}'
+      DesiredState: '{{ item.DesiredState }}'
+      Enrichment: '{{ item.Enrichment }}'
+      Source: '{{ item.Source }}'
+      StateReason: '{{ item.StateReason }}'
+      Target: '{{ item.Target }}'
+- discovery_id: aws.pipes.describe_pipe
+  for_each: aws.pipes.list_pipes
+  calls:
+  - action: describe_pipe
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.SourceParameters.Status }}'
+      ActiveMQBrokerParameters: '{{ response.SourceParameters.ActiveMQBrokerParameters.QueueName }}'
+      Description: '{{ response.SourceParameters.Description }}'
+      DynamoDBStreamParameters: '{{ response.SourceParameters.DynamoDBStreamParameters.BatchSize }}'
+      Enabled: '{{ response.SourceParameters.Enabled }}'
+      FilterCriteria: '{{ response.SourceParameters.FilterCriteria }}'
+      KinesisStreamParameters: '{{ response.SourceParameters.KinesisStreamParameters.BatchSize }}'
+      ManagedStreamingKafkaParameters: '{{ response.SourceParameters.ManagedStreamingKafkaParameters.TopicName }}'
+      RabbitMQBrokerParameters: '{{ response.SourceParameters.RabbitMQBrokerParameters.QueueName }}'
+      SelfManagedKafkaParameters: '{{ response.SourceParameters.SelfManagedKafkaParameters.TopicName }}'
+      SqsQueueParameters: '{{ response.SourceParameters.SqsQueueParameters.BatchSize }}'
+      Arn: '{{ response.Arn }}'
+      CreationTime: '{{ response.CreationTime }}'
+      CurrentState: '{{ response.CurrentState }}'
+      DesiredState: '{{ response.DesiredState }}'
+      Enrichment: '{{ response.Enrichment }}'
+      HeaderParameters: '{{ response.EnrichmentParameters.HttpParameters.HeaderParameters }}'
+      QueryStringParameters: '{{ response.EnrichmentParameters.HttpParameters.QueryStringParameters }}'
+      InputTemplate: '{{ response.EnrichmentParameters.InputTemplate }}'
+      KmsKeyIdentifier: '{{ response.KmsKeyIdentifier }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+      LogGroupArn: '{{ response.LogConfiguration.CloudwatchLogsLogDestination.LogGroupArn }}'
+      DeliveryStreamArn: '{{ response.LogConfiguration.FirehoseLogDestination.DeliveryStreamArn }}'
+      Level: '{{ response.LogConfiguration.Level }}'
+      BucketName: '{{ response.LogConfiguration.S3LogDestination.BucketName }}'
+      BucketOwner: '{{ response.LogConfiguration.S3LogDestination.BucketOwner }}'
+      OutputFormat: '{{ response.LogConfiguration.S3LogDestination.OutputFormat }}'
+      Prefix: '{{ response.LogConfiguration.S3LogDestination.Prefix }}'
+      Name: '{{ response.Name }}'
+      RoleArn: '{{ response.RoleArn }}'
+      Source: '{{ response.Source }}'
+      BatchSize: '{{ response.SourceParameters.ActiveMQBrokerParameters.BatchSize }}'
+      BasicAuth: '{{ response.SourceParameters.ActiveMQBrokerParameters.Credentials.BasicAuth }}'
+      MaximumBatchingWindowInSeconds: '{{ response.SourceParameters.ActiveMQBrokerParameters.MaximumBatchingWindowInSeconds }}'
+      QueueName: '{{ response.SourceParameters.ActiveMQBrokerParameters.QueueName }}'
+      MaximumRecordAgeInSeconds: '{{ response.SourceParameters.DynamoDBStreamParameters.MaximumRecordAgeInSeconds }}'
+      MaximumRetryAttempts: '{{ response.SourceParameters.DynamoDBStreamParameters.MaximumRetryAttempts }}'
+      OnPartialBatchItemFailure: '{{ response.SourceParameters.DynamoDBStreamParameters.OnPartialBatchItemFailure }}'
+      ParallelizationFactor: '{{ response.SourceParameters.DynamoDBStreamParameters.ParallelizationFactor }}'
+      StartingPosition: '{{ response.SourceParameters.DynamoDBStreamParameters.StartingPosition }}'
+      StartingPositionTimestamp: '{{ response.SourceParameters.KinesisStreamParameters.StartingPositionTimestamp }}'
+      ConsumerGroupID: '{{ response.SourceParameters.ManagedStreamingKafkaParameters.ConsumerGroupID }}'
+      ClientCertificateTlsAuth: '{{ response.SourceParameters.ManagedStreamingKafkaParameters.Credentials.ClientCertificateTlsAuth }}'
+      SaslScram512Auth: '{{ response.SourceParameters.ManagedStreamingKafkaParameters.Credentials.SaslScram512Auth }}'
+      TopicName: '{{ response.SourceParameters.ManagedStreamingKafkaParameters.TopicName }}'
+      VirtualHost: '{{ response.SourceParameters.RabbitMQBrokerParameters.VirtualHost }}'
+      SaslScram256Auth: '{{ response.SourceParameters.SelfManagedKafkaParameters.Credentials.SaslScram256Auth }}'
+      ServerRootCaCertificate: '{{ response.SourceParameters.SelfManagedKafkaParameters.ServerRootCaCertificate }}'
+      StateReason: '{{ response.StateReason }}'
+      Tags: '{{ response.Tags }}'
+      Target: '{{ response.Target }}'
+      Size: '{{ response.TargetParameters.BatchJobParameters.ArrayProperties.Size }}'
+      InstanceType: '{{ response.TargetParameters.BatchJobParameters.ContainerOverrides.InstanceType }}'
+      JobDefinition: '{{ response.TargetParameters.BatchJobParameters.JobDefinition }}'
+      JobName: '{{ response.TargetParameters.BatchJobParameters.JobName }}'
+      Parameters: '{{ response.TargetParameters.BatchJobParameters.Parameters }}'
+      Attempts: '{{ response.TargetParameters.BatchJobParameters.RetryStrategy.Attempts }}'
+      LogStreamName: '{{ response.TargetParameters.CloudWatchLogsParameters.LogStreamName }}'
+      Timestamp: '{{ response.TargetParameters.CloudWatchLogsParameters.Timestamp }}'
+      EnableECSManagedTags: '{{ response.TargetParameters.EcsTaskParameters.EnableECSManagedTags }}'
+      EnableExecuteCommand: '{{ response.TargetParameters.EcsTaskParameters.EnableExecuteCommand }}'
+      Group: '{{ response.TargetParameters.EcsTaskParameters.Group }}'
+      LaunchType: '{{ response.TargetParameters.EcsTaskParameters.LaunchType }}'
+      AssignPublicIp: '{{ response.TargetParameters.EcsTaskParameters.NetworkConfiguration.awsvpcConfiguration.AssignPublicIp }}'
+      Cpu: '{{ response.TargetParameters.EcsTaskParameters.Overrides.Cpu }}'
+      sizeInGiB: '{{ response.TargetParameters.EcsTaskParameters.Overrides.EphemeralStorage.sizeInGiB }}'
+      ExecutionRoleArn: '{{ response.TargetParameters.EcsTaskParameters.Overrides.ExecutionRoleArn }}'
+      Memory: '{{ response.TargetParameters.EcsTaskParameters.Overrides.Memory }}'
+      TaskRoleArn: '{{ response.TargetParameters.EcsTaskParameters.Overrides.TaskRoleArn }}'
+      PlatformVersion: '{{ response.TargetParameters.EcsTaskParameters.PlatformVersion }}'
+      PropagateTags: '{{ response.TargetParameters.EcsTaskParameters.PropagateTags }}'
+      ReferenceId: '{{ response.TargetParameters.EcsTaskParameters.ReferenceId }}'
+      TaskCount: '{{ response.TargetParameters.EcsTaskParameters.TaskCount }}'
+      TaskDefinitionArn: '{{ response.TargetParameters.EcsTaskParameters.TaskDefinitionArn }}'
+      DetailType: '{{ response.TargetParameters.EventBridgeEventBusParameters.DetailType }}'
+      EndpointId: '{{ response.TargetParameters.EventBridgeEventBusParameters.EndpointId }}'
+      Time: '{{ response.TargetParameters.EventBridgeEventBusParameters.Time }}'
+      PartitionKey: '{{ response.TargetParameters.KinesisStreamParameters.PartitionKey }}'
+      InvocationType: '{{ response.TargetParameters.LambdaFunctionParameters.InvocationType }}'
+      Database: '{{ response.TargetParameters.RedshiftDataParameters.Database }}'
+      DbUser: '{{ response.TargetParameters.RedshiftDataParameters.DbUser }}'
+      SecretManagerArn: '{{ response.TargetParameters.RedshiftDataParameters.SecretManagerArn }}'
+      StatementName: '{{ response.TargetParameters.RedshiftDataParameters.StatementName }}'
+      WithEvent: '{{ response.TargetParameters.RedshiftDataParameters.WithEvent }}'
+      MessageDeduplicationId: '{{ response.TargetParameters.SqsQueueParameters.MessageDeduplicationId }}'
+      MessageGroupId: '{{ response.TargetParameters.SqsQueueParameters.MessageGroupId }}'
+      EpochTimeUnit: '{{ response.TargetParameters.TimestreamParameters.EpochTimeUnit }}'
+      TimeFieldType: '{{ response.TargetParameters.TimestreamParameters.TimeFieldType }}'
+      TimeValue: '{{ response.TargetParameters.TimestreamParameters.TimeValue }}'
+      TimestampFormat: '{{ response.TargetParameters.TimestreamParameters.TimestampFormat }}'
+      VersionValue: '{{ response.TargetParameters.TimestreamParameters.VersionValue }}'
+- discovery_id: aws.pipes.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

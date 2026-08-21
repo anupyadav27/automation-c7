@@ -1,0 +1,57 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: ec2, vpcflowlogs
+# 2 ops (1 from checks, +1 for inventory)
+version: '1.0'
+provider: aws
+service: vpcflowlogs
+discovery:
+  - calls:
+    - action: describe_flow_logs
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpcflowlogs.describe_flow_logs
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ response.CreationTime }}'
+        DeliverCrossAccountRole: '{{ response.DeliverCrossAccountRole }}'
+        DeliverLogsErrorMessage: '{{ response.DeliverLogsErrorMessage }}'
+        DeliverLogsPermissionArn: '{{ response.DeliverLogsPermissionArn }}'
+        DeliverLogsStatus: '{{ response.DeliverLogsStatus }}'
+        DestinationOptions: '{{ response.DestinationOptions }}'
+        FlowLogId: '{{ response.FlowLogId }}'
+        FlowLogStatus: '{{ response.FlowLogStatus }}'
+        FlowLogs: '{{ response.FlowLogs }}'
+        LogDestination: '{{ response.LogDestination }}'
+        LogDestinationType: '{{ response.LogDestinationType }}'
+        LogFormat: '{{ response.LogFormat }}'
+        LogGroupName: '{{ response.LogGroupName }}'
+        MaxAggregationInterval: '{{ response.MaxAggregationInterval }}'
+        Tags: '{{ response.Tags }}'
+        TrafficType: '{{ response.TrafficType }}'
+  - calls:
+    - action: describe_flow_logs
+      on_error: continue
+      save_as: response
+    discovery_id: aws.ec2.describe_flow_logs
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        DeliverCrossAccountRole: '{{ item.DeliverCrossAccountRole }}'
+        DeliverLogsErrorMessage: '{{ item.DeliverLogsErrorMessage }}'
+        DeliverLogsPermissionArn: '{{ item.DeliverLogsPermissionArn }}'
+        DeliverLogsStatus: '{{ item.DeliverLogsStatus }}'
+        DestinationOptions: '{{ item.DestinationOptions }}'
+        FlowLogId: '{{ item.FlowLogId }}'
+        FlowLogStatus: '{{ item.FlowLogStatus }}'
+        FlowLogs: '{{ item.FlowLogs }}'
+        LogDestination: '{{ item.LogDestination }}'
+        LogDestinationType: '{{ item.LogDestinationType }}'
+        LogFormat: '{{ item.LogFormat }}'
+        LogGroupName: '{{ item.LogGroupName }}'
+        MaxAggregationInterval: '{{ item.MaxAggregationInterval }}'
+        ResourceId: '{{ item.ResourceId }}'
+        Tags: '{{ item.Tags }}'
+        TrafficType: '{{ item.TrafficType }}'
+      items_for: '{{ response.FlowLogs }}'

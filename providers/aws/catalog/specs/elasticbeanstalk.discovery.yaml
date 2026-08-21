@@ -1,0 +1,95 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: elasticbeanstalk
+# 4 ops (4 from checks, +0 for inventory)
+version: '1.0'
+provider: aws
+service: elasticbeanstalk
+discovery:
+  - calls:
+    - action: describe_environments
+      on_error: continue
+      save_as: response
+    discovery_id: aws.elasticbeanstalk.describe_environments
+    emit:
+      as: item
+      item:
+        AbortableOperationInProgress: '{{ item.AbortableOperationInProgress }}'
+        ApplicationName: '{{ item.ApplicationName }}'
+        CNAME: '{{ item.CNAME }}'
+        DateCreated: '{{ item.DateCreated }}'
+        DateUpdated: '{{ item.DateUpdated }}'
+        Description: '{{ item.Description }}'
+        EndpointURL: '{{ item.EndpointURL }}'
+        EnvironmentArn: '{{ item.EnvironmentArn }}'
+        EnvironmentId: '{{ item.EnvironmentId }}'
+        EnvironmentLinks: '{{ item.EnvironmentLinks }}'
+        EnvironmentName: '{{ item.EnvironmentName }}'
+        Environments: '{{ item.Environments }}'
+        Health: '{{ item.Health }}'
+        OperationsRole: '{{ item.OperationsRole }}'
+        PlatformArn: '{{ item.PlatformArn }}'
+        SolutionStackName: '{{ item.SolutionStackName }}'
+        Status: '{{ item.Status }}'
+        TemplateName: '{{ item.TemplateName }}'
+        Tier: '{{ item.Tier }}'
+        VersionLabel: '{{ item.VersionLabel }}'
+      items_for: '{{ response.Environments }}'
+  - calls:
+    - action: describe_configuration_settings
+      on_error: continue
+      params:
+        ApplicationName: '{{ item.ApplicationName }}'
+        EnvironmentName: '{{ item.EnvironmentName }}'
+      save_as: response
+    discovery_id: aws.elasticbeanstalk.describe_configuration_settings_for_environment
+    emit:
+      as: item
+      item:
+        ApplicationName: '{{ item.ApplicationName }}'
+        DateCreated: '{{ item.DateCreated }}'
+        DateUpdated: '{{ item.DateUpdated }}'
+        DeploymentStatus: '{{ item.DeploymentStatus }}'
+        EnvironmentName: '{{ item.EnvironmentName }}'
+        OptionSettings: '{{ item.OptionSettings }}'
+        PlatformArn: '{{ item.PlatformArn }}'
+        SolutionStackName: '{{ item.SolutionStackName }}'
+      items_for: '{{ response.ConfigurationSettings }}'
+    for_each: aws.elasticbeanstalk.describe_environments
+  - calls:
+    - action: describe_applications
+      on_error: continue
+      save_as: response
+    discovery_id: aws.elasticbeanstalk.describe_applications
+    emit:
+      as: item
+      item:
+        ApplicationArn: '{{ item.ApplicationArn }}'
+        ApplicationName: '{{ item.ApplicationName }}'
+        Applications: '{{ item.Applications }}'
+        ConfigurationTemplates: '{{ item.ConfigurationTemplates }}'
+        DateCreated: '{{ item.DateCreated }}'
+        DateUpdated: '{{ item.DateUpdated }}'
+        Description: '{{ item.Description }}'
+        ResourceLifecycleConfig: '{{ item.ResourceLifecycleConfig }}'
+      items_for: '{{ response.Applications }}'
+  - calls:
+    - action: describe_application_versions
+      on_error: continue
+      save_as: response
+    discovery_id: aws.elasticbeanstalk.describe_application_versions
+    emit:
+      as: item
+      item:
+        ApplicationName: '{{ item.ApplicationName }}'
+        ApplicationVersionArn: '{{ item.ApplicationVersionArn }}'
+        ApplicationVersions: '{{ item.ApplicationVersions }}'
+        BuildArn: '{{ item.BuildArn }}'
+        DateCreated: '{{ item.DateCreated }}'
+        DateUpdated: '{{ item.DateUpdated }}'
+        Description: '{{ item.Description }}'
+        SourceBuildInformation: '{{ item.SourceBuildInformation }}'
+        SourceBundle: '{{ item.SourceBundle }}'
+        Status: '{{ item.Status }}'
+        VersionLabel: '{{ item.VersionLabel }}'
+        Versions: '{{ item.Versions }}'
+      items_for: '{{ response.ApplicationVersions }}'

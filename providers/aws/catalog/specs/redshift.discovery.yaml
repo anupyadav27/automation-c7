@@ -1,0 +1,369 @@
+version: '1.0'
+provider: aws
+service: redshift
+discovery:
+- calls:
+  - action: describe_integrations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.describe_integrations
+  emit:
+    as: item
+    item:
+      AdditionalEncryptionContext: '{{ item.AdditionalEncryptionContext }}'
+      CreateTime: '{{ item.CreateTime }}'
+      Description: '{{ item.Description }}'
+      Errors: '{{ item.Errors }}'
+      IntegrationArn: '{{ item.IntegrationArn }}'
+      IntegrationName: '{{ item.IntegrationName }}'
+      Integrations: '{{ item.Integrations }}'
+      KMSKeyId: '{{ item.KMSKeyId }}'
+      SourceArn: '{{ item.SourceArn }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      TargetArn: '{{ item.TargetArn }}'
+    items_for: '{{ response.Integrations }}'
+- calls:
+  - action: describe_cluster_subnet_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.describe_cluster_subnet_groups
+  emit:
+    as: item
+    item:
+      ClusterSubnetGroupName: '{{ item.ClusterSubnetGroupName }}'
+      ClusterSubnetGroups: '{{ item.ClusterSubnetGroups }}'
+      Description: '{{ item.Description }}'
+      SubnetGroupStatus: '{{ item.SubnetGroupStatus }}'
+      Subnets: '{{ item.Subnets }}'
+      SupportedClusterIpAddressTypes: '{{ item.SupportedClusterIpAddressTypes }}'
+      Tags: '{{ item.Tags }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.ClusterSubnetGroups }}'
+- calls:
+  - action: describe_data_shares_for_producer
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.describe_data_shares_for_producer
+  emit:
+    as: item
+    item:
+      AllowPubliclyAccessibleConsumers: '{{ item.AllowPubliclyAccessibleConsumers }}'
+      DataShareArn: '{{ item.DataShareArn }}'
+      DataShareAssociations: '{{ item.DataShareAssociations }}'
+      DataShareType: '{{ item.DataShareType }}'
+      ManagedBy: '{{ item.ManagedBy }}'
+      ProducerArn: '{{ item.ProducerArn }}'
+    items_for: '{{ response.DataShares }}'
+- calls:
+  - action: describe_cluster_db_revisions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.describe_cluster_db_revisions
+  emit:
+    as: item
+    item:
+      ClusterDbRevisions: '{{ item.ClusterDbRevisions }}'
+      ClusterIdentifier: '{{ item.ClusterIdentifier }}'
+      CurrentDatabaseRevision: '{{ item.CurrentDatabaseRevision }}'
+      DatabaseRevisionReleaseDate: '{{ item.DatabaseRevisionReleaseDate }}'
+      RevisionTargets: '{{ item.RevisionTargets }}'
+    items_for: '{{ response.ClusterDbRevisions }}'
+- calls:
+  - action: describe_redshift_idc_applications
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.describe_redshift_idc_applications
+  emit:
+    as: item
+    item:
+      ApplicationType: '{{ item.ApplicationType }}'
+      AuthorizedTokenIssuerList: '{{ item.AuthorizedTokenIssuerList }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      IdcDisplayName: '{{ item.IdcDisplayName }}'
+      IdcInstanceArn: '{{ item.IdcInstanceArn }}'
+      IdcManagedApplicationArn: '{{ item.IdcManagedApplicationArn }}'
+      IdcOnboardStatus: '{{ item.IdcOnboardStatus }}'
+      IdentityNamespace: '{{ item.IdentityNamespace }}'
+      RedshiftIdcApplicationArn: '{{ item.RedshiftIdcApplicationArn }}'
+      RedshiftIdcApplicationName: '{{ item.RedshiftIdcApplicationName }}'
+      RedshiftIdcApplications: '{{ item.RedshiftIdcApplications }}'
+      ServiceIntegrations: '{{ item.ServiceIntegrations }}'
+      SsoTagKeys: '{{ item.SsoTagKeys }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.RedshiftIdcApplications }}'
+- calls:
+  - action: describe_event_subscriptions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.describe_event_subscriptions
+  emit:
+    as: item
+    item:
+      CustSubscriptionId: '{{ item.CustSubscriptionId }}'
+      CustomerAwsId: '{{ item.CustomerAwsId }}'
+      Enabled: '{{ item.Enabled }}'
+      EventCategoriesList: '{{ item.EventCategoriesList }}'
+      EventSubscriptionsList: '{{ item.EventSubscriptionsList }}'
+      Severity: '{{ item.Severity }}'
+      SnsTopicArn: '{{ item.SnsTopicArn }}'
+      SourceIdsList: '{{ item.SourceIdsList }}'
+      SourceType: '{{ item.SourceType }}'
+      Status: '{{ item.Status }}'
+      SubscriptionCreationTime: '{{ item.SubscriptionCreationTime }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.EventSubscriptionsList }}'
+- calls:
+  - action: describe_cluster_snapshots
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.describe_cluster_snapshots
+  emit:
+    as: item
+    item:
+      AccountsWithRestoreAccess: '{{ item.AccountsWithRestoreAccess }}'
+      ActualIncrementalBackupSizeInMegaBytes: '{{ item.Snapshots[].ActualIncrementalBackupSizeInMegaBytes }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      BackupProgressInMegaBytes: '{{ item.BackupProgressInMegaBytes }}'
+      ClusterCreateTime: '{{ item.ClusterCreateTime }}'
+      ClusterIdentifier: '{{ item.ClusterIdentifier }}'
+      ClusterVersion: '{{ item.ClusterVersion }}'
+      CurrentBackupRateInMegaBytesPerSecond: '{{ item.Snapshots[].CurrentBackupRateInMegaBytesPerSecond }}'
+      DBName: '{{ item.DBName }}'
+      ElapsedTimeInSeconds: '{{ item.ElapsedTimeInSeconds }}'
+      Encrypted: '{{ item.Encrypted }}'
+      EncryptedWithHSM: '{{ item.EncryptedWithHSM }}'
+      EngineFullVersion: '{{ item.EngineFullVersion }}'
+      EnhancedVpcRouting: '{{ item.EnhancedVpcRouting }}'
+      EstimatedSecondsToCompletion: '{{ item.EstimatedSecondsToCompletion }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      MaintenanceTrackName: '{{ item.MaintenanceTrackName }}'
+      ManualSnapshotRemainingDays: '{{ item.ManualSnapshotRemainingDays }}'
+      ManualSnapshotRetentionPeriod: '{{ item.ManualSnapshotRetentionPeriod }}'
+      MasterPasswordSecretArn: '{{ item.MasterPasswordSecretArn }}'
+      MasterPasswordSecretKmsKeyId: '{{ item.MasterPasswordSecretKmsKeyId }}'
+      MasterUsername: '{{ item.MasterUsername }}'
+      NodeType: '{{ item.NodeType }}'
+      NumberOfNodes: '{{ item.NumberOfNodes }}'
+      OwnerAccount: '{{ item.OwnerAccount }}'
+      Port: '{{ item.Port }}'
+      RestorableNodeTypes: '{{ item.RestorableNodeTypes }}'
+      SnapshotArn: '{{ item.SnapshotArn }}'
+      SnapshotCreateTime: '{{ item.SnapshotCreateTime }}'
+      SnapshotIdentifier: '{{ item.SnapshotIdentifier }}'
+      SnapshotRetentionStartTime: '{{ item.SnapshotRetentionStartTime }}'
+      SnapshotType: '{{ item.SnapshotType }}'
+      Snapshots: '{{ item.Snapshots }}'
+      SourceRegion: '{{ item.SourceRegion }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      TotalBackupSizeInMegaBytes: '{{ item.TotalBackupSizeInMegaBytes }}'
+      TotalResizeDataInMegaBytes: '{{ item.TotalResizeDataInMegaBytes }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.Snapshots }}'
+- calls:
+  - action: describe_cluster_security_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.describe_cluster_security_groups
+  emit:
+    as: item
+    item:
+      ClusterSecurityGroupName: '{{ item.ClusterSecurityGroupName }}'
+      Description: '{{ item.Description }}'
+      EC2SecurityGroups: '{{ item.EC2SecurityGroups }}'
+      IPRanges: '{{ item.IPRanges }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.ClusterSecurityGroups }}'
+- calls:
+  - action: describe_logging_status
+    on_error: continue
+    params:
+      ClusterIdentifier: '{{ item.ClusterIdentifier }}'
+    save_as: response
+  discovery_id: aws.redshift.describe_logging_status
+  emit:
+    as: item
+    item:
+      BucketName: '{{ response.BucketName }}'
+      LastFailureTime: '{{ response.LastFailureTime }}'
+      LastSuccessfulDeliveryTime: '{{ response.LastSuccessfulDeliveryTime }}'
+      LoggingEnabled: '{{ response.LoggingEnabled }}'
+      S3KeyPrefix: '{{ response.S3KeyPrefix }}'
+      LastFailureMessage: '{{ response.LastFailureMessage }}'
+      LogDestinationType: '{{ response.LogDestinationType }}'
+  for_each: aws.redshift.describe_cluster_db_revisions
+- calls:
+  - action: describe_cluster_parameter_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.describe_cluster_parameter_groups
+  emit:
+    as: item
+    item:
+      Description: '{{ item.Description }}'
+      ParameterGroupFamily: '{{ item.ParameterGroupFamily }}'
+      ParameterGroupName: '{{ item.ParameterGroupName }}'
+      ParameterGroups: '{{ item.ParameterGroups }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.ParameterGroups }}'
+- calls:
+  - action: describe_hsm_client_certificates
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.describe_hsm_client_certificates
+  emit:
+    as: item
+    item:
+      HsmClientCertificateIdentifier: '{{ item.HsmClientCertificateIdentifier }}'
+      HsmClientCertificatePublicKey: '{{ item.HsmClientCertificatePublicKey }}'
+      HsmClientCertificates: '{{ item.HsmClientCertificates }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.HsmClientCertificates }}'
+- calls:
+  - action: list_recommendations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.list_recommendations
+  emit:
+    as: item
+    item:
+      ClusterIdentifier: '{{ item.ClusterIdentifier }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Description: '{{ item.Description }}'
+      Id: '{{ item.Id }}'
+      ImpactRanking: '{{ item.ImpactRanking }}'
+      NamespaceArn: '{{ item.NamespaceArn }}'
+      Observation: '{{ item.Observation }}'
+      RecommendationText: '{{ item.RecommendationText }}'
+      RecommendationType: '{{ item.RecommendationType }}'
+      RecommendedActions: '{{ item.RecommendedActions }}'
+      ReferenceLinks: '{{ item.ReferenceLinks }}'
+      Title: '{{ item.Title }}'
+    items_for: '{{ response.Recommendations }}'
+- calls:
+  - action: describe_endpoint_authorization
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.describe_endpoint_authorization
+  emit:
+    as: item
+    item:
+      AllowedAllVPCs: '{{ item.AllowedAllVPCs }}'
+      AllowedVPCs: '{{ item.AllowedVPCs }}'
+      AuthorizeTime: '{{ item.AuthorizeTime }}'
+      ClusterIdentifier: '{{ item.ClusterIdentifier }}'
+      ClusterStatus: '{{ item.ClusterStatus }}'
+      EndpointAuthorizationList: '{{ item.EndpointAuthorizationList }}'
+      EndpointCount: '{{ item.EndpointCount }}'
+      Grantee: '{{ item.Grantee }}'
+      Grantor: '{{ item.Grantor }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.EndpointAuthorizationList }}'
+- calls:
+  - action: describe_endpoint_access
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.describe_endpoint_access
+  emit:
+    as: item
+    item:
+      Address: '{{ item.Address }}'
+      ClusterIdentifier: '{{ item.ClusterIdentifier }}'
+      EndpointAccessList: '{{ item.EndpointAccessList }}'
+      EndpointCreateTime: '{{ item.EndpointCreateTime }}'
+      EndpointName: '{{ item.EndpointName }}'
+      EndpointStatus: '{{ item.EndpointStatus }}'
+      Port: '{{ item.Port }}'
+      ResourceOwner: '{{ item.ResourceOwner }}'
+      SubnetGroupName: '{{ item.SubnetGroupName }}'
+      VpcEndpoint: '{{ item.VpcEndpoint }}'
+      VpcSecurityGroups: '{{ item.VpcSecurityGroups }}'
+    items_for: '{{ response.EndpointAccessList }}'
+- calls:
+  - action: describe_hsm_configurations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.describe_hsm_configurations
+  emit:
+    as: item
+    item:
+      Description: '{{ item.Description }}'
+      HsmConfigurationIdentifier: '{{ item.HsmConfigurationIdentifier }}'
+      HsmConfigurations: '{{ item.HsmConfigurations }}'
+      HsmIpAddress: '{{ item.HsmIpAddress }}'
+      HsmPartitionName: '{{ item.HsmPartitionName }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.HsmConfigurations }}'
+- calls:
+  - action: describe_clusters
+    on_error: continue
+    save_as: response
+  discovery_id: aws.redshift.describe_clusters
+  emit:
+    as: item
+    item:
+      AllowVersionUpgrade: '{{ item.AllowVersionUpgrade }}'
+      AquaConfiguration: '{{ item.AquaConfiguration }}'
+      AutomatedSnapshotRetentionPeriod: '{{ item.Clusters[].AutomatedSnapshotRetentionPeriod }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      AvailabilityZoneRelocationStatus: '{{ item.Clusters[].AvailabilityZoneRelocationStatus }}'
+      CatalogArn: '{{ item.CatalogArn }}'
+      ClusterAvailabilityStatus: '{{ item.ClusterAvailabilityStatus }}'
+      ClusterCreateTime: '{{ item.ClusterCreateTime }}'
+      ClusterIdentifier: '{{ item.ClusterIdentifier }}'
+      ClusterNamespaceArn: '{{ item.ClusterNamespaceArn }}'
+      ClusterNodes: '{{ item.ClusterNodes }}'
+      ClusterParameterGroups: '{{ item.ClusterParameterGroups }}'
+      ClusterPublicKey: '{{ item.ClusterPublicKey }}'
+      ClusterRevisionNumber: '{{ item.ClusterRevisionNumber }}'
+      ClusterSecurityGroups: '{{ item.ClusterSecurityGroups }}'
+      ClusterSnapshotCopyStatus: '{{ item.ClusterSnapshotCopyStatus }}'
+      ClusterStatus: '{{ item.ClusterStatus }}'
+      ClusterSubnetGroupName: '{{ item.ClusterSubnetGroupName }}'
+      ClusterVersion: '{{ item.ClusterVersion }}'
+      Clusters: '{{ item.Clusters }}'
+      CustomDomainCertificateArn: '{{ item.CustomDomainCertificateArn }}'
+      CustomDomainCertificateExpiryDate: '{{ item.Clusters[].CustomDomainCertificateExpiryDate }}'
+      CustomDomainName: '{{ item.CustomDomainName }}'
+      DBName: '{{ item.DBName }}'
+      DataTransferProgress: '{{ item.DataTransferProgress }}'
+      DefaultIamRoleArn: '{{ item.DefaultIamRoleArn }}'
+      DeferredMaintenanceWindows: '{{ item.DeferredMaintenanceWindows }}'
+      ElasticIpStatus: '{{ item.ElasticIpStatus }}'
+      ElasticResizeNumberOfNodeOptions: '{{ item.Clusters[].ElasticResizeNumberOfNodeOptions }}'
+      Encrypted: '{{ item.Encrypted }}'
+      Endpoint: '{{ item.Endpoint }}'
+      EnhancedVpcRouting: '{{ item.EnhancedVpcRouting }}'
+      ExpectedNextSnapshotScheduleTime: '{{ item.Clusters[].ExpectedNextSnapshotScheduleTime }}'
+      ExpectedNextSnapshotScheduleTimeStatus: '{{ item.Clusters[].ExpectedNextSnapshotScheduleTimeStatus }}'
+      HsmStatus: '{{ item.HsmStatus }}'
+      IamRoles: '{{ item.IamRoles }}'
+      IpAddressType: '{{ item.IpAddressType }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      LakehouseRegistrationStatus: '{{ item.LakehouseRegistrationStatus }}'
+      MaintenanceTrackName: '{{ item.MaintenanceTrackName }}'
+      ManualSnapshotRetentionPeriod: '{{ item.ManualSnapshotRetentionPeriod }}'
+      MasterPasswordSecretArn: '{{ item.MasterPasswordSecretArn }}'
+      MasterPasswordSecretKmsKeyId: '{{ item.MasterPasswordSecretKmsKeyId }}'
+      MasterUsername: '{{ item.MasterUsername }}'
+      ModifyStatus: '{{ item.ModifyStatus }}'
+      MultiAZ: '{{ item.MultiAZ }}'
+      MultiAZSecondary: '{{ item.MultiAZSecondary }}'
+      NextMaintenanceWindowStartTime: '{{ item.NextMaintenanceWindowStartTime }}'
+      NodeType: '{{ item.NodeType }}'
+      NumberOfNodes: '{{ item.NumberOfNodes }}'
+      PendingActions: '{{ item.PendingActions }}'
+      PendingModifiedValues: '{{ item.PendingModifiedValues }}'
+      PreferredMaintenanceWindow: '{{ item.PreferredMaintenanceWindow }}'
+      PubliclyAccessible: '{{ item.PubliclyAccessible }}'
+      ReservedNodeExchangeStatus: '{{ item.ReservedNodeExchangeStatus }}'
+      ResizeInfo: '{{ item.ResizeInfo }}'
+      RestoreStatus: '{{ item.RestoreStatus }}'
+      SnapshotScheduleIdentifier: '{{ item.SnapshotScheduleIdentifier }}'
+      SnapshotScheduleState: '{{ item.SnapshotScheduleState }}'
+      Tags: '{{ item.Tags }}'
+      TotalStorageCapacityInMegaBytes: '{{ item.TotalStorageCapacityInMegaBytes }}'
+      VpcId: '{{ item.VpcId }}'
+      VpcSecurityGroups: '{{ item.VpcSecurityGroups }}'
+    items_for: '{{ response.Clusters }}'

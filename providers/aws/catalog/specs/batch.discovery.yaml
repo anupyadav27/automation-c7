@@ -1,0 +1,153 @@
+version: '1.0'
+provider: aws
+service: batch
+discovery:
+- calls:
+  - action: describe_compute_environments
+    on_error: continue
+    save_as: response
+  discovery_id: aws.batch.describe_compute_environments
+  emit:
+    as: item
+    item:
+      Enabled: '{{ item.Enabled }}'
+      Statement: '{{ item.Statement }}'
+      Status: '{{ item.Status }}'
+      Version: '{{ item.Version }}'
+      computeEnvironmentArn: '{{ item.computeEnvironmentArn }}'
+      computeEnvironmentName: '{{ item.computeEnvironmentName }}'
+      computeEnvironments: '{{ item.computeEnvironments }}'
+      computeResources: '{{ item.computeResources }}'
+      containerOrchestrationType: '{{ item.containerOrchestrationType }}'
+      context: '{{ item.context }}'
+      ecsClusterArn: '{{ item.ecsClusterArn }}'
+      eksConfiguration: '{{ item.eksConfiguration }}'
+      serviceRole: '{{ item.serviceRole }}'
+      state: '{{ item.state }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      tags: '{{ item.tags }}'
+      type: '{{ item.type }}'
+      unmanagedvCpus: '{{ item.unmanagedvCpus }}'
+      updatePolicy: '{{ item.updatePolicy }}'
+      uuid: '{{ item.uuid }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.computeEnvironments }}'
+- calls:
+  - action: describe_job_definitions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.batch.describe_job_definitions
+  emit:
+    as: item
+    item:
+      consumableResourceProperties: '{{ item.consumableResourceProperties }}'
+      containerOrchestrationType: '{{ item.containerOrchestrationType }}'
+      containerProperties: '{{ item.containerProperties }}'
+      ecsProperties: '{{ item.ecsProperties }}'
+      eksProperties: '{{ item.eksProperties }}'
+      jobDefinitionArn: '{{ item.jobDefinitionArn }}'
+      jobDefinitionName: '{{ item.jobDefinitionName }}'
+      jobDefinitions: '{{ item.jobDefinitions }}'
+      nodeProperties: '{{ item.nodeProperties }}'
+      parameters: '{{ item.parameters }}'
+      platformCapabilities: '{{ item.platformCapabilities }}'
+      propagateTags: '{{ item.propagateTags }}'
+      retryStrategy: '{{ item.retryStrategy }}'
+      revision: '{{ item.revision }}'
+      schedulingPriority: '{{ item.schedulingPriority }}'
+      status: '{{ item.status }}'
+      tags: '{{ item.tags }}'
+      timeout: '{{ item.timeout }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.jobDefinitions }}'
+- calls:
+  - action: list_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.batch.list_jobs
+  emit:
+    as: item
+    item:
+      arrayProperties: '{{ item.arrayProperties }}'
+      container: '{{ item.container }}'
+      createdAt: '{{ item.createdAt }}'
+      jobArn: '{{ item.jobArn }}'
+      jobDefinition: '{{ item.jobDefinition }}'
+      jobId: '{{ item.jobId }}'
+      jobName: '{{ item.jobName }}'
+      nodeProperties: '{{ item.nodeProperties }}'
+      startedAt: '{{ item.startedAt }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      stoppedAt: '{{ item.stoppedAt }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.jobSummaryList }}'
+- calls:
+  - action: list_scheduling_policies
+    on_error: continue
+    save_as: response
+  discovery_id: aws.batch.list_scheduling_policies
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      schedulingPolicies: '{{ item.schedulingPolicies[].arn }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.schedulingPolicies }}'
+- calls:
+  - action: describe_service_environments
+    on_error: continue
+    save_as: response
+  discovery_id: aws.batch.describe_service_environments
+  emit:
+    as: item
+    item:
+      capacityLimits: '{{ item.capacityLimits }}'
+      serviceEnvironmentArn: '{{ item.serviceEnvironmentArn }}'
+      serviceEnvironmentName: '{{ item.serviceEnvironmentName }}'
+      serviceEnvironmentType: '{{ item.serviceEnvironmentType }}'
+      serviceEnvironments: '{{ item.serviceEnvironments }}'
+      state: '{{ item.state }}'
+      status: '{{ item.status }}'
+      tags: '{{ item.tags }}'
+    items_for: '{{ response.serviceEnvironments }}'
+- calls:
+  - action: describe_job_queues
+    on_error: continue
+    save_as: response
+  discovery_id: aws.batch.describe_job_queues
+  emit:
+    as: item
+    item:
+      computeEnvironmentOrder: '{{ item.computeEnvironmentOrder }}'
+      jobQueueArn: '{{ item.jobQueueArn }}'
+      jobQueueName: '{{ item.jobQueueName }}'
+      jobQueueType: '{{ item.jobQueueType }}'
+      jobQueues: '{{ item.jobQueues }}'
+      jobStateTimeLimitActions: '{{ item.jobStateTimeLimitActions }}'
+      priority: '{{ item.priority }}'
+      schedulingPolicyArn: '{{ item.schedulingPolicyArn }}'
+      serviceEnvironmentOrder: '{{ item.serviceEnvironmentOrder }}'
+      state: '{{ item.state }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.jobQueues }}'
+- calls:
+  - action: list_consumable_resources
+    on_error: continue
+    save_as: response
+  discovery_id: aws.batch.list_consumable_resources
+  emit:
+    as: item
+    item:
+      consumableResourceArn: '{{ item.consumableResourceArn }}'
+      consumableResourceName: '{{ item.consumableResourceName }}'
+      inUseQuantity: '{{ item.inUseQuantity }}'
+      resourceType: '{{ item.resourceType }}'
+      totalQuantity: '{{ item.totalQuantity }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.consumableResources }}'

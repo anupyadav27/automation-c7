@@ -1,0 +1,12 @@
+resource_key,operation,params,items_for,reason
+eks.cluster,describe_cluster,"{""name"": ""{id}""}",{{ response.cluster }},list_clusters returns names only — every field worth having needs the describe
+eks.nodegroup,describe_nodegroup,"{""clusterName"": ""{parent_id}"", ""nodegroupName"": ""{id}""}",{{ response.nodegroup }},"the autoScalingGroups this pool created live here, and they are the only collected link from an EKS cluster to the EC2 that runs it"
+ecs.service,describe_services,"{""cluster"": ""{parent_id}"", ""services"": [""{id}""]}",{{ response.services }},list_services returns ARNs only
+stepfunctions.state_machine,describe_state_machine,"{""stateMachineArn"": ""{arn}""}",{{ response }},the state machine definition names every resource it invokes; without it a workflow has no members
+s3.bucket,get_bucket_encryption,"{""Bucket"": ""{id}""}",{{ response }},list_buckets returns a name and a date. Whether a bucket is encrypted is the first thing anyone asks and it needs its own call
+s3.bucket,get_bucket_versioning,"{""Bucket"": ""{id}""}",{{ response }},"versioning decides whether a delete is recoverable, and whether old versions are quietly being billed"
+s3.bucket,get_public_access_block,"{""Bucket"": ""{id}""}",{{ response }},the four block settings are the difference between a private bucket and a public one
+s3.bucket,get_bucket_location,"{""Bucket"": ""{id}""}",{{ response }},buckets are global in the API and regional in fact; without this every bucket draws in the wrong region
+dynamodb.table,describe_table,"{""TableName"": ""{id}""}",{{ response.Table }},"list_tables returns names only - size, item count, billing mode and encryption all need the describe"
+sns.topic,get_topic_attributes,"{""TopicArn"": ""{arn}""}",{{ response.Attributes }},"list_topics returns an ARN and nothing else. The subscription counts — confirmed, pending, deleted — are the only signal that a topic is wired to anything"
+sqs.queue,get_queue_attributes,"{""QueueUrl"": ""{id}"", ""AttributeNames"": [""All""]}",{{ response.Attributes }},"list_queues returns a URL. Whether a queue is FIFO, encrypted, or has a dead-letter target is only here"

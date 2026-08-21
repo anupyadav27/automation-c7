@@ -1,0 +1,32 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: codegurureviewer (backed by codeguru-reviewer)
+# 1 ops (from checks)
+# Generated: 2026-04-14
+version: '1.0'
+provider: aws
+service: codegurureviewer
+services:
+  client: codeguru-reviewer
+  module: boto3.client
+discovery:
+  - discovery_id: aws.codegurureviewer.list_repository_associations
+    calls:
+    - action: list_repository_associations
+      save_as: response
+      on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.RepositoryAssociationSummaries }}'
+      item:
+        Name: '{{ item.Name }}'
+        State: '{{ item.State }}'
+        Tags: '{{ item.Tags }}'
+        AssociationArn: '{{ item.AssociationArn }}'
+        AssociationId: '{{ item.AssociationId }}'
+        ConnectionArn: '{{ item.ConnectionArn }}'
+        KMSKeyDetails: '{{ item.KMSKeyDetails }}'
+        LastUpdatedTimeStamp: '{{ item.LastUpdatedTimeStamp }}'
+        Owner: '{{ item.Owner }}'
+        ProviderType: '{{ item.ProviderType }}'
+        RepositoryAssociation: '{{ item.RepositoryAssociation }}'
+        S3RepositoryDetails: '{{ item.S3RepositoryDetails }}'

@@ -1,0 +1,1050 @@
+version: '1.0'
+provider: aws
+service: omics
+services:
+  client: omics
+  module: boto3.client
+discovery:
+- discovery_id: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: list_annotation_import_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.annotationImportJobs }}'
+    item:
+      annotationFields: '{{ item.annotationFields }}'
+      completionTime: '{{ item.completionTime }}'
+      creationJobId: '{{ item.creationJobId }}'
+      creationTime: '{{ item.creationTime }}'
+      destinationName: '{{ item.destinationName }}'
+      formatOptions: '{{ item.formatOptions }}'
+      id: '{{ item.id }}'
+      jobStatus: '{{ item.jobStatus }}'
+      roleArn: '{{ item.roleArn }}'
+      runLeftNormalization: '{{ item.runLeftNormalization }}'
+      source: '{{ item.source }}'
+      status: '{{ item.status }}'
+      tsvVersionOptions: '{{ item.tsvVersionOptions }}'
+      updateTime: '{{ item.updateTime }}'
+      versionArn: '{{ item.versionArn }}'
+      versionName: '{{ item.versionName }}'
+      versionOptions: '{{ item.versionOptions }}'
+      versionSizeBytes: '{{ item.versionSizeBytes }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_annotation_stores
+  calls:
+  - action: list_annotation_stores
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.annotationStores }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      reference: '{{ item.reference }}'
+      sseConfig: '{{ item.sseConfig }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      storeArn: '{{ item.storeArn }}'
+      storeFormat: '{{ item.storeFormat }}'
+      storeSizeBytes: '{{ item.storeSizeBytes }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_reference_stores
+  calls:
+  - action: list_reference_stores
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.referenceStores }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      sseConfig: '{{ item.sseConfig }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_run_caches
+  calls:
+  - action: list_run_caches
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      accelerators: '{{ item.accelerators }}'
+      arn: '{{ item.arn }}'
+      cacheBehavior: '{{ item.cacheBehavior }}'
+      cacheS3Uri: '{{ item.cacheS3Uri }}'
+      creationTime: '{{ item.creationTime }}'
+      definition: '{{ item.definition }}'
+      id: '{{ item.id }}'
+      items: '{{ item["items"] }}'
+      name: '{{ item.name }}'
+      parameters: '{{ item.parameters }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_run_groups
+  calls:
+  - action: list_run_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      id: '{{ item.id }}'
+      maxCpus: '{{ item.maxCpus }}'
+      maxDuration: '{{ item.maxDuration }}'
+      maxGpus: '{{ item.maxGpus }}'
+      maxRuns: '{{ item.maxRuns }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_runs
+  calls:
+  - action: list_runs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      priority: '{{ item.priority }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      stopTime: '{{ item.stopTime }}'
+      storageCapacity: '{{ item.storageCapacity }}'
+      storageType: '{{ item.storageType }}'
+      workflowId: '{{ item.workflowId }}'
+      workflowVersionName: '{{ item.workflowVersionName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_sequence_stores
+  calls:
+  - action: list_sequence_stores
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.sequenceStores }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      eTagAlgorithmFamily: '{{ item.eTagAlgorithmFamily }}'
+      fallbackLocation: '{{ item.fallbackLocation }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      sseConfig: '{{ item.sseConfig }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_variant_import_jobs
+  calls:
+  - action: list_variant_import_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.variantImportJobs }}'
+    item:
+      annotationFields: '{{ item.annotationFields }}'
+      completionTime: '{{ item.completionTime }}'
+      creationTime: '{{ item.creationTime }}'
+      destinationName: '{{ item.destinationName }}'
+      id: '{{ item.id }}'
+      roleArn: '{{ item.roleArn }}'
+      runLeftNormalization: '{{ item.runLeftNormalization }}'
+      status: '{{ item.status }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_variant_stores
+  calls:
+  - action: list_variant_stores
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.variantStores }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      reference: '{{ item.reference }}'
+      sseConfig: '{{ item.sseConfig }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      storeArn: '{{ item.storeArn }}'
+      storeSizeBytes: '{{ item.storeSizeBytes }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_workflows
+  calls:
+  - action: list_workflows
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      digest: '{{ item.digest }}'
+      id: '{{ item.id }}'
+      metadata: '{{ item.metadata }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.get_annotation_import_job
+  calls:
+  - action: get_annotation_import_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      formatOptions: '{{ item.formatOptions }}'
+      jobStatus: '{{ item.jobStatus }}'
+      source: '{{ item.source }}'
+      annotationFields: '{{ response.annotationFields }}'
+      completionTime: '{{ response.completionTime }}'
+      creationTime: '{{ response.creationTime }}'
+      destinationName: '{{ response.destinationName }}'
+      comment: '{{ response.formatOptions.tsvOptions.readOptions.comment }}'
+      encoding: '{{ response.formatOptions.tsvOptions.readOptions.encoding }}'
+      escape: '{{ response.formatOptions.tsvOptions.readOptions.escape }}'
+      escapeQuotes: '{{ response.formatOptions.tsvOptions.readOptions.escapeQuotes }}'
+      header: '{{ response.formatOptions.tsvOptions.readOptions.header }}'
+      lineSep: '{{ response.formatOptions.tsvOptions.readOptions.lineSep }}'
+      quote: '{{ response.formatOptions.tsvOptions.readOptions.quote }}'
+      quoteAll: '{{ response.formatOptions.tsvOptions.readOptions.quoteAll }}'
+      sep: '{{ response.formatOptions.tsvOptions.readOptions.sep }}'
+      ignoreFilterField: '{{ response.formatOptions.vcfOptions.ignoreFilterField }}'
+      ignoreQualField: '{{ response.formatOptions.vcfOptions.ignoreQualField }}'
+      id: '{{ response.id }}'
+      roleArn: '{{ response.roleArn }}'
+      runLeftNormalization: '{{ response.runLeftNormalization }}'
+      status: '{{ response.status }}'
+      statusMessage: '{{ response.statusMessage }}'
+      updateTime: '{{ response.updateTime }}'
+      versionName: '{{ response.versionName }}'
+- discovery_id: aws.omics.get_annotation_store
+  for_each: aws.omics.list_annotation_stores
+  calls:
+  - action: get_annotation_store
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      referenceArn: '{{ response.reference.referenceArn }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      numVersions: '{{ response.numVersions }}'
+      keyArn: '{{ response.sseConfig.keyArn }}'
+      type: '{{ response.sseConfig.type }}'
+      status: '{{ response.status }}'
+      statusMessage: '{{ response.statusMessage }}'
+      storeArn: '{{ response.storeArn }}'
+      storeFormat: '{{ response.storeFormat }}'
+      annotationType: '{{ response.storeOptions.tsvStoreOptions.annotationType }}'
+      formatToHeader: '{{ response.storeOptions.tsvStoreOptions.formatToHeader }}'
+      storeSizeBytes: '{{ response.storeSizeBytes }}'
+      tags: '{{ response.tags }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.omics.get_annotation_store_version
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_annotation_store_version
+    params:
+      name: '{{ item.name }}'
+      versionName: '{{ item.versionName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tsvVersionOptions: '{{ response.versionOptions.tsvVersionOptions }}'
+      versionOptions: '{{ response.versionOptions.versionOptions }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+      statusMessage: '{{ response.statusMessage }}'
+      storeId: '{{ response.storeId }}'
+      tags: '{{ response.tags }}'
+      updateTime: '{{ response.updateTime }}'
+      versionArn: '{{ response.versionArn }}'
+      versionName: '{{ response.versionName }}'
+      annotationType: '{{ response.versionOptions.tsvVersionOptions.annotationType }}'
+      formatToHeader: '{{ response.versionOptions.tsvVersionOptions.formatToHeader }}'
+      versionSizeBytes: '{{ response.versionSizeBytes }}'
+- discovery_id: aws.omics.get_read_set
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_read_set
+    params:
+      id: '{{ item.id }}'
+      sequenceStoreId: '{{ item.sequenceStoreId }}'
+      partNumber: '{{ item.partNumber }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.nextToken }}'
+    item:
+      payload: '{{ item.payload }}'
+- discovery_id: aws.omics.get_read_set_activation_job
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_read_set_activation_job
+    params:
+      id: '{{ item.id }}'
+      sequenceStoreId: '{{ item.sequenceStoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.sources }}'
+    item:
+      readSetId: '{{ item.readSetId }}'
+      sources: '{{ item.sources }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      completionTime: '{{ response.completionTime }}'
+      creationTime: '{{ response.creationTime }}'
+      id: '{{ response.id }}'
+      sequenceStoreId: '{{ response.sequenceStoreId }}'
+- discovery_id: aws.omics.get_read_set_export_job
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_read_set_export_job
+    params:
+      sequenceStoreId: '{{ item.sequenceStoreId }}'
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.readSets }}'
+    item:
+      id: '{{ item.id }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      completionTime: '{{ response.completionTime }}'
+      creationTime: '{{ response.creationTime }}'
+      destination: '{{ response.destination }}'
+      sequenceStoreId: '{{ response.sequenceStoreId }}'
+- discovery_id: aws.omics.get_read_set_import_job
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_read_set_import_job
+    params:
+      id: '{{ item.id }}'
+      sequenceStoreId: '{{ item.sequenceStoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.sources }}'
+    item:
+      description: '{{ item.description }}'
+      generatedFrom: '{{ item.generatedFrom }}'
+      name: '{{ item.name }}'
+      readSetId: '{{ item.readSetId }}'
+      referenceArn: '{{ item.referenceArn }}'
+      sampleId: '{{ item.sampleId }}'
+      sourceFileType: '{{ item.sourceFileType }}'
+      sourceFiles: '{{ item.sourceFiles }}'
+      sources: '{{ item.sources }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      subjectId: '{{ item.subjectId }}'
+      tags: '{{ item.tags }}'
+      completionTime: '{{ response.completionTime }}'
+      creationTime: '{{ response.creationTime }}'
+      id: '{{ response.id }}'
+      roleArn: '{{ response.roleArn }}'
+      sequenceStoreId: '{{ response.sequenceStoreId }}'
+- discovery_id: aws.omics.get_read_set_metadata
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_read_set_metadata
+    params:
+      id: '{{ item.id }}'
+      sequenceStoreId: '{{ item.sequenceStoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      alignment: '{{ response.sequenceInformation.alignment }}'
+      creationJobId: '{{ response.sequenceInformation.creationJobId }}'
+      generatedFrom: '{{ response.sequenceInformation.generatedFrom }}'
+      totalBaseCount: '{{ response.sequenceInformation.totalBaseCount }}'
+      totalReadCount: '{{ response.sequenceInformation.totalReadCount }}'
+      arn: '{{ response.arn }}'
+      creationTime: '{{ response.creationTime }}'
+      creationType: '{{ response.creationType }}'
+      description: '{{ response.description }}'
+      algorithm: '{{ response.etag.algorithm }}'
+      source1: '{{ response.etag.source1 }}'
+      source2: '{{ response.etag.source2 }}'
+      fileType: '{{ response.fileType }}'
+      contentLength: '{{ response.files.index.contentLength }}'
+      partSize: '{{ response.files.index.partSize }}'
+      s3Uri: '{{ response.files.index.s3Access.s3Uri }}'
+      totalParts: '{{ response.files.index.totalParts }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      referenceArn: '{{ response.referenceArn }}'
+      sampleId: '{{ response.sampleId }}'
+      sequenceStoreId: '{{ response.sequenceStoreId }}'
+      status: '{{ response.status }}'
+      statusMessage: '{{ response.statusMessage }}'
+      subjectId: '{{ response.subjectId }}'
+- discovery_id: aws.omics.get_reference
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_reference
+    params:
+      id: '{{ item.id }}'
+      referenceStoreId: '{{ item.referenceStoreId }}'
+      partNumber: '{{ item.partNumber }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      payload: '{{ response.payload }}'
+- discovery_id: aws.omics.get_reference_import_job
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_reference_import_job
+    params:
+      id: '{{ item.id }}'
+      referenceStoreId: '{{ item.referenceStoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.sources }}'
+    item:
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      referenceId: '{{ item.referenceId }}'
+      sourceFile: '{{ item.sourceFile }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      tags: '{{ item.tags }}'
+      completionTime: '{{ response.completionTime }}'
+      creationTime: '{{ response.creationTime }}'
+      id: '{{ response.id }}'
+      referenceStoreId: '{{ response.referenceStoreId }}'
+      roleArn: '{{ response.roleArn }}'
+- discovery_id: aws.omics.get_reference_metadata
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_reference_metadata
+    params:
+      id: '{{ item.id }}'
+      referenceStoreId: '{{ item.referenceStoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      index: '{{ response.files.index }}'
+      source: '{{ response.files.source }}'
+      arn: '{{ response.arn }}'
+      creationJobId: '{{ response.creationJobId }}'
+      creationTime: '{{ response.creationTime }}'
+      creationType: '{{ response.creationType }}'
+      description: '{{ response.description }}'
+      contentLength: '{{ response.files.index.contentLength }}'
+      partSize: '{{ response.files.index.partSize }}'
+      s3Uri: '{{ response.files.index.s3Access.s3Uri }}'
+      totalParts: '{{ response.files.index.totalParts }}'
+      id: '{{ response.id }}'
+      md5: '{{ response.md5 }}'
+      name: '{{ response.name }}'
+      referenceStoreId: '{{ response.referenceStoreId }}'
+      status: '{{ response.status }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.omics.get_reference_store
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_reference_store
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      keyArn: '{{ response.sseConfig.keyArn }}'
+      type: '{{ response.sseConfig.type }}'
+      arn: '{{ response.arn }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+- discovery_id: aws.omics.get_run
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_run
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      accelerators: '{{ response.parameters.accelerators }}'
+      definition: '{{ response.parameters.definition }}'
+      parameters: '{{ response.parameters.parameters }}'
+      arn: '{{ response.arn }}'
+      cacheBehavior: '{{ response.cacheBehavior }}'
+      cacheId: '{{ response.cacheId }}'
+      creationTime: '{{ response.creationTime }}'
+      digest: '{{ response.digest }}'
+      engineVersion: '{{ response.engineVersion }}'
+      failureReason: '{{ response.failureReason }}'
+      id: '{{ response.id }}'
+      logLevel: '{{ response.logLevel }}'
+      engineLogStream: '{{ response.logLocation.engineLogStream }}'
+      runLogStream: '{{ response.logLocation.runLogStream }}'
+      name: '{{ response.name }}'
+      outputUri: '{{ response.outputUri }}'
+      priority: '{{ response.priority }}'
+      resourceDigests: '{{ response.resourceDigests }}'
+      retentionMode: '{{ response.retentionMode }}'
+      roleArn: '{{ response.roleArn }}'
+      runGroupId: '{{ response.runGroupId }}'
+      runId: '{{ response.runId }}'
+      runOutputUri: '{{ response.runOutputUri }}'
+      startTime: '{{ response.startTime }}'
+      startedBy: '{{ response.startedBy }}'
+      status: '{{ response.status }}'
+      statusMessage: '{{ response.statusMessage }}'
+      stopTime: '{{ response.stopTime }}'
+      storageCapacity: '{{ response.storageCapacity }}'
+      storageType: '{{ response.storageType }}'
+      tags: '{{ response.tags }}'
+      uuid: '{{ response.uuid }}'
+      workflowId: '{{ response.workflowId }}'
+      workflowOwnerId: '{{ response.workflowOwnerId }}'
+      workflowType: '{{ response.workflowType }}'
+      workflowUuid: '{{ response.workflowUuid }}'
+      workflowVersionName: '{{ response.workflowVersionName }}'
+- discovery_id: aws.omics.get_run_cache
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_run_cache
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.arn }}'
+      cacheBehavior: '{{ response.cacheBehavior }}'
+      cacheBucketOwnerId: '{{ response.cacheBucketOwnerId }}'
+      cacheS3Uri: '{{ response.cacheS3Uri }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.omics.get_run_group
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_run_group
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.arn }}'
+      creationTime: '{{ response.creationTime }}'
+      id: '{{ response.id }}'
+      maxCpus: '{{ response.maxCpus }}'
+      maxDuration: '{{ response.maxDuration }}'
+      maxGpus: '{{ response.maxGpus }}'
+      maxRuns: '{{ response.maxRuns }}'
+      name: '{{ response.name }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.omics.get_run_task
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_run_task
+    params:
+      id: '{{ item.id }}'
+      taskId: '{{ item.taskId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      image: '{{ response.imageDetails.image }}'
+      imageDigest: '{{ response.imageDetails.imageDigest }}'
+      sourceImage: '{{ response.imageDetails.sourceImage }}'
+      cacheHit: '{{ response.cacheHit }}'
+      cacheS3Uri: '{{ response.cacheS3Uri }}'
+      cpus: '{{ response.cpus }}'
+      creationTime: '{{ response.creationTime }}'
+      failureReason: '{{ response.failureReason }}'
+      gpus: '{{ response.gpus }}'
+      instanceType: '{{ response.instanceType }}'
+      logStream: '{{ response.logStream }}'
+      memory: '{{ response.memory }}'
+      name: '{{ response.name }}'
+      startTime: '{{ response.startTime }}'
+      status: '{{ response.status }}'
+      statusMessage: '{{ response.statusMessage }}'
+      stopTime: '{{ response.stopTime }}'
+      taskId: '{{ response.taskId }}'
+- discovery_id: aws.omics.get_s3_access_policy
+  calls:
+  - action: get_s3_access_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+      s3AccessPointArn: '{{ response.s3AccessPointArn }}'
+      s3AccessPolicy: '{{ response.s3AccessPolicy }}'
+      storeId: '{{ response.storeId }}'
+      storeType: '{{ response.storeType }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.omics.get_sequence_store
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_sequence_store
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.propagatedSetLevelTags }}'
+    item:
+      arn: '{{ response.arn }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      eTagAlgorithmFamily: '{{ response.eTagAlgorithmFamily }}'
+      fallbackLocation: '{{ response.fallbackLocation }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      accessLogLocation: '{{ response.s3Access.accessLogLocation }}'
+      s3AccessPointArn: '{{ response.s3Access.s3AccessPointArn }}'
+      s3Uri: '{{ response.s3Access.s3Uri }}'
+      keyArn: '{{ response.sseConfig.keyArn }}'
+      type: '{{ response.sseConfig.type }}'
+      status: '{{ response.status }}'
+      statusMessage: '{{ response.statusMessage }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.omics.get_share
+  calls:
+  - action: get_share
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      creationTime: '{{ response.share.creationTime }}'
+      ownerId: '{{ response.share.ownerId }}'
+      principalSubscriber: '{{ response.share.principalSubscriber }}'
+      resourceArn: '{{ response.share.resourceArn }}'
+      resourceId: '{{ response.share.resourceId }}'
+      shareId: '{{ response.share.shareId }}'
+      shareName: '{{ response.share.shareName }}'
+      status: '{{ response.share.status }}'
+      statusMessage: '{{ response.share.statusMessage }}'
+      updateTime: '{{ response.share.updateTime }}'
+- discovery_id: aws.omics.get_variant_import_job
+  calls:
+  - action: get_variant_import_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      jobStatus: '{{ item.jobStatus }}'
+      source: '{{ item.source }}'
+      statusMessage: '{{ item.statusMessage }}'
+      annotationFields: '{{ response.annotationFields }}'
+      completionTime: '{{ response.completionTime }}'
+      creationTime: '{{ response.creationTime }}'
+      destinationName: '{{ response.destinationName }}'
+      id: '{{ response.id }}'
+      roleArn: '{{ response.roleArn }}'
+      runLeftNormalization: '{{ response.runLeftNormalization }}'
+      status: '{{ response.status }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.omics.get_variant_store
+  for_each: aws.omics.list_annotation_stores
+  calls:
+  - action: get_variant_store
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      referenceArn: '{{ response.reference.referenceArn }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      keyArn: '{{ response.sseConfig.keyArn }}'
+      type: '{{ response.sseConfig.type }}'
+      status: '{{ response.status }}'
+      statusMessage: '{{ response.statusMessage }}'
+      storeArn: '{{ response.storeArn }}'
+      storeSizeBytes: '{{ response.storeSizeBytes }}'
+      tags: '{{ response.tags }}'
+      updateTime: '{{ response.updateTime }}'
+- discovery_id: aws.omics.get_workflow
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_workflow
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      imageMappings: '{{ response.containerRegistryMap.imageMappings }}'
+      registryMappings: '{{ response.containerRegistryMap.registryMappings }}'
+      accelerators: '{{ response.accelerators }}'
+      arn: '{{ response.arn }}'
+      creationTime: '{{ response.creationTime }}'
+      definition: '{{ response.definition }}'
+      description: '{{ response.description }}'
+      digest: '{{ response.digest }}'
+      engine: '{{ response.engine }}'
+      id: '{{ response.id }}'
+      main: '{{ response.main }}'
+      metadata: '{{ response.metadata }}'
+      name: '{{ response.name }}'
+      parameterTemplate: '{{ response.parameterTemplate }}'
+      status: '{{ response.status }}'
+      statusMessage: '{{ response.statusMessage }}'
+      storageCapacity: '{{ response.storageCapacity }}'
+      storageType: '{{ response.storageType }}'
+      tags: '{{ response.tags }}'
+      type: '{{ response.type }}'
+      uuid: '{{ response.uuid }}'
+- discovery_id: aws.omics.get_workflow_version
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: get_workflow_version
+    params:
+      workflowId: '{{ item.workflowId }}'
+      versionName: '{{ item.versionName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      imageMappings: '{{ response.containerRegistryMap.imageMappings }}'
+      registryMappings: '{{ response.containerRegistryMap.registryMappings }}'
+      accelerators: '{{ response.accelerators }}'
+      arn: '{{ response.arn }}'
+      creationTime: '{{ response.creationTime }}'
+      definition: '{{ response.definition }}'
+      description: '{{ response.description }}'
+      digest: '{{ response.digest }}'
+      engine: '{{ response.engine }}'
+      main: '{{ response.main }}'
+      metadata: '{{ response.metadata }}'
+      parameterTemplate: '{{ response.parameterTemplate }}'
+      status: '{{ response.status }}'
+      statusMessage: '{{ response.statusMessage }}'
+      storageCapacity: '{{ response.storageCapacity }}'
+      storageType: '{{ response.storageType }}'
+      tags: '{{ response.tags }}'
+      type: '{{ response.type }}'
+      uuid: '{{ response.uuid }}'
+      versionName: '{{ response.versionName }}'
+      workflowBucketOwnerId: '{{ response.workflowBucketOwnerId }}'
+      workflowId: '{{ response.workflowId }}'
+- discovery_id: aws.omics.list_annotation_store_versions
+  for_each: aws.omics.list_annotation_stores
+  calls:
+  - action: list_annotation_store_versions
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.annotationStoreVersions }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      storeId: '{{ item.storeId }}'
+      updateTime: '{{ item.updateTime }}'
+      versionArn: '{{ item.versionArn }}'
+      versionName: '{{ item.versionName }}'
+      versionSizeBytes: '{{ item.versionSizeBytes }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_multipart_read_set_uploads
+  calls:
+  - action: list_multipart_read_set_uploads
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.uploads }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      generatedFrom: '{{ item.generatedFrom }}'
+      name: '{{ item.name }}'
+      payload: '{{ item.payload }}'
+      referenceArn: '{{ item.referenceArn }}'
+      sampleId: '{{ item.sampleId }}'
+      sequenceStoreId: '{{ item.sequenceStoreId }}'
+      sourceFileType: '{{ item.sourceFileType }}'
+      subjectId: '{{ item.subjectId }}'
+      tags: '{{ item.tags }}'
+      uploadId: '{{ item.uploadId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_read_set_activation_jobs
+  calls:
+  - action: list_read_set_activation_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.activationJobs }}'
+    item:
+      completionTime: '{{ item.completionTime }}'
+      creationTime: '{{ item.creationTime }}'
+      id: '{{ item.id }}'
+      sequenceStoreId: '{{ item.sequenceStoreId }}'
+      sources: '{{ item.sources }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_read_set_export_jobs
+  calls:
+  - action: list_read_set_export_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.exportJobs }}'
+    item:
+      completionTime: '{{ item.completionTime }}'
+      creationTime: '{{ item.creationTime }}'
+      destination: '{{ item.destination }}'
+      id: '{{ item.id }}'
+      sequenceStoreId: '{{ item.sequenceStoreId }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_read_set_import_jobs
+  calls:
+  - action: list_read_set_import_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.importJobs }}'
+    item:
+      completionTime: '{{ item.completionTime }}'
+      creationTime: '{{ item.creationTime }}'
+      id: '{{ item.id }}'
+      roleArn: '{{ item.roleArn }}'
+      sequenceStoreId: '{{ item.sequenceStoreId }}'
+      sources: '{{ item.sources }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_read_set_upload_parts
+  calls:
+  - action: list_read_set_upload_parts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.parts }}'
+    item:
+      checksum: '{{ item.checksum }}'
+      creationTime: '{{ item.creationTime }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      partNumber: '{{ item.partNumber }}'
+      partSize: '{{ item.partSize }}'
+      partSource: '{{ item.partSource }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_read_sets
+  calls:
+  - action: list_read_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.readSets }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      creationType: '{{ item.creationType }}'
+      description: '{{ item.description }}'
+      etag: '{{ item.etag }}'
+      fileType: '{{ item.fileType }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      referenceArn: '{{ item.referenceArn }}'
+      sampleId: '{{ item.sampleId }}'
+      sequenceInformation: '{{ item.sequenceInformation }}'
+      sequenceStoreId: '{{ item.sequenceStoreId }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      subjectId: '{{ item.subjectId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_reference_import_jobs
+  calls:
+  - action: list_reference_import_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.importJobs }}'
+    item:
+      completionTime: '{{ item.completionTime }}'
+      creationTime: '{{ item.creationTime }}'
+      id: '{{ item.id }}'
+      referenceStoreId: '{{ item.referenceStoreId }}'
+      roleArn: '{{ item.roleArn }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_references
+  calls:
+  - action: list_references
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.references }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      md5: '{{ item.md5 }}'
+      name: '{{ item.name }}'
+      referenceStoreId: '{{ item.referenceStoreId }}'
+      status: '{{ item.status }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_run_tasks
+  for_each: aws.omics.list_annotation_import_jobs
+  calls:
+  - action: list_run_tasks
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      cacheHit: '{{ item.cacheHit }}'
+      cacheS3Uri: '{{ item.cacheS3Uri }}'
+      cpus: '{{ item.cpus }}'
+      creationTime: '{{ item.creationTime }}'
+      gpus: '{{ item.gpus }}'
+      instanceType: '{{ item.instanceType }}'
+      memory: '{{ item.memory }}'
+      name: '{{ item.name }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      stopTime: '{{ item.stopTime }}'
+      taskId: '{{ item.taskId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_shares
+  calls:
+  - action: list_shares
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.shares }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      ownerId: '{{ item.ownerId }}'
+      principalSubscriber: '{{ item.principalSubscriber }}'
+      resourceArn: '{{ item.resourceArn }}'
+      resourceId: '{{ item.resourceId }}'
+      shareId: '{{ item.shareId }}'
+      shareName: '{{ item.shareName }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.omics.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.omics.list_workflow_versions
+  for_each: aws.omics.list_runs
+  calls:
+  - action: list_workflow_versions
+    params:
+      workflowId: '{{ item.workflowId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      digest: '{{ item.digest }}'
+      metadata: '{{ item.metadata }}'
+      status: '{{ item.status }}'
+      type: '{{ item.type }}'
+      versionName: '{{ item.versionName }}'
+      workflowId: '{{ item.workflowId }}'
+      nextToken: '{{ response.nextToken }}'

@@ -1,0 +1,200 @@
+version: '1.0'
+provider: aws
+service: medical-imaging
+services:
+  client: medical-imaging
+  module: boto3.client
+discovery:
+- discovery_id: aws.medical-imaging.list_datastores
+  calls:
+  - action: list_datastores
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.datastoreSummaries }}'
+    item:
+      contentEncoding: '{{ item.contentEncoding }}'
+      contentType: '{{ item.contentType }}'
+      dataAccessRoleArn: '{{ item.dataAccessRoleArn }}'
+      datastoreArn: '{{ item.datastoreArn }}'
+      datastoreId: '{{ item.datastoreId }}'
+      datastoreName: '{{ item.datastoreName }}'
+      datastoreProperties: '{{ item.datastoreProperties }}'
+      datastoreStatus: '{{ item.datastoreStatus }}'
+      endedAt: '{{ item.endedAt }}'
+      forced: '{{ item.forced }}'
+      imageFrameBlob: '{{ item.imageFrameBlob }}'
+      imageSetMetadataBlob: '{{ item.imageSetMetadataBlob }}'
+      inputS3Uri: '{{ item.inputS3Uri }}'
+      jobName: '{{ item.jobName }}'
+      jobProperties: '{{ item.jobProperties }}'
+      jobStatus: '{{ item.jobStatus }}'
+      kmsKeyArn: '{{ item.kmsKeyArn }}'
+      lambdaAuthorizerArn: '{{ item.lambdaAuthorizerArn }}'
+      losslessStorageFormat: '{{ item.losslessStorageFormat }}'
+      message: '{{ item.message }}'
+      outputS3Uri: '{{ item.outputS3Uri }}'
+      submittedAt: '{{ item.submittedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.medical-imaging.get_dicom_import_job
+  for_each: aws.medical-imaging.list_datastores
+  calls:
+  - action: get_dicom_import_job
+    params:
+      datastoreId: '{{ item.datastoreId }}'
+      jobId: '{{ item.jobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      dataAccessRoleArn: '{{ response.jobProperties.dataAccessRoleArn }}'
+      datastoreId: '{{ response.jobProperties.datastoreId }}'
+      endedAt: '{{ response.jobProperties.endedAt }}'
+      inputS3Uri: '{{ response.jobProperties.inputS3Uri }}'
+      jobId: '{{ response.jobProperties.jobId }}'
+      jobName: '{{ response.jobProperties.jobName }}'
+      jobProperties: '{{ response.jobProperties.jobProperties }}'
+      jobStatus: '{{ response.jobProperties.jobStatus }}'
+      message: '{{ response.jobProperties.message }}'
+      outputS3Uri: '{{ response.jobProperties.outputS3Uri }}'
+      submittedAt: '{{ response.jobProperties.submittedAt }}'
+- discovery_id: aws.medical-imaging.get_datastore
+  for_each: aws.medical-imaging.list_datastores
+  calls:
+  - action: get_datastore
+    params:
+      datastoreId: '{{ item.datastoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      datastoreArn: '{{ response.datastoreProperties.datastoreArn }}'
+      datastoreId: '{{ response.datastoreProperties.datastoreId }}'
+      datastoreName: '{{ response.datastoreProperties.datastoreName }}'
+      datastoreProperties: '{{ response.datastoreProperties.datastoreProperties }}'
+      datastoreStatus: '{{ response.datastoreProperties.datastoreStatus }}'
+      kmsKeyArn: '{{ response.datastoreProperties.kmsKeyArn }}'
+      lambdaAuthorizerArn: '{{ response.datastoreProperties.lambdaAuthorizerArn }}'
+      losslessStorageFormat: '{{ response.datastoreProperties.losslessStorageFormat }}'
+      createdAt: '{{ response.datastoreProperties.createdAt }}'
+      updatedAt: '{{ response.datastoreProperties.updatedAt }}'
+- discovery_id: aws.medical-imaging.get_image_frame
+  for_each: aws.medical-imaging.list_datastores
+  calls:
+  - action: get_image_frame
+    params:
+      datastoreId: '{{ item.datastoreId }}'
+      imageSetId: '{{ item.imageSetId }}'
+      imageFrameInformation: '{{ item.imageFrameInformation }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      contentType: '{{ response.contentType }}'
+      imageFrameBlob: '{{ response.imageFrameBlob }}'
+- discovery_id: aws.medical-imaging.get_image_set
+  for_each: aws.medical-imaging.list_datastores
+  calls:
+  - action: get_image_set
+    params:
+      datastoreId: '{{ item.datastoreId }}'
+      imageSetId: '{{ item.imageSetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      forced: '{{ response.overrides.forced }}'
+      createdAt: '{{ response.createdAt }}'
+      datastoreId: '{{ response.datastoreId }}'
+      deletedAt: '{{ response.deletedAt }}'
+      imageSetArn: '{{ response.imageSetArn }}'
+      imageSetId: '{{ response.imageSetId }}'
+      imageSetState: '{{ response.imageSetState }}'
+      imageSetWorkflowStatus: '{{ response.imageSetWorkflowStatus }}'
+      message: '{{ response.message }}'
+      updatedAt: '{{ response.updatedAt }}'
+      versionId: '{{ response.versionId }}'
+- discovery_id: aws.medical-imaging.get_image_set_metadata
+  for_each: aws.medical-imaging.list_datastores
+  calls:
+  - action: get_image_set_metadata
+    params:
+      datastoreId: '{{ item.datastoreId }}'
+      imageSetId: '{{ item.imageSetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      contentEncoding: '{{ response.contentEncoding }}'
+      imageSetMetadataBlob: '{{ response.imageSetMetadataBlob }}'
+      contentType: '{{ response.contentType }}'
+- discovery_id: aws.medical-imaging.list_dicom_import_jobs
+  for_each: aws.medical-imaging.list_datastores
+  calls:
+  - action: list_dicom_import_jobs
+    params:
+      datastoreId: '{{ item.datastoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.jobSummaries }}'
+    item:
+      dataAccessRoleArn: '{{ item.dataAccessRoleArn }}'
+      datastoreId: '{{ item.datastoreId }}'
+      endedAt: '{{ item.endedAt }}'
+      inputS3Uri: '{{ item.inputS3Uri }}'
+      jobId: '{{ item.jobId }}'
+      jobName: '{{ item.jobName }}'
+      jobProperties: '{{ item.jobProperties }}'
+      jobStatus: '{{ item.jobStatus }}'
+      message: '{{ item.message }}'
+      outputS3Uri: '{{ item.outputS3Uri }}'
+      submittedAt: '{{ item.submittedAt }}'
+- discovery_id: aws.medical-imaging.list_image_set_versions
+  for_each: aws.medical-imaging.list_datastores
+  calls:
+  - action: list_image_set_versions
+    params:
+      datastoreId: '{{ item.datastoreId }}'
+      imageSetId: '{{ item.imageSetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.imageSetPropertiesList }}'
+    item:
+      ImageSetWorkflowStatus: '{{ item.ImageSetWorkflowStatus }}'
+      deletedAt: '{{ item.deletedAt }}'
+      imageSetState: '{{ item.imageSetState }}'
+      message: '{{ item.message }}'
+      overrides: '{{ item.overrides }}'
+      versionId: '{{ item.versionId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.medical-imaging.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.medical-imaging.search_image_sets
+  calls:
+  - action: search_image_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.imageSetsMetadataSummaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+      sortField: '{{ response.sort.sortField }}'
+      sortOrder: '{{ response.sort.sortOrder }}'

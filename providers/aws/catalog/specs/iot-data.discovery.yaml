@@ -1,0 +1,57 @@
+version: '1.0'
+provider: aws
+service: iot-data
+services:
+  client: iot-data
+  module: boto3.client
+discovery:
+- discovery_id: aws.iot-data.list_retained_messages
+  calls:
+  - action: list_retained_messages
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.retainedTopics }}'
+    item:
+      lastModifiedTime: '{{ item.lastModifiedTime }}'
+      payloadSize: '{{ item.payloadSize }}'
+      qos: '{{ item.qos }}'
+      topic: '{{ item.topic }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iot-data.get_retained_message
+  for_each: aws.iot-data.list_retained_messages
+  calls:
+  - action: get_retained_message
+    params:
+      topic: '{{ item.topic }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      lastModifiedTime: '{{ response.lastModifiedTime }}'
+      payload: '{{ response.payload }}'
+      qos: '{{ response.qos }}'
+      topic: '{{ response.topic }}'
+      userProperties: '{{ response.userProperties }}'
+- discovery_id: aws.iot-data.get_thing_shadow
+  calls:
+  - action: get_thing_shadow
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      payload: '{{ response.payload }}'
+- discovery_id: aws.iot-data.list_named_shadows_for_thing
+  calls:
+  - action: list_named_shadows_for_thing
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.results }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+      timestamp: '{{ response.timestamp }}'

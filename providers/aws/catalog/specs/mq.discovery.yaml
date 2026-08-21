@@ -1,0 +1,105 @@
+version: '1.0'
+provider: aws
+service: mq
+discovery:
+- calls:
+  - action: list_brokers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.mq.list_brokers
+  emit:
+    as: item
+    item:
+      BrokerArn: '{{ item.BrokerArn }}'
+      BrokerId: '{{ item.BrokerId }}'
+      BrokerName: '{{ item.BrokerName }}'
+      BrokerState: '{{ item.BrokerState }}'
+      Created: '{{ item.Created }}'
+      DeploymentMode: '{{ item.DeploymentMode }}'
+      EngineType: '{{ item.EngineType }}'
+      HostInstanceType: '{{ item.HostInstanceType }}'
+      PendingAuthenticationStrategy: '{{ item.PendingAuthenticationStrategy }}'
+      PendingHostInstanceType: '{{ item.PendingHostInstanceType }}'
+    items_for: '{{ response.BrokerSummaries }}'
+- calls:
+  - action: describe_broker
+    on_error: continue
+    params:
+      BrokerId: '{{ item.BrokerId }}'
+    save_as: response
+  discovery_id: aws.mq.describe_broker
+  emit:
+    as: item
+    item:
+      ActionRequiredCode: '{{ item.ActionRequiredCode }}'
+      ActionRequiredInfo: '{{ item.ActionRequiredInfo }}'
+      Logs: '{{ item.Logs }}'
+      PendingAuthenticationStrategy: '{{ item.PendingAuthenticationStrategy }}'
+      PendingHostInstanceType: '{{ item.PendingHostInstanceType }}'
+      AuthenticationStrategy: '{{ response.AuthenticationStrategy }}'
+      AutoMinorVersionUpgrade: '{{ response.AutoMinorVersionUpgrade }}'
+      BrokerArn: '{{ response.BrokerArn }}'
+      BrokerId: '{{ response.BrokerId }}'
+      BrokerName: '{{ response.BrokerName }}'
+      BrokerState: '{{ response.BrokerState }}'
+      Id: '{{ response.Configurations.Current.Id }}'
+      Revision: '{{ response.Configurations.Current.Revision }}'
+      Created: '{{ response.Created }}'
+      Region: '{{ response.DataReplicationMetadata.DataReplicationCounterpart.Region }}'
+      DataReplicationRole: '{{ response.DataReplicationMetadata.DataReplicationRole }}'
+      DataReplicationMode: '{{ response.DataReplicationMode }}'
+      DeploymentMode: '{{ response.DeploymentMode }}'
+      KmsKeyId: '{{ response.EncryptionOptions.KmsKeyId }}'
+      UseAwsOwnedKey: '{{ response.EncryptionOptions.UseAwsOwnedKey }}'
+      EngineType: '{{ response.EngineType }}'
+      EngineVersion: '{{ response.EngineVersion }}'
+      HostInstanceType: '{{ response.HostInstanceType }}'
+      RoleBase: '{{ response.LdapServerMetadata.RoleBase }}'
+      RoleName: '{{ response.LdapServerMetadata.RoleName }}'
+      RoleSearchMatching: '{{ response.LdapServerMetadata.RoleSearchMatching }}'
+      RoleSearchSubtree: '{{ response.LdapServerMetadata.RoleSearchSubtree }}'
+      ServiceAccountUsername: '{{ response.LdapServerMetadata.ServiceAccountUsername }}'
+      UserBase: '{{ response.LdapServerMetadata.UserBase }}'
+      UserRoleName: '{{ response.LdapServerMetadata.UserRoleName }}'
+      UserSearchMatching: '{{ response.LdapServerMetadata.UserSearchMatching }}'
+      UserSearchSubtree: '{{ response.LdapServerMetadata.UserSearchSubtree }}'
+      Audit: '{{ response.Logs.Audit }}'
+      AuditLogGroup: '{{ response.Logs.AuditLogGroup }}'
+      General: '{{ response.Logs.General }}'
+      GeneralLogGroup: '{{ response.Logs.GeneralLogGroup }}'
+      DayOfWeek: '{{ response.MaintenanceWindowStartTime.DayOfWeek }}'
+      TimeOfDay: '{{ response.MaintenanceWindowStartTime.TimeOfDay }}'
+      TimeZone: '{{ response.MaintenanceWindowStartTime.TimeZone }}'
+      PendingDataReplicationMode: '{{ response.PendingDataReplicationMode }}'
+      PendingEngineVersion: '{{ response.PendingEngineVersion }}'
+      PubliclyAccessible: '{{ response.PubliclyAccessible }}'
+      StorageType: '{{ response.StorageType }}'
+      Tags: '{{ response.Tags }}'
+    items_for: '{{ response.ActionsRequired }}'
+  for_each: aws.mq.list_brokers
+- calls:
+  - action: list_configurations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.mq.list_configurations
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      AuthenticationStrategy: '{{ item.AuthenticationStrategy }}'
+      ConfigurationId: '{{ item.Configurations[].Id }}'
+      Configurations: '{{ item.Configurations }}'
+      Created: '{{ item.Created }}'
+      Data: '{{ item.Data }}'
+      Description: '{{ item.Description }}'
+      Enabled: '{{ item.Enabled }}'
+      EngineType: '{{ item.EngineType }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      Id: '{{ item.Id }}'
+      LatestRevision: '{{ item.LatestRevision }}'
+      Name: '{{ item.Name }}'
+      PendingAuthenticationStrategy: '{{ item.PendingAuthenticationStrategy }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      MaxResults: '{{ response.MaxResults }}'
+    items_for: '{{ response.Configurations }}'

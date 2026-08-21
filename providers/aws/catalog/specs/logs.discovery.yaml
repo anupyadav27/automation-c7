@@ -1,0 +1,696 @@
+version: '1.0'
+provider: aws
+service: logs
+services:
+  client: logs
+  module: boto3.client
+discovery:
+- discovery_id: aws.logs.describe_configuration_templates
+  calls:
+  - action: describe_configuration_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.configurationTemplates }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      allowedActionForAllowVendedLogsDeliveryForResource: '{{ item.allowedActionForAllowVendedLogsDeliveryForResource }}'
+      allowedFieldDelimiters: '{{ item.allowedFieldDelimiters }}'
+      allowedFields: '{{ item.allowedFields }}'
+      allowedOutputFormats: '{{ item.allowedOutputFormats }}'
+      allowedSuffixPathFields: '{{ item.allowedSuffixPathFields }}'
+      configurationTemplates: '{{ item.configurationTemplates }}'
+      defaultDeliveryConfigValues: '{{ item.defaultDeliveryConfigValues }}'
+      deliveryDestinationType: '{{ item.deliveryDestinationType }}'
+      logType: '{{ item.logType }}'
+      resourceType: '{{ item.resourceType }}'
+      service: '{{ item.service }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.describe_deliveries
+  calls:
+  - action: describe_deliveries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.deliveries }}'
+    item:
+      arn: '{{ item.arn }}'
+      deliveries: '{{ item.deliveries }}'
+      deliveryDestinationArn: '{{ item.deliveryDestinationArn }}'
+      deliveryDestinationType: '{{ item.deliveryDestinationType }}'
+      deliverySource: '{{ item.deliverySource }}'
+      deliverySourceName: '{{ item.deliverySourceName }}'
+      fieldDelimiter: '{{ item.fieldDelimiter }}'
+      id: '{{ item.id }}'
+      recordFields: '{{ item.recordFields }}'
+      s3DeliveryConfiguration: '{{ item.s3DeliveryConfiguration }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.describe_delivery_destinations
+  calls:
+  - action: describe_delivery_destinations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.deliveryDestinations }}'
+    item:
+      arn: '{{ item.arn }}'
+      deliveryDestinationConfiguration: '{{ item.deliveryDestinationConfiguration }}'
+      deliveryDestinationType: '{{ item.deliveryDestinationType }}'
+      deliveryDestinations: '{{ item.deliveryDestinations[].arn }}'
+      name: '{{ item.name }}'
+      outputFormat: '{{ item.outputFormat }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.describe_delivery_sources
+  calls:
+  - action: describe_delivery_sources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.deliverySources }}'
+    item:
+      arn: '{{ item.arn }}'
+      deliverySources: '{{ item.deliverySources }}'
+      logType: '{{ item.logType }}'
+      name: '{{ item.name }}'
+      resourceArns: '{{ item.resourceArns }}'
+      service: '{{ item.service }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.describe_destinations
+  calls:
+  - action: describe_destinations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.destinations }}'
+    item:
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+      accessPolicy: '{{ item.accessPolicy }}'
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      destinationName: '{{ item.destinationName }}'
+      executionRoleArn: '{{ item.executionRoleArn }}'
+      roleArn: '{{ item.roleArn }}'
+      targetArn: '{{ item.targetArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.describe_export_tasks
+  calls:
+  - action: describe_export_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.exportTasks }}'
+    item:
+      destination: '{{ item.destination }}'
+      destinationPrefix: '{{ item.destinationPrefix }}'
+      executionInfo: '{{ item.executionInfo }}'
+      exportTasks: '{{ item.exportTasks }}'
+      from: '{{ item.from }}'
+      logGroupName: '{{ item.logGroupName }}'
+      status: '{{ item.status }}'
+      taskId: '{{ item.taskId }}'
+      taskName: '{{ item.taskName }}'
+      to: '{{ item.to }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.describe_log_groups
+  calls:
+  - action: describe_log_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.logGroups }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      dataProtectionStatus: '{{ item.dataProtectionStatus }}'
+      deletionProtectionEnabled: '{{ item.deletionProtectionEnabled }}'
+      inheritedProperties: '{{ item.inheritedProperties }}'
+      kmsKeyId: '{{ item.kmsKeyId }}'
+      logGroupArn: '{{ item.logGroupArn }}'
+      logGroupClass: '{{ item.logGroupClass }}'
+      logGroupName: '{{ item.logGroupName }}'
+      logGroups: '{{ item.logGroups }}'
+      metricFilterCount: '{{ item.metricFilterCount }}'
+      retentionInDays: '{{ item.retentionInDays }}'
+      storedBytes: '{{ item.storedBytes }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.describe_log_streams
+  calls:
+  - action: describe_log_streams
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.logStreams }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      firstEventTimestamp: '{{ item.firstEventTimestamp }}'
+      lastEventTimestamp: '{{ item.lastEventTimestamp }}'
+      lastIngestionTime: '{{ item.lastIngestionTime }}'
+      logStreamName: '{{ item.logStreamName }}'
+      storedBytes: '{{ item.storedBytes }}'
+      uploadSequenceToken: '{{ item.uploadSequenceToken }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.describe_metric_filters
+  calls:
+  - action: describe_metric_filters
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.metricFilters }}'
+    item:
+      applyOnTransformedLogs: '{{ item.applyOnTransformedLogs }}'
+      creationTime: '{{ item.creationTime }}'
+      emitSystemFieldDimensions: '{{ item.emitSystemFieldDimensions }}'
+      fieldSelectionCriteria: '{{ item.fieldSelectionCriteria }}'
+      filterName: '{{ item.filterName }}'
+      filterPattern: '{{ item.filterPattern }}'
+      logGroupName: '{{ item.logGroupName }}'
+      metricFilters: '{{ item.metricFilters }}'
+      metricTransformations: '{{ item.metricTransformations }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.describe_queries
+  calls:
+  - action: describe_queries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.queries }}'
+    item:
+      createTime: '{{ item.createTime }}'
+      logGroupName: '{{ item.logGroupName }}'
+      queries: '{{ item.queries }}'
+      queryId: '{{ item.queryId }}'
+      queryLanguage: '{{ item.queryLanguage }}'
+      queryString: '{{ item.queryString }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.describe_query_definitions
+  calls:
+  - action: describe_query_definitions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.queryDefinitions }}'
+    item:
+      lastModified: '{{ item.lastModified }}'
+      logGroupNames: '{{ item.logGroupNames }}'
+      name: '{{ item.name }}'
+      queryDefinitionId: '{{ item.queryDefinitionId }}'
+      queryDefinitions: '{{ item.queryDefinitions }}'
+      queryLanguage: '{{ item.queryLanguage }}'
+      queryString: '{{ item.queryString }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.describe_resource_policies
+  calls:
+  - action: describe_resource_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.resourcePolicies }}'
+    item:
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      policyDocument: '{{ item.policyDocument }}'
+      policyName: '{{ item.policyName }}'
+      policyScope: '{{ item.policyScope }}'
+      resourceArn: '{{ item.resourceArn }}'
+      resourcePolicies: '{{ item.resourcePolicies }}'
+      revisionId: '{{ item.revisionId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.get_log_group_fields
+  calls:
+  - action: get_log_group_fields
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.logGroupFields }}'
+    item:
+      logGroupFields: '{{ item.logGroupFields }}'
+      name: '{{ item.name }}'
+      percent: '{{ item.percent }}'
+- discovery_id: aws.logs.list_anomalies
+  calls:
+  - action: list_anomalies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.anomalies }}'
+    item:
+      active: '{{ item.active }}'
+      anomalyDetectorArn: '{{ item.anomalyDetectorArn }}'
+      anomalyId: '{{ item.anomalyId }}'
+      description: '{{ item.description }}'
+      firstSeen: '{{ item.firstSeen }}'
+      histogram: '{{ item.histogram }}'
+      isPatternLevelSuppression: '{{ item.isPatternLevelSuppression }}'
+      lastSeen: '{{ item.lastSeen }}'
+      logGroupArnList: '{{ item.logGroupArnList }}'
+      logSamples: '{{ item.logSamples }}'
+      patternId: '{{ item.patternId }}'
+      patternRegex: '{{ item.patternRegex }}'
+      patternString: '{{ item.patternString }}'
+      patternTokens: '{{ item.patternTokens }}'
+      priority: '{{ item.priority }}'
+      state: '{{ item.state }}'
+      suppressed: '{{ item.suppressed }}'
+      suppressedDate: '{{ item.suppressedDate }}'
+      suppressedUntil: '{{ item.suppressedUntil }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.list_integrations
+  calls:
+  - action: list_integrations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.integrationSummaries }}'
+    item:
+      integrationDetails: '{{ item.integrationDetails }}'
+      integrationName: '{{ item.integrationName }}'
+      integrationStatus: '{{ item.integrationStatus }}'
+      integrationType: '{{ item.integrationType }}'
+- discovery_id: aws.logs.list_log_anomaly_detectors
+  calls:
+  - action: list_log_anomaly_detectors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.anomalyDetectors }}'
+    item:
+      anomalyDetectorArn: '{{ item.anomalyDetectorArn }}'
+      anomalyDetectorStatus: '{{ item.anomalyDetectorStatus }}'
+      anomalyVisibilityTime: '{{ item.anomalyVisibilityTime }}'
+      creationTimeStamp: '{{ item.creationTimeStamp }}'
+      detectorName: '{{ item.detectorName }}'
+      evaluationFrequency: '{{ item.evaluationFrequency }}'
+      filterPattern: '{{ item.filterPattern }}'
+      kmsKeyId: '{{ item.kmsKeyId }}'
+      lastModifiedTimeStamp: '{{ item.lastModifiedTimeStamp }}'
+      logGroupArnList: '{{ item.logGroupArnList }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.list_log_groups
+  calls:
+  - action: list_log_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.logGroups }}'
+    item:
+      logGroupArn: '{{ item.logGroupArn }}'
+      logGroupClass: '{{ item.logGroupClass }}'
+      logGroupName: '{{ item.logGroupName }}'
+      logGroups: '{{ item.logGroups }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.list_scheduled_queries
+  calls:
+  - action: list_scheduled_queries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.scheduledQueries }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      destinationConfiguration: '{{ item.destinationConfiguration }}'
+      lastExecutionStatus: '{{ item.lastExecutionStatus }}'
+      lastTriggeredTime: '{{ item.lastTriggeredTime }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      name: '{{ item.name }}'
+      queries: '{{ item.queries }}'
+      scheduleExpression: '{{ item.scheduleExpression }}'
+      scheduledQueryArn: '{{ item.scheduledQueryArn }}'
+      state: '{{ item.state }}'
+      timezone: '{{ item.timezone }}'
+- discovery_id: aws.logs.describe_account_policies
+  calls:
+  - action: describe_account_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.accountPolicies }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      policyDocument: '{{ item.policyDocument }}'
+      policyName: '{{ item.policyName }}'
+      policyType: '{{ item.policyType }}'
+      scope: '{{ item.scope }}'
+      selectionCriteria: '{{ item.selectionCriteria }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.describe_field_indexes
+  calls:
+  - action: describe_field_indexes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.fieldIndexes }}'
+    item:
+      fieldIndexName: '{{ item.fieldIndexName }}'
+      firstEventTime: '{{ item.firstEventTime }}'
+      lastEventTime: '{{ item.lastEventTime }}'
+      lastScanTime: '{{ item.lastScanTime }}'
+      logGroupIdentifier: '{{ item.logGroupIdentifier }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.describe_index_policies
+  calls:
+  - action: describe_index_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.indexPolicies }}'
+    item:
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      logGroupIdentifier: '{{ item.logGroupIdentifier }}'
+      policyDocument: '{{ item.policyDocument }}'
+      policyName: '{{ item.policyName }}'
+      source: '{{ item.source }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.describe_subscription_filters
+  for_each: aws.logs.describe_export_tasks
+  calls:
+  - action: describe_subscription_filters
+    params:
+      logGroupName: '{{ item.logGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.subscriptionFilters }}'
+    item:
+      applyOnTransformedLogs: '{{ item.applyOnTransformedLogs }}'
+      creationTime: '{{ item.creationTime }}'
+      destinationArn: '{{ item.destinationArn }}'
+      distribution: '{{ item.distribution }}'
+      emitSystemFields: '{{ item.emitSystemFields }}'
+      fieldSelectionCriteria: '{{ item.fieldSelectionCriteria }}'
+      filterName: '{{ item.filterName }}'
+      filterPattern: '{{ item.filterPattern }}'
+      logGroupName: '{{ item.logGroupName }}'
+      roleArn: '{{ item.roleArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.get_data_protection_policy
+  calls:
+  - action: get_data_protection_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      lastUpdatedTime: '{{ response.lastUpdatedTime }}'
+      logGroupIdentifier: '{{ response.logGroupIdentifier }}'
+      policyDocument: '{{ response.policyDocument }}'
+- discovery_id: aws.logs.get_delivery
+  for_each: aws.logs.describe_deliveries
+  calls:
+  - action: get_delivery
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.delivery.arn }}'
+      deliveryDestinationArn: '{{ response.delivery.deliveryDestinationArn }}'
+      deliveryDestinationType: '{{ response.delivery.deliveryDestinationType }}'
+      deliverySourceName: '{{ response.delivery.deliverySourceName }}'
+      fieldDelimiter: '{{ response.delivery.fieldDelimiter }}'
+      id: '{{ response.delivery.id }}'
+      recordFields: '{{ response.delivery.recordFields }}'
+      s3DeliveryConfiguration: '{{ response.delivery.s3DeliveryConfiguration.suffixPath }}'
+      tags: '{{ response.delivery.tags }}'
+      enableHiveCompatiblePath: '{{ response.delivery.s3DeliveryConfiguration.enableHiveCompatiblePath }}'
+      suffixPath: '{{ response.delivery.s3DeliveryConfiguration.suffixPath }}'
+- discovery_id: aws.logs.get_delivery_destination
+  for_each: aws.logs.describe_delivery_destinations
+  calls:
+  - action: get_delivery_destination
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.deliveryDestination.arn }}'
+      deliveryDestinationConfiguration: '{{ response.deliveryDestination.deliveryDestinationConfiguration }}'
+      deliveryDestinationType: '{{ response.deliveryDestination.deliveryDestinationType }}'
+      name: '{{ response.deliveryDestination.name }}'
+      outputFormat: '{{ response.deliveryDestination.outputFormat }}'
+      tags: '{{ response.deliveryDestination.tags }}'
+      destinationResourceArn: '{{ response.deliveryDestination.deliveryDestinationConfiguration.destinationResourceArn }}'
+- discovery_id: aws.logs.get_delivery_destination_policy
+  for_each: aws.logs.describe_delivery_destinations
+  calls:
+  - action: get_delivery_destination_policy
+    params:
+      deliveryDestinationName: '{{ item.deliveryDestinationName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      deliveryDestinationPolicy: '{{ response.policy.deliveryDestinationPolicy }}'
+      policy: '{{ response.policy.policy }}'
+- discovery_id: aws.logs.get_delivery_source
+  for_each: aws.logs.describe_delivery_destinations
+  calls:
+  - action: get_delivery_source
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.deliverySource.arn }}'
+      deliverySource: '{{ response.deliverySource.deliverySource }}'
+      logType: '{{ response.deliverySource.logType }}'
+      name: '{{ response.deliverySource.name }}'
+      resourceArns: '{{ response.deliverySource.resourceArns }}'
+      service: '{{ response.deliverySource.service }}'
+      tags: '{{ response.deliverySource.tags }}'
+- discovery_id: aws.logs.get_integration
+  for_each: aws.logs.list_integrations
+  calls:
+  - action: get_integration
+    params:
+      integrationName: '{{ item.integrationName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      integrationDetails: '{{ response.integrationDetails.integrationDetails }}'
+      openSearchIntegrationDetails: '{{ response.integrationDetails.openSearchIntegrationDetails }}'
+      policyName: '{{ response.integrationDetails.openSearchIntegrationDetails.accessPolicy.policyName }}'
+      status: '{{ response.integrationDetails.openSearchIntegrationDetails.accessPolicy.status.status }}'
+      statusMessage: '{{ response.integrationDetails.openSearchIntegrationDetails.accessPolicy.status.statusMessage }}'
+      applicationArn: '{{ response.integrationDetails.openSearchIntegrationDetails.application.applicationArn }}'
+      applicationEndpoint: '{{ response.integrationDetails.openSearchIntegrationDetails.application.applicationEndpoint }}'
+      applicationId: '{{ response.integrationDetails.openSearchIntegrationDetails.application.applicationId }}'
+      collectionArn: '{{ response.integrationDetails.openSearchIntegrationDetails.collection.collectionArn }}'
+      collectionEndpoint: '{{ response.integrationDetails.openSearchIntegrationDetails.collection.collectionEndpoint }}'
+      dataSourceName: '{{ response.integrationDetails.openSearchIntegrationDetails.dataSource.dataSourceName }}'
+      workspaceId: '{{ response.integrationDetails.openSearchIntegrationDetails.workspace.workspaceId }}'
+      integrationName: '{{ response.integrationName }}'
+      integrationStatus: '{{ response.integrationStatus }}'
+      integrationType: '{{ response.integrationType }}'
+- discovery_id: aws.logs.get_log_anomaly_detector
+  for_each: aws.logs.list_anomalies
+  calls:
+  - action: get_log_anomaly_detector
+    params:
+      anomalyDetectorArn: '{{ item.anomalyDetectorArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.logGroupArnList }}'
+    item:
+      anomalyDetectorStatus: '{{ response.anomalyDetectorStatus }}'
+      anomalyVisibilityTime: '{{ response.anomalyVisibilityTime }}'
+      creationTimeStamp: '{{ response.creationTimeStamp }}'
+      detectorName: '{{ response.detectorName }}'
+      evaluationFrequency: '{{ response.evaluationFrequency }}'
+      filterPattern: '{{ response.filterPattern }}'
+      kmsKeyId: '{{ response.kmsKeyId }}'
+      lastModifiedTimeStamp: '{{ response.lastModifiedTimeStamp }}'
+- discovery_id: aws.logs.get_log_events
+  for_each: aws.logs.describe_log_streams
+  calls:
+  - action: get_log_events
+    params:
+      logStreamName: '{{ item.logStreamName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.events }}'
+    item:
+      ingestionTime: '{{ item.ingestionTime }}'
+      message: '{{ item.message }}'
+      timestamp: '{{ item.timestamp }}'
+      nextBackwardToken: '{{ response.nextBackwardToken }}'
+      nextForwardToken: '{{ response.nextForwardToken }}'
+- discovery_id: aws.logs.get_log_object
+  calls:
+  - action: get_log_object
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      InternalStreamingException: '{{ response.fieldStream.InternalStreamingException }}'
+      fields: '{{ response.fieldStream.fields }}'
+- discovery_id: aws.logs.get_log_record
+  calls:
+  - action: get_log_record
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      logRecord: '{{ response.logRecord }}'
+- discovery_id: aws.logs.get_query_results
+  for_each: aws.logs.describe_queries
+  calls:
+  - action: get_query_results
+    params:
+      queryId: '{{ item.queryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.results }}'
+    item:
+      results: '{{ item.results }}'
+      statistics: '{{ item.statistics }}'
+      encryptionKey: '{{ response.encryptionKey }}'
+      queryLanguage: '{{ response.queryLanguage }}'
+      bytesScanned: '{{ response.statistics.bytesScanned }}'
+      estimatedBytesSkipped: '{{ response.statistics.estimatedBytesSkipped }}'
+      estimatedRecordsSkipped: '{{ response.statistics.estimatedRecordsSkipped }}'
+      logGroupsScanned: '{{ response.statistics.logGroupsScanned }}'
+      recordsMatched: '{{ response.statistics.recordsMatched }}'
+      recordsScanned: '{{ response.statistics.recordsScanned }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.logs.get_scheduled_query
+  calls:
+  - action: get_scheduled_query
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.logGroupIdentifiers }}'
+    item:
+      executionRoleArn: '{{ item.executionRoleArn }}'
+- discovery_id: aws.logs.get_scheduled_query_history
+  calls:
+  - action: get_scheduled_query_history
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.triggerHistory }}'
+    item:
+      destinations: '{{ item.destinations }}'
+      errorMessage: '{{ item.errorMessage }}'
+      executionStatus: '{{ item.executionStatus }}'
+      queryId: '{{ item.queryId }}'
+      triggeredTimestamp: '{{ item.triggeredTimestamp }}'
+- discovery_id: aws.logs.get_transformer
+  calls:
+  - action: get_transformer
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.transformerConfig }}'
+    item:
+      addKeys: '{{ item.addKeys }}'
+      copyValue: '{{ item.copyValue }}'
+      csv: '{{ item.csv }}'
+      dateTimeConverter: '{{ item.dateTimeConverter }}'
+      deleteKeys: '{{ item.deleteKeys }}'
+      grok: '{{ item.grok }}'
+      listToMap: '{{ item.listToMap }}'
+      lowerCaseString: '{{ item.lowerCaseString }}'
+      moveKeys: '{{ item.moveKeys }}'
+      parseCloudfront: '{{ item.parseCloudfront }}'
+      parseJSON: '{{ item.parseJSON }}'
+      parseKeyValue: '{{ item.parseKeyValue }}'
+      parsePostgres: '{{ item.parsePostgres }}'
+      parseRoute53: '{{ item.parseRoute53 }}'
+      parseToOCSF: '{{ item.parseToOCSF }}'
+      parseVPC: '{{ item.parseVPC }}'
+      parseWAF: '{{ item.parseWAF }}'
+      renameKeys: '{{ item.renameKeys }}'
+      splitString: '{{ item.splitString }}'
+      substituteString: '{{ item.substituteString }}'
+      trimString: '{{ item.trimString }}'
+      typeConverter: '{{ item.typeConverter }}'
+      upperCaseString: '{{ item.upperCaseString }}'
+      creationTime: '{{ response.creationTime }}'
+      lastModifiedTime: '{{ response.lastModifiedTime }}'
+      logGroupIdentifier: '{{ response.logGroupIdentifier }}'
+- discovery_id: aws.logs.list_log_groups_for_query
+  for_each: aws.logs.describe_queries
+  calls:
+  - action: list_log_groups_for_query
+    params:
+      queryId: '{{ item.queryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.logGroupIdentifiers }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.logs.list_tags_for_resource
+  for_each: aws.logs.describe_resource_policies
+  calls:
+  - action: list_tags_for_resource
+    params:
+      resourceArn: '{{ item.resourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.logs.list_tags_log_group
+  for_each: aws.logs.describe_export_tasks
+  calls:
+  - action: list_tags_log_group
+    params:
+      logGroupName: '{{ item.logGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

@@ -1,0 +1,128 @@
+version: '1.0'
+provider: aws
+service: serverlessrepo
+services:
+  client: serverlessrepo
+  module: boto3.client
+discovery:
+- discovery_id: aws.serverlessrepo.list_applications
+  calls:
+  - action: list_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Applications }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      Labels: '{{ item.Labels }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      Actions: '{{ item.Actions }}'
+      ApplicationId: '{{ item.ApplicationId }}'
+      Author: '{{ item.Author }}'
+      Description: '{{ item.Description }}'
+      HomePageUrl: '{{ item.HomePageUrl }}'
+      IsVerifiedAuthor: '{{ item.IsVerifiedAuthor }}'
+      LicenseUrl: '{{ item.LicenseUrl }}'
+      PrincipalOrgIDs: '{{ item.PrincipalOrgIDs }}'
+      Principals: '{{ item.Principals }}'
+      ReadmeUrl: '{{ item.ReadmeUrl }}'
+      SemanticVersion: '{{ item.SemanticVersion }}'
+      SourceCodeUrl: '{{ item.SourceCodeUrl }}'
+      SpdxLicenseId: '{{ item.SpdxLicenseId }}'
+      VerifiedAuthorUrl: '{{ item.VerifiedAuthorUrl }}'
+- discovery_id: aws.serverlessrepo.get_application
+  for_each: aws.serverlessrepo.list_applications
+  calls:
+  - action: get_application
+    params:
+      ApplicationId: '{{ item.ApplicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Labels }}'
+    item:
+      IsVerifiedAuthor: '{{ item.IsVerifiedAuthor }}'
+      LicenseUrl: '{{ item.LicenseUrl }}'
+      ReadmeUrl: '{{ item.ReadmeUrl }}'
+      VerifiedAuthorUrl: '{{ item.VerifiedAuthorUrl }}'
+      ApplicationId: '{{ response.ApplicationId }}'
+      Author: '{{ response.Author }}'
+      CreationTime: '{{ response.CreationTime }}'
+      Description: '{{ response.Description }}'
+      HomePageUrl: '{{ response.HomePageUrl }}'
+      Name: '{{ response.Name }}'
+      SpdxLicenseId: '{{ response.SpdxLicenseId }}'
+      ResourcesSupported: '{{ response.Version.ResourcesSupported }}'
+      SemanticVersion: '{{ response.Version.SemanticVersion }}'
+      SourceCodeArchiveUrl: '{{ response.Version.SourceCodeArchiveUrl }}'
+      SourceCodeUrl: '{{ response.Version.SourceCodeUrl }}'
+      TemplateUrl: '{{ response.Version.TemplateUrl }}'
+- discovery_id: aws.serverlessrepo.get_application_policy
+  for_each: aws.serverlessrepo.list_applications
+  calls:
+  - action: get_application_policy
+    params:
+      ApplicationId: '{{ item.ApplicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Statements }}'
+    item:
+      Actions: '{{ item.Actions }}'
+      PrincipalOrgIDs: '{{ item.PrincipalOrgIDs }}'
+      Principals: '{{ item.Principals }}'
+      StatementId: '{{ item.StatementId }}'
+      Statements: '{{ item.Statements }}'
+- discovery_id: aws.serverlessrepo.get_cloud_formation_template
+  for_each: aws.serverlessrepo.list_applications
+  calls:
+  - action: get_cloud_formation_template
+    params:
+      ApplicationId: '{{ item.ApplicationId }}'
+      TemplateId: '{{ item.TemplateId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ response.CreationTime }}'
+      Status: '{{ response.Status }}'
+      ApplicationId: '{{ response.ApplicationId }}'
+      ExpirationTime: '{{ response.ExpirationTime }}'
+      SemanticVersion: '{{ response.SemanticVersion }}'
+      TemplateId: '{{ response.TemplateId }}'
+      TemplateUrl: '{{ response.TemplateUrl }}'
+- discovery_id: aws.serverlessrepo.list_application_dependencies
+  for_each: aws.serverlessrepo.list_applications
+  calls:
+  - action: list_application_dependencies
+    params:
+      ApplicationId: '{{ item.ApplicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Dependencies }}'
+    item:
+      ApplicationId: '{{ item.ApplicationId }}'
+      SemanticVersion: '{{ item.SemanticVersion }}'
+- discovery_id: aws.serverlessrepo.list_application_versions
+  for_each: aws.serverlessrepo.list_applications
+  calls:
+  - action: list_application_versions
+    params:
+      ApplicationId: '{{ item.ApplicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Versions }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      ApplicationId: '{{ item.ApplicationId }}'
+      SemanticVersion: '{{ item.SemanticVersion }}'
+      SourceCodeUrl: '{{ item.SourceCodeUrl }}'

@@ -1,0 +1,28 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: virtualmachine (backed by backup-gateway)
+# 1 ops (from checks)
+# Generated: 2026-04-14
+version: '1.0'
+provider: aws
+service: virtualmachine
+services:
+  client: backup-gateway
+  module: boto3.client
+discovery:
+  - discovery_id: aws.virtualmachine.list_virtual_machines
+    calls:
+    - action: list_virtual_machines
+      save_as: response
+      on_error: continue
+      params:
+        MaxResults: 100
+    emit:
+      as: item
+      items_for: '{{ response.VirtualMachines }}'
+      item:
+        Name: '{{ item.Name }}'
+        ResourceArn: '{{ item.ResourceArn }}'
+        HostName: '{{ item.HostName }}'
+        HypervisorId: '{{ item.HypervisorId }}'
+        LastBackupDate: '{{ item.LastBackupDate }}'
+        Path: '{{ item.Path }}'

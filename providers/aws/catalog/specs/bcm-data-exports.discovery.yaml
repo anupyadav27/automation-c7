@@ -1,0 +1,158 @@
+version: '1.0'
+provider: aws
+service: bcm-data-exports
+services:
+  client: bcm-data-exports
+  module: boto3.client
+discovery:
+- discovery_id: aws.bcm-data-exports.list_exports
+  calls:
+  - action: list_exports
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Exports }}'
+    item:
+      Name: '{{ item.Name }}'
+      CompletedAt: '{{ item.CompletedAt }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DataQuery: '{{ item.DataQuery }}'
+      DestinationConfigurations: '{{ item.DestinationConfigurations }}'
+      Export: '{{ item.Export }}'
+      ExportArn: '{{ item.ExportArn }}'
+      ExportName: '{{ item.ExportName }}'
+      ExportStatus: '{{ item.ExportStatus }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      RefreshCadence: '{{ item.RefreshCadence }}'
+      StatusCode: '{{ item.StatusCode }}'
+      StatusReason: '{{ item.StatusReason }}'
+- discovery_id: aws.bcm-data-exports.list_tables
+  calls:
+  - action: list_tables
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tables }}'
+    item:
+      Description: '{{ item.Description }}'
+      Schema: '{{ item.Schema }}'
+      TableName: '{{ item.TableName }}'
+      TableProperties: '{{ item.TableProperties }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.bcm-data-exports.get_execution
+  for_each: aws.bcm-data-exports.list_exports
+  calls:
+  - action: get_execution
+    params:
+      ExecutionId: '{{ item.ExecutionId }}'
+      ExportArn: '{{ item.ExportArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CompletedAt: '{{ response.ExecutionStatus.CompletedAt }}'
+      CreatedAt: '{{ response.ExecutionStatus.CreatedAt }}'
+      Export: '{{ response.ExecutionStatus.Export }}'
+      LastUpdatedAt: '{{ response.ExecutionStatus.LastUpdatedAt }}'
+      StatusCode: '{{ response.ExecutionStatus.StatusCode }}'
+      StatusReason: '{{ response.ExecutionStatus.StatusReason }}'
+      ExecutionId: '{{ response.ExecutionId }}'
+      QueryStatement: '{{ response.Export.DataQuery.QueryStatement }}'
+      TableConfigurations: '{{ response.Export.DataQuery.TableConfigurations }}'
+      Description: '{{ response.Export.Description }}'
+      S3Bucket: '{{ response.Export.DestinationConfigurations.S3Destination.S3Bucket }}'
+      Compression: '{{ response.Export.DestinationConfigurations.S3Destination.S3OutputConfigurations.Compression }}'
+      Format: '{{ response.Export.DestinationConfigurations.S3Destination.S3OutputConfigurations.Format }}'
+      OutputType: '{{ response.Export.DestinationConfigurations.S3Destination.S3OutputConfigurations.OutputType }}'
+      Overwrite: '{{ response.Export.DestinationConfigurations.S3Destination.S3OutputConfigurations.Overwrite }}'
+      S3Prefix: '{{ response.Export.DestinationConfigurations.S3Destination.S3Prefix }}'
+      S3Region: '{{ response.Export.DestinationConfigurations.S3Destination.S3Region }}'
+      ExportArn: '{{ response.Export.ExportArn }}'
+      Name: '{{ response.Export.Name }}'
+      Frequency: '{{ response.Export.RefreshCadence.Frequency }}'
+- discovery_id: aws.bcm-data-exports.get_export
+  for_each: aws.bcm-data-exports.list_exports
+  calls:
+  - action: get_export
+    params:
+      ExportArn: '{{ item.ExportArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Export.Status }}'
+      DataQuery: '{{ response.Export.DataQuery }}'
+      Description: '{{ response.Export.Description }}'
+      DestinationConfigurations: '{{ response.Export.DestinationConfigurations }}'
+      Enabled: '{{ response.Export.Enabled }}'
+      ExportArn: '{{ response.Export.ExportArn }}'
+      RefreshCadence: '{{ response.Export.RefreshCadence }}'
+      CreatedAt: '{{ response.ExportStatus.CreatedAt }}'
+      LastRefreshedAt: '{{ response.ExportStatus.LastRefreshedAt }}'
+      LastUpdatedAt: '{{ response.ExportStatus.LastUpdatedAt }}'
+      StatusCode: '{{ response.ExportStatus.StatusCode }}'
+      StatusReason: '{{ response.ExportStatus.StatusReason }}'
+      QueryStatement: '{{ response.Export.DataQuery.QueryStatement }}'
+      TableConfigurations: '{{ response.Export.DataQuery.TableConfigurations }}'
+      S3Bucket: '{{ response.Export.DestinationConfigurations.S3Destination.S3Bucket }}'
+      Compression: '{{ response.Export.DestinationConfigurations.S3Destination.S3OutputConfigurations.Compression }}'
+      Format: '{{ response.Export.DestinationConfigurations.S3Destination.S3OutputConfigurations.Format }}'
+      OutputType: '{{ response.Export.DestinationConfigurations.S3Destination.S3OutputConfigurations.OutputType }}'
+      Overwrite: '{{ response.Export.DestinationConfigurations.S3Destination.S3OutputConfigurations.Overwrite }}'
+      S3Prefix: '{{ response.Export.DestinationConfigurations.S3Destination.S3Prefix }}'
+      S3Region: '{{ response.Export.DestinationConfigurations.S3Destination.S3Region }}'
+      Name: '{{ response.Export.Name }}'
+      Frequency: '{{ response.Export.RefreshCadence.Frequency }}'
+- discovery_id: aws.bcm-data-exports.get_table
+  for_each: aws.bcm-data-exports.list_tables
+  calls:
+  - action: get_table
+    params:
+      TableName: '{{ item.TableName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Schema }}'
+    item:
+      Name: '{{ item.Name }}'
+      Description: '{{ item.Description }}'
+      Schema: '{{ item.Schema }}'
+      Type: '{{ item.Type }}'
+      TableName: '{{ response.TableName }}'
+      TableProperties: '{{ response.TableProperties }}'
+- discovery_id: aws.bcm-data-exports.list_executions
+  for_each: aws.bcm-data-exports.list_exports
+  calls:
+  - action: list_executions
+    params:
+      ExportArn: '{{ item.ExportArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Executions }}'
+    item:
+      CompletedAt: '{{ item.CompletedAt }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      ExecutionId: '{{ item.ExecutionId }}'
+      ExecutionStatus: '{{ item.ExecutionStatus }}'
+      Export: '{{ item.Export }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      StatusCode: '{{ item.StatusCode }}'
+      StatusReason: '{{ item.StatusReason }}'
+- discovery_id: aws.bcm-data-exports.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceTags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

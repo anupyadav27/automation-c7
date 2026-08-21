@@ -1,0 +1,68 @@
+version: '1.0'
+provider: aws
+service: sns
+discovery:
+- calls:
+  - action: list_subscriptions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.sns.list_subscriptions
+  emit:
+    as: item
+    item:
+      Endpoint: '{{ item.Endpoint }}'
+      Owner: '{{ item.Owner }}'
+      Protocol: '{{ item.Protocol }}'
+      SubscriptionArn: '{{ item.SubscriptionArn }}'
+      TopicArn: '{{ item.TopicArn }}'
+    items_for: '{{ response.Subscriptions }}'
+  resource_type: sns_subscription
+- calls:
+  - action: get_topic_attributes
+    on_error: continue
+    params:
+      TopicArn: '{{ item.TopicArn }}'
+    save_as: response
+  discovery_id: aws.sns.get_topic_attributes
+  emit:
+    as: item
+    item:
+      DeliveryPolicy: '{{ response.Attributes.DeliveryPolicy }}'
+      EffectiveDeliveryPolicy: '{{ response.Attributes.EffectiveDeliveryPolicy }}'
+      KmsMasterKeyId: '{{ response.Attributes.KmsMasterKeyId }}'
+      Owner: '{{ response.Attributes.Owner }}'
+      Policy: '{{ response.Attributes.Policy }}'
+      SubscriptionsConfirmed: '{{ response.Attributes.SubscriptionsConfirmed }}'
+      SubscriptionsPending: '{{ response.Attributes.SubscriptionsPending }}'
+      TopicArn: '{{ response.Attributes.TopicArn }}'
+  for_each: aws.sns.list_topics
+  resource_type: sns_topic_attribute
+- calls:
+  - action: get_subscription_attributes
+    on_error: continue
+    params:
+      SubscriptionArn: '{{ item.SubscriptionArn }}'
+    save_as: response
+  discovery_id: aws.sns.get_subscription_attributes
+  emit:
+    as: item
+    item:
+      EffectiveDeliveryPolicy: '{{ response.Attributes.EffectiveDeliveryPolicy }}'
+      Owner: '{{ response.Attributes.Owner }}'
+      Policy: '{{ response.Attributes.Policy }}'
+      SubscriptionArn: '{{ response.Attributes.SubscriptionArn }}'
+      TopicArn: '{{ response.Attributes.TopicArn }}'
+  for_each: aws.sns.list_subscriptions
+  resource_type: sns_subscription_attribute
+- calls:
+  - action: list_platform_applications
+    on_error: continue
+    save_as: response
+  discovery_id: aws.sns.list_platform_applications
+  emit:
+    as: item
+    item:
+      Attributes: '{{ item.Attributes }}'
+      PlatformApplicationArn: '{{ item.PlatformApplicationArn }}'
+    items_for: '{{ response.PlatformApplications }}'
+  resource_type: sns_platform_application

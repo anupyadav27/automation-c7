@@ -1,0 +1,312 @@
+version: '1.0'
+provider: aws
+service: memorydb
+is_active: false
+services:
+  client: memorydb
+  module: boto3.client
+discovery:
+- discovery_id: aws.memorydb.describe_ac_ls
+  calls:
+  - action: describe_ac_ls
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ACLs }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      ACLs: '{{ item.ACLs }}'
+      ARN: '{{ item.ARN }}'
+      Clusters: '{{ item.Clusters }}'
+      MinimumEngineVersion: '{{ item.MinimumEngineVersion }}'
+      PendingChanges: '{{ item.PendingChanges }}'
+      UserNames: '{{ item.UserNames }}'
+- discovery_id: aws.memorydb.describe_clusters
+  calls:
+  - action: describe_clusters
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Clusters }}'
+    item:
+      AutoMinorVersionUpgrade: '{{ item.AutoMinorVersionUpgrade }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      Name: '{{ item.Name }}'
+      SecurityGroups: '{{ item.SecurityGroups }}'
+      SnapshotRetentionLimit: '{{ item.SnapshotRetentionLimit }}'
+      Status: '{{ item.Status }}'
+      ACLName: '{{ item.ACLName }}'
+      ARN: '{{ item.ARN }}'
+      AvailabilityMode: '{{ item.AvailabilityMode }}'
+      ClusterEndpoint: '{{ item.ClusterEndpoint }}'
+      DataTiering: '{{ item.DataTiering }}'
+      Description: '{{ item.Description }}'
+      Engine: '{{ item.Engine }}'
+      EnginePatchVersion: '{{ item.EnginePatchVersion }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      IpDiscovery: '{{ item.IpDiscovery }}'
+      MaintenanceWindow: '{{ item.MaintenanceWindow }}'
+      MultiRegionClusterName: '{{ item.MultiRegionClusterName }}'
+      NetworkType: '{{ item.NetworkType }}'
+      NodeType: '{{ item.NodeType }}'
+      NumberOfShards: '{{ item.NumberOfShards }}'
+      ParameterGroupName: '{{ item.ParameterGroupName }}'
+      ParameterGroupStatus: '{{ item.ParameterGroupStatus }}'
+      PendingUpdates: '{{ item.PendingUpdates }}'
+      Shards: '{{ item.Shards }}'
+      SnapshotWindow: '{{ item.SnapshotWindow }}'
+      SnsTopicArn: '{{ item.SnsTopicArn }}'
+      SnsTopicStatus: '{{ item.SnsTopicStatus }}'
+      SubnetGroupName: '{{ item.SubnetGroupName }}'
+      TLSEnabled: '{{ item.TLSEnabled }}'
+- discovery_id: aws.memorydb.describe_engine_versions
+  calls:
+  - action: describe_engine_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EngineVersions }}'
+    item:
+      Engine: '{{ item.Engine }}'
+      EnginePatchVersion: '{{ item.EnginePatchVersion }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      EngineVersions: '{{ item.EngineVersions }}'
+      ParameterGroupFamily: '{{ item.ParameterGroupFamily }}'
+- discovery_id: aws.memorydb.describe_events
+  calls:
+  - action: describe_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Events }}'
+    item:
+      Date: '{{ item.Date }}'
+      Events: '{{ item.Events }}'
+      Message: '{{ item.Message }}'
+      SourceName: '{{ item.SourceName }}'
+      SourceType: '{{ item.SourceType }}'
+- discovery_id: aws.memorydb.describe_multi_region_clusters
+  calls:
+  - action: describe_multi_region_clusters
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MultiRegionClusters }}'
+    item:
+      Status: '{{ item.Status }}'
+      ARN: '{{ item.ARN }}'
+      Clusters: '{{ item.Clusters }}'
+      Description: '{{ item.Description }}'
+      Engine: '{{ item.Engine }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      MultiRegionClusterName: '{{ item.MultiRegionClusterName }}'
+      MultiRegionClusters: '{{ item.MultiRegionClusters[].ARN }}'
+      MultiRegionParameterGroupName: '{{ item.MultiRegionParameterGroupName }}'
+      NodeType: '{{ item.NodeType }}'
+      NumberOfShards: '{{ item.NumberOfShards }}'
+      TLSEnabled: '{{ item.TLSEnabled }}'
+- discovery_id: aws.memorydb.describe_multi_region_parameter_groups
+  calls:
+  - action: describe_multi_region_parameter_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MultiRegionParameterGroups }}'
+    item:
+      Name: '{{ item.Name }}'
+      ARN: '{{ item.ARN }}'
+      Description: '{{ item.Description }}'
+      Family: '{{ item.Family }}'
+      MultiRegionParameterGroups: '{{ item.MultiRegionParameterGroups }}'
+- discovery_id: aws.memorydb.describe_parameter_groups
+  calls:
+  - action: describe_parameter_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ParameterGroups }}'
+    item:
+      Name: '{{ item.Name }}'
+      ARN: '{{ item.ARN }}'
+      Description: '{{ item.Description }}'
+      Family: '{{ item.Family }}'
+      ParameterGroups: '{{ item.ParameterGroups }}'
+- discovery_id: aws.memorydb.describe_reserved_nodes
+  calls:
+  - action: describe_reserved_nodes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ReservedNodes }}'
+    item:
+      State: '{{ item.State }}'
+      ARN: '{{ item.ARN }}'
+      Duration: '{{ item.Duration }}'
+      FixedPrice: '{{ item.FixedPrice }}'
+      NodeCount: '{{ item.NodeCount }}'
+      NodeType: '{{ item.NodeType }}'
+      OfferingType: '{{ item.OfferingType }}'
+      RecurringCharges: '{{ item.RecurringCharges }}'
+      ReservationId: '{{ item.ReservationId }}'
+      ReservedNodes: '{{ item.ReservedNodes }}'
+      ReservedNodesOfferingId: '{{ item.ReservedNodesOfferingId }}'
+      StartTime: '{{ item.StartTime }}'
+- discovery_id: aws.memorydb.describe_reserved_nodes_offerings
+  calls:
+  - action: describe_reserved_nodes_offerings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ReservedNodesOfferings }}'
+    item:
+      Duration: '{{ item.Duration }}'
+      FixedPrice: '{{ item.FixedPrice }}'
+      NodeType: '{{ item.NodeType }}'
+      OfferingType: '{{ item.OfferingType }}'
+      RecurringCharges: '{{ item.RecurringCharges }}'
+      ReservedNodesOfferingId: '{{ item.ReservedNodesOfferingId }}'
+      ReservedNodesOfferings: '{{ item.ReservedNodesOfferings }}'
+- discovery_id: aws.memorydb.describe_service_updates
+  calls:
+  - action: describe_service_updates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ServiceUpdates }}'
+    item:
+      Status: '{{ item.Status }}'
+      AutoUpdateStartDate: '{{ item.AutoUpdateStartDate }}'
+      ClusterName: '{{ item.ClusterName }}'
+      Description: '{{ item.Description }}'
+      Engine: '{{ item.Engine }}'
+      NodesUpdated: '{{ item.NodesUpdated }}'
+      ReleaseDate: '{{ item.ReleaseDate }}'
+      ServiceUpdateName: '{{ item.ServiceUpdateName }}'
+      ServiceUpdates: '{{ item.ServiceUpdates }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.memorydb.describe_snapshots
+  calls:
+  - action: describe_snapshots
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Snapshots }}'
+    item:
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      ARN: '{{ item.ARN }}'
+      ClusterConfiguration: '{{ item.ClusterConfiguration }}'
+      DataTiering: '{{ item.DataTiering }}'
+      Enabled: '{{ item.Enabled }}'
+      Snapshots: '{{ item.Snapshots }}'
+      Source: '{{ item.Source }}'
+- discovery_id: aws.memorydb.describe_subnet_groups
+  calls:
+  - action: describe_subnet_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SubnetGroups }}'
+    item:
+      Name: '{{ item.Name }}'
+      VpcId: '{{ item.VpcId }}'
+      ARN: '{{ item.ARN }}'
+      Description: '{{ item.Description }}'
+      SubnetGroups: '{{ item.SubnetGroups }}'
+      Subnets: '{{ item.Subnets }}'
+      SupportedNetworkTypes: '{{ item.SupportedNetworkTypes }}'
+- discovery_id: aws.memorydb.describe_users
+  calls:
+  - action: describe_users
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Users }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      ACLNames: '{{ item.ACLNames }}'
+      ARN: '{{ item.ARN }}'
+      AccessString: '{{ item.AccessString }}'
+      Authentication: '{{ item.Authentication }}'
+      MinimumEngineVersion: '{{ item.MinimumEngineVersion }}'
+      Users: '{{ item.Users }}'
+- discovery_id: aws.memorydb.describe_multi_region_parameters
+  for_each: aws.memorydb.describe_multi_region_clusters
+  calls:
+  - action: describe_multi_region_parameters
+    params:
+      MultiRegionParameterGroupName: '{{ item.MultiRegionParameterGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MultiRegionParameters }}'
+    item:
+      Name: '{{ item.Name }}'
+      AllowedValues: '{{ item.AllowedValues }}'
+      DataType: '{{ item.DataType }}'
+      Description: '{{ item.Description }}'
+      MinimumEngineVersion: '{{ item.MinimumEngineVersion }}'
+      Source: '{{ item.Source }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.memorydb.describe_parameters
+  for_each: aws.memorydb.describe_clusters
+  calls:
+  - action: describe_parameters
+    params:
+      ParameterGroupName: '{{ item.ParameterGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Parameters }}'
+    item:
+      Name: '{{ item.Name }}'
+      AllowedValues: '{{ item.AllowedValues }}'
+      DataType: '{{ item.DataType }}'
+      Description: '{{ item.Description }}'
+      MinimumEngineVersion: '{{ item.MinimumEngineVersion }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.memorydb.list_allowed_multi_region_cluster_updates
+  calls:
+  - action: list_allowed_multi_region_cluster_updates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ScaleUpNodeTypes }}'
+- discovery_id: aws.memorydb.list_allowed_node_type_updates
+  calls:
+  - action: list_allowed_node_type_updates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ScaleUpNodeTypes }}'
+- discovery_id: aws.memorydb.list_tags
+  calls:
+  - action: list_tags
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TagList }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

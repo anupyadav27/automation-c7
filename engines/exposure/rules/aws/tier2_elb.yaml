@@ -1,0 +1,58 @@
+# =============================================================================
+# IEDS Tier 2 — AWS Load Balancers (ALB / NLB / CLB)
+# Tier 2 = emitted-field condition check.
+# =============================================================================
+
+rules:
+
+  # resource_type = di_table_inventory.resource_type: elbv2_load_balancer / elb_load_balancer
+  - rule_id: IEDS-T2-AWS-001
+    tier: 2
+    csp: aws
+    resource_type: elbv2_load_balancer
+    origin_type: internet
+    title: "AWS ALB/NLB is internet-facing"
+    description: >
+      Application and Network Load Balancers with scheme=internet-facing are directly
+      reachable from the internet. Any instance attached behind the LB inherits internet
+      exposure.
+    severity: high
+    required_emitted_fields:
+      - scheme
+    exposure_conditions:
+      - field: scheme
+        operator: eq
+        value: internet-facing
+
+  - rule_id: IEDS-T2-AWS-002
+    tier: 2
+    csp: aws
+    resource_type: elb_load_balancer
+    origin_type: internet
+    title: "AWS Classic Load Balancer is internet-facing"
+    description: >
+      Classic ELBs with scheme=internet-facing are directly reachable from the internet.
+    severity: high
+    required_emitted_fields:
+      - scheme
+    exposure_conditions:
+      - field: scheme
+        operator: eq
+        value: internet-facing
+
+  - rule_id: IEDS-T2-AWS-003
+    tier: 2
+    csp: aws
+    resource_type: elbv2_load_balancer
+    origin_type: internet
+    title: "AWS ALB/NLB is internet-facing (via DNS name)"
+    description: >
+      Catch-all for internet-facing LBs via DNS name pattern — covers cases where
+      the scheme field is not emitted but the ELB DNS name confirms internet-facing.
+    severity: high
+    required_emitted_fields:
+      - dns_name
+    exposure_conditions:
+      - field: dns_name
+        operator: contains
+        value: ".elb.amazonaws.com"

@@ -1,0 +1,108 @@
+version: '1.0'
+provider: aws
+service: s3vectors
+services:
+  client: s3vectors
+  module: boto3.client
+discovery:
+- discovery_id: aws.s3vectors.get_index
+  calls:
+  - action: get_index
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.index.Status }}'
+      Enabled: '{{ response.index.Enabled }}'
+      dataType: '{{ response.index.dataType }}'
+      dimension: '{{ response.index.dimension }}'
+      distanceMetric: '{{ response.index.distanceMetric }}'
+      index: '{{ response.index.index }}'
+      indexArn: '{{ response.index.indexArn }}'
+      indexName: '{{ response.index.indexName }}'
+      metadataConfiguration: '{{ response.index.metadataConfiguration }}'
+- discovery_id: aws.s3vectors.get_vector_bucket
+  calls:
+  - action: get_vector_bucket
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      creationTime: '{{ response.vectorBucket.creationTime }}'
+      encryptionConfiguration: '{{ response.vectorBucket.encryptionConfiguration }}'
+      vectorBucket: '{{ response.vectorBucket.vectorBucket }}'
+      vectorBucketArn: '{{ response.vectorBucket.vectorBucketArn }}'
+      vectorBucketName: '{{ response.vectorBucket.vectorBucketName }}'
+- discovery_id: aws.s3vectors.get_vector_bucket_policy
+  calls:
+  - action: get_vector_bucket_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+      policy: '{{ response.policy }}'
+- discovery_id: aws.s3vectors.list_indexes
+  calls:
+  - action: list_indexes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.indexes }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      index: '{{ item.index }}'
+      indexArn: '{{ item.indexArn }}'
+      indexName: '{{ item.indexName }}'
+      vectorBucketName: '{{ item.vectorBucketName }}'
+- discovery_id: aws.s3vectors.list_vector_buckets
+  calls:
+  - action: list_vector_buckets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.vectorBuckets }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      vectorBucket: '{{ item.vectorBucket }}'
+      vectorBucketArn: '{{ item.vectorBucketArn }}'
+      vectorBucketName: '{{ item.vectorBucketName }}'
+- discovery_id: aws.s3vectors.list_vectors
+  calls:
+  - action: list_vectors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.vectors }}'
+    item:
+      data: '{{ item.data }}'
+      key: '{{ item.key }}'
+      metadata: '{{ item.metadata }}'
+      vectors: '{{ item.vectors }}'
+- discovery_id: aws.s3vectors.get_vectors
+  calls:
+  - action: get_vectors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.vectors }}'
+    item:
+      data: '{{ item.data }}'
+      key: '{{ item.key }}'
+      metadata: '{{ item.metadata }}'
+- discovery_id: aws.s3vectors.query_vectors
+  calls:
+  - action: query_vectors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.vectors }}'

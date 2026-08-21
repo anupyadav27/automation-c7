@@ -1,0 +1,63 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: kinesisvideostreams
+# 4 ops (1 from checks, +3 for inventory)
+version: '1.0'
+provider: aws
+service: kinesisvideostreams
+discovery:
+  - calls:
+    - action: describe_edge_configuration
+      on_error: continue
+      save_as: response
+    discovery_id: aws.kinesisvideostreams.describe_edge_configuration
+    emit:
+      as: item
+      item:
+        DeletionConfig: '{{ response.DeletionConfig }}'
+        EdgeAgentStatus: '{{ response.EdgeAgentStatus }}'
+        HubDeviceArn: '{{ response.HubDeviceArn }}'
+        RecorderConfig: '{{ response.RecorderConfig }}'
+        UploaderConfig: '{{ response.UploaderConfig }}'
+  - calls:
+    - action: describe_stream
+      on_error: continue
+      save_as: response
+    discovery_id: aws.kinesisvideostreams.describe_stream
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ response.CreationTime }}'
+        DataRetentionInHours: '{{ response.DataRetentionInHours }}'
+        DeviceName: '{{ response.DeviceName }}'
+        KmsKeyId: '{{ response.KmsKeyId }}'
+        MediaType: '{{ response.MediaType }}'
+        Status: '{{ response.Status }}'
+        StreamARN: '{{ response.StreamARN }}'
+        StreamName: '{{ response.StreamName }}'
+        Version: '{{ response.Version }}'
+  - calls:
+    - action: describe_signaling_channel
+      on_error: continue
+      save_as: response
+    discovery_id: aws.kinesisvideostreams.describe_signaling_channel
+    emit:
+      as: item
+      item:
+        ChannelARN: '{{ response.ChannelARN }}'
+        ChannelInfo: '{{ response.ChannelInfo }}'
+        ChannelName: '{{ response.ChannelName }}'
+        CreationTime: '{{ response.CreationTime }}'
+        SingleMasterConfiguration: '{{ response.SingleMasterConfiguration }}'
+        Version: '{{ response.Version }}'
+  - calls:
+    - action: describe_mapped_resource_configuration
+      on_error: continue
+      save_as: response
+    discovery_id: aws.kinesisvideostreams.describe_mapped_resource_configuration
+    emit:
+      as: item
+      item:
+        ARN: '{{ response.ARN }}'
+        MappedResourceConfigurationList: '{{ response.MappedResourceConfigurationList
+          }}'
+        Type: '{{ response.Type }}'

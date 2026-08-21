@@ -1,0 +1,161 @@
+version: '1.0'
+provider: aws
+service: managedblockchain-query
+services:
+  client: managedblockchain-query
+  module: boto3.client
+discovery:
+- discovery_id: aws.managedblockchain-query.get_asset_contract
+  calls:
+  - action: get_asset_contract
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      contractAddress: '{{ response.contractIdentifier.contractAddress }}'
+      network: '{{ response.contractIdentifier.network }}'
+      deployerAddress: '{{ response.deployerAddress }}'
+      decimals: '{{ response.metadata.decimals }}'
+      name: '{{ response.metadata.name }}'
+      symbol: '{{ response.metadata.symbol }}'
+      tokenStandard: '{{ response.tokenStandard }}'
+- discovery_id: aws.managedblockchain-query.get_token_balance
+  calls:
+  - action: get_token_balance
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      address: '{{ response.ownerIdentifier.address }}'
+      time: '{{ response.atBlockchainInstant.time }}'
+      balance: '{{ response.balance }}'
+      contractAddress: '{{ response.tokenIdentifier.contractAddress }}'
+      network: '{{ response.tokenIdentifier.network }}'
+      tokenId: '{{ response.tokenIdentifier.tokenId }}'
+- discovery_id: aws.managedblockchain-query.get_transaction
+  calls:
+  - action: get_transaction
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      blockHash: '{{ response.transaction.blockHash }}'
+      blockNumber: '{{ response.transaction.blockNumber }}'
+      confirmationStatus: '{{ response.transaction.confirmationStatus }}'
+      contractAddress: '{{ response.transaction.contractAddress }}'
+      cumulativeGasUsed: '{{ response.transaction.cumulativeGasUsed }}'
+      effectiveGasPrice: '{{ response.transaction.effectiveGasPrice }}'
+      executionStatus: '{{ response.transaction.executionStatus }}'
+      from: '{{ response.transaction.from }}'
+      gasUsed: '{{ response.transaction.gasUsed }}'
+      network: '{{ response.transaction.network }}'
+      numberOfTransactions: '{{ response.transaction.numberOfTransactions }}'
+      signatureR: '{{ response.transaction.signatureR }}'
+      signatureS: '{{ response.transaction.signatureS }}'
+      signatureV: '{{ response.transaction.signatureV }}'
+      to: '{{ response.transaction.to }}'
+      transaction: '{{ response.transaction.transactionId }}'
+      transactionFee: '{{ response.transaction.transactionFee }}'
+      transactionHash: '{{ response.transaction.transactionHash }}'
+      transactionId: '{{ response.transaction.transactionId }}'
+      transactionIndex: '{{ response.transaction.transactionIndex }}'
+      transactionTimestamp: '{{ response.transaction.transactionTimestamp }}'
+- discovery_id: aws.managedblockchain-query.list_asset_contracts
+  calls:
+  - action: list_asset_contracts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.contracts }}'
+    item:
+      contractIdentifier: '{{ item.contractIdentifier }}'
+      deployerAddress: '{{ item.deployerAddress }}'
+      tokenStandard: '{{ item.tokenStandard }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.managedblockchain-query.list_filtered_transaction_events
+  calls:
+  - action: list_filtered_transaction_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.events }}'
+    item:
+      blockchainInstant: '{{ item.blockchainInstant }}'
+      confirmationStatus: '{{ item.confirmationStatus }}'
+      contractAddress: '{{ item.contractAddress }}'
+      eventType: '{{ item.eventType }}'
+      from: '{{ item.from }}'
+      network: '{{ item.network }}'
+      spentVoutIndex: '{{ item.spentVoutIndex }}'
+      spentVoutTransactionHash: '{{ item.spentVoutTransactionHash }}'
+      spentVoutTransactionId: '{{ item.spentVoutTransactionId }}'
+      to: '{{ item.to }}'
+      tokenId: '{{ item.tokenId }}'
+      transaction: '{{ item.transaction }}'
+      transactionHash: '{{ item.transactionHash }}'
+      transactionId: '{{ item.transactionId }}'
+      value: '{{ item.value }}'
+      voutIndex: '{{ item.voutIndex }}'
+      voutSpent: '{{ item.voutSpent }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.managedblockchain-query.list_token_balances
+  calls:
+  - action: list_token_balances
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tokenBalances }}'
+    item:
+      atBlockchainInstant: '{{ item.atBlockchainInstant }}'
+      balance: '{{ item.balance }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      ownerIdentifier: '{{ item.ownerIdentifier }}'
+      tokenIdentifier: '{{ item.tokenIdentifier }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.managedblockchain-query.list_transaction_events
+  calls:
+  - action: list_transaction_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.events }}'
+    item:
+      blockchainInstant: '{{ item.blockchainInstant }}'
+      confirmationStatus: '{{ item.confirmationStatus }}'
+      contractAddress: '{{ item.contractAddress }}'
+      eventType: '{{ item.eventType }}'
+      from: '{{ item.from }}'
+      network: '{{ item.network }}'
+      spentVoutIndex: '{{ item.spentVoutIndex }}'
+      spentVoutTransactionHash: '{{ item.spentVoutTransactionHash }}'
+      spentVoutTransactionId: '{{ item.spentVoutTransactionId }}'
+      to: '{{ item.to }}'
+      tokenId: '{{ item.tokenId }}'
+      transactionHash: '{{ item.transactionHash }}'
+      transactionId: '{{ item.transactionId }}'
+      value: '{{ item.value }}'
+      voutIndex: '{{ item.voutIndex }}'
+      voutSpent: '{{ item.voutSpent }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.managedblockchain-query.list_transactions
+  calls:
+  - action: list_transactions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.transactions }}'
+    item:
+      confirmationStatus: '{{ item.confirmationStatus }}'
+      network: '{{ item.network }}'
+      transactionHash: '{{ item.transactionHash }}'
+      transactionId: '{{ item.transactionId }}'
+      transactionTimestamp: '{{ item.transactionTimestamp }}'
+      nextToken: '{{ response.nextToken }}'

@@ -1,0 +1,218 @@
+version: '1.0'
+provider: aws
+service: application-signals
+services:
+  client: application-signals
+  module: boto3.client
+discovery:
+- discovery_id: aws.application-signals.list_grouping_attribute_definitions
+  calls:
+  - action: list_grouping_attribute_definitions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.GroupingAttributeDefinitions }}'
+    item:
+      DefaultGroupingValue: '{{ item.DefaultGroupingValue }}'
+      GroupingName: '{{ item.GroupingName }}'
+      GroupingSourceKeys: '{{ item.GroupingSourceKeys }}'
+- discovery_id: aws.application-signals.list_service_level_objectives
+  calls:
+  - action: list_service_level_objectives
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SloSummaries }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Name: '{{ item.Name }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      DependencyConfig: '{{ item.DependencyConfig }}'
+      EvaluationType: '{{ item.EvaluationType }}'
+      KeyAttributes: '{{ item.KeyAttributes }}'
+      MetricSourceType: '{{ item.MetricSourceType }}'
+      OperationName: '{{ item.OperationName }}'
+- discovery_id: aws.application-signals.get_service
+  for_each: aws.application-signals.list_service_level_objectives
+  calls:
+  - action: get_service
+    params:
+      KeyAttributes: '{{ item.KeyAttributes }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LogGroupReferences }}'
+    item:
+      EndTime: '{{ response.EndTime }}'
+      KeyAttributes: '{{ response.Service.KeyAttributes }}'
+      StartTime: '{{ response.StartTime }}'
+- discovery_id: aws.application-signals.get_service_level_objective
+  calls:
+  - action: get_service_level_objective
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Slo.Arn }}'
+      Name: '{{ response.Slo.Name }}'
+      BurnRateConfigurations: '{{ response.Slo.BurnRateConfigurations }}'
+      CreatedTime: '{{ response.Slo.CreatedTime }}'
+      Description: '{{ response.Slo.Description }}'
+      EvaluationType: '{{ response.Slo.EvaluationType }}'
+      Goal: '{{ response.Slo.Goal }}'
+      LastUpdatedTime: '{{ response.Slo.LastUpdatedTime }}'
+      MetricSourceType: '{{ response.Slo.MetricSourceType }}'
+      RequestBasedSli: '{{ response.Slo.RequestBasedSli }}'
+      Sli: '{{ response.Slo.Sli }}'
+      Slo: '{{ response.Slo.Slo }}'
+      AttainmentGoal: '{{ response.Slo.Goal.AttainmentGoal }}'
+      Duration: '{{ response.Slo.Goal.Interval.CalendarInterval.Duration }}'
+      DurationUnit: '{{ response.Slo.Goal.Interval.CalendarInterval.DurationUnit }}'
+      StartTime: '{{ response.Slo.Goal.Interval.CalendarInterval.StartTime }}'
+      WarningThreshold: '{{ response.Slo.Goal.WarningThreshold }}'
+      ComparisonOperator: '{{ response.Slo.RequestBasedSli.ComparisonOperator }}'
+      MetricThreshold: '{{ response.Slo.RequestBasedSli.MetricThreshold }}'
+      DependencyKeyAttributes: '{{ response.Slo.RequestBasedSli.RequestBasedSliMetric.DependencyConfig.DependencyKeyAttributes }}'
+      DependencyOperationName: '{{ response.Slo.RequestBasedSli.RequestBasedSliMetric.DependencyConfig.DependencyOperationName }}'
+      KeyAttributes: '{{ response.Slo.RequestBasedSli.RequestBasedSliMetric.KeyAttributes }}'
+      MetricType: '{{ response.Slo.RequestBasedSli.RequestBasedSliMetric.MetricType }}'
+      OperationName: '{{ response.Slo.RequestBasedSli.RequestBasedSliMetric.OperationName }}'
+- discovery_id: aws.application-signals.list_audit_findings
+  calls:
+  - action: list_audit_findings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AuditFindings }}'
+    item:
+      AuditorResults: '{{ item.AuditorResults }}'
+      DependencyGraph: '{{ item.DependencyGraph }}'
+      KeyAttributes: '{{ item.KeyAttributes }}'
+      MetricGraph: '{{ item.MetricGraph }}'
+      Operation: '{{ item.Operation }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.application-signals.list_entity_events
+  calls:
+  - action: list_entity_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ChangeEvents }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      Region: '{{ item.Region }}'
+      ChangeEventType: '{{ item.ChangeEventType }}'
+      Entity: '{{ item.Entity }}'
+      EventId: '{{ item.EventId }}'
+      EventName: '{{ item.EventName }}'
+      Timestamp: '{{ item.Timestamp }}'
+      UserName: '{{ item.UserName }}'
+- discovery_id: aws.application-signals.list_service_dependencies
+  for_each: aws.application-signals.list_service_level_objectives
+  calls:
+  - action: list_service_dependencies
+    params:
+      KeyAttributes: '{{ item.KeyAttributes }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ServiceDependencies }}'
+    item:
+      DependencyKeyAttributes: '{{ item.DependencyKeyAttributes }}'
+      DependencyOperationName: '{{ item.DependencyOperationName }}'
+      MetricReferences: '{{ item.MetricReferences }}'
+      OperationName: '{{ item.OperationName }}'
+      EndTime: '{{ response.EndTime }}'
+      StartTime: '{{ response.StartTime }}'
+- discovery_id: aws.application-signals.list_service_dependents
+  for_each: aws.application-signals.list_service_level_objectives
+  calls:
+  - action: list_service_dependents
+    params:
+      KeyAttributes: '{{ item.KeyAttributes }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ServiceDependents }}'
+    item:
+      DependentKeyAttributes: '{{ item.DependentKeyAttributes }}'
+      DependentOperationName: '{{ item.DependentOperationName }}'
+      MetricReferences: '{{ item.MetricReferences }}'
+      OperationName: '{{ item.OperationName }}'
+      EndTime: '{{ response.EndTime }}'
+      StartTime: '{{ response.StartTime }}'
+- discovery_id: aws.application-signals.list_service_level_objective_exclusion_windows
+  calls:
+  - action: list_service_level_objective_exclusion_windows
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ExclusionWindows }}'
+    item:
+      Reason: '{{ item.Reason }}'
+      RecurrenceRule: '{{ item.RecurrenceRule }}'
+      StartTime: '{{ item.StartTime }}'
+      Window: '{{ item.Window }}'
+- discovery_id: aws.application-signals.list_service_operations
+  for_each: aws.application-signals.list_service_level_objectives
+  calls:
+  - action: list_service_operations
+    params:
+      KeyAttributes: '{{ item.KeyAttributes }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ServiceOperations }}'
+    item:
+      Name: '{{ item.Name }}'
+      MetricReferences: '{{ item.MetricReferences }}'
+      EndTime: '{{ response.EndTime }}'
+      StartTime: '{{ response.StartTime }}'
+- discovery_id: aws.application-signals.list_service_states
+  calls:
+  - action: list_service_states
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ServiceStates }}'
+    item:
+      AttributeFilters: '{{ item.AttributeFilters }}'
+      LatestChangeEvents: '{{ item.LatestChangeEvents }}'
+      Service: '{{ item.Service }}'
+- discovery_id: aws.application-signals.list_services
+  calls:
+  - action: list_services
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ServiceSummaries }}'
+    item:
+      AttributeMaps: '{{ item.AttributeMaps }}'
+      KeyAttributes: '{{ item.KeyAttributes }}'
+      MetricReferences: '{{ item.MetricReferences }}'
+      ServiceGroups: '{{ item.ServiceGroups }}'
+      EndTime: '{{ response.EndTime }}'
+      StartTime: '{{ response.StartTime }}'
+- discovery_id: aws.application-signals.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

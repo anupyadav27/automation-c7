@@ -1,0 +1,150 @@
+version: '1.0'
+provider: aws
+service: textract
+discovery:
+- calls:
+  - action: list_adapter_versions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.textract.list_adapter_versions
+  emit:
+    as: item
+    item:
+      AdapterId: '{{ item.AdapterId }}'
+      AdapterVersion: '{{ item.AdapterVersion }}'
+      AutoUpdate: '{{ item.AutoUpdate }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Description: '{{ item.Description }}'
+      FeatureTypes: '{{ item.FeatureTypes }}'
+      Status: '{{ item.Status }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.AdapterVersions }}'
+- calls:
+  - action: list_adapters
+    on_error: continue
+    save_as: response
+  discovery_id: aws.textract.list_adapters
+  emit:
+    as: item
+    item:
+      AdapterId: '{{ item.AdapterId }}'
+      AdapterName: '{{ item.AdapterName }}'
+      CreationTime: '{{ item.CreationTime }}'
+      FeatureTypes: '{{ item.FeatureTypes }}'
+    items_for: '{{ response.Adapters }}'
+- calls:
+  - action: get_document_analysis
+    on_error: continue
+    save_as: response
+  discovery_id: aws.textract.get_document_analysis
+  emit:
+    as: item
+    item:
+      BlockType: '{{ item.BlockType }}'
+      ColumnIndex: '{{ item.ColumnIndex }}'
+      ColumnSpan: '{{ item.ColumnSpan }}'
+      Confidence: '{{ item.Confidence }}'
+      EntityTypes: '{{ item.EntityTypes }}'
+      Geometry: '{{ item.Geometry }}'
+      Id: '{{ item.Id }}'
+      Page: '{{ item.Page }}'
+      Query: '{{ item.Query }}'
+      Relationships: '{{ item.Relationships }}'
+      RowIndex: '{{ item.RowIndex }}'
+      RowSpan: '{{ item.RowSpan }}'
+      SelectionStatus: '{{ item.SelectionStatus }}'
+      Text: '{{ item.Text }}'
+      TextType: '{{ item.TextType }}'
+      Warnings: '{{ item.Warnings }}'
+      AnalyzeDocumentModelVersion: '{{ response.AnalyzeDocumentModelVersion }}'
+      Pages: '{{ response.DocumentMetadata.Pages }}'
+      JobStatus: '{{ response.JobStatus }}'
+      StatusMessage: '{{ response.StatusMessage }}'
+    items_for: '{{ response.Blocks }}'
+- calls:
+  - action: get_document_text_detection
+    on_error: continue
+    save_as: response
+  discovery_id: aws.textract.get_document_text_detection
+  emit:
+    as: item
+    item:
+      BlockType: '{{ item.BlockType }}'
+      ColumnIndex: '{{ item.ColumnIndex }}'
+      ColumnSpan: '{{ item.ColumnSpan }}'
+      Confidence: '{{ item.Confidence }}'
+      EntityTypes: '{{ item.EntityTypes }}'
+      Geometry: '{{ item.Geometry }}'
+      Id: '{{ item.Id }}'
+      Page: '{{ item.Page }}'
+      Query: '{{ item.Query }}'
+      Relationships: '{{ item.Relationships }}'
+      RowIndex: '{{ item.RowIndex }}'
+      RowSpan: '{{ item.RowSpan }}'
+      SelectionStatus: '{{ item.SelectionStatus }}'
+      Text: '{{ item.Text }}'
+      TextType: '{{ item.TextType }}'
+      DetectDocumentTextModelVersion: '{{ response.DetectDocumentTextModelVersion }}'
+      Pages: '{{ response.DocumentMetadata.Pages }}'
+      JobStatus: '{{ response.JobStatus }}'
+      StatusMessage: '{{ response.StatusMessage }}'
+    items_for: '{{ response.Blocks }}'
+- calls:
+  - action: get_expense_analysis
+    on_error: continue
+    save_as: response
+  discovery_id: aws.textract.get_expense_analysis
+  emit:
+    as: item
+    item:
+      Blocks: '{{ item.Blocks }}'
+      ExpenseIndex: '{{ item.ExpenseIndex }}'
+      LineItemGroups: '{{ item.LineItemGroups }}'
+      SummaryFields: '{{ item.SummaryFields }}'
+      AnalyzeExpenseModelVersion: '{{ response.AnalyzeExpenseModelVersion }}'
+      Pages: '{{ response.DocumentMetadata.Pages }}'
+      JobStatus: '{{ response.JobStatus }}'
+      StatusMessage: '{{ response.StatusMessage }}'
+    items_for: '{{ response.ExpenseDocuments }}'
+- calls:
+  - action: get_lending_analysis
+    on_error: continue
+    save_as: response
+  discovery_id: aws.textract.get_lending_analysis
+  emit:
+    as: item
+    item:
+      Extractions: '{{ item.Extractions }}'
+      Page: '{{ item.Page }}'
+      PageClassification: '{{ item.PageClassification }}'
+      Results: '{{ item.Results }}'
+      AnalyzeLendingModelVersion: '{{ response.AnalyzeLendingModelVersion }}'
+      Pages: '{{ response.DocumentMetadata.Pages }}'
+      JobStatus: '{{ response.JobStatus }}'
+      StatusMessage: '{{ response.StatusMessage }}'
+    items_for: '{{ response.Results }}'
+- calls:
+  - action: get_lending_analysis_summary
+    on_error: continue
+    save_as: response
+  discovery_id: aws.textract.get_lending_analysis_summary
+  emit:
+    as: item
+    item:
+      ErrorCode: '{{ item.ErrorCode }}'
+      Pages: '{{ item.Pages }}'
+      Summary: '{{ item.Summary }}'
+      AnalyzeLendingModelVersion: '{{ response.AnalyzeLendingModelVersion }}'
+      JobStatus: '{{ response.JobStatus }}'
+      StatusMessage: '{{ response.StatusMessage }}'
+    items_for: '{{ response.Warnings }}'
+- calls:
+  - action: list_tags_for_resource
+    on_error: continue
+    save_as: response
+  discovery_id: aws.textract.list_tags_for_resource
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

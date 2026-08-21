@@ -1,0 +1,198 @@
+version: '1.0'
+provider: aws
+service: amplifyuibuilder
+services:
+  client: amplifyuibuilder
+  module: boto3.client
+discovery:
+- discovery_id: aws.amplifyuibuilder.get_codegen_job
+  calls:
+  - action: get_codegen_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      appId: '{{ response.job.appId }}'
+      asset: '{{ response.job.asset }}'
+      autoGenerateForms: '{{ response.job.autoGenerateForms }}'
+      createdAt: '{{ response.job.createdAt }}'
+      dependencies: '{{ response.job.dependencies }}'
+      environmentName: '{{ response.job.environmentName }}'
+      features: '{{ response.job.features }}'
+      genericDataSchema: '{{ response.job.genericDataSchema.enums }}'
+      id: '{{ response.job.id }}'
+      job: '{{ response.job.job }}'
+      modifiedAt: '{{ response.job.modifiedAt }}'
+      renderConfig: '{{ response.job.renderConfig }}'
+      status: '{{ response.job.status }}'
+      statusMessage: '{{ response.job.statusMessage }}'
+      tags: '{{ response.job.tags }}'
+      downloadUrl: '{{ response.job.asset.downloadUrl }}'
+      isNonModelSupported: '{{ response.job.features.isNonModelSupported }}'
+      isRelationshipSupported: '{{ response.job.features.isRelationshipSupported }}'
+      dataSourceType: '{{ response.job.genericDataSchema.dataSourceType }}'
+      enums: '{{ response.job.genericDataSchema.enums }}'
+      models: '{{ response.job.genericDataSchema.models }}'
+      nonModels: '{{ response.job.genericDataSchema.nonModels }}'
+      inlineSourceMap: '{{ response.job.renderConfig.react.inlineSourceMap }}'
+      module: '{{ response.job.renderConfig.react.module }}'
+      renderTypeDeclarations: '{{ response.job.renderConfig.react.renderTypeDeclarations }}'
+      script: '{{ response.job.renderConfig.react.script }}'
+      target: '{{ response.job.renderConfig.react.target }}'
+- discovery_id: aws.amplifyuibuilder.get_component
+  calls:
+  - action: get_component
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      appId: '{{ response.component.appId }}'
+      bindingProperties: '{{ response.component.bindingProperties }}'
+      children: '{{ response.component.children }}'
+      collectionProperties: '{{ response.component.collectionProperties }}'
+      component: '{{ response.component.componentType }}'
+      componentType: '{{ response.component.componentType }}'
+      createdAt: '{{ response.component.createdAt }}'
+      environmentName: '{{ response.component.environmentName }}'
+      events: '{{ response.component.events }}'
+      id: '{{ response.component.id }}'
+      modifiedAt: '{{ response.component.modifiedAt }}'
+      name: '{{ response.component.name }}'
+      overrides: '{{ response.component.overrides }}'
+      properties: '{{ response.component.properties }}'
+      schemaVersion: '{{ response.component.schemaVersion }}'
+      sourceId: '{{ response.component.sourceId }}'
+      tags: '{{ response.component.tags }}'
+      variants: '{{ response.component.variants }}'
+- discovery_id: aws.amplifyuibuilder.get_form
+  calls:
+  - action: get_form
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      appId: '{{ response.form.appId }}'
+      cta: '{{ response.form.cta }}'
+      dataType: '{{ response.form.dataType }}'
+      environmentName: '{{ response.form.environmentName }}'
+      fields: '{{ response.form.fields }}'
+      form: '{{ response.form.form }}'
+      formActionType: '{{ response.form.formActionType }}'
+      id: '{{ response.form.id }}'
+      labelDecorator: '{{ response.form.labelDecorator }}'
+      name: '{{ response.form.name }}'
+      schemaVersion: '{{ response.form.schemaVersion }}'
+      sectionalElements: '{{ response.form.sectionalElements }}'
+      style: '{{ response.form.style }}'
+      tags: '{{ response.form.tags }}'
+      children: '{{ response.form.cta.cancel.children }}'
+      excluded: '{{ response.form.cta.cancel.excluded }}'
+      below: '{{ response.form.cta.cancel.position.below }}'
+      fixed: '{{ response.form.cta.cancel.position.fixed }}'
+      rightOf: '{{ response.form.cta.cancel.position.rightOf }}'
+      position: '{{ response.form.cta.position }}'
+      dataSourceType: '{{ response.form.dataType.dataSourceType }}'
+      dataTypeName: '{{ response.form.dataType.dataTypeName }}'
+      tokenReference: '{{ response.form.style.horizontalGap.tokenReference }}'
+      value: '{{ response.form.style.horizontalGap.value }}'
+- discovery_id: aws.amplifyuibuilder.get_metadata
+  calls:
+  - action: get_metadata
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      features: '{{ response.features }}'
+- discovery_id: aws.amplifyuibuilder.get_theme
+  calls:
+  - action: get_theme
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      appId: '{{ response.theme.appId }}'
+      createdAt: '{{ response.theme.createdAt }}'
+      environmentName: '{{ response.theme.environmentName }}'
+      id: '{{ response.theme.id }}'
+      modifiedAt: '{{ response.theme.modifiedAt }}'
+      name: '{{ response.theme.name }}'
+      overrides: '{{ response.theme.overrides }}'
+      tags: '{{ response.theme.tags }}'
+      values: '{{ response.theme.values }}'
+- discovery_id: aws.amplifyuibuilder.list_codegen_jobs
+  calls:
+  - action: list_codegen_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.entities }}'
+    item:
+      appId: '{{ item.appId }}'
+      createdAt: '{{ item.createdAt }}'
+      environmentName: '{{ item.environmentName }}'
+      id: '{{ item.id }}'
+      job: '{{ item.job }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.amplifyuibuilder.list_components
+  calls:
+  - action: list_components
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.entities }}'
+    item:
+      appId: '{{ item.appId }}'
+      component: '{{ item.component }}'
+      componentType: '{{ item.componentType }}'
+      environmentName: '{{ item.environmentName }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.amplifyuibuilder.list_forms
+  calls:
+  - action: list_forms
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.entities }}'
+    item:
+      appId: '{{ item.appId }}'
+      dataType: '{{ item.dataType }}'
+      environmentName: '{{ item.environmentName }}'
+      form: '{{ item.form }}'
+      formActionType: '{{ item.formActionType }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.amplifyuibuilder.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.amplifyuibuilder.list_themes
+  calls:
+  - action: list_themes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.entities }}'
+    item:
+      appId: '{{ item.appId }}'
+      environmentName: '{{ item.environmentName }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'

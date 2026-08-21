@@ -1,0 +1,1446 @@
+version: '1.0'
+provider: aws
+service: datazone
+services:
+  client: datazone
+  module: boto3.client
+discovery:
+- discovery_id: aws.datazone.list_domains
+  calls:
+  - action: list_domains
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      domainVersion: '{{ item.domainVersion }}'
+      items: '{{ item["items"] }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      managedAccountId: '{{ item.managedAccountId }}'
+      name: '{{ item.name }}'
+      portalUrl: '{{ item.portalUrl }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.get_account_pool
+  calls:
+  - action: get_account_pool
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      accounts: '{{ response.accountSource.accounts }}'
+      customAccountPoolHandler: '{{ response.accountSource.customAccountPoolHandler
+        }}'
+- discovery_id: aws.datazone.get_asset
+  calls:
+  - action: get_asset
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.formsOutput }}'
+    item:
+      content: '{{ item.content }}'
+      formName: '{{ item.formName }}'
+      typeName: '{{ item.typeName }}'
+      typeRevision: '{{ item.typeRevision }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      description: '{{ response.description }}'
+      domainId: '{{ response.domainId }}'
+      externalIdentifier: '{{ response.externalIdentifier }}'
+      firstRevisionCreatedAt: '{{ response.firstRevisionCreatedAt }}'
+      firstRevisionCreatedBy: '{{ response.firstRevisionCreatedBy }}'
+      id: '{{ response.id }}'
+      listingId: '{{ response.listing.listingId }}'
+      listingStatus: '{{ response.listing.listingStatus }}'
+      name: '{{ response.name }}'
+      owningProjectId: '{{ response.owningProjectId }}'
+      revision: '{{ response.revision }}'
+      typeIdentifier: '{{ response.typeIdentifier }}'
+- discovery_id: aws.datazone.get_asset_filter
+  calls:
+  - action: get_asset_filter
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.effectiveColumnNames }}'
+    item:
+      assetId: '{{ response.assetId }}'
+      sensitive: '{{ response.configuration.rowConfiguration.sensitive }}'
+      createdAt: '{{ response.createdAt }}'
+      description: '{{ response.description }}'
+      domainId: '{{ response.domainId }}'
+      effectiveRowFilter: '{{ response.effectiveRowFilter }}'
+      errorMessage: '{{ response.errorMessage }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.datazone.get_asset_type
+  calls:
+  - action: get_asset_type
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      description: '{{ response.description }}'
+      domainId: '{{ response.domainId }}'
+      formsOutput: '{{ response.formsOutput }}'
+      name: '{{ response.name }}'
+      originDomainId: '{{ response.originDomainId }}'
+      originProjectId: '{{ response.originProjectId }}'
+      owningProjectId: '{{ response.owningProjectId }}'
+      revision: '{{ response.revision }}'
+      updatedAt: '{{ response.updatedAt }}'
+      updatedBy: '{{ response.updatedBy }}'
+- discovery_id: aws.datazone.get_connection
+  calls:
+  - action: get_connection
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.physicalEndpoints }}'
+    item:
+      awsLocation: '{{ item.awsLocation }}'
+      enableTrustedIdentityPropagation: '{{ item.enableTrustedIdentityPropagation
+        }}'
+      glueConnection: '{{ item.glueConnection }}'
+      glueConnectionName: '{{ item.glueConnectionName }}'
+      host: '{{ item.host }}'
+      port: '{{ item.port }}'
+      protocol: '{{ item.protocol }}'
+      stage: '{{ item.stage }}'
+      accessKeyId: '{{ response.connectionCredentials.accessKeyId }}'
+      expiration: '{{ response.connectionCredentials.expiration }}'
+      secretAccessKey: '{{ response.connectionCredentials.secretAccessKey }}'
+      sessionToken: '{{ response.connectionCredentials.sessionToken }}'
+      connectionId: '{{ response.connectionId }}'
+      description: '{{ response.description }}'
+      domainId: '{{ response.domainId }}'
+      domainUnitId: '{{ response.domainUnitId }}'
+      environmentId: '{{ response.environmentId }}'
+      environmentUserRole: '{{ response.environmentUserRole }}'
+      name: '{{ response.name }}'
+      projectId: '{{ response.projectId }}'
+      workgroupName: '{{ response.props.athenaProperties.workgroupName }}'
+      errorMessage: '{{ response.props.glueProperties.errorMessage }}'
+      status: '{{ response.props.glueProperties.status }}'
+      clusterArn: '{{ response.props.hyperPodProperties.clusterArn }}'
+      clusterName: '{{ response.props.hyperPodProperties.clusterName }}'
+      orchestrator: '{{ response.props.hyperPodProperties.orchestrator }}'
+      glueLineageSyncEnabled: '{{ response.props.iamProperties.glueLineageSyncEnabled
+        }}'
+      secretArn: '{{ response.props.redshiftProperties.credentials.secretArn }}'
+      password: '{{ response.props.redshiftProperties.credentials.usernamePassword.password
+        }}'
+      username: '{{ response.props.redshiftProperties.credentials.usernamePassword.username
+        }}'
+      databaseName: '{{ response.props.redshiftProperties.databaseName }}'
+      isProvisionedSecret: '{{ response.props.redshiftProperties.isProvisionedSecret
+        }}'
+      jdbcIamUrl: '{{ response.props.redshiftProperties.jdbcIamUrl }}'
+      jdbcUrl: '{{ response.props.redshiftProperties.jdbcUrl }}'
+      enabled: '{{ response.props.redshiftProperties.lineageSync.enabled }}'
+      lineageJobId: '{{ response.props.redshiftProperties.lineageSync.lineageJobId
+        }}'
+      schedule: '{{ response.props.redshiftProperties.lineageSync.schedule.schedule
+        }}'
+      redshiftTempDir: '{{ response.props.redshiftProperties.redshiftTempDir }}'
+      computeArn: '{{ response.props.sparkEmrProperties.computeArn }}'
+      credentialsExpiration: '{{ response.props.sparkEmrProperties.credentialsExpiration
+        }}'
+      governanceType: '{{ response.props.sparkEmrProperties.governanceType }}'
+      instanceProfileArn: '{{ response.props.sparkEmrProperties.instanceProfileArn
+        }}'
+      javaVirtualEnv: '{{ response.props.sparkEmrProperties.javaVirtualEnv }}'
+      livyEndpoint: '{{ response.props.sparkEmrProperties.livyEndpoint }}'
+      logUri: '{{ response.props.sparkEmrProperties.logUri }}'
+      pythonVirtualEnv: '{{ response.props.sparkEmrProperties.pythonVirtualEnv }}'
+      runtimeRole: '{{ response.props.sparkEmrProperties.runtimeRole }}'
+      trustedCertificatesS3Uri: '{{ response.props.sparkEmrProperties.trustedCertificatesS3Uri
+        }}'
+      connection: '{{ response.props.sparkGlueProperties.additionalArgs.connection
+        }}'
+      glueVersion: '{{ response.props.sparkGlueProperties.glueVersion }}'
+      idleTimeout: '{{ response.props.sparkGlueProperties.idleTimeout }}'
+      numberOfWorkers: '{{ response.props.sparkGlueProperties.numberOfWorkers }}'
+      workerType: '{{ response.props.sparkGlueProperties.workerType }}'
+      type: '{{ response.type }}'
+- discovery_id: aws.datazone.get_data_product
+  calls:
+  - action: get_data_product
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.formsOutput }}'
+    item:
+      glossaryTerms: '{{ item.glossaryTerms }}'
+      identifier: '{{ item.identifier }}'
+      itemType: '{{ item.itemType }}'
+      revision: '{{ item.revision }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      description: '{{ response.description }}'
+      domainId: '{{ response.domainId }}'
+      firstRevisionCreatedAt: '{{ response.firstRevisionCreatedAt }}'
+      firstRevisionCreatedBy: '{{ response.firstRevisionCreatedBy }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      owningProjectId: '{{ response.owningProjectId }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.datazone.get_data_source
+  calls:
+  - action: get_data_source
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assetFormsOutput }}'
+    item:
+      content: '{{ item.content }}'
+      formName: '{{ item.formName }}'
+      typeName: '{{ item.typeName }}'
+      typeRevision: '{{ item.typeRevision }}'
+      accountId: '{{ response.configuration.glueRunConfiguration.accountId }}'
+      autoImportDataQualityResult: '{{ response.configuration.glueRunConfiguration.autoImportDataQualityResult
+        }}'
+      catalogName: '{{ response.configuration.glueRunConfiguration.catalogName }}'
+      dataAccessRole: '{{ response.configuration.glueRunConfiguration.dataAccessRole
+        }}'
+      region: '{{ response.configuration.glueRunConfiguration.region }}'
+      secretManagerArn: '{{ response.configuration.redshiftRunConfiguration.redshiftCredentialConfiguration.secretManagerArn
+        }}'
+      clusterName: '{{ response.configuration.redshiftRunConfiguration.redshiftStorage.redshiftClusterSource.clusterName
+        }}'
+      workgroupName: '{{ response.configuration.redshiftRunConfiguration.redshiftStorage.redshiftServerlessSource.workgroupName
+        }}'
+      trackingAssets: '{{ response.configuration.sageMakerRunConfiguration.trackingAssets
+        }}'
+      connectionId: '{{ response.connectionId }}'
+      createdAt: '{{ response.createdAt }}'
+      description: '{{ response.description }}'
+      domainId: '{{ response.domainId }}'
+      enableSetting: '{{ response.enableSetting }}'
+      environmentId: '{{ response.environmentId }}'
+      errorDetail: '{{ response.errorMessage.errorDetail }}'
+      errorType: '{{ response.errorMessage.errorType }}'
+      id: '{{ response.id }}'
+      lastRunAssetCount: '{{ response.lastRunAssetCount }}'
+      lastRunAt: '{{ response.lastRunAt }}'
+      lastRunStatus: '{{ response.lastRunStatus }}'
+      name: '{{ response.name }}'
+      projectId: '{{ response.projectId }}'
+      publishOnImport: '{{ response.publishOnImport }}'
+      enableBusinessNameGeneration: '{{ response.recommendation.enableBusinessNameGeneration
+        }}'
+      schedule: '{{ response.schedule.schedule }}'
+      timezone: '{{ response.schedule.timezone }}'
+      status: '{{ response.status }}'
+      type: '{{ response.type }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.datazone.get_data_source_run
+  calls:
+  - action: get_data_source_run
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      errorDetail: '{{ response.errorMessage.errorDetail }}'
+      errorType: '{{ response.errorMessage.errorType }}'
+      createdAt: '{{ response.createdAt }}'
+      dataSourceConfigurationSnapshot: '{{ response.dataSourceConfigurationSnapshot
+        }}'
+      dataSourceId: '{{ response.dataSourceId }}'
+      domainId: '{{ response.domainId }}'
+      id: '{{ response.id }}'
+      importStatus: '{{ response.lineageSummary.importStatus }}'
+      projectId: '{{ response.projectId }}'
+      added: '{{ response.runStatisticsForAssets.added }}'
+      failed: '{{ response.runStatisticsForAssets.failed }}'
+      skipped: '{{ response.runStatisticsForAssets.skipped }}'
+      unchanged: '{{ response.runStatisticsForAssets.unchanged }}'
+      updated: '{{ response.runStatisticsForAssets.updated }}'
+      startedAt: '{{ response.startedAt }}'
+      status: '{{ response.status }}'
+      stoppedAt: '{{ response.stoppedAt }}'
+      type: '{{ response.type }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.datazone.get_domain
+  calls:
+  - action: get_domain
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      idcInstanceArn: '{{ response.singleSignOn.idcInstanceArn }}'
+      userAssignment: '{{ response.singleSignOn.userAssignment }}'
+      arn: '{{ response.arn }}'
+      createdAt: '{{ response.createdAt }}'
+      description: '{{ response.description }}'
+      domainExecutionRole: '{{ response.domainExecutionRole }}'
+      domainVersion: '{{ response.domainVersion }}'
+      id: '{{ response.id }}'
+      kmsKeyIdentifier: '{{ response.kmsKeyIdentifier }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      name: '{{ response.name }}'
+      portalUrl: '{{ response.portalUrl }}'
+      rootDomainUnitId: '{{ response.rootDomainUnitId }}'
+      serviceRole: '{{ response.serviceRole }}'
+      type: '{{ response.singleSignOn.type }}'
+      status: '{{ response.status }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.datazone.get_domain_unit
+  calls:
+  - action: get_domain_unit
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.owners }}'
+    item:
+      group: '{{ item.group }}'
+      user: '{{ item.user }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      description: '{{ response.description }}'
+      domainId: '{{ response.domainId }}'
+      id: '{{ response.id }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      lastUpdatedBy: '{{ response.lastUpdatedBy }}'
+      name: '{{ response.name }}'
+      parentDomainUnitId: '{{ response.parentDomainUnitId }}'
+- discovery_id: aws.datazone.get_environment
+  calls:
+  - action: get_environment
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.environmentActions }}'
+    item:
+      name: '{{ item.name }}'
+      provider: '{{ item.provider }}'
+      value: '{{ item.value }}'
+      awsAccountId: '{{ response.awsAccountId }}'
+      awsAccountRegion: '{{ response.awsAccountRegion }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      endTimeoutMinutes: '{{ response.deploymentProperties.endTimeoutMinutes }}'
+      startTimeoutMinutes: '{{ response.deploymentProperties.startTimeoutMinutes }}'
+      description: '{{ response.description }}'
+      domainId: '{{ response.domainId }}'
+      environmentBlueprintId: '{{ response.environmentBlueprintId }}'
+      environmentConfigurationId: '{{ response.environmentConfigurationId }}'
+      environmentProfileId: '{{ response.environmentProfileId }}'
+      id: '{{ response.id }}'
+      deploymentId: '{{ response.lastDeployment.deploymentId }}'
+      deploymentStatus: '{{ response.lastDeployment.deploymentStatus }}'
+      deploymentType: '{{ response.lastDeployment.deploymentType }}'
+      code: '{{ response.lastDeployment.failureReason.code }}'
+      message: '{{ response.lastDeployment.failureReason.message }}'
+      isDeploymentComplete: '{{ response.lastDeployment.isDeploymentComplete }}'
+      projectId: '{{ response.projectId }}'
+      templateUrl: '{{ response.provisioningProperties.cloudFormation.templateUrl
+        }}'
+      status: '{{ response.status }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.datazone.get_environment_action
+  calls:
+  - action: get_environment_action
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      awsConsoleLink: '{{ response.parameters.awsConsoleLink.uri }}'
+      description: '{{ response.description }}'
+      domainId: '{{ response.domainId }}'
+      environmentId: '{{ response.environmentId }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      uri: '{{ response.parameters.awsConsoleLink.uri }}'
+- discovery_id: aws.datazone.get_environment_blueprint
+  calls:
+  - action: get_environment_blueprint
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.glossaryTerms }}'
+    item:
+      createdAt: '{{ response.createdAt }}'
+      endTimeoutMinutes: '{{ response.deploymentProperties.endTimeoutMinutes }}'
+      startTimeoutMinutes: '{{ response.deploymentProperties.startTimeoutMinutes }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      provider: '{{ response.provider }}'
+      templateUrl: '{{ response.provisioningProperties.cloudFormation.templateUrl
+        }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.datazone.get_environment_blueprint_configuration
+  calls:
+  - action: get_environment_blueprint_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.enabledRegions }}'
+    item:
+      createdAt: '{{ response.createdAt }}'
+      domainId: '{{ response.domainId }}'
+      environmentBlueprintId: '{{ response.environmentBlueprintId }}'
+      environmentRolePermissionBoundary: '{{ response.environmentRolePermissionBoundary
+        }}'
+      manageAccessRoleArn: '{{ response.manageAccessRoleArn }}'
+      provisioningRoleArn: '{{ response.provisioningRoleArn }}'
+      regionalParameters: '{{ response.regionalParameters }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.datazone.get_environment_credentials
+  calls:
+  - action: get_environment_credentials
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      expiration: '{{ response.expiration }}'
+      accessKeyId: '{{ response.accessKeyId }}'
+      secretAccessKey: '{{ response.secretAccessKey }}'
+      sessionToken: '{{ response.sessionToken }}'
+- discovery_id: aws.datazone.get_environment_profile
+  calls:
+  - action: get_environment_profile
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.userParameters }}'
+    item:
+      defaultValue: '{{ item.defaultValue }}'
+      description: '{{ item.description }}'
+      fieldType: '{{ item.fieldType }}'
+      isEditable: '{{ item.isEditable }}'
+      isOptional: '{{ item.isOptional }}'
+      isUpdateSupported: '{{ item.isUpdateSupported }}'
+      keyName: '{{ item.keyName }}'
+      awsAccountId: '{{ response.awsAccountId }}'
+      awsAccountRegion: '{{ response.awsAccountRegion }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      domainId: '{{ response.domainId }}'
+      environmentBlueprintId: '{{ response.environmentBlueprintId }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      projectId: '{{ response.projectId }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.datazone.get_form_type
+  calls:
+  - action: get_form_type
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.imports }}'
+    item:
+      imports: '{{ item.imports }}'
+      name: '{{ item.name }}'
+      revision: '{{ item.revision }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      description: '{{ response.description }}'
+      domainId: '{{ response.domainId }}'
+      smithy: '{{ response.model.smithy }}'
+      originDomainId: '{{ response.originDomainId }}'
+      originProjectId: '{{ response.originProjectId }}'
+      owningProjectId: '{{ response.owningProjectId }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.datazone.get_glossary
+  calls:
+  - action: get_glossary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.usageRestrictions }}'
+    item:
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      description: '{{ response.description }}'
+      domainId: '{{ response.domainId }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      owningProjectId: '{{ response.owningProjectId }}'
+      status: '{{ response.status }}'
+      updatedAt: '{{ response.updatedAt }}'
+      updatedBy: '{{ response.updatedBy }}'
+- discovery_id: aws.datazone.get_glossary_term
+  calls:
+  - action: get_glossary_term
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.usageRestrictions }}'
+    item:
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      domainId: '{{ response.domainId }}'
+      glossaryId: '{{ response.glossaryId }}'
+      id: '{{ response.id }}'
+      longDescription: '{{ response.longDescription }}'
+      name: '{{ response.name }}'
+      shortDescription: '{{ response.shortDescription }}'
+      status: '{{ response.status }}'
+      updatedAt: '{{ response.updatedAt }}'
+      updatedBy: '{{ response.updatedBy }}'
+- discovery_id: aws.datazone.get_group_profile
+  calls:
+  - action: get_group_profile
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      domainId: '{{ response.domainId }}'
+      groupName: '{{ response.groupName }}'
+      id: '{{ response.id }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.datazone.get_iam_portal_login_url
+  calls:
+  - action: get_iam_portal_login_url
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      authCodeUrl: '{{ response.authCodeUrl }}'
+      userProfileId: '{{ response.userProfileId }}'
+- discovery_id: aws.datazone.get_job_run
+  calls:
+  - action: get_job_run
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      lineageRunDetails: '{{ response.details.lineageRunDetails }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      numQueriesFailed: '{{ response.details.lineageRunDetails.sqlQueryRunDetails.numQueriesFailed
+        }}'
+      queryEndTime: '{{ response.details.lineageRunDetails.sqlQueryRunDetails.queryEndTime
+        }}'
+      queryStartTime: '{{ response.details.lineageRunDetails.sqlQueryRunDetails.queryStartTime
+        }}'
+      totalQueriesProcessed: '{{ response.details.lineageRunDetails.sqlQueryRunDetails.totalQueriesProcessed
+        }}'
+      domainId: '{{ response.domainId }}'
+      endTime: '{{ response.endTime }}'
+      message: '{{ response.error.message }}'
+      id: '{{ response.id }}'
+      jobId: '{{ response.jobId }}'
+      jobType: '{{ response.jobType }}'
+      runMode: '{{ response.runMode }}'
+      startTime: '{{ response.startTime }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.datazone.get_lineage_event
+  calls:
+  - action: get_lineage_event
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      domainId: '{{ response.domainId }}'
+      event: '{{ response.event }}'
+      eventTime: '{{ response.eventTime }}'
+      id: '{{ response.id }}'
+      processingStatus: '{{ response.processingStatus }}'
+- discovery_id: aws.datazone.get_lineage_node
+  calls:
+  - action: get_lineage_node
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.downstreamNodes }}'
+    item:
+      eventTimestamp: '{{ item.eventTimestamp }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      description: '{{ response.description }}'
+      domainId: '{{ response.domainId }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      sourceIdentifier: '{{ response.sourceIdentifier }}'
+      typeName: '{{ response.typeName }}'
+      typeRevision: '{{ response.typeRevision }}'
+      updatedAt: '{{ response.updatedAt }}'
+      updatedBy: '{{ response.updatedBy }}'
+- discovery_id: aws.datazone.get_listing
+  calls:
+  - action: get_listing
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      description: '{{ response.description }}'
+      domainId: '{{ response.domainId }}'
+      id: '{{ response.id }}'
+      listingRevision: '{{ response.listingRevision }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+      updatedAt: '{{ response.updatedAt }}'
+      updatedBy: '{{ response.updatedBy }}'
+      assetId: '{{ response.item.assetListing.assetId }}'
+      assetRevision: '{{ response.item.assetListing.assetRevision }}'
+      assetType: '{{ response.item.assetListing.assetType }}'
+      forms: '{{ response.item.assetListing.forms }}'
+      owningProjectId: '{{ response.item.assetListing.owningProjectId }}'
+      dataProductId: '{{ response.item.dataProductListing.dataProductId }}'
+      dataProductRevision: '{{ response.item.dataProductListing.dataProductRevision
+        }}'
+- discovery_id: aws.datazone.get_metadata_generation_run
+  calls:
+  - action: get_metadata_generation_run
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      identifier: '{{ response.target.identifier }}'
+      revision: '{{ response.target.revision }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      domainId: '{{ response.domainId }}'
+      id: '{{ response.id }}'
+      owningProjectId: '{{ response.owningProjectId }}'
+      status: '{{ response.status }}'
+      type: '{{ response.target.type }}'
+- discovery_id: aws.datazone.get_project
+  calls:
+  - action: get_project
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.failureReasons }}'
+    item:
+      code: '{{ item.code }}'
+      message: '{{ item.message }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      description: '{{ response.description }}'
+      domainId: '{{ response.domainId }}'
+      domainUnitId: '{{ response.domainUnitId }}'
+      environmentFailureReasons: '{{ response.environmentDeploymentDetails.environmentFailureReasons
+        }}'
+      overallDeploymentStatus: '{{ response.environmentDeploymentDetails.overallDeploymentStatus
+        }}'
+      id: '{{ response.id }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      name: '{{ response.name }}'
+      projectProfileId: '{{ response.projectProfileId }}'
+      projectStatus: '{{ response.projectStatus }}'
+- discovery_id: aws.datazone.get_project_profile
+  calls:
+  - action: get_project_profile
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.environmentConfigurations }}'
+    item:
+      accountPools: '{{ item.accountPools }}'
+      awsAccount: '{{ item.awsAccount }}'
+      awsRegion: '{{ item.awsRegion }}'
+      configurationParameters: '{{ item.configurationParameters }}'
+      deploymentMode: '{{ item.deploymentMode }}'
+      deploymentOrder: '{{ item.deploymentOrder }}'
+      description: '{{ item.description }}'
+      environmentBlueprintId: '{{ item.environmentBlueprintId }}'
+      name: '{{ item.name }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      domainId: '{{ response.domainId }}'
+      domainUnitId: '{{ response.domainUnitId }}'
+      id: '{{ response.id }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.datazone.get_rule
+  calls:
+  - action: get_rule
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      glossaryTermEnforcementDetail: '{{ response.detail.glossaryTermEnforcementDetail
+        }}'
+      metadataFormEnforcementDetail: '{{ response.detail.metadataFormEnforcementDetail
+        }}'
+      action: '{{ response.action }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      description: '{{ response.description }}'
+      identifier: '{{ response.identifier }}'
+      lastUpdatedBy: '{{ response.lastUpdatedBy }}'
+      name: '{{ response.name }}'
+      revision: '{{ response.revision }}'
+      ruleType: '{{ response.ruleType }}'
+      selectionMode: '{{ response.scope.assetType.selectionMode }}'
+      dataProduct: '{{ response.scope.dataProduct }}'
+      targetType: '{{ response.targetType }}'
+      domainUnitId: '{{ response.target.domainUnitTarget.domainUnitId }}'
+      includeChildDomainUnits: '{{ response.target.domainUnitTarget.includeChildDomainUnits
+        }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.datazone.get_subscription
+  calls:
+  - action: get_subscription
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      description: '{{ response.subscribedListing.description }}'
+      item: '{{ response.subscribedListing.id }}'
+      name: '{{ response.subscribedListing.name }}'
+      ownerProjectId: '{{ response.subscribedListing.ownerProjectId }}'
+      ownerProjectName: '{{ response.subscribedListing.ownerProjectName }}'
+      revision: '{{ response.subscribedListing.revision }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      domainId: '{{ response.domainId }}'
+      id: '{{ response.id }}'
+      retainPermissions: '{{ response.retainPermissions }}'
+      status: '{{ response.status }}'
+      assetId: '{{ response.subscribedListing.item.assetListing.assetScope.assetId
+        }}'
+      errorMessage: '{{ response.subscribedListing.item.assetListing.assetScope.errorMessage
+        }}'
+      entityId: '{{ response.subscribedListing.item.assetListing.entityId }}'
+      entityRevision: '{{ response.subscribedListing.item.assetListing.entityRevision
+        }}'
+      entityType: '{{ response.subscribedListing.item.assetListing.entityType }}'
+      forms: '{{ response.subscribedListing.item.assetListing.forms }}'
+      subscriptionRequestId: '{{ response.subscriptionRequestId }}'
+      updatedAt: '{{ response.updatedAt }}'
+      updatedBy: '{{ response.updatedBy }}'
+- discovery_id: aws.datazone.get_subscription_grant
+  calls:
+  - action: get_subscription_grant
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assets }}'
+    item:
+      assetId: '{{ item.assetId }}'
+      assetRevision: '{{ item.assetRevision }}'
+      assetScope: '{{ item.assetScope }}'
+      failureCause: '{{ item.failureCause }}'
+      failureTimestamp: '{{ item.failureTimestamp }}'
+      grantedTimestamp: '{{ item.grantedTimestamp }}'
+      permissions: '{{ item.permissions }}'
+      targetName: '{{ item.targetName }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      domainId: '{{ response.domainId }}'
+      id: '{{ response.grantedEntity.listing.id }}'
+      revision: '{{ response.grantedEntity.listing.revision }}'
+      status: '{{ response.status }}'
+      subscriptionId: '{{ response.subscriptionId }}'
+      subscriptionTargetId: '{{ response.subscriptionTargetId }}'
+      updatedAt: '{{ response.updatedAt }}'
+      updatedBy: '{{ response.updatedBy }}'
+- discovery_id: aws.datazone.get_subscription_request_details
+  calls:
+  - action: get_subscription_request_details
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.metadataForms }}'
+    item:
+      description: '{{ item.description }}'
+      item: '{{ item.item }}'
+      name: '{{ item.name }}'
+      ownerProjectId: '{{ item.ownerProjectId }}'
+      ownerProjectName: '{{ item.ownerProjectName }}'
+      revision: '{{ item.revision }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      decisionComment: '{{ response.decisionComment }}'
+      domainId: '{{ response.domainId }}'
+      existingSubscriptionId: '{{ response.existingSubscriptionId }}'
+      id: '{{ response.id }}'
+      requestReason: '{{ response.requestReason }}'
+      reviewerId: '{{ response.reviewerId }}'
+      status: '{{ response.status }}'
+      updatedAt: '{{ response.updatedAt }}'
+      updatedBy: '{{ response.updatedBy }}'
+- discovery_id: aws.datazone.get_subscription_target
+  calls:
+  - action: get_subscription_target
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.applicableAssetTypes }}'
+    item:
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      domainId: '{{ response.domainId }}'
+      environmentId: '{{ response.environmentId }}'
+      id: '{{ response.id }}'
+      manageAccessRole: '{{ response.manageAccessRole }}'
+      name: '{{ response.name }}'
+      projectId: '{{ response.projectId }}'
+      provider: '{{ response.provider }}'
+      type: '{{ response.type }}'
+      updatedAt: '{{ response.updatedAt }}'
+      updatedBy: '{{ response.updatedBy }}'
+- discovery_id: aws.datazone.get_time_series_data_point
+  calls:
+  - action: get_time_series_data_point
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      content: '{{ response.form.content }}'
+      form: '{{ response.form.form }}'
+      formName: '{{ response.form.formName }}'
+      timestamp: '{{ response.form.timestamp }}'
+      typeIdentifier: '{{ response.form.typeIdentifier }}'
+      typeRevision: '{{ response.form.typeRevision }}'
+      domainId: '{{ response.domainId }}'
+      entityId: '{{ response.entityId }}'
+      entityType: '{{ response.entityType }}'
+      id: '{{ response.form.id }}'
+- discovery_id: aws.datazone.get_user_profile
+  calls:
+  - action: get_user_profile
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      iam: '{{ response.details.iam }}'
+      sso: '{{ response.details.sso }}'
+      arn: '{{ response.details.iam.arn }}'
+      firstName: '{{ response.details.sso.firstName }}'
+      lastName: '{{ response.details.sso.lastName }}'
+      username: '{{ response.details.sso.username }}'
+      domainId: '{{ response.domainId }}'
+      id: '{{ response.id }}'
+      status: '{{ response.status }}'
+      type: '{{ response.type }}'
+- discovery_id: aws.datazone.list_account_pools
+  calls:
+  - action: list_account_pools
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdBy: '{{ item.createdBy }}'
+      domainUnitId: '{{ item.domainUnitId }}'
+      name: '{{ item.name }}'
+      resolutionStrategy: '{{ item.resolutionStrategy }}'
+      updatedBy: '{{ item.updatedBy }}'
+- discovery_id: aws.datazone.list_accounts_in_account_pool
+  calls:
+  - action: list_accounts_in_account_pool
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      awsAccountId: '{{ item.awsAccountId }}'
+      awsAccountName: '{{ item.awsAccountName }}'
+      supportedRegions: '{{ item.supportedRegions }}'
+- discovery_id: aws.datazone.list_asset_filters
+  calls:
+  - action: list_asset_filters
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      assetId: '{{ item.assetId }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      effectiveColumnNames: '{{ item.effectiveColumnNames }}'
+      effectiveRowFilter: '{{ item.effectiveRowFilter }}'
+      errorMessage: '{{ item.errorMessage }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_asset_revisions
+  calls:
+  - action: list_asset_revisions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      revision: '{{ item.revision }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_connections
+  calls:
+  - action: list_connections
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      connectionId: '{{ item.connectionId }}'
+      domainUnitId: '{{ item.domainUnitId }}'
+      environmentId: '{{ item.environmentId }}'
+      name: '{{ item.name }}'
+      physicalEndpoints: '{{ item.physicalEndpoints }}'
+      projectId: '{{ item.projectId }}'
+      props: '{{ item.props }}'
+      scope: '{{ item.scope }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_data_product_revisions
+  calls:
+  - action: list_data_product_revisions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      revision: '{{ item.revision }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_data_source_run_activities
+  calls:
+  - action: list_data_source_run_activities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      dataAssetId: '{{ item.dataAssetId }}'
+      dataAssetStatus: '{{ item.dataAssetStatus }}'
+      dataSourceRunId: '{{ item.dataSourceRunId }}'
+      database: '{{ item.database }}'
+      errorMessage: '{{ item.errorMessage }}'
+      lineageSummary: '{{ item.lineageSummary }}'
+      projectId: '{{ item.projectId }}'
+      technicalDescription: '{{ item.technicalDescription }}'
+      technicalName: '{{ item.technicalName }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_data_source_runs
+  calls:
+  - action: list_data_source_runs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      dataSourceId: '{{ item.dataSourceId }}'
+      errorMessage: '{{ item.errorMessage }}'
+      lineageSummary: '{{ item.lineageSummary }}'
+      projectId: '{{ item.projectId }}'
+      runStatisticsForAssets: '{{ item.runStatisticsForAssets }}'
+      startedAt: '{{ item.startedAt }}'
+      stoppedAt: '{{ item.stoppedAt }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_data_sources
+  calls:
+  - action: list_data_sources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      connectionId: '{{ item.connectionId }}'
+      createdAt: '{{ item.createdAt }}'
+      dataSourceId: '{{ item.dataSourceId }}'
+      description: '{{ item.description }}'
+      enableSetting: '{{ item.enableSetting }}'
+      environmentId: '{{ item.environmentId }}'
+      lastRunAssetCount: '{{ item.lastRunAssetCount }}'
+      lastRunAt: '{{ item.lastRunAt }}'
+      lastRunErrorMessage: '{{ item.lastRunErrorMessage }}'
+      lastRunStatus: '{{ item.lastRunStatus }}'
+      name: '{{ item.name }}'
+      schedule: '{{ item.schedule }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_domain_units_for_parent
+  calls:
+  - action: list_domain_units_for_parent
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_entity_owners
+  calls:
+  - action: list_entity_owners
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.owners }}'
+    item:
+      group: '{{ item.group }}'
+      user: '{{ item.user }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_environment_actions
+  calls:
+  - action: list_environment_actions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      description: '{{ item.description }}'
+      environmentId: '{{ item.environmentId }}'
+      name: '{{ item.name }}'
+      parameters: '{{ item.parameters }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_environment_blueprint_configurations
+  calls:
+  - action: list_environment_blueprint_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      enabledRegions: '{{ item.enabledRegions }}'
+      environmentBlueprintId: '{{ item.environmentBlueprintId }}'
+      environmentRolePermissionBoundary: '{{ item.items[].environmentRolePermissionBoundary
+        }}'
+      manageAccessRoleArn: '{{ item.manageAccessRoleArn }}'
+      provisioningConfigurations: '{{ item.provisioningConfigurations }}'
+      provisioningRoleArn: '{{ item.provisioningRoleArn }}'
+      regionalParameters: '{{ item.regionalParameters }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_environment_blueprints
+  calls:
+  - action: list_environment_blueprints
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      provider: '{{ item.provider }}'
+      provisioningProperties: '{{ item.provisioningProperties }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_environment_profiles
+  calls:
+  - action: list_environment_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      awsAccountId: '{{ item.awsAccountId }}'
+      awsAccountRegion: '{{ item.awsAccountRegion }}'
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      description: '{{ item.description }}'
+      environmentBlueprintId: '{{ item.environmentBlueprintId }}'
+      name: '{{ item.name }}'
+      projectId: '{{ item.projectId }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_environments
+  calls:
+  - action: list_environments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      awsAccountId: '{{ item.awsAccountId }}'
+      awsAccountRegion: '{{ item.awsAccountRegion }}'
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      description: '{{ item.description }}'
+      environmentConfigurationId: '{{ item.items[].environmentConfigurationId }}'
+      environmentProfileId: '{{ item.environmentProfileId }}'
+      name: '{{ item.name }}'
+      projectId: '{{ item.projectId }}'
+      provider: '{{ item.provider }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_job_runs
+  calls:
+  - action: list_job_runs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      endTime: '{{ item.endTime }}'
+      error: '{{ item.error }}'
+      jobId: '{{ item.jobId }}'
+      jobType: '{{ item.jobType }}'
+      runId: '{{ item.runId }}'
+      runMode: '{{ item.runMode }}'
+      startTime: '{{ item.startTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_lineage_events
+  calls:
+  - action: list_lineage_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      eventSummary: '{{ item.eventSummary }}'
+      eventTime: '{{ item.eventTime }}'
+      processingStatus: '{{ item.processingStatus }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_lineage_node_history
+  calls:
+  - action: list_lineage_node_history
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.nodes }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      description: '{{ item.description }}'
+      eventTimestamp: '{{ item.eventTimestamp }}'
+      name: '{{ item.name }}'
+      sourceIdentifier: '{{ item.sourceIdentifier }}'
+      typeName: '{{ item.typeName }}'
+      typeRevision: '{{ item.typeRevision }}'
+      updatedAt: '{{ item.updatedAt }}'
+      updatedBy: '{{ item.updatedBy }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_metadata_generation_runs
+  calls:
+  - action: list_metadata_generation_runs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      owningProjectId: '{{ item.owningProjectId }}'
+      target: '{{ item.target }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_notifications
+  calls:
+  - action: list_notifications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.notifications }}'
+    item:
+      actionLink: '{{ item.actionLink }}'
+      creationTimestamp: '{{ item.creationTimestamp }}'
+      domainIdentifier: '{{ item.domainIdentifier }}'
+      identifier: '{{ item.identifier }}'
+      lastUpdatedTimestamp: '{{ item.lastUpdatedTimestamp }}'
+      message: '{{ item.message }}'
+      metadata: '{{ item.metadata }}'
+      title: '{{ item.title }}'
+      topic: '{{ item.topic }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_policy_grants
+  calls:
+  - action: list_policy_grants
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.grantList }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      detail: '{{ item.detail }}'
+      grantId: '{{ item.grantId }}'
+      principal: '{{ item.principal }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_project_memberships
+  calls:
+  - action: list_project_memberships
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.members }}'
+    item:
+      designation: '{{ item.designation }}'
+      memberDetails: '{{ item.memberDetails }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_project_profiles
+  calls:
+  - action: list_project_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      description: '{{ item.description }}'
+      domainUnitId: '{{ item.domainUnitId }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_projects
+  calls:
+  - action: list_projects
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      description: '{{ item.description }}'
+      domainUnitId: '{{ item.domainUnitId }}'
+      failureReasons: '{{ item.failureReasons }}'
+      name: '{{ item.name }}'
+      projectStatus: '{{ item.projectStatus }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_rules
+  calls:
+  - action: list_rules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      action: '{{ item.action }}'
+      identifier: '{{ item.identifier }}'
+      lastUpdatedBy: '{{ item.lastUpdatedBy }}'
+      name: '{{ item.name }}'
+      revision: '{{ item.revision }}'
+      ruleType: '{{ item.ruleType }}'
+      scope: '{{ item.scope }}'
+      target: '{{ item.target }}'
+      targetType: '{{ item.targetType }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_subscription_grants
+  calls:
+  - action: list_subscription_grants
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      assets: '{{ item.assets }}'
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      environmentId: '{{ item.environmentId }}'
+      grantedEntity: '{{ item.grantedEntity }}'
+      subscriptionId: '{{ item.subscriptionId }}'
+      subscriptionTargetId: '{{ item.subscriptionTargetId }}'
+      updatedAt: '{{ item.updatedAt }}'
+      updatedBy: '{{ item.updatedBy }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_subscription_requests
+  calls:
+  - action: list_subscription_requests
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      decisionComment: '{{ item.decisionComment }}'
+      existingSubscriptionId: '{{ item.existingSubscriptionId }}'
+      metadataFormsSummary: '{{ item.metadataFormsSummary }}'
+      requestReason: '{{ item.requestReason }}'
+      reviewerId: '{{ item.reviewerId }}'
+      subscribedListings: '{{ item.subscribedListings }}'
+      subscribedPrincipals: '{{ item.subscribedPrincipals }}'
+      updatedAt: '{{ item.updatedAt }}'
+      updatedBy: '{{ item.updatedBy }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_subscription_targets
+  calls:
+  - action: list_subscription_targets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      applicableAssetTypes: '{{ item.applicableAssetTypes }}'
+      authorizedPrincipals: '{{ item.authorizedPrincipals }}'
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      environmentId: '{{ item.environmentId }}'
+      manageAccessRole: '{{ item.manageAccessRole }}'
+      name: '{{ item.name }}'
+      projectId: '{{ item.projectId }}'
+      provider: '{{ item.provider }}'
+      subscriptionTargetConfig: '{{ item.subscriptionTargetConfig }}'
+      updatedAt: '{{ item.updatedAt }}'
+      updatedBy: '{{ item.updatedBy }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_subscriptions
+  calls:
+  - action: list_subscriptions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      retainPermissions: '{{ item.retainPermissions }}'
+      subscribedListing: '{{ item.subscribedListing }}'
+      subscribedPrincipal: '{{ item.subscribedPrincipal }}'
+      subscriptionRequestId: '{{ item.subscriptionRequestId }}'
+      updatedAt: '{{ item.updatedAt }}'
+      updatedBy: '{{ item.updatedBy }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.datazone.list_time_series_data_points
+  calls:
+  - action: list_time_series_data_points
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      contentSummary: '{{ item.contentSummary }}'
+      form: '{{ item.form }}'
+      formName: '{{ item.formName }}'
+      timestamp: '{{ item.timestamp }}'
+      typeIdentifier: '{{ item.typeIdentifier }}'
+      typeRevision: '{{ item.typeRevision }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.search
+  calls:
+  - action: search
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+      totalMatchCount: '{{ response.totalMatchCount }}'
+- discovery_id: aws.datazone.search_group_profiles
+  calls:
+  - action: search_group_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.datazone.search_listings
+  calls:
+  - action: search_listings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.aggregates }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+      totalMatchCount: '{{ response.totalMatchCount }}'
+- discovery_id: aws.datazone.search_types
+  calls:
+  - action: search_types
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+      totalMatchCount: '{{ response.totalMatchCount }}'
+- discovery_id: aws.datazone.search_user_profiles
+  calls:
+  - action: search_user_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      nextToken: '{{ response.nextToken }}'

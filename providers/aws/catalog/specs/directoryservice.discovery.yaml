@@ -1,0 +1,197 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: directoryservice, ds
+# 4 ops (2 from checks, +2 for inventory)
+version: '1.0'
+provider: aws
+service: directoryservice
+discovery:
+  - calls:
+    - action: describe_directories
+      on_error: continue
+      save_as: response
+    discovery_id: aws.ds.describe_directories
+    emit:
+      as: item
+      item:
+        AccessUrl: '{{ item.AccessUrl }}'
+        Alias: '{{ item.Alias }}'
+        AllowedValues: '{{ item.AllowedValues }}'
+        AppliedValue: '{{ item.AppliedValue }}'
+        AvailabilityZone: '{{ item.AvailabilityZone }}'
+        CaEnrollmentPolicyStatus: '{{ item.CaEnrollmentPolicyStatus }}'
+        CaEnrollmentPolicyStatusReason: '{{ item.CaEnrollmentPolicyStatusReason }}'
+        ClientAuthenticationSettingsInfo: '{{ item.ClientAuthenticationSettingsInfo
+          }}'
+        ConditionalForwarders: '{{ item.ConditionalForwarders }}'
+        ConnectSettings: '{{ item.ConnectSettings }}'
+        DataAccessStatus: '{{ item.DataAccessStatus }}'
+        Description: '{{ item.Description }}'
+        DesiredNumberOfDomainControllers: '{{ item.DesiredNumberOfDomainControllers
+          }}'
+        DestinationArn: '{{ item.DestinationArn }}'
+        DirectoryDescriptions: '{{ item.DirectoryDescriptions }}'
+        DirectoryId: '{{ item.DirectoryId }}'
+        DnsIpAddr: '{{ item.DnsIpAddr }}'
+        DnsIpAddrs: '{{ item.DnsIpAddrs }}'
+        DnsIpv6Addr: '{{ item.DnsIpv6Addr }}'
+        DnsIpv6Addrs: '{{ item.DnsIpv6Addrs }}'
+        DomainControllers: '{{ item.DomainControllers }}'
+        Edition: '{{ item.Edition }}'
+        Enabled: '{{ item.Enabled }}'
+        Format: '{{ item.Format }}'
+        HybridAdministratorAccount: '{{ item.HybridAdministratorAccount }}'
+        HybridSettings: '{{ item.HybridSettings }}'
+        InitiatedBy: '{{ item.InitiatedBy }}'
+        LDAPSSettingsInfo: '{{ item.LDAPSSettingsInfo }}'
+        LastRequestedDateTime: '{{ item.LastRequestedDateTime }}'
+        LaunchTime: '{{ item.LaunchTime }}'
+        Level: '{{ item.Level }}'
+        ManualSnapshotsCurrentCount: '{{ item.ManualSnapshotsCurrentCount }}'
+        ManualSnapshotsLimit: '{{ item.ManualSnapshotsLimit }}'
+        ManualSnapshotsLimitReached: '{{ item.ManualSnapshotsLimitReached }}'
+        Name: '{{ item.Name }}'
+        NetworkType: '{{ item.NetworkType }}'
+        NewValue: '{{ item.NewValue }}'
+        OsVersion: '{{ item.OsVersion }}'
+        OwnerDirectoryDescription: '{{ item.OwnerDirectoryDescription }}'
+        PcaConnectorArn: '{{ item.PcaConnectorArn }}'
+        PreviousValue: '{{ item.PreviousValue }}'
+        RadiusSettings: '{{ item.RadiusSettings }}'
+        RadiusStatus: '{{ item.RadiusStatus }}'
+        Region: '{{ item.Region }}'
+        RegionType: '{{ item.RegionType }}'
+        RegionsDescription: '{{ item.RegionsDescription }}'
+        RegionsInfo: '{{ item.RegionsInfo }}'
+        ReplicationScope: '{{ item.ReplicationScope }}'
+        RequestDetailedStatus: '{{ item.RequestDetailedStatus }}'
+        RequestStatus: '{{ item.RequestStatus }}'
+        RequestStatusMessage: '{{ item.RequestStatusMessage }}'
+        RequestedValue: '{{ item.RequestedValue }}'
+        SelfManagedInstances: '{{ item.SelfManagedInstances }}'
+        SettingEntries: '{{ item.SettingEntries }}'
+        ShareMethod: '{{ item.ShareMethod }}'
+        ShareNotes: '{{ item.ShareNotes }}'
+        ShareStatus: '{{ item.ShareStatus }}'
+        ShortName: '{{ item.ShortName }}'
+        Size: '{{ item.Size }}'
+        SnapshotLimits: '{{ item.SnapshotLimits }}'
+        SsoEnabled: '{{ item.SsoEnabled }}'
+        Stage: '{{ item.Stage }}'
+        StageLastUpdatedDateTime: '{{ item.StageLastUpdatedDateTime }}'
+        StageReason: '{{ item.StageReason }}'
+        StatusLastUpdatedDateTime: '{{ item.StatusLastUpdatedDateTime }}'
+        StatusReason: '{{ item.StatusReason }}'
+        SubnetId: '{{ item.SubnetId }}'
+        Type: '{{ item.Type }}'
+        UpdateActivities: '{{ item.UpdateActivities }}'
+        VpcId: '{{ item.VpcId }}'
+        VpcSettings: '{{ item.VpcSettings }}'
+      items_for: '{{ response.DirectoryDescriptions }}'
+  - calls:
+    - action: list_log_subscriptions
+      on_error: continue
+      save_as: response
+    discovery_id: aws.ds.list_log_subscriptions
+    emit:
+      as: item
+      item:
+        DirectoryId: '{{ item.DirectoryId }}'
+        LogGroupName: '{{ item.LogGroupName }}'
+        SubscriptionCreatedDateTime: '{{ item.SubscriptionCreatedDateTime }}'
+      items_for: '{{ response.LogSubscriptions }}'
+  - calls:
+    - action: describe_directories
+      on_error: continue
+      save_as: response
+    discovery_id: aws.directoryservice.describe_directories
+    emit:
+      as: item
+      item:
+        AccessUrl: '{{ response.AccessUrl }}'
+        Alias: '{{ response.Alias }}'
+        AllowedValues: '{{ response.AllowedValues }}'
+        AppliedValue: '{{ response.AppliedValue }}'
+        AvailabilityZone: '{{ response.AvailabilityZone }}'
+        CaEnrollmentPolicyStatus: '{{ response.CaEnrollmentPolicyStatus }}'
+        CaEnrollmentPolicyStatusReason: '{{ response.CaEnrollmentPolicyStatusReason
+          }}'
+        ClientAuthenticationSettingsInfo: '{{ response.ClientAuthenticationSettingsInfo
+          }}'
+        ConditionalForwarders: '{{ response.ConditionalForwarders }}'
+        ConnectSettings: '{{ response.ConnectSettings }}'
+        DataAccessStatus: '{{ response.DataAccessStatus }}'
+        Description: '{{ response.Description }}'
+        DesiredNumberOfDomainControllers: '{{ response.DesiredNumberOfDomainControllers
+          }}'
+        DestinationArn: '{{ response.DestinationArn }}'
+        DirectoryDescriptions: '{{ response.DirectoryDescriptions }}'
+        DirectoryId: '{{ response.DirectoryId }}'
+        DnsIpAddr: '{{ response.DnsIpAddr }}'
+        DnsIpAddrs: '{{ response.DnsIpAddrs }}'
+        DnsIpv6Addr: '{{ response.DnsIpv6Addr }}'
+        DnsIpv6Addrs: '{{ response.DnsIpv6Addrs }}'
+        DomainControllers: '{{ response.DomainControllers }}'
+        Edition: '{{ response.Edition }}'
+        Enabled: '{{ response.Enabled }}'
+        Format: '{{ response.Format }}'
+        HybridAdministratorAccount: '{{ response.HybridAdministratorAccount }}'
+        HybridSettings: '{{ response.HybridSettings }}'
+        InitiatedBy: '{{ response.InitiatedBy }}'
+        LDAPSSettingsInfo: '{{ response.LDAPSSettingsInfo }}'
+        LastRequestedDateTime: '{{ response.LastRequestedDateTime }}'
+        LaunchTime: '{{ response.LaunchTime }}'
+        Level: '{{ response.Level }}'
+        ManualSnapshotsCurrentCount: '{{ response.ManualSnapshotsCurrentCount }}'
+        ManualSnapshotsLimit: '{{ response.ManualSnapshotsLimit }}'
+        ManualSnapshotsLimitReached: '{{ response.ManualSnapshotsLimitReached }}'
+        Name: '{{ response.Name }}'
+        NetworkType: '{{ response.NetworkType }}'
+        NewValue: '{{ response.NewValue }}'
+        OsVersion: '{{ response.OsVersion }}'
+        OwnerDirectoryDescription: '{{ response.OwnerDirectoryDescription }}'
+        PcaConnectorArn: '{{ response.PcaConnectorArn }}'
+        PreviousValue: '{{ response.PreviousValue }}'
+        RadiusSettings: '{{ response.RadiusSettings }}'
+        RadiusStatus: '{{ response.RadiusStatus }}'
+        Region: '{{ response.Region }}'
+        RegionType: '{{ response.RegionType }}'
+        RegionsDescription: '{{ response.RegionsDescription }}'
+        RegionsInfo: '{{ response.RegionsInfo }}'
+        ReplicationScope: '{{ response.ReplicationScope }}'
+        RequestDetailedStatus: '{{ response.RequestDetailedStatus }}'
+        RequestStatus: '{{ response.RequestStatus }}'
+        RequestStatusMessage: '{{ response.RequestStatusMessage }}'
+        RequestedValue: '{{ response.RequestedValue }}'
+        SelfManagedInstances: '{{ response.SelfManagedInstances }}'
+        SettingEntries: '{{ response.SettingEntries }}'
+        ShareMethod: '{{ response.ShareMethod }}'
+        ShareNotes: '{{ response.ShareNotes }}'
+        ShareStatus: '{{ response.ShareStatus }}'
+        ShortName: '{{ response.ShortName }}'
+        Size: '{{ response.Size }}'
+        SnapshotLimits: '{{ response.SnapshotLimits }}'
+        SsoEnabled: '{{ response.SsoEnabled }}'
+        Stage: '{{ response.Stage }}'
+        StageLastUpdatedDateTime: '{{ response.StageLastUpdatedDateTime }}'
+        StageReason: '{{ response.StageReason }}'
+        StatusLastUpdatedDateTime: '{{ response.StatusLastUpdatedDateTime }}'
+        StatusReason: '{{ response.StatusReason }}'
+        SubnetId: '{{ response.SubnetId }}'
+        Type: '{{ response.Type }}'
+        UpdateActivities: '{{ response.UpdateActivities }}'
+        VpcId: '{{ response.VpcId }}'
+        VpcSettings: '{{ response.VpcSettings }}'
+  - calls:
+    - action: describe_event_topics
+      on_error: continue
+      save_as: response
+    discovery_id: aws.directoryservice.describe_event_topics
+    emit:
+      as: item
+      item:
+        CreatedDateTime: '{{ response.CreatedDateTime }}'
+        DirectoryId: '{{ response.DirectoryId }}'
+        EventTopics: '{{ response.EventTopics }}'
+        Status: '{{ response.Status }}'
+        TopicArn: '{{ response.TopicArn }}'
+        TopicName: '{{ response.TopicName }}'

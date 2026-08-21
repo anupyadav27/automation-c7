@@ -1,0 +1,319 @@
+version: '1.0'
+provider: aws
+service: workdocs
+services:
+  client: workdocs
+  module: boto3.client
+discovery:
+- discovery_id: aws.workdocs.describe_activities
+  calls:
+  - action: describe_activities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UserActivities }}'
+    item:
+      EndPoint: '{{ item.EndPoint }}'
+      Initiator: '{{ item.Initiator }}'
+      IsIndirectActivity: '{{ item.IsIndirectActivity }}'
+      OrganizationId: '{{ item.OrganizationId }}'
+      OriginalParent: '{{ item.OriginalParent }}'
+      Participants: '{{ item.Participants }}'
+      Protocol: '{{ item.Protocol }}'
+      ResourceMetadata: '{{ item.ResourceMetadata }}'
+      TimeStamp: '{{ item.TimeStamp }}'
+      Type: '{{ item.Type }}'
+      UserActivities: '{{ item.UserActivities }}'
+- discovery_id: aws.workdocs.describe_users
+  calls:
+  - action: describe_users
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Users }}'
+    item:
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      EmailAddress: '{{ item.EmailAddress }}'
+      GivenName: '{{ item.GivenName }}'
+      Locale: '{{ item.Locale }}'
+      ModifiedTimestamp: '{{ item.ModifiedTimestamp }}'
+      OrganizationId: '{{ item.OrganizationId }}'
+      RecycleBinFolderId: '{{ item.RecycleBinFolderId }}'
+      RootFolderId: '{{ item.RootFolderId }}'
+      Storage: '{{ item.Storage }}'
+      Surname: '{{ item.Surname }}'
+      TimeZoneId: '{{ item.TimeZoneId }}'
+      TotalNumberOfUsers: '{{ item.TotalNumberOfUsers }}'
+      Type: '{{ item.Type }}'
+      User: '{{ item.User }}'
+      Username: '{{ item.Username }}'
+      Users: '{{ item.Users }}'
+- discovery_id: aws.workdocs.get_resources
+  calls:
+  - action: get_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Folders }}'
+    item:
+      Id: '{{ item.Id }}'
+      Labels: '{{ item.Labels }}'
+      Name: '{{ item.Name }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      CreatorId: '{{ item.CreatorId }}'
+      Documents: '{{ item.Documents }}'
+      Folders: '{{ item.Folders }}'
+      LatestVersionSize: '{{ item.LatestVersionSize }}'
+      ModifiedTimestamp: '{{ item.ModifiedTimestamp }}'
+      ParentFolderId: '{{ item.ParentFolderId }}'
+      ResourceState: '{{ item.ResourceState }}'
+      Signature: '{{ item.Signature }}'
+      Size: '{{ item.Size }}'
+- discovery_id: aws.workdocs.search_resources
+  calls:
+  - action: search_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+- discovery_id: aws.workdocs.describe_comments
+  calls:
+  - action: describe_comments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Comments }}'
+    item:
+      Status: '{{ item.Status }}'
+      CommentId: '{{ item.CommentId }}'
+      Comments: '{{ item.Comments }}'
+      Contributor: '{{ item.Contributor }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      ParentId: '{{ item.ParentId }}'
+      RecipientId: '{{ item.RecipientId }}'
+      Text: '{{ item.Text }}'
+      ThreadId: '{{ item.ThreadId }}'
+      Visibility: '{{ item.Visibility }}'
+- discovery_id: aws.workdocs.describe_document_versions
+  calls:
+  - action: describe_document_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DocumentVersions }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      ContentCreatedTimestamp: '{{ item.ContentCreatedTimestamp }}'
+      ContentModifiedTimestamp: '{{ item.ContentModifiedTimestamp }}'
+      ContentType: '{{ item.ContentType }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      CreatorId: '{{ item.CreatorId }}'
+      ModifiedTimestamp: '{{ item.ModifiedTimestamp }}'
+      Signature: '{{ item.Signature }}'
+      Size: '{{ item.Size }}'
+      Source: '{{ item.Source }}'
+      Thumbnail: '{{ item.Thumbnail }}'
+- discovery_id: aws.workdocs.describe_folder_contents
+  calls:
+  - action: describe_folder_contents
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Folders }}'
+    item:
+      Id: '{{ item.Id }}'
+      Labels: '{{ item.Labels }}'
+      Name: '{{ item.Name }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      CreatorId: '{{ item.CreatorId }}'
+      LatestVersionSize: '{{ item.LatestVersionSize }}'
+      ModifiedTimestamp: '{{ item.ModifiedTimestamp }}'
+      ParentFolderId: '{{ item.ParentFolderId }}'
+      ResourceState: '{{ item.ResourceState }}'
+      Signature: '{{ item.Signature }}'
+      Size: '{{ item.Size }}'
+- discovery_id: aws.workdocs.describe_groups
+  calls:
+  - action: describe_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Groups }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Groups: '{{ item.Groups }}'
+- discovery_id: aws.workdocs.describe_notification_subscriptions
+  for_each: aws.workdocs.describe_activities
+  calls:
+  - action: describe_notification_subscriptions
+    params:
+      OrganizationId: '{{ item.OrganizationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Subscriptions }}'
+    item:
+      EndPoint: '{{ item.EndPoint }}'
+      Protocol: '{{ item.Protocol }}'
+      SubscriptionId: '{{ item.SubscriptionId }}'
+      Subscriptions: '{{ item.Subscriptions }}'
+- discovery_id: aws.workdocs.describe_resource_permissions
+  calls:
+  - action: describe_resource_permissions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Principals }}'
+    item:
+      Id: '{{ item.Id }}'
+      Principals: '{{ item.Principals }}'
+      Roles: '{{ item.Roles }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.workdocs.describe_root_folders
+  calls:
+  - action: describe_root_folders
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Folders }}'
+    item:
+      Id: '{{ item.Id }}'
+      Labels: '{{ item.Labels }}'
+      Name: '{{ item.Name }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      CreatorId: '{{ item.CreatorId }}'
+      LatestVersionSize: '{{ item.LatestVersionSize }}'
+      ModifiedTimestamp: '{{ item.ModifiedTimestamp }}'
+      ParentFolderId: '{{ item.ParentFolderId }}'
+      ResourceState: '{{ item.ResourceState }}'
+      Signature: '{{ item.Signature }}'
+      Size: '{{ item.Size }}'
+- discovery_id: aws.workdocs.get_current_user
+  calls:
+  - action: get_current_user
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.User.Id }}'
+      Status: '{{ response.User.Status }}'
+      CreatedTimestamp: '{{ response.User.CreatedTimestamp }}'
+      EmailAddress: '{{ response.User.EmailAddress }}'
+      GivenName: '{{ response.User.GivenName }}'
+      Locale: '{{ response.User.Locale }}'
+      ModifiedTimestamp: '{{ response.User.ModifiedTimestamp }}'
+      OrganizationId: '{{ response.User.OrganizationId }}'
+      RecycleBinFolderId: '{{ response.User.RecycleBinFolderId }}'
+      RootFolderId: '{{ response.User.RootFolderId }}'
+      Storage: '{{ response.User.Storage }}'
+      Surname: '{{ response.User.Surname }}'
+      TimeZoneId: '{{ response.User.TimeZoneId }}'
+      Type: '{{ response.User.Type }}'
+      Username: '{{ response.User.Username }}'
+      StorageAllocatedInBytes: '{{ response.User.Storage.StorageRule.StorageAllocatedInBytes }}'
+      StorageType: '{{ response.User.Storage.StorageRule.StorageType }}'
+      StorageUtilizedInBytes: '{{ response.User.Storage.StorageUtilizedInBytes }}'
+- discovery_id: aws.workdocs.get_document
+  calls:
+  - action: get_document
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.Metadata.Id }}'
+      Labels: '{{ response.Metadata.Labels }}'
+      CreatedTimestamp: '{{ response.Metadata.CreatedTimestamp }}'
+      CreatorId: '{{ response.Metadata.CreatorId }}'
+      LatestVersionMetadata: '{{ response.Metadata.LatestVersionMetadata.Id }}'
+      ModifiedTimestamp: '{{ response.Metadata.ModifiedTimestamp }}'
+      ParentFolderId: '{{ response.Metadata.ParentFolderId }}'
+      ResourceState: '{{ response.Metadata.ResourceState }}'
+      CustomMetadata: '{{ response.CustomMetadata }}'
+      ContentCreatedTimestamp: '{{ response.Metadata.LatestVersionMetadata.ContentCreatedTimestamp }}'
+      ContentModifiedTimestamp: '{{ response.Metadata.LatestVersionMetadata.ContentModifiedTimestamp }}'
+      ContentType: '{{ response.Metadata.LatestVersionMetadata.ContentType }}'
+      Name: '{{ response.Metadata.LatestVersionMetadata.Name }}'
+      Signature: '{{ response.Metadata.LatestVersionMetadata.Signature }}'
+      Size: '{{ response.Metadata.LatestVersionMetadata.Size }}'
+      Source: '{{ response.Metadata.LatestVersionMetadata.Source }}'
+      Status: '{{ response.Metadata.LatestVersionMetadata.Status }}'
+      Thumbnail: '{{ response.Metadata.LatestVersionMetadata.Thumbnail }}'
+- discovery_id: aws.workdocs.get_document_path
+  calls:
+  - action: get_document_path
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Components: '{{ response.Path.Components[].Id }}'
+      Path: '{{ response.Path.Path }}'
+- discovery_id: aws.workdocs.get_document_version
+  calls:
+  - action: get_document_version
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.Metadata.Id }}'
+      Name: '{{ response.Metadata.Name }}'
+      Status: '{{ response.Metadata.Status }}'
+      ContentCreatedTimestamp: '{{ response.Metadata.ContentCreatedTimestamp }}'
+      ContentModifiedTimestamp: '{{ response.Metadata.ContentModifiedTimestamp }}'
+      ContentType: '{{ response.Metadata.ContentType }}'
+      CreatedTimestamp: '{{ response.Metadata.CreatedTimestamp }}'
+      CreatorId: '{{ response.Metadata.CreatorId }}'
+      ModifiedTimestamp: '{{ response.Metadata.ModifiedTimestamp }}'
+      Signature: '{{ response.Metadata.Signature }}'
+      Size: '{{ response.Metadata.Size }}'
+      Source: '{{ response.Metadata.Source }}'
+      Thumbnail: '{{ response.Metadata.Thumbnail }}'
+      CustomMetadata: '{{ response.CustomMetadata }}'
+- discovery_id: aws.workdocs.get_folder
+  calls:
+  - action: get_folder
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.Metadata.Id }}'
+      Labels: '{{ response.Metadata.Labels }}'
+      Name: '{{ response.Metadata.Name }}'
+      CreatedTimestamp: '{{ response.Metadata.CreatedTimestamp }}'
+      CreatorId: '{{ response.Metadata.CreatorId }}'
+      LatestVersionSize: '{{ response.Metadata.LatestVersionSize }}'
+      ModifiedTimestamp: '{{ response.Metadata.ModifiedTimestamp }}'
+      ParentFolderId: '{{ response.Metadata.ParentFolderId }}'
+      ResourceState: '{{ response.Metadata.ResourceState }}'
+      Signature: '{{ response.Metadata.Signature }}'
+      Size: '{{ response.Metadata.Size }}'
+      CustomMetadata: '{{ response.CustomMetadata }}'
+- discovery_id: aws.workdocs.get_folder_path
+  calls:
+  - action: get_folder_path
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Components: '{{ response.Path.Components[].Id }}'

@@ -1,0 +1,113 @@
+policies:
+
+  # ---------------------------------------------------------------
+  # 1. VPCs without flow logs enabled
+  # ---------------------------------------------------------------
+  - name: vpc-no-flow-logs
+    resource: vpc
+    description: >
+      VPCs with no VPC Flow Logs configured. Flow logs capture network
+      traffic metadata and are essential for security investigations,
+      intrusion detection, and compliance audits.
+    filters:
+      - not:
+          - type: flow-logs
+            enabled: true
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "vpc-no-flow-logs"
+      - type: notify
+        template: default.html
+        subject: "[c7n] VPC missing flow logs — network traffic not recorded"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 2. Default VPC in use (has running EC2 instances)
+  # ---------------------------------------------------------------
+  - name: vpc-default-in-use
+    resource: vpc
+    description: >
+      Default VPC exists in this region. The default VPC has
+      permissive default SGs and no network segmentation. All
+      workloads should use custom VPCs with proper CIDR design.
+    filters:
+      - type: value
+        key: IsDefault
+        value: true
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "default-vpc-present"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Default VPC contains running EC2 instances — migrate to custom VPC"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 3. Subnets that auto-assign public IPs
+  # ---------------------------------------------------------------
+  - name: subnet-auto-assign-public-ip
+    resource: subnet
+    description: >
+      Subnets with MapPublicIpOnLaunch=true. Any EC2 instance launched
+      in these subnets automatically receives a public IP, creating
+      unexpected internet exposure.
+    filters:
+      - type: value
+        key: MapPublicIpOnLaunch
+        value: true
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "subnet-auto-public-ip"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Subnet auto-assigns public IPs — review for unintended exposure"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 4. Internet Gateways attached to non-production VPCs
+  # ---------------------------------------------------------------
+  - name: igw-attached-non-prod-vpc
+    resource: internet-gateway
+    description: >
+      Internet Gateways attached to VPCs not tagged as production.
+      Dev/staging VPCs often do not need direct internet access —
+      use NAT Gateways for egress-only access instead.
+    filters:
+      - type: value
+        key: "Attachments[0].State"
+        value: available
+      - not:
+          - type: value
+            key: tag:Environment
+            op: in
+            value:
+              - prod
+              - production
+              - prd
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "igw-on-non-prod-vpc-review"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Internet Gateway attached to non-prod VPC — verify necessity"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

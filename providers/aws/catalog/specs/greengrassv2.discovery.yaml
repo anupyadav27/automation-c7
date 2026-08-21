@@ -1,0 +1,272 @@
+enabled: false
+version: '1.0'
+provider: aws
+service: greengrassv2
+services:
+  client: greengrassv2
+  module: boto3.client
+discovery:
+- discovery_id: aws.greengrassv2.get_service_role_for_account
+  calls:
+  - action: get_service_role_for_account
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      associatedAt: '{{ response.associatedAt }}'
+      roleArn: '{{ response.roleArn }}'
+- discovery_id: aws.greengrassv2.list_components
+  calls:
+  - action: list_components
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.components }}'
+    item:
+      arn: '{{ item.arn }}'
+      componentName: '{{ item.componentName }}'
+      components: '{{ item.components }}'
+      latestVersion: '{{ item.latestVersion }}'
+      platforms: '{{ item.platforms }}'
+      publisher: '{{ item.publisher }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.greengrassv2.list_core_devices
+  calls:
+  - action: list_core_devices
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.coreDevices }}'
+    item:
+      architecture: '{{ item.architecture }}'
+      coreDeviceThingName: '{{ item.coreDeviceThingName }}'
+      lastStatusUpdateTimestamp: '{{ item.lastStatusUpdateTimestamp }}'
+      platform: '{{ item.platform }}'
+      runtime: '{{ item.runtime }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.greengrassv2.list_deployments
+  calls:
+  - action: list_deployments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.deployments }}'
+    item:
+      creationTimestamp: '{{ item.creationTimestamp }}'
+      deploymentId: '{{ item.deploymentId }}'
+      deploymentName: '{{ item.deploymentName }}'
+      deploymentStatus: '{{ item.deploymentStatus }}'
+      isLatestForTarget: '{{ item.isLatestForTarget }}'
+      parentTargetArn: '{{ item.parentTargetArn }}'
+      revisionId: '{{ item.revisionId }}'
+      targetArn: '{{ item.targetArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.greengrassv2.describe_component
+  for_each: aws.greengrassv2.list_components
+  calls:
+  - action: describe_component
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.platforms }}'
+    item:
+      attributes: '{{ item.attributes }}'
+      name: '{{ item.name }}'
+      platforms: '{{ item.platforms }}'
+      publisher: '{{ item.publisher }}'
+      arn: '{{ response.arn }}'
+      componentName: '{{ response.componentName }}'
+      componentVersion: '{{ response.componentVersion }}'
+      creationTimestamp: '{{ response.creationTimestamp }}'
+      description: '{{ response.description }}'
+      componentState: '{{ response.status.componentState }}'
+      errors: '{{ response.status.errors }}'
+      message: '{{ response.status.message }}'
+      vendorGuidance: '{{ response.status.vendorGuidance }}'
+      vendorGuidanceMessage: '{{ response.status.vendorGuidanceMessage }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.greengrassv2.get_component
+  calls:
+  - action: get_component
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      recipe: '{{ response.recipe }}'
+      recipeOutputFormat: '{{ response.recipeOutputFormat }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.greengrassv2.get_component_version_artifact
+  calls:
+  - action: get_component_version_artifact
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      preSignedUrl: '{{ response.preSignedUrl }}'
+- discovery_id: aws.greengrassv2.get_connectivity_info
+  calls:
+  - action: get_connectivity_info
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.connectivityInfo }}'
+    item:
+      hostAddress: '{{ item.hostAddress }}'
+      id: '{{ item.id }}'
+      metadata: '{{ item.metadata }}'
+      portNumber: '{{ item.portNumber }}'
+      message: '{{ response.message }}'
+- discovery_id: aws.greengrassv2.get_core_device
+  for_each: aws.greengrassv2.list_core_devices
+  calls:
+  - action: get_core_device
+    params:
+      coreDeviceThingName: '{{ item.coreDeviceThingName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      architecture: '{{ response.architecture }}'
+      coreDeviceThingName: '{{ response.coreDeviceThingName }}'
+      coreVersion: '{{ response.coreVersion }}'
+      lastStatusUpdateTimestamp: '{{ response.lastStatusUpdateTimestamp }}'
+      platform: '{{ response.platform }}'
+      runtime: '{{ response.runtime }}'
+      status: '{{ response.status }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.greengrassv2.get_deployment
+  for_each: aws.greengrassv2.list_deployments
+  calls:
+  - action: get_deployment
+    params:
+      deploymentId: '{{ item.deploymentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.deploymentPolicies.Status }}'
+      Enabled: '{{ response.deploymentPolicies.Enabled }}'
+      Statement: '{{ response.deploymentPolicies.Statement }}'
+      Version: '{{ response.deploymentPolicies.Version }}'
+      componentUpdatePolicy: '{{ response.deploymentPolicies.componentUpdatePolicy.action }}'
+      configurationValidationPolicy: '{{ response.deploymentPolicies.configurationValidationPolicy }}'
+      failureHandlingPolicy: '{{ response.deploymentPolicies.failureHandlingPolicy }}'
+      components: '{{ response.components }}'
+      creationTimestamp: '{{ response.creationTimestamp }}'
+      deploymentId: '{{ response.deploymentId }}'
+      deploymentName: '{{ response.deploymentName }}'
+      action: '{{ response.deploymentPolicies.componentUpdatePolicy.action }}'
+      timeoutInSeconds: '{{ response.deploymentPolicies.componentUpdatePolicy.timeoutInSeconds }}'
+      deploymentStatus: '{{ response.deploymentStatus }}'
+      iotJobArn: '{{ response.iotJobArn }}'
+      baseRatePerMinute: '{{ response.iotJobConfiguration.jobExecutionsRolloutConfig.exponentialRate.baseRatePerMinute }}'
+      incrementFactor: '{{ response.iotJobConfiguration.jobExecutionsRolloutConfig.exponentialRate.incrementFactor }}'
+      numberOfNotifiedThings: '{{ response.iotJobConfiguration.jobExecutionsRolloutConfig.exponentialRate.rateIncreaseCriteria.numberOfNotifiedThings }}'
+      numberOfSucceededThings: '{{ response.iotJobConfiguration.jobExecutionsRolloutConfig.exponentialRate.rateIncreaseCriteria.numberOfSucceededThings }}'
+      maximumPerMinute: '{{ response.iotJobConfiguration.jobExecutionsRolloutConfig.maximumPerMinute }}'
+      inProgressTimeoutInMinutes: '{{ response.iotJobConfiguration.timeoutConfig.inProgressTimeoutInMinutes }}'
+      iotJobId: '{{ response.iotJobId }}'
+      isLatestForTarget: '{{ response.isLatestForTarget }}'
+      parentTargetArn: '{{ response.parentTargetArn }}'
+      revisionId: '{{ response.revisionId }}'
+      tags: '{{ response.tags }}'
+      targetArn: '{{ response.targetArn }}'
+- discovery_id: aws.greengrassv2.list_client_devices_associated_with_core_device
+  for_each: aws.greengrassv2.list_core_devices
+  calls:
+  - action: list_client_devices_associated_with_core_device
+    params:
+      coreDeviceThingName: '{{ item.coreDeviceThingName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.associatedClientDevices }}'
+    item:
+      associationTimestamp: '{{ item.associationTimestamp }}'
+      thingName: '{{ item.thingName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.greengrassv2.list_component_versions
+  for_each: aws.greengrassv2.list_components
+  calls:
+  - action: list_component_versions
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.componentVersions }}'
+    item:
+      arn: '{{ item.arn }}'
+      componentName: '{{ item.componentName }}'
+      componentVersion: '{{ item.componentVersion }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.greengrassv2.list_effective_deployments
+  for_each: aws.greengrassv2.list_core_devices
+  calls:
+  - action: list_effective_deployments
+    params:
+      coreDeviceThingName: '{{ item.coreDeviceThingName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.effectiveDeployments }}'
+    item:
+      coreDeviceExecutionStatus: '{{ item.coreDeviceExecutionStatus }}'
+      creationTimestamp: '{{ item.creationTimestamp }}'
+      deploymentId: '{{ item.deploymentId }}'
+      deploymentName: '{{ item.deploymentName }}'
+      description: '{{ item.description }}'
+      iotJobArn: '{{ item.iotJobArn }}'
+      iotJobId: '{{ item.iotJobId }}'
+      modifiedTimestamp: '{{ item.modifiedTimestamp }}'
+      reason: '{{ item.reason }}'
+      statusDetails: '{{ item.statusDetails }}'
+      targetArn: '{{ item.targetArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.greengrassv2.list_installed_components
+  for_each: aws.greengrassv2.list_core_devices
+  calls:
+  - action: list_installed_components
+    params:
+      coreDeviceThingName: '{{ item.coreDeviceThingName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.installedComponents }}'
+    item:
+      componentName: '{{ item.componentName }}'
+      componentVersion: '{{ item.componentVersion }}'
+      isRoot: '{{ item.isRoot }}'
+      lastInstallationSource: '{{ item.lastInstallationSource }}'
+      lastReportedTimestamp: '{{ item.lastReportedTimestamp }}'
+      lastStatusChangeTimestamp: '{{ item.lastStatusChangeTimestamp }}'
+      lifecycleState: '{{ item.lifecycleState }}'
+      lifecycleStateDetails: '{{ item.lifecycleStateDetails }}'
+      lifecycleStatusCodes: '{{ item.lifecycleStatusCodes }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.greengrassv2.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

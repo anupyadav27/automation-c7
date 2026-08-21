@@ -1,0 +1,59 @@
+version: '1.0'
+provider: aws
+service: codebuild
+discovery:
+- calls:
+  - action: list_projects
+    on_error: continue
+    save_as: response
+  discovery_id: aws.codebuild.list_projects
+  emit:
+    as: item
+    items_for: '{{ response.projects }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+  uid_template: arn:aws:codebuild:{context.region}:{context.account_id}:project/{item._raw_item}
+  uid_source: template
+- calls:
+  - action: batch_get_projects
+    on_error: continue
+    params:
+      names:
+      - '{{ item._raw_item }}'
+    save_as: response
+  discovery_id: aws.codebuild.batch_get_projects
+  emit:
+    as: item
+    item:
+      resource_type: codebuild_project
+      arn: '{{ response.projects.0.arn }}'
+      artifacts: '{{ response.projects.0.artifacts }}'
+      cache: '{{ response.projects.0.cache }}'
+      created: '{{ response.projects.0.created }}'
+      description: '{{ response.projects.0.description }}'
+      encryptionKey: '{{ response.projects.0.encryptionKey }}'
+      environment: '{{ response.projects.0.environment }}'
+      lastModified: '{{ response.projects.0.lastModified }}'
+      logsConfig: '{{ response.projects.0.logsConfig }}'
+      name: '{{ response.projects.0.name }}'
+      projectVisibility: '{{ response.projects.0.projectVisibility }}'
+      secondaryArtifacts: '{{ response.projects.0.secondaryArtifacts }}'
+      serviceRole: '{{ response.projects.0.serviceRole }}'
+      source: '{{ response.projects.0.source }}'
+      tags: '{{ response.projects.0.tags }}'
+      timeoutInMinutes: '{{ response.projects.0.timeoutInMinutes }}'
+      vpcConfig: '{{ response.projects.0.vpcConfig }}'
+  for_each: aws.codebuild.list_projects
+- calls:
+  - action: list_source_credentials
+    on_error: continue
+    save_as: response
+  discovery_id: aws.codebuild.list_source_credentials
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      authType: '{{ item.authType }}'
+      resource: '{{ item.resource }}'
+      serverType: '{{ item.serverType }}'
+    items_for: '{{ response.sourceCredentialsInfos }}'

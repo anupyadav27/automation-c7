@@ -1,0 +1,56 @@
+version: '1.0'
+provider: aws
+service: marketplace-agreement
+services:
+  client: marketplace-agreement
+  module: boto3.client
+discovery:
+- discovery_id: aws.marketplace-agreement.search_agreements
+  calls:
+  - action: search_agreements
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.agreementViewSummaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.marketplace-agreement.describe_agreement
+  calls:
+  - action: describe_agreement
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      accountId: '{{ response.acceptor.accountId }}'
+      acceptanceTime: '{{ response.acceptanceTime }}'
+      agreementId: '{{ response.agreementId }}'
+      agreementType: '{{ response.agreementType }}'
+      endTime: '{{ response.endTime }}'
+      agreementValue: '{{ response.estimatedCharges.agreementValue }}'
+      currencyCode: '{{ response.estimatedCharges.currencyCode }}'
+      offerId: '{{ response.proposalSummary.offerId }}'
+      startTime: '{{ response.startTime }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.marketplace-agreement.get_agreement_terms
+  calls:
+  - action: get_agreement_terms
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.acceptedTerms }}'
+    item:
+      byolPricingTerm: '{{ item.byolPricingTerm }}'
+      configurableUpfrontPricingTerm: '{{ item.configurableUpfrontPricingTerm }}'
+      fixedUpfrontPricingTerm: '{{ item.fixedUpfrontPricingTerm }}'
+      freeTrialPricingTerm: '{{ item.freeTrialPricingTerm }}'
+      legalTerm: '{{ item.legalTerm }}'
+      paymentScheduleTerm: '{{ item.paymentScheduleTerm }}'
+      recurringPaymentTerm: '{{ item.recurringPaymentTerm }}'
+      renewalTerm: '{{ item.renewalTerm }}'
+      supportTerm: '{{ item.supportTerm }}'
+      usageBasedPricingTerm: '{{ item.usageBasedPricingTerm }}'
+      validityTerm: '{{ item.validityTerm }}'
+      nextToken: '{{ response.nextToken }}'

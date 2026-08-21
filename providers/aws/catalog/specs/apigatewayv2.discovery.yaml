@@ -1,0 +1,261 @@
+version: '1.0'
+provider: aws
+service: apigatewayv2
+discovery:
+- calls:
+  - action: list_portal_products
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigatewayv2.list_portal_products
+  emit:
+    as: item
+    item:
+      Description: '{{ item.Description }}'
+      DisplayName: '{{ item.DisplayName }}'
+      Items: '{{ item.Items }}'
+      LastModified: '{{ item.LastModified }}'
+      PortalProductArn: '{{ item.PortalProductArn }}'
+      PortalProductId: '{{ item.PortalProductId }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.Items }}'
+- calls:
+  - action: get_apis
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigatewayv2.get_apis
+  emit:
+    as: item
+    item:
+      AccessLogSettings: '{{ item.AccessLogSettings }}'
+      ApiEndpoint: '{{ item.ApiEndpoint }}'
+      ApiGatewayManaged: '{{ item.ApiGatewayManaged }}'
+      ApiId: '{{ item.ApiId }}'
+      ApiKeyRequired: '{{ item.ApiKeyRequired }}'
+      ApiKeySelectionExpression: '{{ item.Items[].ApiKeySelectionExpression }}'
+      AuthorizationScopes: '{{ item.AuthorizationScopes }}'
+      AuthorizationType: '{{ item.AuthorizationType }}'
+      AuthorizerPayloadFormatVersion: '{{ item.AuthorizerPayloadFormatVersion }}'
+      AuthorizerResultTtlInSeconds: '{{ item.AuthorizerResultTtlInSeconds }}'
+      AuthorizerType: '{{ item.AuthorizerType }}'
+      AuthorizerUri: '{{ item.AuthorizerUri }}'
+      AutoDeploy: '{{ item.AutoDeploy }}'
+      AutoDeployed: '{{ item.AutoDeployed }}'
+      ConnectionType: '{{ item.ConnectionType }}'
+      ContentHandlingStrategy: '{{ item.ContentHandlingStrategy }}'
+      ContentType: '{{ item.ContentType }}'
+      CorsConfiguration: '{{ item.CorsConfiguration }}'
+      CreatedDate: '{{ item.CreatedDate }}'
+      DefaultRouteSettings: '{{ item.DefaultRouteSettings }}'
+      DeploymentStatus: '{{ item.DeploymentStatus }}'
+      DeploymentStatusMessage: '{{ item.DeploymentStatusMessage }}'
+      DisableExecuteApiEndpoint: '{{ item.Items[].DisableExecuteApiEndpoint }}'
+      DisableSchemaValidation: '{{ item.Items[].DisableSchemaValidation }}'
+      EnableSimpleResponses: '{{ item.EnableSimpleResponses }}'
+      Enabled: '{{ item.Enabled }}'
+      IdentitySource: '{{ item.IdentitySource }}'
+      IdentityValidationExpression: '{{ item.IdentityValidationExpression }}'
+      ImportInfo: '{{ item.ImportInfo }}'
+      IntegrationMethod: '{{ item.IntegrationMethod }}'
+      IntegrationResponseKey: '{{ item.IntegrationResponseKey }}'
+      IntegrationResponseSelectionExpression: '{{ item.IntegrationResponseSelectionExpression
+        }}'
+      IntegrationSubtype: '{{ item.IntegrationSubtype }}'
+      IntegrationType: '{{ item.IntegrationType }}'
+      IntegrationUri: '{{ item.IntegrationUri }}'
+      IpAddressType: '{{ item.IpAddressType }}'
+      JwtConfiguration: '{{ item.JwtConfiguration }}'
+      LastDeploymentStatusMessage: '{{ item.LastDeploymentStatusMessage }}'
+      LastUpdatedDate: '{{ item.LastUpdatedDate }}'
+      ModelSelectionExpression: '{{ item.ModelSelectionExpression }}'
+      Name: '{{ item.Name }}'
+      PassthroughBehavior: '{{ item.PassthroughBehavior }}'
+      PayloadFormatVersion: '{{ item.PayloadFormatVersion }}'
+      ProtocolType: '{{ item.ProtocolType }}'
+      RequestModels: '{{ item.RequestModels }}'
+      RequestParameters: '{{ item.RequestParameters }}'
+      RequestTemplates: '{{ item.RequestTemplates }}'
+      ResponseParameters: '{{ item.ResponseParameters }}'
+      ResponseTemplates: '{{ item.ResponseTemplates }}'
+      RouteKey: '{{ item.RouteKey }}'
+      RouteResponseSelectionExpression: '{{ item.RouteResponseSelectionExpression
+        }}'
+      RouteSelectionExpression: '{{ item.Items[].RouteSelectionExpression }}'
+      RouteSettings: '{{ item.RouteSettings }}'
+      Schema: '{{ item.Schema }}'
+      ServerNameToVerify: '{{ item.ServerNameToVerify }}'
+      StageVariables: '{{ item.StageVariables }}'
+      Target: '{{ item.Target }}'
+      TemplateSelectionExpression: '{{ item.TemplateSelectionExpression }}'
+      TimeoutInMillis: '{{ item.TimeoutInMillis }}'
+      TlsConfig: '{{ item.TlsConfig }}'
+      Version: '{{ item.Version }}'
+      Warnings: '{{ item.Warnings }}'
+    items_for: '{{ response.Items }}'
+- calls:
+  - action: get_stages
+    on_error: continue
+    params:
+      ApiId: '{{ item.ApiId }}'
+    save_as: response
+  discovery_id: aws.apigatewayv2.get_stages
+  emit:
+    as: item
+    item:
+      AccessLogSettings: '{{ item.AccessLogSettings }}'
+      ApiGatewayManaged: '{{ item.ApiGatewayManaged }}'
+      AutoDeploy: '{{ item.AutoDeploy }}'
+      ClientCertificateId: '{{ item.ClientCertificateId }}'
+      CreatedDate: '{{ item.CreatedDate }}'
+      DataTraceEnabled: '{{ item.DataTraceEnabled }}'
+      DefaultRouteSettings: '{{ item.DefaultRouteSettings }}'
+      DeploymentId: '{{ item.DeploymentId }}'
+      Description: '{{ item.Description }}'
+      DetailedMetricsEnabled: '{{ item.DetailedMetricsEnabled }}'
+      LastDeploymentStatusMessage: '{{ item.Items[].LastDeploymentStatusMessage }}'
+      LastUpdatedDate: '{{ item.LastUpdatedDate }}'
+      LoggingLevel: '{{ item.LoggingLevel }}'
+      RouteSettings: '{{ item.RouteSettings }}'
+      StageName: '{{ item.StageName }}'
+      StageVariables: '{{ item.StageVariables }}'
+      Tags: '{{ item.Tags }}'
+      ThrottlingBurstLimit: '{{ item.ThrottlingBurstLimit }}'
+      ThrottlingRateLimit: '{{ item.ThrottlingRateLimit }}'
+    items_for: '{{ response.Items }}'
+  for_each: aws.apigatewayv2.get_apis
+- calls:
+  - action: get_routes
+    on_error: continue
+    params:
+      ApiId: '{{ item.ApiId }}'
+    save_as: response
+  discovery_id: aws.apigatewayv2.get_routes
+  emit:
+    as: item
+    item:
+      ApiGatewayManaged: '{{ item.ApiGatewayManaged }}'
+      ApiKeyRequired: '{{ item.ApiKeyRequired }}'
+      AuthorizationScopes: '{{ item.AuthorizationScopes }}'
+      AuthorizationType: '{{ item.AuthorizationType }}'
+      AuthorizerId: '{{ item.AuthorizerId }}'
+      ModelSelectionExpression: '{{ item.Items[].ModelSelectionExpression }}'
+      OperationName: '{{ item.OperationName }}'
+      RequestModels: '{{ item.RequestModels }}'
+      RequestParameters: '{{ item.RequestParameters }}'
+      RouteId: '{{ item.RouteId }}'
+      RouteKey: '{{ item.RouteKey }}'
+      RouteResponseSelectionExpression: '{{ item.Items[].RouteResponseSelectionExpression
+        }}'
+      Target: '{{ item.Target }}'
+    items_for: '{{ response.Items }}'
+  for_each: aws.apigatewayv2.get_apis
+- calls:
+  - action: get_integrations
+    on_error: continue
+    params:
+      ApiId: '{{ item.ApiId }}'
+    save_as: response
+  discovery_id: aws.apigatewayv2.get_integrations
+  emit:
+    as: item
+    item:
+      ApiId: '{{ item.ApiId }}'
+      ConnectionId: '{{ item.ConnectionId }}'
+      ConnectionType: '{{ item.ConnectionType }}'
+      ContentHandlingStrategy: '{{ item.ContentHandlingStrategy }}'
+      CredentialsArn: '{{ item.CredentialsArn }}'
+      Description: '{{ item.Description }}'
+      IntegrationId: '{{ item.IntegrationId }}'
+      IntegrationMethod: '{{ item.IntegrationMethod }}'
+      IntegrationSubtype: '{{ item.IntegrationSubtype }}'
+      IntegrationType: '{{ item.IntegrationType }}'
+      IntegrationUri: '{{ item.IntegrationUri }}'
+      PayloadFormatVersion: '{{ item.PayloadFormatVersion }}'
+      TimeoutInMillis: '{{ item.TimeoutInMillis }}'
+      TlsConfig: '{{ item.TlsConfig }}'
+    items_for: '{{ response.Items }}'
+  for_each: aws.apigatewayv2.get_apis
+- calls:
+  - action: list_portals
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigatewayv2.list_portals
+  emit:
+    as: item
+    item:
+      Authorization: '{{ item.Authorization }}'
+      EndpointConfiguration: '{{ item.EndpointConfiguration }}'
+      IncludedPortalProductArns: '{{ item.IncludedPortalProductArns }}'
+      LastModified: '{{ item.LastModified }}'
+      LastPublished: '{{ item.LastPublished }}'
+      LastPublishedDescription: '{{ item.LastPublishedDescription }}'
+      PortalArn: '{{ item.PortalArn }}'
+      PortalContent: '{{ item.PortalContent }}'
+      PortalId: '{{ item.PortalId }}'
+      Preview: '{{ item.Preview }}'
+      PublishStatus: '{{ item.PublishStatus }}'
+      RumAppMonitorName: '{{ item.RumAppMonitorName }}'
+      StatusException: '{{ item.StatusException }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.Items }}'
+- calls:
+  - action: get_stage
+    on_error: continue
+    params:
+      ApiId: '{{ item.ApiId }}'
+      StageName: '{{ item.StageName }}'
+    save_as: response
+  discovery_id: aws.apigatewayv2.get_stage
+  emit:
+    as: item
+    item:
+      AutoDeploy: '{{ response.AutoDeploy }}'
+      ClientCertificateId: '{{ response.ClientCertificateId }}'
+      DeploymentId: '{{ response.DeploymentId }}'
+      Description: '{{ response.Description }}'
+      DestinationArn: '{{ response.AccessLogSettings.DestinationArn }}'
+      Format: '{{ response.AccessLogSettings.Format }}'
+      RouteSettings: '{{ response.RouteSettings }}'
+      StageName: '{{ response.StageName }}'
+      StageVariables: '{{ response.StageVariables }}'
+      Tags: '{{ response.Tags }}'
+      ApiGatewayManaged: '{{ response.ApiGatewayManaged }}'
+      CreatedDate: '{{ response.CreatedDate }}'
+      DataTraceEnabled: '{{ response.DefaultRouteSettings.DataTraceEnabled }}'
+      DetailedMetricsEnabled: '{{ response.DefaultRouteSettings.DetailedMetricsEnabled
+        }}'
+      LoggingLevel: '{{ response.DefaultRouteSettings.LoggingLevel }}'
+      ThrottlingBurstLimit: '{{ response.DefaultRouteSettings.ThrottlingBurstLimit
+        }}'
+      ThrottlingRateLimit: '{{ response.DefaultRouteSettings.ThrottlingRateLimit }}'
+      LastDeploymentStatusMessage: '{{ response.LastDeploymentStatusMessage }}'
+      LastUpdatedDate: '{{ response.LastUpdatedDate }}'
+  for_each: aws.apigatewayv2.get_apis
+- calls:
+  - action: get_domain_names
+    on_error: continue
+    save_as: response
+  discovery_id: aws.apigatewayv2.get_domain_names
+  emit:
+    as: item
+    item:
+      ApiMappingKey: '{{ item.ApiMappingKey }}'
+      ApiMappingSelectionExpression: '{{ item.Items[].ApiMappingSelectionExpression
+        }}'
+      CertificateArn: '{{ item.CertificateArn }}'
+      CertificateName: '{{ item.CertificateName }}'
+      CertificateUploadDate: '{{ item.CertificateUploadDate }}'
+      DomainName: '{{ item.DomainName }}'
+      DomainNameArn: '{{ item.DomainNameArn }}'
+      DomainNameConfigurations: '{{ item.DomainNameConfigurations }}'
+      DomainNameStatus: '{{ item.DomainNameStatus }}'
+      DomainNameStatusMessage: '{{ item.DomainNameStatusMessage }}'
+      EndpointType: '{{ item.EndpointType }}'
+      HostedZoneId: '{{ item.HostedZoneId }}'
+      MutualTlsAuthentication: '{{ item.MutualTlsAuthentication }}'
+      OwnershipVerificationCertificateArn: '{{ item.OwnershipVerificationCertificateArn
+        }}'
+      RoutingMode: '{{ item.RoutingMode }}'
+      SecurityPolicy: '{{ item.SecurityPolicy }}'
+      Stage: '{{ item.Stage }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.Items }}'

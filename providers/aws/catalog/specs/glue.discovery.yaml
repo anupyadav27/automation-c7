@@ -1,0 +1,336 @@
+version: '1.0'
+provider: aws
+service: glue
+discovery:
+- calls:
+  - action: get_glue_identity_center_configuration
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.get_glue_identity_center_configuration
+  emit:
+    as: item
+    item:
+      ApplicationArn: '{{ item.ApplicationArn }}'
+      InstanceArn: '{{ item.InstanceArn }}'
+      Scopes: '{{ item.Scopes }}'
+      UserBackgroundSessionsEnabled: '{{ item.UserBackgroundSessionsEnabled }}'
+    items_for: '{{ response.Scopes }}'
+- calls:
+  - action: get_classifiers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.get_classifiers
+  emit:
+    as: item
+    item:
+      Classifier: '{{ item.Classifier }}'
+      CsvClassifier: '{{ item.CsvClassifier }}'
+      JsonClassifier: '{{ item.JsonClassifier }}'
+      Name: '{{ item.GrokClassifier.Name }}'
+      XMLClassifier: '{{ item.XMLClassifier }}'
+    items_for: '{{ response.Classifiers }}'
+- calls:
+  - action: get_dev_endpoints
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.get_dev_endpoints
+  emit:
+    as: item
+    item:
+      Arguments: '{{ item.Arguments }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      CreatedTimestamp: '{{ item.CreatedTimestamp }}'
+      DevEndpoint: '{{ item.DevEndpoint }}'
+      DevEndpoints: '{{ item.DevEndpoints }}'
+      EndpointName: '{{ item.EndpointName }}'
+      ExtraJarsS3Path: '{{ item.ExtraJarsS3Path }}'
+      ExtraPythonLibsS3Path: '{{ item.ExtraPythonLibsS3Path }}'
+      FailureReason: '{{ item.FailureReason }}'
+      GlueVersion: '{{ item.GlueVersion }}'
+      LastModifiedTimestamp: '{{ item.LastModifiedTimestamp }}'
+      LastUpdateStatus: '{{ item.LastUpdateStatus }}'
+      NumberOfNodes: '{{ item.NumberOfNodes }}'
+      NumberOfWorkers: '{{ item.NumberOfWorkers }}'
+      PrivateAddress: '{{ item.PrivateAddress }}'
+      PublicAddress: '{{ item.PublicAddress }}'
+      PublicKey: '{{ item.PublicKey }}'
+      PublicKeys: '{{ item.PublicKeys }}'
+      RoleArn: '{{ item.RoleArn }}'
+      SecurityConfiguration: '{{ item.SecurityConfiguration }}'
+      SecurityGroupIds: '{{ item.SecurityGroupIds }}'
+      SubnetId: '{{ item.SubnetId }}'
+      VpcId: '{{ item.VpcId }}'
+      WorkerType: '{{ item.WorkerType }}'
+      YarnEndpointAddress: '{{ item.YarnEndpointAddress }}'
+      ZeppelinRemoteSparkInterpreterPort: '{{ item.ZeppelinRemoteSparkInterpreterPort
+        }}'
+    items_for: '{{ response.DevEndpoints }}'
+- calls:
+  - action: get_data_catalog_encryption_settings
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.get_data_catalog_encryption_settings
+  emit:
+    as: item
+    item:
+      ConnectionPasswordEncryption: '{{ response.DataCatalogEncryptionSettings.ConnectionPasswordEncryption.AwsKmsKeyId
+        }}'
+      DataCatalogEncryptionSettings: '{{ response.DataCatalogEncryptionSettings.DataCatalogEncryptionSettings
+        }}'
+      DestinationArn: '{{ response.DataCatalogEncryptionSettings.DestinationArn }}'
+      EncryptionAtRest: '{{ response.DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId
+        }}'
+      Format: '{{ response.DataCatalogEncryptionSettings.Format }}'
+      Level: '{{ response.DataCatalogEncryptionSettings.Level }}'
+      AwsKmsKeyId: '{{ response.DataCatalogEncryptionSettings.ConnectionPasswordEncryption.AwsKmsKeyId
+        }}'
+      ReturnConnectionPasswordEncrypted: '{{ response.DataCatalogEncryptionSettings.ConnectionPasswordEncryption.ReturnConnectionPasswordEncrypted
+        }}'
+      CatalogEncryptionMode: '{{ response.DataCatalogEncryptionSettings.EncryptionAtRest.CatalogEncryptionMode
+        }}'
+      CatalogEncryptionServiceRole: '{{ response.DataCatalogEncryptionSettings.EncryptionAtRest.CatalogEncryptionServiceRole
+        }}'
+      SseAwsKmsKeyId: '{{ response.DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId
+        }}'
+- calls:
+  - action: list_integration_resource_properties
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.list_integration_resource_properties
+  emit:
+    as: item
+    item:
+      ResourceArn: '{{ item.ResourceArn }}'
+      ResourcePropertyArn: '{{ item.ResourcePropertyArn }}'
+      SourceProcessingProperties: '{{ item.SourceProcessingProperties }}'
+      TargetProcessingProperties: '{{ item.TargetProcessingProperties }}'
+    items_for: '{{ response.IntegrationResourcePropertyList }}'
+- calls:
+  - action: get_crawlers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.get_crawlers
+  emit:
+    as: item
+    item:
+      Classifiers: '{{ item.Classifiers }}'
+      CloudWatchLogGroupArn: '{{ item.CloudWatchLogGroupArn }}'
+      Configuration: '{{ item.Configuration }}'
+      CrawlElapsedTime: '{{ item.CrawlElapsedTime }}'
+      Crawler: '{{ item.Crawler }}'
+      CrawlerSecurityConfiguration: '{{ item.CrawlerSecurityConfiguration }}'
+      Crawlers: '{{ item.Crawlers }}'
+      CreationTime: '{{ item.CreationTime }}'
+      LakeFormationConfiguration: '{{ item.LakeFormationConfiguration }}'
+      LastCrawl: '{{ item.LastCrawl }}'
+      LastUpdated: '{{ item.LastUpdated }}'
+      LineageConfiguration: '{{ item.LineageConfiguration }}'
+      Name: '{{ item.Name }}'
+      RecrawlPolicy: '{{ item.RecrawlPolicy }}'
+      Role: '{{ item.Role }}'
+      Schedule: '{{ item.Schedule }}'
+      SchemaChangePolicy: '{{ item.SchemaChangePolicy }}'
+      State: '{{ item.State }}'
+      Statement: '{{ item.Statement }}'
+      TablePrefix: '{{ item.TablePrefix }}'
+      Targets: '{{ item.Targets }}'
+      Version: '{{ item.Version }}'
+    items_for: '{{ response.Crawlers }}'
+- calls:
+  - action: get_catalogs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.get_catalogs
+  emit:
+    as: item
+    item:
+      AllowFullTableExternalDataAccess: '{{ item.AllowFullTableExternalDataAccess
+        }}'
+      Catalog: '{{ item.Catalog }}'
+      CatalogList: '{{ item.CatalogList }}'
+      CatalogProperties: '{{ item.CatalogProperties }}'
+      CreateDatabaseDefaultPermissions: '{{ item.CreateDatabaseDefaultPermissions
+        }}'
+      CreateTableDefaultPermissions: '{{ item.CreateTableDefaultPermissions }}'
+      FederatedCatalog: '{{ item.FederatedCatalog }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      TargetRedshiftCatalog: '{{ item.TargetRedshiftCatalog }}'
+    items_for: '{{ response.CatalogList }}'
+- calls:
+  - action: get_databases
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.get_databases
+  emit:
+    as: item
+    item:
+      CatalogId: '{{ item.CatalogId }}'
+      CreateTableDefaultPermissions: '{{ item.CreateTableDefaultPermissions }}'
+      FederatedDatabase: '{{ item.FederatedDatabase }}'
+      LocationUri: '{{ item.LocationUri }}'
+      Name: '{{ item.Name }}'
+      Parameters: '{{ item.Parameters }}'
+      TargetDatabase: '{{ item.TargetDatabase }}'
+    items_for: '{{ response.DatabaseList }}'
+- calls:
+  - action: get_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.get_jobs
+  emit:
+    as: item
+    item:
+      AllocatedCapacity: '{{ item.AllocatedCapacity }}'
+      CodeGenConfigurationNodes: '{{ item.Jobs[].CodeGenConfigurationNodes }}'
+      Command: '{{ item.Command }}'
+      Connections: '{{ item.Connections }}'
+      CreatedOn: '{{ item.CreatedOn }}'
+      DefaultArguments: '{{ item.DefaultArguments }}'
+      ExecutionClass: '{{ item.ExecutionClass }}'
+      ExecutionProperty: '{{ item.ExecutionProperty }}'
+      GlueVersion: '{{ item.GlueVersion }}'
+      JobMode: '{{ item.JobMode }}'
+      JobRunQueuingEnabled: '{{ item.Jobs[].JobRunQueuingEnabled }}'
+      Jobs: '{{ item.Jobs }}'
+      LastModifiedOn: '{{ item.LastModifiedOn }}'
+      LogUri: '{{ item.LogUri }}'
+      MaintenanceWindow: '{{ item.MaintenanceWindow }}'
+      MaxCapacity: '{{ item.MaxCapacity }}'
+      MaxRetries: '{{ item.MaxRetries }}'
+      Name: '{{ item.Name }}'
+      NonOverridableArguments: '{{ item.Jobs[].NonOverridableArguments }}'
+      NotificationProperty: '{{ item.NotificationProperty }}'
+      NumberOfWorkers: '{{ item.NumberOfWorkers }}'
+      ProfileName: '{{ item.ProfileName }}'
+      Role: '{{ item.Role }}'
+      SecurityConfiguration: '{{ item.Jobs[].SecurityConfiguration }}'
+      SourceControlDetails: '{{ item.SourceControlDetails }}'
+      Timeout: '{{ item.Timeout }}'
+      WorkerType: '{{ item.WorkerType }}'
+    items_for: '{{ response.Jobs }}'
+- calls:
+  - action: list_registries
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.list_registries
+  emit:
+    as: item
+    item:
+      CreatedTime: '{{ item.CreatedTime }}'
+      RegistryArn: '{{ item.RegistryArn }}'
+      RegistryName: '{{ item.RegistryName }}'
+      UpdatedTime: '{{ item.UpdatedTime }}'
+    items_for: '{{ response.Registries }}'
+- calls:
+  - action: describe_integrations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.describe_integrations
+  emit:
+    as: item
+    item:
+      AdditionalEncryptionContext: '{{ item.AdditionalEncryptionContext }}'
+      DataFilter: '{{ item.DataFilter }}'
+      Errors: '{{ item.Errors }}'
+      IntegrationArn: '{{ item.IntegrationArn }}'
+      IntegrationConfig: '{{ item.IntegrationConfig }}'
+      IntegrationName: '{{ item.IntegrationName }}'
+      Integrations: '{{ item.Integrations }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      SourceArn: '{{ item.SourceArn }}'
+      Tags: '{{ item.Tags }}'
+      TargetArn: '{{ item.TargetArn }}'
+    items_for: '{{ response.Integrations }}'
+- calls:
+  - action: get_connections
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.get_connections
+  emit:
+    as: item
+    item:
+      AthenaProperties: '{{ item.AthenaProperties }}'
+      AuthenticationConfiguration: '{{ item.AuthenticationConfiguration }}'
+      CompatibleComputeEnvironments: '{{ item.CompatibleComputeEnvironments }}'
+      Connection: '{{ item.Connection }}'
+      ConnectionList: '{{ item.ConnectionList }}'
+      ConnectionProperties: '{{ item.ConnectionProperties }}'
+      ConnectionSchemaVersion: '{{ item.ConnectionSchemaVersion }}'
+      ConnectionType: '{{ item.ConnectionType }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Enabled: '{{ item.Enabled }}'
+      LastConnectionValidationTime: '{{ item.LastConnectionValidationTime }}'
+      LastUpdatedBy: '{{ item.LastUpdatedBy }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      LatestSchemaVersion: '{{ item.LatestSchemaVersion }}'
+      MatchCriteria: '{{ item.MatchCriteria }}'
+      Name: '{{ item.Name }}'
+      NextSchemaVersion: '{{ item.NextSchemaVersion }}'
+      PhysicalConnectionRequirements: '{{ item.PhysicalConnectionRequirements }}'
+      PythonProperties: '{{ item.PythonProperties }}'
+      SparkProperties: '{{ item.SparkProperties }}'
+      StatusReason: '{{ item.StatusReason }}'
+    items_for: '{{ response.ConnectionList }}'
+- calls:
+  - action: list_schemas
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.list_schemas
+  emit:
+    as: item
+    item:
+      CreatedTime: '{{ item.CreatedTime }}'
+      RegistryName: '{{ item.RegistryName }}'
+      SchemaArn: '{{ item.SchemaArn }}'
+      SchemaName: '{{ item.SchemaName }}'
+      SchemaStatus: '{{ item.SchemaStatus }}'
+      UpdatedTime: '{{ item.UpdatedTime }}'
+    items_for: '{{ response.Schemas }}'
+- calls:
+  - action: get_column_statistics_task_run
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.get_column_statistics_task_run
+  emit:
+    as: item
+    item:
+      CatalogID: '{{ response.ColumnStatisticsTaskRun.CatalogID }}'
+      CatalogId: '{{ response.ColumnStatisticsTaskRun.CatalogID }}'
+      ColumnNameList: '{{ response.ColumnStatisticsTaskRun.ColumnNameList }}'
+      ColumnStatisticsTaskRunId: '{{ response.ColumnStatisticsTaskRun.ColumnStatisticsTaskRunId
+        }}'
+      ComputationType: '{{ response.ColumnStatisticsTaskRun.ComputationType }}'
+      CreationTime: '{{ response.ColumnStatisticsTaskRun.CreationTime }}'
+      CustomerId: '{{ response.ColumnStatisticsTaskRun.CustomerId }}'
+      DPUSeconds: '{{ response.ColumnStatisticsTaskRun.DPUSeconds }}'
+      EndTime: '{{ response.ColumnStatisticsTaskRun.EndTime }}'
+      ErrorMessage: '{{ response.ColumnStatisticsTaskRun.ErrorMessage }}'
+      LastUpdated: '{{ response.ColumnStatisticsTaskRun.LastUpdated }}'
+      NumberOfWorkers: '{{ response.ColumnStatisticsTaskRun.NumberOfWorkers }}'
+      Role: '{{ response.ColumnStatisticsTaskRun.Role }}'
+      SampleSize: '{{ response.ColumnStatisticsTaskRun.SampleSize }}'
+      SecurityConfiguration: '{{ response.ColumnStatisticsTaskRun.SecurityConfiguration
+        }}'
+      StartTime: '{{ response.ColumnStatisticsTaskRun.StartTime }}'
+      TableName: '{{ response.ColumnStatisticsTaskRun.TableName }}'
+      WorkerType: '{{ response.ColumnStatisticsTaskRun.WorkerType }}'
+      DatabaseName: '{{ response.ColumnStatisticsTaskRun.DatabaseName }}'
+      Status: '{{ response.ColumnStatisticsTaskRun.Status }}'
+- calls:
+  - action: get_tables
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glue.get_tables
+  emit:
+    as: item
+    item:
+      CreateTime: '{{ item.CreateTime }}'
+      DatabaseName: '{{ item.DatabaseName }}'
+      IsRegisteredWithLakeFormation: '{{ item.IsRegisteredWithLakeFormation }}'
+      Name: '{{ item.Name }}'
+      Owner: '{{ item.Owner }}'
+      Parameters: '{{ item.Parameters }}'
+      StorageDescriptor: '{{ item.StorageDescriptor }}'
+      TableType: '{{ item.TableType }}'
+      UpdateTime: '{{ item.UpdateTime }}'
+    items_for: '{{ response.TableList }}'

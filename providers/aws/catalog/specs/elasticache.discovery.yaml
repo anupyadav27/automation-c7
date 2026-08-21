@@ -1,0 +1,200 @@
+version: '1.0'
+provider: aws
+service: elasticache
+discovery:
+- calls:
+  - action: describe_cache_subnet_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.elasticache.describe_cache_subnet_groups
+  emit:
+    as: item
+    item:
+      ARN: '{{ item.ARN }}'
+      CacheSubnetGroupDescription: '{{ item.CacheSubnetGroupDescription }}'
+      CacheSubnetGroupName: '{{ item.CacheSubnetGroupName }}'
+      CacheSubnetGroups: '{{ item.CacheSubnetGroups[].ARN }}'
+      Subnets: '{{ item.Subnets }}'
+      SupportedNetworkTypes: '{{ item.SupportedNetworkTypes }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.CacheSubnetGroups }}'
+- calls:
+  - action: describe_user_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.elasticache.describe_user_groups
+  emit:
+    as: item
+    item:
+      ARN: '{{ item.ARN }}'
+      Engine: '{{ item.Engine }}'
+      MinimumEngineVersion: '{{ item.MinimumEngineVersion }}'
+      PendingChanges: '{{ item.PendingChanges }}'
+      ReplicationGroups: '{{ item.ReplicationGroups }}'
+      ServerlessCaches: '{{ item.ServerlessCaches }}'
+      Status: '{{ item.Status }}'
+      UserGroupId: '{{ item.UserGroupId }}'
+      UserGroups: '{{ item.UserGroups }}'
+      UserIds: '{{ item.UserIds }}'
+    items_for: '{{ response.UserGroups }}'
+- calls:
+  - action: describe_replication_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.elasticache.describe_replication_groups
+  emit:
+    as: item
+    item:
+      ARN: '{{ item.ARN }}'
+      AtRestEncryptionEnabled: '{{ item.AtRestEncryptionEnabled }}'
+      AuthTokenEnabled: '{{ item.AuthTokenEnabled }}'
+      AuthTokenLastModifiedDate: '{{ item.AuthTokenLastModifiedDate }}'
+      AutoMinorVersionUpgrade: '{{ item.AutoMinorVersionUpgrade }}'
+      AutomaticFailover: '{{ item.AutomaticFailover }}'
+      CacheNodeType: '{{ item.CacheNodeType }}'
+      ClusterEnabled: '{{ item.ClusterEnabled }}'
+      ClusterMode: '{{ item.ClusterMode }}'
+      ConfigurationEndpoint: '{{ item.ConfigurationEndpoint }}'
+      DataTiering: '{{ item.DataTiering }}'
+      Description: '{{ item.Description }}'
+      Engine: '{{ item.Engine }}'
+      GlobalReplicationGroupInfo: '{{ item.GlobalReplicationGroupInfo }}'
+      IpDiscovery: '{{ item.IpDiscovery }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      LogDeliveryConfigurations: '{{ item.LogDeliveryConfigurations }}'
+      MemberClusters: '{{ item.MemberClusters }}'
+      MemberClustersOutpostArns: '{{ item.MemberClustersOutpostArns }}'
+      MultiAZ: '{{ item.MultiAZ }}'
+      NetworkType: '{{ item.NetworkType }}'
+      NodeGroups: '{{ item.NodeGroups }}'
+      PendingModifiedValues: '{{ item.PendingModifiedValues }}'
+      ReplicationGroupCreateTime: '{{ item.ReplicationGroupCreateTime }}'
+      ReplicationGroupId: '{{ item.ReplicationGroupId }}'
+      SnapshotRetentionLimit: '{{ item.SnapshotRetentionLimit }}'
+      SnapshotWindow: '{{ item.SnapshotWindow }}'
+      SnapshottingClusterId: '{{ item.SnapshottingClusterId }}'
+      Status: '{{ item.Status }}'
+      TransitEncryptionEnabled: '{{ item.TransitEncryptionEnabled }}'
+      TransitEncryptionMode: '{{ item.TransitEncryptionMode }}'
+      UserGroupIds: '{{ item.UserGroupIds }}'
+    items_for: '{{ response.ReplicationGroups }}'
+- calls:
+  - action: describe_cache_parameter_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.elasticache.describe_cache_parameter_groups
+  emit:
+    as: item
+    item:
+      ARN: '{{ item.ARN }}'
+      CacheParameterGroupFamily: '{{ item.CacheParameterGroupFamily }}'
+      CacheParameterGroupName: '{{ item.CacheParameterGroupName }}'
+      CacheParameterGroups: '{{ item.CacheParameterGroups[].ARN }}'
+      Description: '{{ item.Description }}'
+      IsGlobal: '{{ item.IsGlobal }}'
+    items_for: '{{ response.CacheParameterGroups }}'
+- calls:
+  - action: describe_cache_clusters
+    on_error: continue
+    save_as: response
+  discovery_id: aws.elasticache.describe_cache_clusters
+  emit:
+    as: item
+    item:
+      ARN: '{{ item.ARN }}'
+      AtRestEncryptionEnabled: '{{ item.AtRestEncryptionEnabled }}'
+      AuthTokenEnabled: '{{ item.AuthTokenEnabled }}'
+      AuthTokenLastModifiedDate: '{{ item.AuthTokenLastModifiedDate }}'
+      AutoMinorVersionUpgrade: '{{ item.AutoMinorVersionUpgrade }}'
+      CacheClusterCreateTime: '{{ item.CacheClusterCreateTime }}'
+      CacheClusterId: '{{ item.CacheClusterId }}'
+      CacheClusterStatus: '{{ item.CacheClusterStatus }}'
+      CacheClusters: '{{ item.CacheClusters }}'
+      CacheNodeType: '{{ item.CacheNodeType }}'
+      CacheNodes: '{{ item.CacheNodes }}'
+      CacheParameterGroup: '{{ item.CacheParameterGroup }}'
+      CacheSecurityGroups: '{{ item.CacheSecurityGroups }}'
+      CacheSubnetGroupName: '{{ item.CacheSubnetGroupName }}'
+      ClientDownloadLandingPage: '{{ item.ClientDownloadLandingPage }}'
+      ConfigurationEndpoint: '{{ item.ConfigurationEndpoint }}'
+      Enabled: '{{ item.Enabled }}'
+      Engine: '{{ item.Engine }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      IpDiscovery: '{{ item.IpDiscovery }}'
+      LogDeliveryConfigurations: '{{ item.LogDeliveryConfigurations }}'
+      NetworkType: '{{ item.NetworkType }}'
+      NotificationConfiguration: '{{ item.NotificationConfiguration }}'
+      NumCacheNodes: '{{ item.NumCacheNodes }}'
+      PendingModifiedValues: '{{ item.PendingModifiedValues }}'
+      PreferredAvailabilityZone: '{{ item.PreferredAvailabilityZone }}'
+      PreferredMaintenanceWindow: '{{ item.PreferredMaintenanceWindow }}'
+      PreferredOutpostArn: '{{ item.PreferredOutpostArn }}'
+      ReplicationGroupId: '{{ item.ReplicationGroupId }}'
+      ReplicationGroupLogDeliveryEnabled: '{{ item.ReplicationGroupLogDeliveryEnabled }}'
+      SecurityGroups: '{{ item.SecurityGroups }}'
+      SnapshotRetentionLimit: '{{ item.SnapshotRetentionLimit }}'
+      SnapshotWindow: '{{ item.SnapshotWindow }}'
+      TransitEncryptionEnabled: '{{ item.TransitEncryptionEnabled }}'
+      TransitEncryptionMode: '{{ item.TransitEncryptionMode }}'
+    items_for: '{{ response.CacheClusters }}'
+- calls:
+  - action: describe_reserved_cache_nodes
+    on_error: continue
+    save_as: response
+  discovery_id: aws.elasticache.describe_reserved_cache_nodes
+  emit:
+    as: item
+    item:
+      CacheNodeCount: '{{ item.CacheNodeCount }}'
+      CacheNodeType: '{{ item.CacheNodeType }}'
+      Duration: '{{ item.Duration }}'
+      FixedPrice: '{{ item.FixedPrice }}'
+      OfferingType: '{{ item.OfferingType }}'
+      ProductDescription: '{{ item.ProductDescription }}'
+      RecurringCharges: '{{ item.RecurringCharges }}'
+      ReservationARN: '{{ item.ReservationARN }}'
+      ReservedCacheNodeId: '{{ item.ReservedCacheNodeId }}'
+      ReservedCacheNodes: '{{ item.ReservedCacheNodes }}'
+      ReservedCacheNodesOfferingId: '{{ item.ReservedCacheNodes[].OfferingType }}'
+      StartTime: '{{ item.StartTime }}'
+      State: '{{ item.State }}'
+      UsagePrice: '{{ item.UsagePrice }}'
+    items_for: '{{ response.ReservedCacheNodes }}'
+- calls:
+  - action: describe_snapshots
+    on_error: continue
+    save_as: response
+  discovery_id: aws.elasticache.describe_snapshots
+  emit:
+    as: item
+    item:
+      ARN: '{{ item.ARN }}'
+      AutoMinorVersionUpgrade: '{{ item.AutoMinorVersionUpgrade }}'
+      AutomaticFailover: '{{ item.AutomaticFailover }}'
+      CacheClusterCreateTime: '{{ item.CacheClusterCreateTime }}'
+      CacheClusterId: '{{ item.CacheClusterId }}'
+      CacheNodeType: '{{ item.CacheNodeType }}'
+      CacheParameterGroupName: '{{ item.CacheParameterGroupName }}'
+      CacheSubnetGroupName: '{{ item.CacheSubnetGroupName }}'
+      DataTiering: '{{ item.DataTiering }}'
+      Engine: '{{ item.Engine }}'
+      EngineVersion: '{{ item.EngineVersion }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      NodeSnapshots: '{{ item.NodeSnapshots }}'
+      NumCacheNodes: '{{ item.NumCacheNodes }}'
+      NumNodeGroups: '{{ item.NumNodeGroups }}'
+      Port: '{{ item.Port }}'
+      PreferredAvailabilityZone: '{{ item.PreferredAvailabilityZone }}'
+      PreferredMaintenanceWindow: '{{ item.PreferredMaintenanceWindow }}'
+      PreferredOutpostArn: '{{ item.PreferredOutpostArn }}'
+      ReplicationGroupDescription: '{{ item.ReplicationGroupDescription }}'
+      ReplicationGroupId: '{{ item.ReplicationGroupId }}'
+      SnapshotName: '{{ item.SnapshotName }}'
+      SnapshotRetentionLimit: '{{ item.SnapshotRetentionLimit }}'
+      SnapshotSource: '{{ item.SnapshotSource }}'
+      SnapshotStatus: '{{ item.SnapshotStatus }}'
+      SnapshotWindow: '{{ item.SnapshotWindow }}'
+      Snapshots: '{{ item.Snapshots }}'
+      TopicArn: '{{ item.TopicArn }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.Snapshots }}'

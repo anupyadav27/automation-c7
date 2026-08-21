@@ -1,0 +1,432 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Cloud Estate Console — production design system.
+ * Exact token values below are the only colors allowed in the product.
+ */
+
+@theme inline {
+  --radius: 6px;
+  --radius-sm: 5px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  --radius-xl: 12px;
+  --radius-2xl: 12px;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-body: var(--body);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-tertiary: var(--surface-tertiary);
+  --color-rail: var(--rail);
+  --color-code: var(--code-bg);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-strong: var(--primary-strong);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-input-bg: var(--input-bg);
+  --color-ring: var(--ring);
+
+  --color-divider: var(--border);
+  --color-row-hover: var(--row-hover);
+  --color-row-selected: var(--row-selected);
+  --color-label: var(--sub);
+  --color-sub: var(--sub);
+
+  --color-nav: var(--nav-fg);
+  --color-nav-hover: var(--nav-hover);
+  --color-nav-active: var(--nav-active-bg);
+  --color-nav-active-fg: var(--nav-active-fg);
+
+  --color-sev-critical: var(--sev-critical);
+  --color-sev-high: var(--sev-high);
+  --color-sev-medium: var(--sev-medium);
+  --color-sev-low: var(--sev-low);
+  --color-sev-info: var(--sev-info);
+
+  --color-domain-compliance: var(--primary);
+  --color-domain-governance: var(--sev-info);
+  --color-domain-cost: var(--green);
+
+  --color-green: var(--green);
+  --color-fresh: var(--green);
+  --color-stale: var(--sev-medium);
+
+  --color-age-1d: var(--age-1d);
+  --color-age-7d: var(--age-7d);
+  --color-age-30d: var(--age-30d);
+  --color-age-old: var(--age-old);
+
+  --color-provider-aws: var(--provider-aws);
+  --color-provider-azure: var(--provider-azure);
+  --color-provider-gcp: var(--provider-gcp);
+  --color-provider-oci: var(--provider-oci);
+  --color-provider-ibm: var(--provider-ibm);
+  --color-provider-k8s: var(--provider-k8s);
+
+  --color-chart-1: var(--primary);
+  --color-chart-2: var(--sev-info);
+  --color-chart-3: var(--green);
+  --color-chart-4: var(--sev-medium);
+  --color-chart-5: var(--sev-high);
+
+  --color-sidebar: var(--rail);
+  --color-sidebar-foreground: var(--nav-fg);
+  --color-sidebar-primary: var(--primary);
+  --color-sidebar-primary-foreground: #ffffff;
+  --color-sidebar-accent: var(--nav-active-bg);
+  --color-sidebar-accent-foreground: var(--nav-active-fg);
+  --color-sidebar-border: var(--border);
+  --color-sidebar-ring: var(--primary);
+
+  /* legacy tint aliases resolved to the production palette */
+  --color-tint-blue: color-mix(in srgb, var(--primary) 12%, transparent);
+  --color-tint-blue-fg: var(--primary-strong);
+  --color-tint-red: color-mix(in srgb, var(--sev-critical) 12%, transparent);
+  --color-tint-red-fg: var(--sev-critical);
+  --color-tint-orange: color-mix(in srgb, var(--sev-high) 12%, transparent);
+  --color-tint-orange-fg: var(--sev-high);
+  --color-tint-amber: color-mix(in srgb, var(--sev-medium) 12%, transparent);
+  --color-tint-amber-fg: var(--sev-medium);
+  --color-tint-emerald: color-mix(in srgb, #16a34a 12%, transparent);
+  --color-tint-emerald-fg: #16a34a;
+
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-pop: 0 2px 4px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --shadow-drawer: 0 0 0 1px rgba(15, 23, 42, 0.04), -8px 0 32px rgba(15, 23, 42, 0.12);
+}
+
+:root {
+  /* surfaces */
+  --background: #ffffff;
+  --surface: #ffffff;
+  --surface-raised: #f6f8fb;
+  --surface-tertiary: #eef2f7;
+  --rail: #f7f9fb;
+  --input-bg: #f5f7fa;
+  --code-bg: #f1f5f9;
+  --card: #ffffff;
+  --popover: #ffffff;
+
+  /* borders */
+  --border: #e5e9f0;
+  --border-strong: #cdd6e2;
+  --input: #cdd6e2;
+
+  /* text */
+  --foreground: #0f172a;
+  --body: #1e3350;
+  --muted-foreground: #4a6280;
+  --sub: #6b849e;
+  --card-foreground: #0f172a;
+  --popover-foreground: #1e3350;
+  --secondary-foreground: #1e3350;
+  --accent-foreground: #0f172a;
+
+  /* accent */
+  --primary: #3b82f6;
+  --primary-strong: #2563eb;
+  --primary-foreground: #ffffff;
+  --ring: #3b82f6;
+  --secondary: #f6f8fb;
+  --muted: #f6f8fb;
+  --accent: #eef2f7;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+
+  /* rows */
+  --row-hover: #f6f8fb;
+  --row-selected: rgba(59, 130, 246, 0.06);
+
+  /* navigation rail */
+  --nav-fg: #475569;
+  --nav-hover: #eef4fc;
+  --nav-active-bg: #e4eefe;
+  --nav-active-fg: #2563eb;
+
+  /* severity */
+  --sev-critical: #dc2626;
+  --sev-high: #ea580c;
+  --sev-medium: #d97706;
+  --sev-low: #0284c7;
+  --sev-info: #64748b;
+  --green: #22c55e;
+
+  /* recency */
+  --age-1d: #22c55e;
+  --age-7d: #eab308;
+  --age-30d: #f97316;
+  --age-old: #ef4444;
+
+  /* domains */
+  --domain-compliance: #3b82f6;
+  --domain-governance: #64748b;
+  --domain-cost: #16a34a;
+
+  /* providers */
+  --provider-aws: #ff9900;
+  --provider-azure: #0078d4;
+  --provider-gcp: #4285f4;
+  --provider-k8s: #326ce5;
+  --provider-oci: #c74634;
+  --provider-ibm: #0f62fe;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--body);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.45;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--surface-raised);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 8px;
+    border: 2px solid var(--surface-raised);
+  }
+}
+
+/* ------------------------------- typography ------------------------------- */
+
+@utility page-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--foreground);
+}
+
+@utility card-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--foreground);
+}
+
+@utility kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+@utility label-caps {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+@utility section-caps {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+@utility cell-primary {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--foreground);
+  line-height: 1.35;
+}
+
+@utility cell-sub {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--sub);
+  line-height: 1.35;
+}
+
+@utility body-13 {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+@utility text-secondary {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+
+/* identifiers only: ARNs, resource ids, scan ids, account ids */
+@utility mono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 400;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
+
+@utility num {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  font-size: 12px;
+}
+
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------- chips ---------------------------------- */
+
+@utility chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  border-radius: 5px;
+  padding: 2px 8px 2px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--chip-color) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--chip-color) 30%, transparent);
+  color: var(--chip-color);
+}
+
+@utility chip-critical {
+  --chip-color: var(--sev-critical);
+}
+@utility chip-high {
+  --chip-color: var(--sev-high);
+}
+@utility chip-medium {
+  --chip-color: var(--sev-medium);
+}
+@utility chip-low {
+  --chip-color: var(--sev-low);
+}
+@utility chip-info {
+  --chip-color: var(--sev-info);
+}
+@utility chip-accent {
+  --chip-color: var(--primary-strong);
+}
+@utility chip-green {
+  --chip-color: #16a34a;
+}
+@utility chip-aws {
+  --chip-color: var(--provider-aws);
+}
+@utility chip-azure {
+  --chip-color: var(--provider-azure);
+}
+@utility chip-gcp {
+  --chip-color: var(--provider-gcp);
+}
+@utility chip-k8s {
+  --chip-color: var(--provider-k8s);
+}
+@utility chip-oci {
+  --chip-color: var(--provider-oci);
+}
+@utility chip-ibm {
+  --chip-color: var(--provider-ibm);
+}
+
+/* -------------------------------- surfaces -------------------------------- */
+
+@utility panel {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+@utility panel-flat {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+@utility table-frame {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: var(--surface);
+}
+
+@utility grid-cell {
+  border-bottom: 1px solid var(--border);
+}
+
+@utility data-row {
+  transition: background-color 100ms ease;
+  &:hover {
+    background-color: var(--row-hover);
+  }
+}
+
+@utility dashed-box {
+  border: 1px dashed var(--border-strong);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 12px;
+  color: var(--sub);
+}
+
+@utility shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--surface-raised) 25%,
+    var(--surface-tertiary) 37%,
+    var(--surface-raised) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 5px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}

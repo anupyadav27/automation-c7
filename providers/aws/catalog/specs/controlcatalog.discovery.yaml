@@ -1,0 +1,109 @@
+version: '1.0'
+provider: aws
+service: controlcatalog
+services:
+  client: controlcatalog
+  module: boto3.client
+discovery:
+- discovery_id: aws.controlcatalog.list_common_controls
+  calls:
+  - action: list_common_controls
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CommonControls }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreateTime: '{{ item.CreateTime }}'
+      Name: '{{ item.Name }}'
+      Description: '{{ item.Description }}'
+      Domain: '{{ item.Domain }}'
+      LastUpdateTime: '{{ item.LastUpdateTime }}'
+      Objective: '{{ item.Objective }}'
+      Parameters: '{{ item.Parameters }}'
+      RegionConfiguration: '{{ item.RegionConfiguration }}'
+- discovery_id: aws.controlcatalog.list_control_mappings
+  calls:
+  - action: list_control_mappings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ControlMappings }}'
+    item:
+      ControlArn: '{{ item.ControlArn }}'
+      Mapping: '{{ item.Mapping }}'
+      MappingType: '{{ item.MappingType }}'
+- discovery_id: aws.controlcatalog.list_controls
+  calls:
+  - action: list_controls
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Controls }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreateTime: '{{ item.CreateTime }}'
+      Name: '{{ item.Name }}'
+      Aliases: '{{ item.Aliases }}'
+      Behavior: '{{ item.Behavior }}'
+      Description: '{{ item.Description }}'
+      GovernedResources: '{{ item.GovernedResources }}'
+      Implementation: '{{ item.Implementation }}'
+      Severity: '{{ item.Severity }}'
+- discovery_id: aws.controlcatalog.list_domains
+  calls:
+  - action: list_domains
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Domains }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreateTime: '{{ item.CreateTime }}'
+      Name: '{{ item.Name }}'
+      Description: '{{ item.Description }}'
+      LastUpdateTime: '{{ item.LastUpdateTime }}'
+- discovery_id: aws.controlcatalog.list_objectives
+  calls:
+  - action: list_objectives
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Objectives }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreateTime: '{{ item.CreateTime }}'
+      Name: '{{ item.Name }}'
+      Description: '{{ item.Description }}'
+      Domain: '{{ item.Domain }}'
+      LastUpdateTime: '{{ item.LastUpdateTime }}'
+- discovery_id: aws.controlcatalog.get_control
+  for_each: aws.controlcatalog.list_control_mappings
+  calls:
+  - action: get_control
+    params:
+      ControlArn: '{{ item.ControlArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Aliases }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      Parameters: '{{ item.Parameters }}'
+      RegionConfiguration: '{{ item.RegionConfiguration.Scope }}'
+      Arn: '{{ response.Arn }}'
+      Behavior: '{{ response.Behavior }}'
+      CreateTime: '{{ response.CreateTime }}'
+      Description: '{{ response.Description }}'
+      Identifier: '{{ response.Implementation.Identifier }}'
+      Type: '{{ response.Implementation.Type }}'
+      Name: '{{ response.Name }}'
+      Scope: '{{ response.RegionConfiguration.Scope }}'
+      Severity: '{{ response.Severity }}'

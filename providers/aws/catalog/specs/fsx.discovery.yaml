@@ -1,0 +1,87 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: fsx
+# 3 ops (3 from checks, +0 for inventory)
+version: '1.0'
+provider: aws
+service: fsx
+discovery:
+  - calls:
+    - action: describe_backups
+      on_error: continue
+      save_as: response
+    discovery_id: aws.fsx.describe_backups
+    emit:
+      as: item
+      item:
+        BackupId: '{{ item.BackupId }}'
+        Backups: '{{ item.Backups }}'
+        CreationTime: '{{ item.CreationTime }}'
+        DirectoryInformation: '{{ item.DirectoryInformation }}'
+        FailureDetails: '{{ item.FailureDetails }}'
+        FileSystem: '{{ item.FileSystem }}'
+        Key: '{{ item.Key }}'
+        KmsKeyId: '{{ item.KmsKeyId }}'
+        Lifecycle: '{{ item.Lifecycle }}'
+        OwnerId: '{{ item.OwnerId }}'
+        ProgressPercent: '{{ item.ProgressPercent }}'
+        ResourceARN: '{{ item.ResourceARN }}'
+        ResourceType: '{{ item.ResourceType }}'
+        SizeInBytes: '{{ item.SizeInBytes }}'
+        SourceBackupId: '{{ item.SourceBackupId }}'
+        SourceBackupRegion: '{{ item.SourceBackupRegion }}'
+        Tags: '{{ item.Tags }}'
+        Type: '{{ item.Type }}'
+        Value: '{{ item.Value }}'
+        Volume: '{{ item.Volume }}'
+      items_for: '{{ response.Backups }}'
+  - calls:
+    - action: describe_snapshots
+      on_error: continue
+      save_as: response
+    discovery_id: aws.fsx.describe_snapshots
+    emit:
+      as: item
+      item:
+        AdministrativeActions: '{{ item.AdministrativeActions }}'
+        CreationTime: '{{ item.CreationTime }}'
+        Lifecycle: '{{ item.Lifecycle }}'
+        LifecycleTransitionReason: '{{ item.LifecycleTransitionReason }}'
+        Name: '{{ item.Name }}'
+        ResourceARN: '{{ item.ResourceARN }}'
+        SnapshotId: '{{ item.SnapshotId }}'
+        Snapshots: '{{ item.Snapshots }}'
+        Tags: '{{ item.Tags }}'
+        VolumeId: '{{ item.VolumeId }}'
+      items_for: '{{ response.Snapshots }}'
+  - calls:
+    - action: describe_file_systems
+      on_error: continue
+      save_as: response
+    discovery_id: aws.fsx.describe_file_systems
+    emit:
+      as: item
+      item:
+        AdministrativeActions: '{{ item.AdministrativeActions }}'
+        CreationTime: '{{ item.CreationTime }}'
+        DNSName: '{{ item.DNSName }}'
+        FailureDetails: '{{ item.FailureDetails }}'
+        FileSystemId: '{{ item.FileSystemId }}'
+        FileSystemType: '{{ item.FileSystemType }}'
+        FileSystemTypeVersion: '{{ item.FileSystemTypeVersion }}'
+        FileSystems: '{{ item.FileSystems }}'
+        KmsKeyId: '{{ item.KmsKeyId }}'
+        Lifecycle: '{{ item.Lifecycle }}'
+        LustreConfiguration: '{{ item.LustreConfiguration }}'
+        NetworkInterfaceIds: '{{ item.NetworkInterfaceIds }}'
+        NetworkType: '{{ item.NetworkType }}'
+        OntapConfiguration: '{{ item.OntapConfiguration }}'
+        OpenZFSConfiguration: '{{ item.OpenZFSConfiguration }}'
+        OwnerId: '{{ item.OwnerId }}'
+        ResourceARN: '{{ item.ResourceARN }}'
+        StorageCapacity: '{{ item.StorageCapacity }}'
+        StorageType: '{{ item.StorageType }}'
+        SubnetIds: '{{ item.SubnetIds }}'
+        Tags: '{{ item.Tags }}'
+        VpcId: '{{ item.VpcId }}'
+        WindowsConfiguration: '{{ item.WindowsConfiguration }}'
+      items_for: '{{ response.FileSystems }}'

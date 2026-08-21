@@ -1,0 +1,138 @@
+version: '1.0'
+provider: aws
+service: codeguru-security
+services:
+  client: codeguru-security
+  module: boto3.client
+discovery:
+- discovery_id: aws.codeguru-security.get_account_configuration
+  calls:
+  - action: get_account_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      encryptionConfig: '{{ response.encryptionConfig.encryptionConfig }}'
+      kmsKeyArn: '{{ response.encryptionConfig.kmsKeyArn }}'
+- discovery_id: aws.codeguru-security.list_scans
+  calls:
+  - action: list_scans
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.summaries }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      detectorId: '{{ item.detectorId }}'
+      detectorName: '{{ item.detectorName }}'
+      detectorTags: '{{ item.detectorTags }}'
+      generatorId: '{{ item.generatorId }}'
+      id: '{{ item.id }}'
+      remediation: '{{ item.remediation }}'
+      resource: '{{ item.resource }}'
+      ruleId: '{{ item.ruleId }}'
+      runId: '{{ item.runId }}'
+      scanName: '{{ item.scanName }}'
+      scanNameArn: '{{ item.scanNameArn }}'
+      scanState: '{{ item.scanState }}'
+      severity: '{{ item.severity }}'
+      status: '{{ item.status }}'
+      title: '{{ item.title }}'
+      type: '{{ item.type }}'
+      updatedAt: '{{ item.updatedAt }}'
+      vulnerability: '{{ item.vulnerability }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codeguru-security.get_findings
+  for_each: aws.codeguru-security.list_scans
+  calls:
+  - action: get_findings
+    params:
+      scanName: '{{ item.scanName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.findings }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      detectorId: '{{ item.detectorId }}'
+      detectorName: '{{ item.detectorName }}'
+      detectorTags: '{{ item.detectorTags }}'
+      generatorId: '{{ item.generatorId }}'
+      id: '{{ item.id }}'
+      remediation: '{{ item.remediation }}'
+      resource: '{{ item.resource }}'
+      ruleId: '{{ item.ruleId }}'
+      severity: '{{ item.severity }}'
+      status: '{{ item.status }}'
+      title: '{{ item.title }}'
+      type: '{{ item.type }}'
+      updatedAt: '{{ item.updatedAt }}'
+      vulnerability: '{{ item.vulnerability }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codeguru-security.get_metrics_summary
+  calls:
+  - action: get_metrics_summary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      categoriesWithMostFindings: '{{ response.metricsSummary.categoriesWithMostFindings }}'
+      date: '{{ response.metricsSummary.date }}'
+      openFindings: '{{ response.metricsSummary.openFindings.low }}'
+      scansWithMostOpenCriticalFindings: '{{ response.metricsSummary.scansWithMostOpenCriticalFindings[].scanName }}'
+      scansWithMostOpenFindings: '{{ response.metricsSummary.scansWithMostOpenFindings[].scanName }}'
+      critical: '{{ response.metricsSummary.openFindings.critical }}'
+      high: '{{ response.metricsSummary.openFindings.high }}'
+      info: '{{ response.metricsSummary.openFindings.info }}'
+      low: '{{ response.metricsSummary.openFindings.low }}'
+      medium: '{{ response.metricsSummary.openFindings.medium }}'
+- discovery_id: aws.codeguru-security.get_scan
+  for_each: aws.codeguru-security.list_scans
+  calls:
+  - action: get_scan
+    params:
+      scanName: '{{ item.scanName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      analysisType: '{{ response.analysisType }}'
+      createdAt: '{{ response.createdAt }}'
+      errorMessage: '{{ response.errorMessage }}'
+      numberOfRevisions: '{{ response.numberOfRevisions }}'
+      runId: '{{ response.runId }}'
+      scanName: '{{ response.scanName }}'
+      scanNameArn: '{{ response.scanNameArn }}'
+      scanState: '{{ response.scanState }}'
+      updatedAt: '{{ response.updatedAt }}'
+- discovery_id: aws.codeguru-security.list_findings_metrics
+  calls:
+  - action: list_findings_metrics
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.findingsMetrics }}'
+    item:
+      closedFindings: '{{ item.closedFindings }}'
+      date: '{{ item.date }}'
+      meanTimeToClose: '{{ item.meanTimeToClose }}'
+      newFindings: '{{ item.newFindings }}'
+      openFindings: '{{ item.openFindings }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codeguru-security.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

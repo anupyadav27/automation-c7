@@ -1,0 +1,140 @@
+version: '1.0'
+provider: aws
+service: inspector2
+discovery:
+- calls:
+  - action: list_filters
+    on_error: continue
+    save_as: response
+  discovery_id: aws.inspector2.list_filters
+  emit:
+    as: item
+    item:
+      action: '{{ item.action }}'
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      criteria: '{{ item.criteria }}'
+      filterCriteria: '{{ item.filterCriteria }}'
+      name: '{{ item.name }}'
+      ownerId: '{{ item.ownerId }}'
+      reason: '{{ item.reason }}'
+      tags: '{{ item.tags }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.filters }}'
+- calls:
+  - action: list_cis_scans
+    on_error: continue
+    save_as: response
+  discovery_id: aws.inspector2.list_cis_scans
+  emit:
+    as: item
+    item:
+      failedChecks: '{{ item.failedChecks }}'
+      scanArn: '{{ item.scanArn }}'
+      scanConfigurationArn: '{{ item.scanConfigurationArn }}'
+      scanDate: '{{ item.scanDate }}'
+      scanName: '{{ item.scanName }}'
+      scheduledBy: '{{ item.scheduledBy }}'
+      securityLevel: '{{ item.securityLevel }}'
+      status: '{{ item.status }}'
+      targets: '{{ item.targets }}'
+      totalChecks: '{{ item.totalChecks }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.scans }}'
+- calls:
+  - action: describe_organization_configuration
+    on_error: continue
+    save_as: response
+  discovery_id: aws.inspector2.describe_organization_configuration
+  emit:
+    as: item
+    item:
+      autoEnable: '{{ response.autoEnable.autoEnable }}'
+      codeRepository: '{{ response.autoEnable.codeRepository }}'
+      ec2: '{{ response.autoEnable.ec2 }}'
+      ecr: '{{ response.autoEnable.ecr }}'
+      lambda: '{{ response.autoEnable.lambda }}'
+      lambdaCode: '{{ response.autoEnable.lambdaCode }}'
+      maxAccountLimitReached: '{{ response.autoEnable.maxAccountLimitReached }}'
+- calls:
+  - action: get_findings_report_status
+    on_error: continue
+    save_as: response
+  discovery_id: aws.inspector2.get_findings_report_status
+  emit:
+    as: item
+    item:
+      bucketName: '{{ response.destination.bucketName }}'
+      destination: '{{ response.destination.destination }}'
+      errorCode: '{{ response.destination.errorCode }}'
+      filterCriteria: '{{ response.destination.filterCriteria }}'
+      keyPrefix: '{{ response.destination.keyPrefix }}'
+      kmsKeyArn: '{{ response.destination.kmsKeyArn }}'
+      reportId: '{{ response.destination.reportId }}'
+      errorMessage: '{{ response.errorMessage }}'
+      status: '{{ response.status }}'
+- calls:
+  - action: list_findings
+    on_error: continue
+    save_as: response
+  discovery_id: aws.inspector2.list_findings
+  emit:
+    as: item
+    item:
+      awsAccountId: '{{ item.awsAccountId }}'
+      codeVulnerabilityDetails: '{{ item.codeVulnerabilityDetails }}'
+      exploitAvailable: '{{ item.exploitAvailable }}'
+      exploitabilityDetails: '{{ item.exploitabilityDetails }}'
+      findingArn: '{{ item.findingArn }}'
+      firstObservedAt: '{{ item.firstObservedAt }}'
+      fixAvailable: '{{ item.fixAvailable }}'
+      inspectorScore: '{{ item.inspectorScore }}'
+      inspectorScoreDetails: '{{ item.inspectorScoreDetails }}'
+      lastObservedAt: '{{ item.lastObservedAt }}'
+      networkReachabilityDetails: '{{ item.networkReachabilityDetails }}'
+      packageVulnerabilityDetails: '{{ item.packageVulnerabilityDetails }}'
+      remediation: '{{ item.remediation }}'
+      resources: '{{ item.resources }}'
+      severity: '{{ item.severity }}'
+      status: '{{ item.status }}'
+      title: '{{ item.title }}'
+      type: '{{ item.type }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.findings }}'
+- calls:
+  - action: list_code_security_integrations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.inspector2.list_code_security_integrations
+  emit:
+    as: item
+    item:
+      createdOn: '{{ item.createdOn }}'
+      integrationArn: '{{ item.integrationArn }}'
+      lastUpdateOn: '{{ item.lastUpdateOn }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      tags: '{{ item.tags }}'
+      type: '{{ item.type }}'
+    items_for: '{{ response.integrations }}'
+- calls:
+  - action: list_coverage
+    on_error: continue
+    save_as: response
+  discovery_id: aws.inspector2.list_coverage
+  emit:
+    as: item
+    item:
+      accountId: '{{ item.accountId }}'
+      lastScannedAt: '{{ item.lastScannedAt }}'
+      resourceId: '{{ item.resourceId }}'
+      resourceMetadata: '{{ item.resourceMetadata }}'
+      resourceType: '{{ item.resourceType }}'
+      scanMode: '{{ item.scanMode }}'
+      scanStatus: '{{ item.scanStatus }}'
+      scanType: '{{ item.scanType }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.coveredResources }}'

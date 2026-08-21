@@ -1,0 +1,462 @@
+version: '1.0'
+provider: aws
+service: codecommit
+services:
+  client: codecommit
+  module: boto3.client
+discovery:
+- discovery_id: aws.codecommit.get_branch
+  calls:
+  - action: get_branch
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      baseCommitId: '{{ response.branch.baseCommitId }}'
+      branch: '{{ response.branch.branch }}'
+      branchName: '{{ response.branch.branchName }}'
+      commitId: '{{ response.branch.commitId }}'
+      destinationCommitId: '{{ response.branch.destinationCommitId }}'
+      mergedCommitId: '{{ response.branch.mergedCommitId }}'
+      sourceCommitId: '{{ response.branch.sourceCommitId }}'
+- discovery_id: aws.codecommit.list_approval_rule_templates
+  calls:
+  - action: list_approval_rule_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.approvalRuleTemplateNames }}'
+- discovery_id: aws.codecommit.list_repositories
+  calls:
+  - action: list_repositories
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.repositories }}'
+    item:
+      repositoryId: '{{ item.repositoryId }}'
+      repositoryName: '{{ item.repositoryName }}'
+- discovery_id: aws.codecommit.describe_merge_conflicts
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: describe_merge_conflicts
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+      destinationCommitSpecifier: '{{ item.destinationCommitSpecifier }}'
+      sourceCommitSpecifier: '{{ item.sourceCommitSpecifier }}'
+      mergeOption: '{{ item.mergeOption }}'
+      filePath: '{{ item.filePath }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.mergeHunks }}'
+    item:
+      base: '{{ item.base }}'
+      destination: '{{ item.destination }}'
+      isConflict: '{{ item.isConflict }}'
+      source: '{{ item.source }}'
+- discovery_id: aws.codecommit.describe_pull_request_events
+  calls:
+  - action: describe_pull_request_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.pullRequestEvents }}'
+    item:
+      actorArn: '{{ item.actorArn }}'
+      approvalRuleEventMetadata: '{{ item.approvalRuleEventMetadata }}'
+      approvalRuleOverriddenEventMetadata: '{{ item.approvalRuleOverriddenEventMetadata
+        }}'
+      approvalStateChangedEventMetadata: '{{ item.approvalStateChangedEventMetadata
+        }}'
+      eventDate: '{{ item.eventDate }}'
+      pullRequestCreatedEventMetadata: '{{ item.pullRequestCreatedEventMetadata }}'
+      pullRequestEventType: '{{ item.pullRequestEventType }}'
+      pullRequestId: '{{ item.pullRequestId }}'
+      pullRequestMergedStateChangedEventMetadata: '{{ item.pullRequestMergedStateChangedEventMetadata
+        }}'
+      pullRequestSourceReferenceUpdatedEventMetadata: '{{ item.pullRequestSourceReferenceUpdatedEventMetadata
+        }}'
+      pullRequestStatusChangedEventMetadata: '{{ item.pullRequestStatusChangedEventMetadata
+        }}'
+- discovery_id: aws.codecommit.get_approval_rule_template
+  calls:
+  - action: get_approval_rule_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      approvalRuleTemplateContent: '{{ response.approvalRuleTemplate.approvalRuleTemplateContent
+        }}'
+      approvalRuleTemplateDescription: '{{ response.approvalRuleTemplate.approvalRuleTemplateDescription
+        }}'
+      approvalRuleTemplateId: '{{ response.approvalRuleTemplate.approvalRuleTemplateId
+        }}'
+      approvalRuleTemplateName: '{{ response.approvalRuleTemplate.approvalRuleTemplateName
+        }}'
+      creationDate: '{{ response.approvalRuleTemplate.creationDate }}'
+      lastModifiedDate: '{{ response.approvalRuleTemplate.lastModifiedDate }}'
+      lastModifiedUser: '{{ response.approvalRuleTemplate.lastModifiedUser }}'
+      ruleContentSha256: '{{ response.approvalRuleTemplate.ruleContentSha256 }}'
+- discovery_id: aws.codecommit.get_blob
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: get_blob
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+      blobId: '{{ item.blobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      content: '{{ response.content }}'
+- discovery_id: aws.codecommit.get_comment
+  calls:
+  - action: get_comment
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      authorArn: '{{ response.comment.authorArn }}'
+      callerReactions: '{{ response.comment.callerReactions }}'
+      clientRequestToken: '{{ response.comment.clientRequestToken }}'
+      comment: '{{ response.comment.comment }}'
+      commentId: '{{ response.comment.commentId }}'
+      content: '{{ response.comment.content }}'
+      creationDate: '{{ response.comment.creationDate }}'
+      deleted: '{{ response.comment.deleted }}'
+      inReplyTo: '{{ response.comment.inReplyTo }}'
+      lastModifiedDate: '{{ response.comment.lastModifiedDate }}'
+      reactionCounts: '{{ response.comment.reactionCounts }}'
+- discovery_id: aws.codecommit.get_comment_reactions
+  calls:
+  - action: get_comment_reactions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.reactionsForComment }}'
+    item:
+      reaction: '{{ item.reaction }}'
+      reactionUsers: '{{ item.reactionUsers }}'
+      reactionsFromDeletedUsersCount: '{{ item.reactionsFromDeletedUsersCount }}'
+- discovery_id: aws.codecommit.get_comments_for_compared_commit
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: get_comments_for_compared_commit
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+      afterCommitId: '{{ item.afterCommitId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.commentsForComparedCommitData }}'
+    item:
+      afterBlobId: '{{ item.afterBlobId }}'
+      afterCommitId: '{{ item.afterCommitId }}'
+      beforeBlobId: '{{ item.beforeBlobId }}'
+      beforeCommitId: '{{ item.beforeCommitId }}'
+      comments: '{{ item.comments }}'
+      location: '{{ item.location }}'
+      repositoryName: '{{ item.repositoryName }}'
+- discovery_id: aws.codecommit.get_comments_for_pull_request
+  calls:
+  - action: get_comments_for_pull_request
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.commentsForPullRequestData }}'
+    item:
+      afterBlobId: '{{ item.afterBlobId }}'
+      afterCommitId: '{{ item.afterCommitId }}'
+      beforeBlobId: '{{ item.beforeBlobId }}'
+      beforeCommitId: '{{ item.beforeCommitId }}'
+      comments: '{{ item.comments }}'
+      location: '{{ item.location }}'
+      pullRequestId: '{{ item.pullRequestId }}'
+      repositoryName: '{{ item.repositoryName }}'
+- discovery_id: aws.codecommit.get_commit
+  for_each: aws.codecommit.get_branch
+  calls:
+  - action: get_commit
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+      commitId: '{{ item.commitId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      additionalData: '{{ response.commit.additionalData }}'
+      author: '{{ response.commit.author }}'
+      commitId: '{{ response.commit.commitId }}'
+      committer: '{{ response.commit.committer }}'
+      message: '{{ response.commit.message }}'
+      parents: '{{ response.commit.parents }}'
+      treeId: '{{ response.commit.treeId }}'
+- discovery_id: aws.codecommit.get_differences
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: get_differences
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+      afterCommitSpecifier: '{{ item.afterCommitSpecifier }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.differences }}'
+    item:
+      afterBlob: '{{ item.afterBlob }}'
+      beforeBlob: '{{ item.beforeBlob }}'
+      changeType: '{{ item.changeType }}'
+      differences: '{{ item.differences }}'
+- discovery_id: aws.codecommit.get_file
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: get_file
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+      filePath: '{{ item.filePath }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      blobId: '{{ response.blobId }}'
+      commitId: '{{ response.commitId }}'
+      fileContent: '{{ response.fileContent }}'
+      fileMode: '{{ response.fileMode }}'
+      filePath: '{{ response.filePath }}'
+      fileSize: '{{ response.fileSize }}'
+- discovery_id: aws.codecommit.get_folder
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: get_folder
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+      folderPath: '{{ item.folderPath }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.subFolders }}'
+    item:
+      absolutePath: '{{ item.absolutePath }}'
+      relativePath: '{{ item.relativePath }}'
+      treeId: '{{ item.treeId }}'
+- discovery_id: aws.codecommit.get_merge_commit
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: get_merge_commit
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+      sourceCommitSpecifier: '{{ item.sourceCommitSpecifier }}'
+      destinationCommitSpecifier: '{{ item.destinationCommitSpecifier }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      mergedCommitId: '{{ response.mergedCommitId }}'
+- discovery_id: aws.codecommit.get_merge_conflicts
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: get_merge_conflicts
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+      destinationCommitSpecifier: '{{ item.destinationCommitSpecifier }}'
+      sourceCommitSpecifier: '{{ item.sourceCommitSpecifier }}'
+      mergeOption: '{{ item.mergeOption }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.conflictMetadataList }}'
+    item:
+      conflictMetadataList: '{{ item.conflictMetadataList }}'
+      contentConflict: '{{ item.contentConflict }}'
+      fileModeConflict: '{{ item.fileModeConflict }}'
+      fileModes: '{{ item.fileModes }}'
+      filePath: '{{ item.filePath }}'
+      fileSizes: '{{ item.fileSizes }}'
+      isBinaryFile: '{{ item.isBinaryFile }}'
+      mergeOperations: '{{ item.mergeOperations }}'
+      numberOfConflicts: '{{ item.numberOfConflicts }}'
+      objectTypeConflict: '{{ item.objectTypeConflict }}'
+      objectTypes: '{{ item.objectTypes }}'
+- discovery_id: aws.codecommit.get_merge_options
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: get_merge_options
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+      sourceCommitSpecifier: '{{ item.sourceCommitSpecifier }}'
+      destinationCommitSpecifier: '{{ item.destinationCommitSpecifier }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.mergeOptions }}'
+- discovery_id: aws.codecommit.get_pull_request
+  calls:
+  - action: get_pull_request
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      approvalRules: '{{ response.pullRequest.approvalRules }}'
+      authorArn: '{{ response.pullRequest.authorArn }}'
+      clientRequestToken: '{{ response.pullRequest.clientRequestToken }}'
+      creationDate: '{{ response.pullRequest.creationDate }}'
+      description: '{{ response.pullRequest.description }}'
+      lastActivityDate: '{{ response.pullRequest.lastActivityDate }}'
+      pullRequestId: '{{ response.pullRequest.pullRequestId }}'
+      pullRequestStatus: '{{ response.pullRequest.pullRequestStatus }}'
+      pullRequestTargets: '{{ response.pullRequest.pullRequestTargets }}'
+      revisionId: '{{ response.pullRequest.revisionId }}'
+      title: '{{ response.pullRequest.title }}'
+- discovery_id: aws.codecommit.get_pull_request_approval_states
+  calls:
+  - action: get_pull_request_approval_states
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.approvals }}'
+    item:
+      approvalState: '{{ item.approvalState }}'
+      approvals: '{{ item.approvals }}'
+      userArn: '{{ item.userArn }}'
+- discovery_id: aws.codecommit.get_pull_request_override_state
+  calls:
+  - action: get_pull_request_override_state
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      overrider: '{{ response.overrider }}'
+- discovery_id: aws.codecommit.get_repository
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: get_repository
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.repositoryMetadata.Arn }}'
+      accountId: '{{ response.repositoryMetadata.accountId }}'
+      cloneUrlHttp: '{{ response.repositoryMetadata.cloneUrlHttp }}'
+      cloneUrlSsh: '{{ response.repositoryMetadata.cloneUrlSsh }}'
+      creationDate: '{{ response.repositoryMetadata.creationDate }}'
+      defaultBranch: '{{ response.repositoryMetadata.defaultBranch }}'
+      kmsKeyId: '{{ response.repositoryMetadata.kmsKeyId }}'
+      lastModifiedDate: '{{ response.repositoryMetadata.lastModifiedDate }}'
+      repositoryDescription: '{{ response.repositoryMetadata.repositoryDescription
+        }}'
+      repositoryId: '{{ response.repositoryMetadata.repositoryId }}'
+      repositoryName: '{{ response.repositoryMetadata.repositoryName }}'
+- discovery_id: aws.codecommit.get_repository_triggers
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: get_repository_triggers
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.triggers }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      branches: '{{ item.branches }}'
+      customData: '{{ item.customData }}'
+      destinationArn: '{{ item.destinationArn }}'
+      events: '{{ item.events }}'
+      name: '{{ item.name }}'
+      triggers: '{{ item.triggers }}'
+- discovery_id: aws.codecommit.list_associated_approval_rule_templates_for_repository
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: list_associated_approval_rule_templates_for_repository
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.approvalRuleTemplateNames }}'
+- discovery_id: aws.codecommit.list_branches
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: list_branches
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.branches }}'
+    item:
+      branch: '{{ item.branch }}'
+- discovery_id: aws.codecommit.list_file_commit_history
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: list_file_commit_history
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+      filePath: '{{ item.filePath }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.revisionDag }}'
+    item:
+      blobId: '{{ item.blobId }}'
+      commit: '{{ item.commit }}'
+      path: '{{ item.path }}'
+      revisionChildren: '{{ item.revisionChildren }}'
+- discovery_id: aws.codecommit.list_pull_requests
+  for_each: aws.codecommit.list_repositories
+  calls:
+  - action: list_pull_requests
+    params:
+      repositoryName: '{{ item.repositoryName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.pullRequestIds }}'
+- discovery_id: aws.codecommit.list_repositories_for_approval_rule_template
+  calls:
+  - action: list_repositories_for_approval_rule_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.repositoryNames }}'
+- discovery_id: aws.codecommit.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

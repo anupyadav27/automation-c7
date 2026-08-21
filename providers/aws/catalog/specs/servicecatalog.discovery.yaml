@@ -1,0 +1,41 @@
+version: '1.0'
+provider: aws
+service: servicecatalog
+discovery:
+- calls:
+  - action: list_portfolios
+    on_error: continue
+    save_as: response
+  discovery_id: aws.servicecatalog.list_portfolios
+  emit:
+    as: item
+    item:
+      ARN: '{{ item.ARN }}'
+      Description: '{{ item.Description }}'
+      DisplayName: '{{ item.DisplayName }}'
+      Id: '{{ item.Id }}'
+      PortfolioShareDetails: '{{ item.PortfolioShareDetails }}'
+      ProviderName: '{{ item.ProviderName }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+    items_for: '{{ response.PortfolioDetails }}'
+- calls:
+  - action: list_record_history
+    on_error: continue
+    save_as: response
+  discovery_id: aws.servicecatalog.list_record_history
+  emit:
+    as: item
+    item:
+      LaunchRoleArn: '{{ item.LaunchRoleArn }}'
+      PathId: '{{ item.PathId }}'
+      ProvisionedProductId: '{{ item.ProvisionedProductId }}'
+      ProvisionedProductName: '{{ item.ProvisionedProductName }}'
+      ProvisionedProductType: '{{ item.ProvisionedProductType }}'
+      RecordDetail: '{{ item.RecordDetail }}'
+      RecordErrors: '{{ item.RecordErrors }}'
+      RecordId: '{{ item.RecordId }}'
+      RecordTags: '{{ item.RecordTags }}'
+      RecordType: '{{ item.RecordType }}'
+      UpdatedTime: '{{ item.UpdatedTime }}'
+      NextPageToken: '{{ response.NextPageToken }}'
+    items_for: '{{ response.RecordDetails }}'

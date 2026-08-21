@@ -1,0 +1,86 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: ec2
+# 3 ops (3 from checks, +0 for inventory)
+version: '1.0'
+provider: aws
+service: ebs
+discovery:
+  - calls:
+    - action: describe_fast_snapshot_restores
+      on_error: continue
+      save_as: response
+    discovery_id: aws.ec2.describe_fast_snapshot_restores
+    emit:
+      as: item
+      item:
+        AvailabilityZone: '{{ item.AvailabilityZone }}'
+        AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+        CreateVolumePermissions: '{{ item.CreateVolumePermissions }}'
+        DisabledTime: '{{ item.DisabledTime }}'
+        DisablingTime: '{{ item.DisablingTime }}'
+        EnabledTime: '{{ item.EnabledTime }}'
+        EnablingTime: '{{ item.EnablingTime }}'
+        FastSnapshotRestores: '{{ item.FastSnapshotRestores }}'
+        OptimizingTime: '{{ item.OptimizingTime }}'
+        OwnerAlias: '{{ item.OwnerAlias }}'
+        ProductCodeId: '{{ item.ProductCodeId }}'
+        ProductCodeType: '{{ item.ProductCodeType }}'
+        SnapshotId: '{{ item.SnapshotId }}'
+        StateTransitionReason: '{{ item.StateTransitionReason }}'
+      items_for: '{{ response.FastSnapshotRestores }}'
+  - calls:
+    - action: describe_volumes
+      on_error: continue
+      save_as: response
+    discovery_id: aws.ec2.describe_volumes
+    emit:
+      as: item
+      item:
+        Attachments: '{{ item.Attachments }}'
+        AvailabilityZone: '{{ item.AvailabilityZone }}'
+        AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+        CreateTime: '{{ item.CreateTime }}'
+        Encrypted: '{{ item.Encrypted }}'
+        FastRestored: '{{ item.FastRestored }}'
+        KmsKeyId: '{{ item.KmsKeyId }}'
+        MultiAttachEnabled: '{{ item.MultiAttachEnabled }}'
+        Operator: '{{ item.Operator }}'
+        OutpostArn: '{{ item.OutpostArn }}'
+        SnapshotId: '{{ item.SnapshotId }}'
+        SourceVolumeId: '{{ item.SourceVolumeId }}'
+        SseType: '{{ item.SseType }}'
+        Tags: '{{ item.Tags }}'
+        VolumeId: '{{ item.VolumeId }}'
+        VolumeInitializationRate: '{{ item.VolumeInitializationRate }}'
+      items_for: '{{ response.Volumes }}'
+  - calls:
+    - action: describe_snapshots
+      on_error: continue
+      save_as: response
+    discovery_id: aws.ec2.describe_snapshots
+    emit:
+      as: item
+      item:
+        AvailabilityZone: '{{ item.AvailabilityZone }}'
+        CompletionDurationMinutes: '{{ item.CompletionDurationMinutes }}'
+        CompletionTime: '{{ item.CompletionTime }}'
+        DataEncryptionKeyId: '{{ item.DataEncryptionKeyId }}'
+        Description: '{{ item.Description }}'
+        Encrypted: '{{ item.Encrypted }}'
+        FullSnapshotSizeInBytes: '{{ item.FullSnapshotSizeInBytes }}'
+        KmsKeyId: '{{ item.KmsKeyId }}'
+        OutpostArn: '{{ item.OutpostArn }}'
+        OwnerAlias: '{{ item.OwnerAlias }}'
+        Progress: '{{ item.Progress }}'
+        RestoreExpiryTime: '{{ item.RestoreExpiryTime }}'
+        SnapshotId: '{{ item.SnapshotId }}'
+        Snapshots: '{{ item.Snapshots }}'
+        SseType: '{{ item.SseType }}'
+        StartTime: '{{ item.StartTime }}'
+        StateMessage: '{{ item.StateMessage }}'
+        StorageTier: '{{ item.StorageTier }}'
+        Tags: '{{ item.Tags }}'
+        TransferType: '{{ item.TransferType }}'
+        VolumeId: '{{ item.VolumeId }}'
+        VolumeSize: '{{ item.VolumeSize }}'
+      items_for: '{{ response.Snapshots }}'

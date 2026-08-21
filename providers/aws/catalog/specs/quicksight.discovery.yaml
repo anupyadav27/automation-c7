@@ -1,0 +1,116 @@
+version: '1.0'
+provider: aws
+service: quicksight
+discovery:
+- calls:
+  - action: list_users
+    on_error: continue
+    save_as: response
+  discovery_id: aws.quicksight.list_users
+  emit:
+    as: item
+    item:
+      Active: '{{ item.Active }}'
+      CustomPermissionsName: '{{ item.CustomPermissionsName }}'
+      Email: '{{ item.Email }}'
+      ExternalLoginFederationProviderType: '{{ item.UserList[].ExternalLoginFederationProviderType
+        }}'
+      ExternalLoginFederationProviderUrl: '{{ item.UserList[].ExternalLoginFederationProviderUrl
+        }}'
+      ExternalLoginId: '{{ item.ExternalLoginId }}'
+      IdentityType: '{{ item.IdentityType }}'
+      Role: '{{ item.Role }}'
+      User: '{{ item.User }}'
+      UserName: '{{ item.UserName }}'
+      RequestId: '{{ response.RequestId }}'
+      Status: '{{ response.Status }}'
+    items_for: '{{ response.UserList }}'
+- calls:
+  - action: describe_data_set_permissions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.quicksight.describe_data_set_permissions
+  emit:
+    as: item
+    item:
+      Actions: '{{ item.Actions }}'
+      Principal: '{{ item.Principal }}'
+      DataSetArn: '{{ response.DataSetArn }}'
+      DataSetId: '{{ response.DataSetId }}'
+      RequestId: '{{ response.RequestId }}'
+      Status: '{{ response.Status }}'
+    items_for: '{{ response.Permissions }}'
+- calls:
+  - action: list_data_sets
+    on_error: continue
+    save_as: response
+  discovery_id: aws.quicksight.list_data_sets
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      DataSet: '{{ item }}'
+      DataSetId: '{{ item.DataSetId }}'
+      ImportMode: '{{ item.ImportMode }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      Name: '{{ item.Name }}'
+      RowLevelPermissionDataSet: '{{ item.RowLevelPermissionDataSet }}'
+      RequestId: '{{ response.RequestId }}'
+      Status: '{{ response.Status }}'
+    items_for: '{{ response.DataSetSummaries }}'
+- calls:
+  - action: list_dashboards
+    on_error: continue
+    save_as: response
+  discovery_id: aws.quicksight.list_dashboards
+  emit:
+    as: item
+    item:
+      Dashboard: '{{ item.Dashboard }}'
+      DashboardId: '{{ item.DashboardId }}'
+      DashboardPublishOptions: '{{ item.DashboardPublishOptions }}'
+      RequestId: '{{ response.RequestId }}'
+      Status: '{{ response.Status }}'
+    items_for: '{{ response.DashboardSummaryList }}'
+- calls:
+  - action: describe_action_connector_permissions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.quicksight.describe_action_connector_permissions
+  emit:
+    as: item
+    item:
+      Actions: '{{ item.Actions }}'
+      Principal: '{{ item.Principal }}'
+    items_for: '{{ response.Permissions }}'
+- calls:
+  - action: describe_account_settings
+    on_error: continue
+    save_as: response
+  discovery_id: aws.quicksight.describe_account_settings
+  emit:
+    as: item
+    item:
+      AccountName: '{{ response.AccountSettings.AccountName }}'
+      DefaultNamespace: '{{ response.AccountSettings.DefaultNamespace }}'
+      Edition: '{{ response.AccountSettings.Edition }}'
+      NotificationEmail: '{{ response.AccountSettings.NotificationEmail }}'
+      PublicSharingEnabled: '{{ response.AccountSettings.PublicSharingEnabled }}'
+      TerminationProtectionEnabled: '{{ response.AccountSettings.TerminationProtectionEnabled
+        }}'
+      RequestId: '{{ response.RequestId }}'
+      Status: '{{ response.Status }}'
+- calls:
+  - action: list_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.quicksight.list_groups
+  emit:
+    as: item
+    item:
+      Group: '{{ item.Group }}'
+      GroupName: '{{ item.GroupName }}'
+      RequestId: '{{ response.RequestId }}'
+      Status: '{{ response.Status }}'
+    items_for: '{{ response.GroupList }}'

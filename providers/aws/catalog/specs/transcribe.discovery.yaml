@@ -1,0 +1,176 @@
+version: '1.0'
+provider: aws
+service: transcribe
+discovery:
+- calls:
+  - action: list_call_analytics_categories
+    on_error: continue
+    save_as: response
+  discovery_id: aws.transcribe.list_call_analytics_categories
+  emit:
+    as: item
+    item:
+      CategoryName: '{{ item.CategoryName }}'
+      CategoryProperties: '{{ item.CategoryProperties }}'
+      CreateTime: '{{ item.CreateTime }}'
+      InputType: '{{ item.InputType }}'
+      LastUpdateTime: '{{ item.LastUpdateTime }}'
+      Rules: '{{ item.Rules }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.Categories }}'
+- calls:
+  - action: list_call_analytics_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.transcribe.list_call_analytics_jobs
+  emit:
+    as: item
+    item:
+      CallAnalyticsJob: '{{ item.CallAnalyticsJob }}'
+      CallAnalyticsJobDetails: '{{ item.CallAnalyticsJobDetails }}'
+      CallAnalyticsJobName: '{{ item.CallAnalyticsJobName }}'
+      CallAnalyticsJobStatus: '{{ item.CallAnalyticsJobStatus }}'
+      CompletionTime: '{{ item.CompletionTime }}'
+      CreationTime: '{{ item.CreationTime }}'
+      FailureReason: '{{ item.FailureReason }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      StartTime: '{{ item.StartTime }}'
+      Status: '{{ response.Status }}'
+    items_for: '{{ response.CallAnalyticsJobSummaries }}'
+- calls:
+  - action: list_language_models
+    on_error: continue
+    save_as: response
+  discovery_id: aws.transcribe.list_language_models
+  emit:
+    as: item
+    item:
+      BaseModelName: '{{ item.BaseModelName }}'
+      CreateTime: '{{ item.CreateTime }}'
+      FailureReason: '{{ item.FailureReason }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      ModelName: '{{ item.ModelName }}'
+      ModelStatus: '{{ item.ModelStatus }}'
+      UpgradeAvailability: '{{ item.UpgradeAvailability }}'
+    items_for: '{{ response.Models }}'
+- calls:
+  - action: list_medical_scribe_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.transcribe.list_medical_scribe_jobs
+  emit:
+    as: item
+    item:
+      CompletionTime: '{{ item.CompletionTime }}'
+      CreationTime: '{{ item.CreationTime }}'
+      FailureReason: '{{ item.FailureReason }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      MedicalScribeJobName: '{{ item.MedicalScribeJobName }}'
+      MedicalScribeJobStatus: '{{ item.MedicalScribeJobStatus }}'
+      StartTime: '{{ item.StartTime }}'
+      Status: '{{ response.Status }}'
+    items_for: '{{ response.MedicalScribeJobSummaries }}'
+- calls:
+  - action: list_medical_transcription_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.transcribe.list_medical_transcription_jobs
+  emit:
+    as: item
+    item:
+      CompletionTime: '{{ item.CompletionTime }}'
+      ContentIdentificationType: '{{ item.ContentIdentificationType }}'
+      CreationTime: '{{ item.CreationTime }}'
+      FailureReason: '{{ item.FailureReason }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      MedicalTranscriptionJobName: '{{ item.MedicalTranscriptionJobName }}'
+      OutputLocationType: '{{ item.OutputLocationType }}'
+      Specialty: '{{ item.Specialty }}'
+      StartTime: '{{ item.StartTime }}'
+      TranscriptionJobStatus: '{{ item.TranscriptionJobStatus }}'
+      Type: '{{ item.Type }}'
+      Status: '{{ response.Status }}'
+    items_for: '{{ response.MedicalTranscriptionJobSummaries }}'
+- calls:
+  - action: list_medical_vocabularies
+    on_error: continue
+    save_as: response
+  discovery_id: aws.transcribe.list_medical_vocabularies
+  emit:
+    as: item
+    item:
+      LanguageCode: '{{ item.LanguageCode }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      VocabularyName: '{{ item.VocabularyName }}'
+      VocabularyState: '{{ item.VocabularyState }}'
+      Status: '{{ response.Status }}'
+    items_for: '{{ response.Vocabularies }}'
+- calls:
+  - action: list_transcription_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.transcribe.list_transcription_jobs
+  emit:
+    as: item
+    item:
+      CompletionTime: '{{ item.CompletionTime }}'
+      ContentRedaction: '{{ item.ContentRedaction }}'
+      CreationTime: '{{ item.CreationTime }}'
+      DestinationArn: '{{ item.DestinationArn }}'
+      Enabled: '{{ item.Enabled }}'
+      FailureReason: '{{ item.FailureReason }}'
+      Format: '{{ item.Format }}'
+      IdentifiedLanguageScore: '{{ item.IdentifiedLanguageScore }}'
+      IdentifyLanguage: '{{ item.IdentifyLanguage }}'
+      IdentifyMultipleLanguages: '{{ item.IdentifyMultipleLanguages }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      LanguageCodes: '{{ item.LanguageCodes }}'
+      Level: '{{ item.Level }}'
+      ModelSettings: '{{ item.ModelSettings }}'
+      OutputLocationType: '{{ item.OutputLocationType }}'
+      StartTime: '{{ item.StartTime }}'
+      ToxicityDetection: '{{ item.ToxicityDetection }}'
+      TranscriptionJobName: '{{ item.TranscriptionJobName }}'
+      TranscriptionJobStatus: '{{ item.TranscriptionJobStatus }}'
+      Status: '{{ response.Status }}'
+    items_for: '{{ response.TranscriptionJobSummaries }}'
+- calls:
+  - action: list_vocabularies
+    on_error: continue
+    save_as: response
+  discovery_id: aws.transcribe.list_vocabularies
+  emit:
+    as: item
+    item:
+      LanguageCode: '{{ item.LanguageCode }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      VocabularyName: '{{ item.VocabularyName }}'
+      VocabularyState: '{{ item.VocabularyState }}'
+      Status: '{{ response.Status }}'
+    items_for: '{{ response.Vocabularies }}'
+- calls:
+  - action: list_vocabulary_filters
+    on_error: continue
+    save_as: response
+  discovery_id: aws.transcribe.list_vocabulary_filters
+  emit:
+    as: item
+    item:
+      LanguageCode: '{{ item.LanguageCode }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      VocabularyFilterName: '{{ item.VocabularyFilterName }}'
+    items_for: '{{ response.VocabularyFilters }}'
+- calls:
+  - action: list_tags_for_resource
+    on_error: continue
+    save_as: response
+  discovery_id: aws.transcribe.list_tags_for_resource
+  emit:
+    as: item
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+      ResourceArn: '{{ response.ResourceArn }}'
+    items_for: '{{ response.Tags }}'

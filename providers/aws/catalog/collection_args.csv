@@ -1,0 +1,8 @@
+resource_key,args_json,reason
+iam.policy,"{""Scope"": ""Local"", ""OnlyAttached"": true}","ListPolicies defaults to Scope=All, which returns ~1600 AWS-managed policies alongside a handful of ours. Scope=Local keeps only customer-managed ones; OnlyAttached keeps only those actually attached to a role, user or group. An unattached policy is not part of the running estate."
+ec2.ami,"{""Owners"": [""self""]}","DescribeImages with no Owners returns EVERY public AMI in the region - hundreds of thousands of rows that are not our assets. `self` scopes it to images this account owns."
+ec2.ebs_snapshot,"{""OwnerIds"": [""self""]}","DescribeSnapshots with no OwnerIds returns every public snapshot in the region. Same failure mode as AMIs, and the same fix."
+ram.resource_share,"{""resourceOwner"": ""SELF""}",Shares we own. The OTHER-ACCOUNTS side is collected separately as shared-in resources.
+ram.resource,"{""resourceOwner"": ""SELF""}",As above.
+ram.principal,"{""resourceOwner"": ""SELF""}",As above.
+ssm.document,"{""Filters"": [{""Key"": ""Owner"", ""Values"": [""Self""]}]}","ListDocuments with no filter returns every SSM document AWS publishes - thousands of them, none owned by this account. Owner=Self scopes it to ours."

@@ -1,0 +1,187 @@
+version: '1.0'
+provider: aws
+service: synthetics
+enabled: false
+services:
+  client: synthetics
+  module: boto3.client
+discovery:
+- discovery_id: aws.synthetics.describe_canaries
+  calls:
+  - action: describe_canaries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Canaries }}'
+    item:
+      ExecutionRoleArn: '{{ item.ExecutionRoleArn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      SecurityGroupIds: '{{ item.SecurityGroupIds }}'
+      Status: '{{ item.Status }}'
+      SubnetIds: '{{ item.SubnetIds }}'
+      Tags: '{{ item.Tags }}'
+      VpcConfig: '{{ item.VpcConfig }}'
+      ArtifactConfig: '{{ item.ArtifactConfig }}'
+      ArtifactS3Location: '{{ item.ArtifactS3Location }}'
+      BrowserConfigs: '{{ item.BrowserConfigs }}'
+      Canaries: '{{ item.Canaries }}'
+      Canary: '{{ item.Canary }}'
+      Code: '{{ item.Code }}'
+      DryRunConfig: '{{ item.DryRunConfig }}'
+      EngineArn: '{{ item.EngineArn }}'
+      EngineConfigs: '{{ item.EngineConfigs }}'
+      FailureRetentionPeriodInDays: '{{ item.FailureRetentionPeriodInDays }}'
+      ProvisionedResourceCleanup: '{{ item.ProvisionedResourceCleanup }}'
+      RunConfig: '{{ item.RunConfig }}'
+      RuntimeVersion: '{{ item.RuntimeVersion }}'
+      Schedule: '{{ item.Schedule }}'
+      SuccessRetentionPeriodInDays: '{{ item.SuccessRetentionPeriodInDays }}'
+      Timeline: '{{ item.Timeline }}'
+      VisualReference: '{{ item.VisualReference }}'
+      VisualReferences: '{{ item.VisualReferences }}'
+- discovery_id: aws.synthetics.describe_canaries_last_run
+  calls:
+  - action: describe_canaries_last_run
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CanariesLastRun }}'
+    item:
+      CanariesLastRun: '{{ item.CanariesLastRun }}'
+      CanaryName: '{{ item.CanaryName }}'
+      LastRun: '{{ item.LastRun }}'
+- discovery_id: aws.synthetics.list_groups
+  calls:
+  - action: list_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Groups }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+- discovery_id: aws.synthetics.get_canary
+  for_each: aws.synthetics.describe_canaries
+  calls:
+  - action: get_canary
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ExecutionRoleArn: '{{ response.Canary.ExecutionRoleArn }}'
+      Id: '{{ response.Canary.Id }}'
+      Name: '{{ response.Canary.Name }}'
+      Status: '{{ response.Canary.Status }}'
+      Tags: '{{ response.Canary.Tags }}'
+      VpcConfig: '{{ response.Canary.VpcConfig }}'
+      ArtifactConfig: '{{ response.Canary.ArtifactConfig }}'
+      ArtifactS3Location: '{{ response.Canary.ArtifactS3Location }}'
+      BrowserConfigs: '{{ response.Canary.BrowserConfigs }}'
+      Code: '{{ response.Canary.Code }}'
+      DryRunConfig: '{{ response.Canary.DryRunConfig }}'
+      EngineArn: '{{ response.Canary.EngineArn }}'
+      EngineConfigs: '{{ response.Canary.EngineConfigs }}'
+      FailureRetentionPeriodInDays: '{{ response.Canary.FailureRetentionPeriodInDays }}'
+      ProvisionedResourceCleanup: '{{ response.Canary.ProvisionedResourceCleanup }}'
+      RunConfig: '{{ response.Canary.RunConfig }}'
+      RuntimeVersion: '{{ response.Canary.RuntimeVersion }}'
+      Schedule: '{{ response.Canary.Schedule }}'
+      SuccessRetentionPeriodInDays: '{{ response.Canary.SuccessRetentionPeriodInDays }}'
+      Timeline: '{{ response.Canary.Timeline }}'
+      VisualReference: '{{ response.Canary.VisualReference }}'
+      VisualReferences: '{{ response.Canary.VisualReferences }}'
+      EncryptionMode: '{{ response.Canary.ArtifactConfig.S3Encryption.EncryptionMode }}'
+      KmsKeyArn: '{{ response.Canary.ArtifactConfig.S3Encryption.KmsKeyArn }}'
+      Handler: '{{ response.Canary.Code.Handler }}'
+      SourceLocationArn: '{{ response.Canary.Code.SourceLocationArn }}'
+      DryRunId: '{{ response.Canary.DryRunConfig.DryRunId }}'
+      LastDryRunExecutionStatus: '{{ response.Canary.DryRunConfig.LastDryRunExecutionStatus }}'
+      ActiveTracing: '{{ response.Canary.RunConfig.ActiveTracing }}'
+      EphemeralStorage: '{{ response.Canary.RunConfig.EphemeralStorage }}'
+      MemoryInMB: '{{ response.Canary.RunConfig.MemoryInMB }}'
+      TimeoutInSeconds: '{{ response.Canary.RunConfig.TimeoutInSeconds }}'
+      DurationInSeconds: '{{ response.Canary.Schedule.DurationInSeconds }}'
+      Expression: '{{ response.Canary.Schedule.Expression }}'
+      MaxRetries: '{{ response.Canary.Schedule.RetryConfig.MaxRetries }}'
+      State: '{{ response.Canary.Status.State }}'
+      StateReason: '{{ response.Canary.Status.StateReason }}'
+      StateReasonCode: '{{ response.Canary.Status.StateReasonCode }}'
+      Created: '{{ response.Canary.Timeline.Created }}'
+      LastModified: '{{ response.Canary.Timeline.LastModified }}'
+      LastStarted: '{{ response.Canary.Timeline.LastStarted }}'
+      LastStopped: '{{ response.Canary.Timeline.LastStopped }}'
+      BaseCanaryRunId: '{{ response.Canary.VisualReference.BaseCanaryRunId }}'
+      Ipv6AllowedForDualStack: '{{ response.Canary.VpcConfig.Ipv6AllowedForDualStack }}'
+      VpcId: '{{ response.Canary.VpcConfig.VpcId }}'
+- discovery_id: aws.synthetics.get_canary_runs
+  for_each: aws.synthetics.describe_canaries
+  calls:
+  - action: get_canary_runs
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CanaryRuns }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      ArtifactS3Location: '{{ item.ArtifactS3Location }}'
+      BrowserType: '{{ item.BrowserType }}'
+      DryRunConfig: '{{ item.DryRunConfig }}'
+      RetryAttempt: '{{ item.RetryAttempt }}'
+      ScheduledRunId: '{{ item.ScheduledRunId }}'
+      Timeline: '{{ item.Timeline }}'
+- discovery_id: aws.synthetics.get_group
+  calls:
+  - action: get_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Group.Arn }}'
+      Id: '{{ response.Group.Id }}'
+      LastModifiedTime: '{{ response.Group.LastModifiedTime }}'
+      Name: '{{ response.Group.Name }}'
+      Tags: '{{ response.Group.Tags }}'
+      CreatedTime: '{{ response.Group.CreatedTime }}'
+- discovery_id: aws.synthetics.list_associated_groups
+  calls:
+  - action: list_associated_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Groups }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+- discovery_id: aws.synthetics.list_group_resources
+  calls:
+  - action: list_group_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Resources }}'
+- discovery_id: aws.synthetics.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

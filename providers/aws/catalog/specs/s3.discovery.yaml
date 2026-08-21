@@ -1,0 +1,246 @@
+version: '1.0'
+provider: aws
+service: s3
+discovery:
+- calls:
+  - action: list_buckets
+    on_error: continue
+    save_as: response
+  discovery_id: aws.s3.list_buckets
+  emit:
+    as: item
+    item:
+      BucketArn: '{{ item.BucketArn }}'
+      BucketRegion: '{{ item.BucketRegion }}'
+      CreationDate: '{{ item.CreationDate }}'
+      Name: '{{ item.Name }}'
+      ContinuationToken: '{{ response.ContinuationToken }}'
+      DisplayName: '{{ response.Owner.DisplayName }}'
+      ID: '{{ response.Owner.ID }}'
+      Prefix: '{{ response.Prefix }}'
+    items_for: '{{ response.Buckets }}'
+  resource_type: s3_bucket
+- calls:
+  - action: get_bucket_versioning
+    on_error: continue
+    params:
+      Bucket: '{{ item.Name }}'
+    save_as: response
+  discovery_id: aws.s3.get_bucket_versioning
+  emit:
+    as: item
+    item:
+      MFADelete: '{{ response.MFADelete }}'
+      Status: '{{ response.Status }}'
+  for_each: aws.s3.list_buckets
+  resource_type: s3_bucket_versioning
+- calls:
+  - action: get_public_access_block
+    on_error: continue
+    params:
+      Bucket: '{{ item.Name }}'
+    save_as: response
+  discovery_id: aws.s3.get_public_access_block
+  emit:
+    as: item
+    item:
+      BlockPublicAcls: '{{ response.PublicAccessBlockConfiguration.BlockPublicAcls }}'
+      BlockPublicPolicy: '{{ response.PublicAccessBlockConfiguration.BlockPublicPolicy }}'
+      IgnorePublicAcls: '{{ response.PublicAccessBlockConfiguration.IgnorePublicAcls }}'
+      RestrictPublicBuckets: '{{ response.PublicAccessBlockConfiguration.RestrictPublicBuckets }}'
+  for_each: aws.s3.list_buckets
+  resource_type: s3_public_access_block
+- calls:
+  - action: list_bucket_metrics_configurations
+    on_error: continue
+    params:
+      Bucket: '{{ item.Name }}'
+    save_as: response
+  discovery_id: aws.s3.list_bucket_metrics_configurations
+  emit:
+    as: item
+    item:
+      Filter: '{{ item.Filter }}'
+      Id: '{{ item.Id }}'
+      ContinuationToken: '{{ response.ContinuationToken }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+      NextContinuationToken: '{{ response.NextContinuationToken }}'
+    items_for: '{{ response.MetricsConfigurationList }}'
+  for_each: aws.s3.list_buckets
+  resource_type: s3_bucket_metrics_configuration
+- calls:
+  - action: get_bucket_acl
+    on_error: continue
+    params:
+      Bucket: '{{ item.Name }}'
+    save_as: response
+  discovery_id: aws.s3.get_bucket_acl
+  emit:
+    as: item
+    item:
+      Grantee: '{{ item.Grantee }}'
+      Permission: '{{ item.Permission }}'
+      DisplayName: '{{ response.Owner.DisplayName }}'
+      ID: '{{ response.Owner.ID }}'
+      Grants: '{{ response.Grants }}'
+    items_for: '{{ response.Grants }}'
+  for_each: aws.s3.list_buckets
+  resource_type: s3_bucket_acl
+- calls:
+  - action: get_bucket_policy_status
+    on_error: continue
+    params:
+      Bucket: '{{ item.Name }}'
+    save_as: response
+  discovery_id: aws.s3.get_bucket_policy_status
+  emit:
+    as: item
+    item:
+      IsPublic: '{{ response.PolicyStatus.IsPublic }}'
+  for_each: aws.s3.list_buckets
+  resource_type: s3_bucket_policy_status
+- calls:
+  - action: list_directory_buckets
+    on_error: continue
+    save_as: response
+  discovery_id: aws.s3.list_directory_buckets
+  emit:
+    as: item
+    item:
+      BucketArn: '{{ item.BucketArn }}'
+      BucketRegion: '{{ item.BucketRegion }}'
+      CreationDate: '{{ item.CreationDate }}'
+      Name: '{{ item.Name }}'
+      ContinuationToken: '{{ response.ContinuationToken }}'
+    items_for: '{{ response.Buckets }}'
+  resource_type: s3_directory_bucket
+- calls:
+  - action: list_bucket_intelligent_tiering_configurations
+    on_error: continue
+    params:
+      Bucket: '{{ item.Name }}'
+    save_as: response
+  discovery_id: aws.s3.list_bucket_intelligent_tiering_configurations
+  emit:
+    as: item
+    item:
+      Filter: '{{ item.Filter }}'
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      Tierings: '{{ item.Tierings }}'
+      ContinuationToken: '{{ response.ContinuationToken }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+      NextContinuationToken: '{{ response.NextContinuationToken }}'
+    items_for: '{{ response.IntelligentTieringConfigurationList }}'
+  for_each: aws.s3.list_buckets
+  resource_type: s3_bucket_intelligent_tiering_configuration
+- calls:
+  - action: get_bucket_logging
+    on_error: continue
+    params:
+      Bucket: '{{ item.Name }}'
+    save_as: response
+  discovery_id: aws.s3.get_bucket_logging
+  emit:
+    as: item
+    item:
+      TargetBucket: '{{ response.LoggingEnabled.TargetBucket }}'
+      TargetGrants: '{{ response.LoggingEnabled.TargetGrants }}'
+      TargetObjectKeyFormat: '{{ response.LoggingEnabled.TargetObjectKeyFormat }}'
+      TargetPrefix: '{{ response.LoggingEnabled.TargetPrefix }}'
+      PartitionDateSource: '{{ response.LoggingEnabled.TargetObjectKeyFormat.PartitionedPrefix.PartitionDateSource }}'
+  for_each: aws.s3.list_buckets
+  resource_type: s3_bucket_logging
+- calls:
+  - action: get_bucket_policy
+    on_error: continue
+    params:
+      Bucket: '{{ item.Name }}'
+    save_as: response
+  discovery_id: aws.s3.get_bucket_policy
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+  for_each: aws.s3.list_buckets
+  resource_type: s3_bucket_policy
+- calls:
+  - action: get_bucket_encryption
+    on_error: continue
+    params:
+      Bucket: '{{ item.Name }}'
+    save_as: response
+  discovery_id: aws.s3.get_bucket_encryption
+  emit:
+    as: item
+    item:
+      Rules: '{{ response.ServerSideEncryptionConfiguration.Rules }}'
+  for_each: aws.s3.list_buckets
+  resource_type: s3_bucket_encryption
+- calls:
+  - action: get_object_lock_configuration
+    on_error: continue
+    params:
+      Bucket: '{{ item.Name }}'
+    save_as: response
+  discovery_id: aws.s3.get_object_lock_configuration
+  emit:
+    as: item
+    item:
+      ObjectLockEnabled: '{{ response.ObjectLockConfiguration.ObjectLockEnabled }}'
+      Rule: '{{ response.ObjectLockConfiguration.Rule }}'
+      Days: '{{ response.ObjectLockConfiguration.Rule.DefaultRetention.Days }}'
+      Mode: '{{ response.ObjectLockConfiguration.Rule.DefaultRetention.Mode }}'
+      Years: '{{ response.ObjectLockConfiguration.Rule.DefaultRetention.Years }}'
+  for_each: aws.s3.list_buckets
+  resource_type: s3_object_lock_configuration
+- calls:
+  - action: get_bucket_lifecycle_configuration
+    on_error: continue
+    params:
+      Bucket: '{{ item.Name }}'
+    save_as: response
+  discovery_id: aws.s3.get_bucket_lifecycle_configuration
+  emit:
+    as: item
+    item:
+      AbortIncompleteMultipartUpload: '{{ item.AbortIncompleteMultipartUpload }}'
+      Expiration: '{{ item.Expiration }}'
+      NoncurrentVersionExpiration: '{{ item.NoncurrentVersionExpiration }}'
+      NoncurrentVersionTransitions: '{{ item.NoncurrentVersionTransitions }}'
+      Transitions: '{{ item.Transitions }}'
+      TransitionDefaultMinimumObjectSize: '{{ response.TransitionDefaultMinimumObjectSize }}'
+      LifecycleRuleStatus: '{{ item.Status }}'
+      LifecycleRuleID: '{{ item.ID }}'
+      LifecyclePrefix: '{{ item.Prefix }}'
+      LifecycleFilter: '{{ item.Filter }}'
+    items_for: '{{ response.Rules }}'
+  for_each: aws.s3.list_buckets
+  resource_type: s3_bucket_lifecycle_configuration
+- calls:
+  - action: get_bucket_replication
+    on_error: continue
+    params:
+      Bucket: '{{ item.Name }}'
+    save_as: response
+  discovery_id: aws.s3.get_bucket_replication
+  emit:
+    as: item
+    item:
+      ReplicationRole: '{{ response.ReplicationConfiguration.Role }}'
+      ReplicationRules: '{{ response.ReplicationConfiguration.Rules }}'
+  for_each: aws.s3.list_buckets
+  resource_type: s3_bucket_replication
+- calls:
+  - action: get_bucket_ownership_controls
+    on_error: continue
+    params:
+      Bucket: '{{ item.Name }}'
+    save_as: response
+  discovery_id: aws.s3.get_bucket_ownership_controls
+  resource_type: s3_bucket
+  emit:
+    as: item
+    item:
+      ObjectOwnership: '{{ response.OwnershipControls.Rules[0].ObjectOwnership }}'
+  for_each: aws.s3.list_buckets

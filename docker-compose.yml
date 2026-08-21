@@ -1,22 +1,50 @@
-version: "3.8"
-
 services:
-  ui:
-    build:
-      context: ./ui
-      args:
-        VITE_API_ENDPOINT: ${VITE_API_ENDPOINT:-http://localhost:8080}
+  postgres:
+    image: postgres:16-alpine
+    container_name: cloud-estate-pg
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: cloud_estate
     ports:
-      - "3000:80"
-    restart: unless-stopped
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
-  # Optional: local mock API for development/testing
-  # Uncomment below to test UI without deploying Lambda
-  # mock-api:
-  #   image: python:3.11-slim
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - ./policies:/app/policies:ro
-  #     - ./mock-api.py:/app/mock-api.py:ro
-  #   command: python /app/mock-api.py
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: cloud-estate-api
+    environment:
+      STORE_BACKEND: postgres
+      STORE_DATABASE_URL: postgresql://postgres:password@postgres:5432/cloud_estate
+      # API_TOKEN: required before exposing this beyond localhost
+    ports:
+      - "8090:8090"
+    volumes:
+      # The architecture scene is a build artifact, not a store row - it needs
+      # the resources' raw payloads to place a node, and those are far too large
+      # to keep in postgres. `/api/v1/architecture/scene` reads it from here.
+      - ./out:/app/out:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  console:
+    build:
+      context: ./console
+    container_name: cloud-estate-console
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8090
+    ports:
+      - "3100:3100"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

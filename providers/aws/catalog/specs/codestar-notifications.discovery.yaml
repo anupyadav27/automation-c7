@@ -1,0 +1,89 @@
+version: '1.0'
+provider: aws
+service: codestar-notifications
+services:
+  client: codestar-notifications
+  module: boto3.client
+discovery:
+- discovery_id: aws.codestar-notifications.list_event_types
+  calls:
+  - action: list_event_types
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EventTypes }}'
+    item:
+      Name: '{{ item.Name }}'
+      Tags: '{{ item.Tags }}'
+      EventTypeId: '{{ item.EventTypeId }}'
+      EventTypeName: '{{ item.EventTypeName }}'
+      EventTypes: '{{ item.EventTypes }}'
+      Resource: '{{ item.Resource }}'
+      ResourceType: '{{ item.ResourceType }}'
+      ServiceName: '{{ item.ServiceName }}'
+- discovery_id: aws.codestar-notifications.list_notification_rules
+  calls:
+  - action: list_notification_rules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.NotificationRules }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      Resource: '{{ item.Resource }}'
+- discovery_id: aws.codestar-notifications.list_targets
+  calls:
+  - action: list_targets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Targets }}'
+    item:
+      TargetAddress: '{{ item.TargetAddress }}'
+      TargetStatus: '{{ item.TargetStatus }}'
+      TargetType: '{{ item.TargetType }}'
+      Targets: '{{ item.Targets }}'
+- discovery_id: aws.codestar-notifications.describe_notification_rule
+  for_each: aws.codestar-notifications.list_notification_rules
+  calls:
+  - action: describe_notification_rule
+    params:
+      Arn: '{{ item.Arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EventTypes }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      EventTypeId: '{{ item.EventTypeId }}'
+      EventTypeName: '{{ item.EventTypeName }}'
+      Resource: '{{ item.Resource }}'
+      ResourceType: '{{ item.ResourceType }}'
+      ServiceName: '{{ item.ServiceName }}'
+      Arn: '{{ response.Arn }}'
+      CreatedBy: '{{ response.CreatedBy }}'
+      CreatedTimestamp: '{{ response.CreatedTimestamp }}'
+      DetailType: '{{ response.DetailType }}'
+      LastModifiedTimestamp: '{{ response.LastModifiedTimestamp }}'
+- discovery_id: aws.codestar-notifications.list_tags_for_resource
+  for_each: aws.codestar-notifications.list_notification_rules
+  calls:
+  - action: list_tags_for_resource
+    params:
+      Arn: '{{ item.Arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

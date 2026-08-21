@@ -1,0 +1,68 @@
+version: '1.0'
+provider: aws
+service: transfer
+discovery:
+- calls:
+  - action: list_servers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.transfer.list_servers
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      Domain: '{{ item.Domain }}'
+      EndpointType: '{{ item.EndpointType }}'
+      IdentityProviderType: '{{ item.IdentityProviderType }}'
+      LoggingRole: '{{ item.LoggingRole }}'
+      Server: '{{ item.Server }}'
+      ServerId: '{{ item.ServerId }}'
+      State: '{{ item.State }}'
+      UserCount: '{{ item.UserCount }}'
+    items_for: '{{ response.Servers }}'
+- calls:
+  - action: describe_server
+    on_error: continue
+    params:
+      ServerId: '{{ item.ServerId }}'
+    save_as: response
+  discovery_id: aws.transfer.describe_server
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Server.Arn }}'
+      As2ServiceManagedEgressIpAddresses: '{{ response.Server.As2ServiceManagedEgressIpAddresses }}'
+      Certificate: '{{ response.Server.Certificate }}'
+      Domain: '{{ response.Server.Domain }}'
+      EndpointDetails: '{{ response.Server.EndpointDetails.VpcId }}'
+      EndpointType: '{{ response.Server.EndpointType }}'
+      HostKeyFingerprint: '{{ response.Server.HostKeyFingerprint }}'
+      IdentityProviderDetails: '{{ response.Server.IdentityProviderDetails.Url }}'
+      IdentityProviderType: '{{ response.Server.IdentityProviderType }}'
+      IpAddressType: '{{ response.Server.IpAddressType }}'
+      LoggingRole: '{{ response.Server.LoggingRole }}'
+      PostAuthenticationLoginBanner: '{{ response.Server.PostAuthenticationLoginBanner }}'
+      PreAuthenticationLoginBanner: '{{ response.Server.PreAuthenticationLoginBanner }}'
+      ProtocolDetails: '{{ response.Server.ProtocolDetails }}'
+      Protocols: '{{ response.Server.Protocols }}'
+      S3StorageOptions: '{{ response.Server.S3StorageOptions }}'
+      SecurityPolicyName: '{{ response.Server.SecurityPolicyName }}'
+      Server: '{{ response.Server.ServerId }}'
+      ServerId: '{{ response.Server.ServerId }}'
+      State: '{{ response.Server.State }}'
+      StructuredLogDestinations: '{{ response.Server.StructuredLogDestinations }}'
+      Tags: '{{ response.Server.Tags }}'
+      UserCount: '{{ response.Server.UserCount }}'
+      WorkflowDetails: '{{ response.Server.WorkflowDetails }}'
+      VpcEndpointId: '{{ response.Server.EndpointDetails.VpcEndpointId }}'
+      VpcId: '{{ response.Server.EndpointDetails.VpcId }}'
+      DirectoryId: '{{ response.Server.IdentityProviderDetails.DirectoryId }}'
+      Function: '{{ response.Server.IdentityProviderDetails.Function }}'
+      InvocationRole: '{{ response.Server.IdentityProviderDetails.InvocationRole }}'
+      SftpAuthenticationMethods: '{{ response.Server.IdentityProviderDetails.SftpAuthenticationMethods }}'
+      Url: '{{ response.Server.IdentityProviderDetails.Url }}'
+      PassiveIp: '{{ response.Server.ProtocolDetails.PassiveIp }}'
+      SetStatOption: '{{ response.Server.ProtocolDetails.SetStatOption }}'
+      TlsSessionResumptionMode: '{{ response.Server.ProtocolDetails.TlsSessionResumptionMode }}'
+      DirectoryListingOptimization: '{{ response.Server.S3StorageOptions.DirectoryListingOptimization }}'
+  for_each: aws.transfer.list_servers

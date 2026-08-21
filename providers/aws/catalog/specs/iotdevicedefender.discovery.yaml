@@ -1,0 +1,52 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: iotdevicedefender (backed by iot)
+# 1 ops (from checks)
+# Generated: 2026-04-14
+version: '1.0'
+provider: aws
+service: iotdevicedefender
+services:
+  client: iot
+  module: boto3.client
+discovery:
+  - discovery_id: aws.iotdevicedefender.list_custom_metrics
+    calls:
+    - action: list_custom_metrics
+      save_as: response
+      on_error: continue
+      params:
+        maxResults: 100
+    emit:
+      as: item
+      items_for: '{{ response.metricNames }}'
+      item:
+        metricName: '{{ item }}'
+  - discovery_id: aws.iotdevicedefender.describe_custom_metric
+    for_each: aws.iotdevicedefender.list_custom_metrics
+    calls:
+    - action: describe_custom_metric
+      save_as: response
+      on_error: continue
+      params:
+        metricName: '{{ item.metricName }}'
+    emit:
+      as: item
+      items_for: '{{ response }}'
+      item:
+        metricName: '{{ item.metricName }}'
+        metricArn: '{{ item.metricArn }}'
+        metricType: '{{ item.metricType }}'
+  - discovery_id: aws.iotdevicedefender.list_tags_for_resource
+    for_each: aws.iotdevicedefender.describe_custom_metric
+    calls:
+    - action: list_tags_for_resource
+      save_as: response
+      on_error: continue
+      params:
+        resourceArn: '{{ item.metricArn }}'
+    emit:
+      as: item
+      items_for: '{{ response }}'
+      item:
+        metricArn: '{{ item.metricArn }}'
+        tags: '{{ item.tags }}'

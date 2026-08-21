@@ -1,0 +1,237 @@
+version: '1.0'
+provider: aws
+service: compute-optimizer-automation
+services:
+  client: compute-optimizer-automation
+  module: boto3.client
+discovery:
+- discovery_id: aws.compute-optimizer-automation.get_enrollment_configuration
+  calls:
+  - action: get_enrollment_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      lastUpdatedTimestamp: '{{ response.lastUpdatedTimestamp }}'
+      organizationRuleMode: '{{ response.organizationRuleMode }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+- discovery_id: aws.compute-optimizer-automation.list_accounts
+  calls:
+  - action: list_accounts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.accounts }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      lastUpdatedTimestamp: '{{ item.lastUpdatedTimestamp }}'
+      organizationRuleMode: '{{ item.organizationRuleMode }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+- discovery_id: aws.compute-optimizer-automation.list_automation_event_summaries
+  calls:
+  - action: list_automation_event_summaries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.automationEventSummaries }}'
+    item:
+      dimensions: '{{ item.dimensions }}'
+      key: '{{ item.key }}'
+      timePeriod: '{{ item.timePeriod }}'
+      total: '{{ item.total }}'
+- discovery_id: aws.compute-optimizer-automation.list_automation_events
+  calls:
+  - action: list_automation_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.automationEvents }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      completedTimestamp: '{{ item.completedTimestamp }}'
+      createdTimestamp: '{{ item.createdTimestamp }}'
+      estimatedMonthlySavings: '{{ item.estimatedMonthlySavings }}'
+      eventDescription: '{{ item.eventDescription }}'
+      eventId: '{{ item.eventId }}'
+      eventStatus: '{{ item.eventStatus }}'
+      eventStatusReason: '{{ item.eventStatusReason }}'
+      eventType: '{{ item.eventType }}'
+      recommendedActionId: '{{ item.recommendedActionId }}'
+      region: '{{ item.region }}'
+      resourceArn: '{{ item.resourceArn }}'
+      resourceId: '{{ item.resourceId }}'
+      resourceType: '{{ item.resourceType }}'
+      ruleId: '{{ item.ruleId }}'
+- discovery_id: aws.compute-optimizer-automation.list_automation_rules
+  calls:
+  - action: list_automation_rules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.automationRules }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      accountId: '{{ item.accountId }}'
+      createdTimestamp: '{{ item.createdTimestamp }}'
+      description: '{{ item.description }}'
+      lastUpdatedTimestamp: '{{ item.lastUpdatedTimestamp }}'
+      name: '{{ item.name }}'
+      organizationConfiguration: '{{ item.organizationConfiguration }}'
+      priority: '{{ item.priority }}'
+      recommendedActionTypes: '{{ item.recommendedActionTypes }}'
+      ruleArn: '{{ item.ruleArn }}'
+      ruleId: '{{ item.ruleId }}'
+      ruleRevision: '{{ item.ruleRevision }}'
+      ruleType: '{{ item.ruleType }}'
+      schedule: '{{ item.schedule }}'
+      status: '{{ item.status }}'
+- discovery_id: aws.compute-optimizer-automation.list_recommended_action_summaries
+  calls:
+  - action: list_recommended_action_summaries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recommendedActionSummaries }}'
+    item:
+      key: '{{ item.key }}'
+      total: '{{ item.total }}'
+- discovery_id: aws.compute-optimizer-automation.list_recommended_actions
+  calls:
+  - action: list_recommended_actions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recommendedActions }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      criteria: '{{ item.criteria }}'
+      currentResourceDetails: '{{ item.currentResourceDetails }}'
+      currentResourceSummary: '{{ item.currentResourceSummary }}'
+      estimatedMonthlySavings: '{{ item.estimatedMonthlySavings }}'
+      lookBackPeriodInDays: '{{ item.lookBackPeriodInDays }}'
+      recommendedActionId: '{{ item.recommendedActionId }}'
+      recommendedActionType: '{{ item.recommendedActionType }}'
+      recommendedResourceDetails: '{{ item.recommendedResourceDetails }}'
+      recommendedResourceSummary: '{{ item.recommendedResourceSummary }}'
+      region: '{{ item.region }}'
+      resourceArn: '{{ item.resourceArn }}'
+      resourceId: '{{ item.resourceId }}'
+      resourceTags: '{{ item.resourceTags }}'
+      resourceType: '{{ item.resourceType }}'
+      restartNeeded: '{{ item.restartNeeded }}'
+- discovery_id: aws.compute-optimizer-automation.get_automation_event
+  for_each: aws.compute-optimizer-automation.list_automation_events
+  calls:
+  - action: get_automation_event
+    params:
+      eventId: '{{ item.eventId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      afterDiscountSavings: '{{ response.estimatedMonthlySavings.afterDiscountSavings
+        }}'
+      beforeDiscountSavings: '{{ response.estimatedMonthlySavings.beforeDiscountSavings
+        }}'
+      currency: '{{ response.estimatedMonthlySavings.currency }}'
+      savingsEstimationMode: '{{ response.estimatedMonthlySavings.savingsEstimationMode
+        }}'
+- discovery_id: aws.compute-optimizer-automation.get_automation_rule
+  for_each: aws.compute-optimizer-automation.list_automation_rules
+  calls:
+  - action: get_automation_rule
+    params:
+      ruleArn: '{{ item.ruleArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recommendedActionTypes }}'
+- discovery_id: aws.compute-optimizer-automation.list_automation_event_steps
+  for_each: aws.compute-optimizer-automation.list_automation_events
+  calls:
+  - action: list_automation_event_steps
+    params:
+      eventId: '{{ item.eventId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.automationEventSteps }}'
+    item:
+      completedTimestamp: '{{ item.completedTimestamp }}'
+      estimatedMonthlySavings: '{{ item.estimatedMonthlySavings }}'
+      eventId: '{{ item.eventId }}'
+      resourceId: '{{ item.resourceId }}'
+      startTimestamp: '{{ item.startTimestamp }}'
+      stepId: '{{ item.stepId }}'
+      stepStatus: '{{ item.stepStatus }}'
+      stepType: '{{ item.stepType }}'
+- discovery_id: aws.compute-optimizer-automation.list_automation_rule_preview
+  for_each: aws.compute-optimizer-automation.list_automation_rules
+  calls:
+  - action: list_automation_rule_preview
+    params:
+      ruleType: '{{ item.ruleType }}'
+      recommendedActionTypes: '{{ item.recommendedActionTypes }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.previewResults }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      currentResourceDetails: '{{ item.currentResourceDetails }}'
+      currentResourceSummary: '{{ item.currentResourceSummary }}'
+      estimatedMonthlySavings: '{{ item.estimatedMonthlySavings }}'
+      lookBackPeriodInDays: '{{ item.lookBackPeriodInDays }}'
+      recommendedActionId: '{{ item.recommendedActionId }}'
+      recommendedActionType: '{{ item.recommendedActionType }}'
+      recommendedResourceDetails: '{{ item.recommendedResourceDetails }}'
+      recommendedResourceSummary: '{{ item.recommendedResourceSummary }}'
+      region: '{{ item.region }}'
+      resourceArn: '{{ item.resourceArn }}'
+      resourceId: '{{ item.resourceId }}'
+      resourceTags: '{{ item.resourceTags }}'
+      resourceType: '{{ item.resourceType }}'
+      restartNeeded: '{{ item.restartNeeded }}'
+- discovery_id: aws.compute-optimizer-automation.list_automation_rule_preview_summaries
+  for_each: aws.compute-optimizer-automation.list_automation_rules
+  calls:
+  - action: list_automation_rule_preview_summaries
+    params:
+      ruleType: '{{ item.ruleType }}'
+      recommendedActionTypes: '{{ item.recommendedActionTypes }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.previewResultSummaries }}'
+    item:
+      key: '{{ item.key }}'
+      total: '{{ item.total }}'
+- discovery_id: aws.compute-optimizer-automation.list_tags_for_resource
+  for_each: aws.compute-optimizer-automation.list_automation_events
+  calls:
+  - action: list_tags_for_resource
+    params:
+      resourceArn: '{{ item.resourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'

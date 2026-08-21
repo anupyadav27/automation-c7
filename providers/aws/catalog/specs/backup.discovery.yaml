@@ -1,0 +1,502 @@
+version: '1.0'
+provider: aws
+service: backup
+discovery:
+- calls:
+  - action: list_report_plans
+    on_error: continue
+    save_as: response
+  discovery_id: aws.backup.list_report_plans
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      DeploymentStatus: '{{ item.DeploymentStatus }}'
+      LastAttemptedExecutionTime: '{{ item.LastAttemptedExecutionTime }}'
+      LastSuccessfulExecutionTime: '{{ item.LastSuccessfulExecutionTime }}'
+      ReportDeliveryChannel: '{{ item.ReportDeliveryChannel }}'
+      ReportPlanArn: '{{ item.ReportPlanArn }}'
+      ReportPlanDescription: '{{ item.ReportPlanDescription }}'
+      ReportPlanName: '{{ item.ReportPlanName }}'
+      ReportPlans: '{{ item }}'
+      ReportSetting: '{{ item.ReportSetting }}'
+    items_for: '{{ response.ReportPlans }}'
+  resource_type: backup_report_plan
+- calls:
+  - action: list_backup_vaults
+    on_error: continue
+    save_as: response
+  discovery_id: aws.backup.list_backup_vaults
+  emit:
+    as: item
+    item:
+      BackupVaultArn: '{{ item.BackupVaultArn }}'
+      BackupVaultList: '{{ item }}'
+      BackupVaultName: '{{ item.BackupVaultName }}'
+      CreationDate: '{{ item.CreationDate }}'
+      CreatorRequestId: '{{ item.CreatorRequestId }}'
+      EncryptionKeyArn: '{{ item.EncryptionKeyArn }}'
+      EncryptionKeyType: '{{ item.EncryptionKeyType }}'
+      LockDate: '{{ item.LockDate }}'
+      Locked: '{{ item.Locked }}'
+      MaxRetentionDays: '{{ item.MaxRetentionDays }}'
+      MinRetentionDays: '{{ item.MinRetentionDays }}'
+      NumberOfRecoveryPoints: '{{ item.NumberOfRecoveryPoints }}'
+      VaultState: '{{ item.VaultState }}'
+      VaultType: '{{ item.VaultType }}'
+    items_for: '{{ response.BackupVaultList }}'
+  resource_type: backup_backup_vault
+- calls:
+  - action: get_backup_vault_notifications
+    on_error: continue
+    params:
+      BackupVaultName: '{{ item.BackupVaultName }}'
+    save_as: response
+  discovery_id: aws.backup.get_backup_vault_notifications
+  emit:
+    as: item
+    item:
+      BackupVaultArn: '{{ response.BackupVaultArn }}'
+      BackupVaultEvents: '{{ response.BackupVaultEvents }}'
+      BackupVaultName: '{{ response.BackupVaultName }}'
+      SNSTopicArn: '{{ response.SNSTopicArn }}'
+  for_each: aws.backup.list_backup_vaults
+  resource_type: backup_backup_vault_notification
+- calls:
+  - action: list_backup_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.backup.list_backup_jobs
+  emit:
+    as: item
+    item:
+      AccountId: '{{ item.AccountId }}'
+      BackupJobId: '{{ item.BackupJobId }}'
+      BackupJobs: '{{ item }}'
+      BackupOptions: '{{ item.BackupOptions }}'
+      BackupSizeInBytes: '{{ item.BackupSizeInBytes }}'
+      BackupType: '{{ item.BackupType }}'
+      BackupVaultArn: '{{ item.BackupVaultArn }}'
+      BackupVaultName: '{{ item.BackupVaultName }}'
+      BytesTransferred: '{{ item.BytesTransferred }}'
+      CompletionDate: '{{ item.CompletionDate }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      CreationDate: '{{ item.CreationDate }}'
+      EncryptionKeyArn: '{{ item.EncryptionKeyArn }}'
+      ExpectedCompletionDate: '{{ item.ExpectedCompletionDate }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      InitiationDate: '{{ item.InitiationDate }}'
+      IsEncrypted: '{{ item.IsEncrypted }}'
+      IsParent: '{{ item.IsParent }}'
+      MessageCategory: '{{ item.MessageCategory }}'
+      ParentJobId: '{{ item.ParentJobId }}'
+      PercentDone: '{{ item.PercentDone }}'
+      RecoveryPointArn: '{{ item.RecoveryPointArn }}'
+      RecoveryPointLifecycle: '{{ item.RecoveryPointLifecycle }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      ResourceName: '{{ item.ResourceName }}'
+      ResourceType: '{{ item.ResourceType }}'
+      StartBy: '{{ item.StartBy }}'
+      State: '{{ item.State }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      VaultLockState: '{{ item.VaultLockState }}'
+      VaultType: '{{ item.VaultType }}'
+    items_for: '{{ response.BackupJobs }}'
+  resource_type: backup_backup_job
+- calls:
+  - action: list_restore_jobs_by_protected_resource
+    on_error: continue
+    params:
+      ResourceArn: '{{ item.ResourceArn }}'
+    save_as: response
+  discovery_id: aws.backup.list_restore_jobs_by_protected_resource
+  emit:
+    as: item
+    item:
+      AccountId: '{{ item.AccountId }}'
+      BackupJobs: '{{ item }}'
+      BackupSizeInBytes: '{{ item.BackupSizeInBytes }}'
+      BackupVaultArn: '{{ item.BackupVaultArn }}'
+      CompletionDate: '{{ item.CompletionDate }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      CreatedResourceArn: '{{ item.CreatedResourceArn }}'
+      CreationDate: '{{ item.CreationDate }}'
+      DeletionStatus: '{{ item.DeletionStatus }}'
+      DeletionStatusMessage: '{{ item.DeletionStatusMessage }}'
+      ExpectedCompletionTimeMinutes: '{{ item.ExpectedCompletionTimeMinutes }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      IsParent: '{{ item.IsParent }}'
+      ParentJobId: '{{ item.ParentJobId }}'
+      PercentDone: '{{ item.PercentDone }}'
+      RecoveryPointArn: '{{ item.RecoveryPointArn }}'
+      RecoveryPointCreationDate: '{{ item.RecoveryPointCreationDate }}'
+      RecoveryPoints: '{{ item }}'
+      ResourceType: '{{ item.ResourceType }}'
+      RestoreJobId: '{{ item.RestoreJobId }}'
+      RestoreJobs: '{{ item }}'
+      SourceResourceArn: '{{ item.SourceResourceArn }}'
+      Status: '{{ item.Status }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      ValidationStatus: '{{ item.ValidationStatus }}'
+      ValidationStatusMessage: '{{ item.ValidationStatusMessage }}'
+    items_for: '{{ response.RestoreJobs }}'
+  for_each: aws.backup.list_backup_jobs
+  resource_type: backup_restore_jobs_by_protected_resource
+- calls:
+  - action: list_recovery_points_by_resource
+    on_error: continue
+    params:
+      ResourceArn: '{{ item.ResourceArn }}'
+    save_as: response
+  discovery_id: aws.backup.list_recovery_points_by_resource
+  emit:
+    as: item
+    item:
+      AggregatedScanResult: '{{ item.AggregatedScanResult }}'
+      BackupSizeBytes: '{{ item.BackupSizeBytes }}'
+      BackupVaultList: '{{ item }}'
+      BackupVaultName: '{{ item.BackupVaultName }}'
+      CreationDate: '{{ item.CreationDate }}'
+      EncryptionKeyArn: '{{ item.EncryptionKeyArn }}'
+      EncryptionKeyType: '{{ item.EncryptionKeyType }}'
+      IndexStatus: '{{ item.IndexStatus }}'
+      IndexStatusMessage: '{{ item.IndexStatusMessage }}'
+      IsParent: '{{ item.IsParent }}'
+      ParentRecoveryPointArn: '{{ item.ParentRecoveryPointArn }}'
+      RecoveryPointArn: '{{ item.RecoveryPointArn }}'
+      ResourceName: '{{ item.ResourceName }}'
+      Status: '{{ item.Status }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      VaultType: '{{ item.VaultType }}'
+    items_for: '{{ response.RecoveryPoints }}'
+  for_each: aws.backup.list_backup_jobs
+  resource_type: backup_recovery_points_by_resource
+- calls:
+  - action: list_backup_plans
+    on_error: continue
+    save_as: response
+  discovery_id: aws.backup.list_backup_plans
+  emit:
+    as: item
+    item:
+      AdvancedBackupSettings: '{{ item.AdvancedBackupSettings }}'
+      BackupPlanArn: '{{ item.BackupPlanArn }}'
+      BackupPlanId: '{{ item.BackupPlanId }}'
+      BackupPlanName: '{{ item.BackupPlanName }}'
+      CreationDate: '{{ item.CreationDate }}'
+      CreatorRequestId: '{{ item.CreatorRequestId }}'
+      DeletionDate: '{{ item.DeletionDate }}'
+      IndexDeletionDate: '{{ item.IndexDeletionDate }}'
+      LastExecutionDate: '{{ item.LastExecutionDate }}'
+      VersionId: '{{ item.VersionId }}'
+    items_for: '{{ response.BackupPlansList }}'
+  is_active: false
+  resource_type: backup_backup_plan
+- calls:
+  - action: list_backup_plan_versions
+    on_error: continue
+    params:
+      BackupPlanId: '{{ item.BackupPlanId }}'
+    save_as: response
+  discovery_id: aws.backup.list_backup_plan_versions
+  emit:
+    as: item
+    item:
+      AdvancedBackupSettings: '{{ item.AdvancedBackupSettings }}'
+      BackupPlanArn: '{{ item.BackupPlanArn }}'
+      BackupPlanId: '{{ item.BackupPlanId }}'
+      BackupPlanName: '{{ item.BackupPlanName }}'
+      BackupPlansList: '{{ item }}'
+      CreationDate: '{{ item.CreationDate }}'
+      CreatorRequestId: '{{ item.CreatorRequestId }}'
+      DeletionDate: '{{ item.DeletionDate }}'
+      LastExecutionDate: '{{ item.LastExecutionDate }}'
+      VersionId: '{{ item.VersionId }}'
+    items_for: '{{ response.BackupPlanVersionsList }}'
+  for_each: aws.backup.list_backup_plans
+  resource_type: backup_backup_plan_version
+- calls:
+  - action: list_protected_resources
+    on_error: continue
+    save_as: response
+  discovery_id: aws.backup.list_protected_resources
+  emit:
+    as: item
+    item:
+      LastBackupTime: '{{ item.LastBackupTime }}'
+      LastBackupVaultArn: '{{ item.LastBackupVaultArn }}'
+      LastRecoveryPointArn: '{{ item.LastRecoveryPointArn }}'
+      LatestRestoreJobCreationDate: '{{ item.LatestRestoreJobCreationDate }}'
+      LatestRestoreRecoveryPointCreationDate: '{{ item.LatestRestoreRecoveryPointCreationDate }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      ResourceName: '{{ item.ResourceName }}'
+      ResourceType: '{{ item.ResourceType }}'
+    items_for: '{{ response.Results }}'
+  resource_type: backup_protected_resource
+- calls:
+  - action: list_scan_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.backup.list_scan_jobs
+  emit:
+    as: item
+    item:
+      AccountId: '{{ item.AccountId }}'
+      BackupVaultArn: '{{ item.BackupVaultArn }}'
+      BackupVaultName: '{{ item.BackupVaultName }}'
+      CompletionDate: '{{ item.CompletionDate }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      CreationDate: '{{ item.CreationDate }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      MalwareScanner: '{{ item.MalwareScanner }}'
+      RecoveryPointArn: '{{ item.RecoveryPointArn }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      ResourceName: '{{ item.ResourceName }}'
+      ResourceType: '{{ item.ResourceType }}'
+      ScanBaseRecoveryPointArn: '{{ item.ScanBaseRecoveryPointArn }}'
+      ScanId: '{{ item.ScanId }}'
+      ScanJobId: '{{ item.ScanJobId }}'
+      ScanMode: '{{ item.ScanMode }}'
+      ScanResult: '{{ item.ScanResult }}'
+      ScannerRoleArn: '{{ item.ScannerRoleArn }}'
+      State: '{{ item.State }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+    items_for: '{{ response.ScanJobs }}'
+  resource_type: backup_scan_job
+- calls:
+  - action: list_restore_testing_plans
+    on_error: continue
+    save_as: response
+  discovery_id: aws.backup.list_restore_testing_plans
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      LastExecutionTime: '{{ item.LastExecutionTime }}'
+      LastUpdateTime: '{{ item.LastUpdateTime }}'
+      RestoreTestingPlanArn: '{{ item.RestoreTestingPlanArn }}'
+      RestoreTestingPlanName: '{{ item.RestoreTestingPlanName }}'
+      ScheduleExpression: '{{ item.ScheduleExpression }}'
+      ScheduleExpressionTimezone: '{{ item.ScheduleExpressionTimezone }}'
+      StartWindowHours: '{{ item.StartWindowHours }}'
+    items_for: '{{ response.RestoreTestingPlans }}'
+  resource_type: backup_restore_testing_plan
+- calls:
+  - action: list_restore_testing_selections
+    on_error: continue
+    params:
+      RestoreTestingPlanName: '{{ item.RestoreTestingPlanName }}'
+    save_as: response
+  discovery_id: aws.backup.list_restore_testing_selections
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      ProtectedResourceType: '{{ item.ProtectedResourceType }}'
+      RestoreTestingPlanName: '{{ item.RestoreTestingPlanName }}'
+      RestoreTestingSelectionName: '{{ item.RestoreTestingSelectionName }}'
+      ValidationWindowHours: '{{ item.ValidationWindowHours }}'
+    items_for: '{{ response.RestoreTestingSelections }}'
+  for_each: aws.backup.list_restore_testing_plans
+  resource_type: backup_restore_testing_selection
+- calls:
+  - action: list_frameworks
+    on_error: continue
+    save_as: response
+  discovery_id: aws.backup.list_frameworks
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      DeploymentStatus: '{{ item.DeploymentStatus }}'
+      FrameworkArn: '{{ item.FrameworkArn }}'
+      FrameworkDescription: '{{ item.FrameworkDescription }}'
+      FrameworkName: '{{ item.FrameworkName }}'
+      NumberOfControls: '{{ item.NumberOfControls }}'
+    items_for: '{{ response.Frameworks }}'
+  resource_type: backup_framework
+- calls:
+  - action: list_legal_holds
+    on_error: continue
+    save_as: response
+  discovery_id: aws.backup.list_legal_holds
+  emit:
+    as: item
+    item:
+      CancellationDate: '{{ item.CancellationDate }}'
+      CreationDate: '{{ item.CreationDate }}'
+      Description: '{{ item.Description }}'
+      LegalHoldArn: '{{ item.LegalHoldArn }}'
+      LegalHoldId: '{{ item.LegalHoldId }}'
+      Status: '{{ item.Status }}'
+      Title: '{{ item.Title }}'
+    items_for: '{{ response.LegalHolds }}'
+  resource_type: backup_legal_hold
+- calls:
+  - action: list_tiering_configurations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.backup.list_tiering_configurations
+  emit:
+    as: item
+    item:
+      BackupVaultName: '{{ item.BackupVaultName }}'
+      CreationTime: '{{ item.CreationTime }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      TieringConfigurationArn: '{{ item.TieringConfigurationArn }}'
+      TieringConfigurationName: '{{ item.TieringConfigurationName }}'
+    items_for: '{{ response.TieringConfigurations }}'
+  resource_type: backup_tiering_configuration
+- calls:
+  - action: get_backup_vault_access_policy
+    on_error: continue
+    params:
+      BackupVaultName: '{{ item.BackupVaultName }}'
+    save_as: response
+  discovery_id: aws.backup.get_backup_vault_access_policy
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+  for_each: aws.backup.list_backup_vaults
+  resource_type: backup_backup_vault_access_policy
+- calls:
+  - action: list_backup_selections
+    on_error: continue
+    params:
+      BackupPlanId: '{{ item.BackupPlanId }}'
+    save_as: response
+  discovery_id: aws.backup.list_backup_selections
+  emit:
+    as: item
+    item:
+      BackupPlanId: '{{ item.BackupPlanId }}'
+      BackupPlansList: '{{ item }}'
+      CreationDate: '{{ item.CreationDate }}'
+      CreatorRequestId: '{{ item.CreatorRequestId }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      SelectionId: '{{ item.SelectionId }}'
+      SelectionName: '{{ item.SelectionName }}'
+    items_for: '{{ response.BackupSelectionsList }}'
+  for_each: aws.backup.list_backup_plans
+  resource_type: backup_backup_selection
+- calls:
+  - action: list_restore_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.backup.list_restore_jobs
+  emit:
+    as: item
+    item:
+      AccountId: '{{ item.AccountId }}'
+      BackupSizeInBytes: '{{ item.BackupSizeInBytes }}'
+      BackupVaultArn: '{{ item.BackupVaultArn }}'
+      CompletionDate: '{{ item.CompletionDate }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      CreatedResourceArn: '{{ item.CreatedResourceArn }}'
+      CreationDate: '{{ item.CreationDate }}'
+      DeletionStatus: '{{ item.DeletionStatus }}'
+      DeletionStatusMessage: '{{ item.DeletionStatusMessage }}'
+      ExpectedCompletionTimeMinutes: '{{ item.ExpectedCompletionTimeMinutes }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      IndexCompletionDate: '{{ item.IndexCompletionDate }}'
+      IsParent: '{{ item.IsParent }}'
+      LatestRestoreJobCreationDate: '{{ item.LatestRestoreJobCreationDate }}'
+      LatestRestoreRecoveryPointCreationDate: '{{ item.LatestRestoreRecoveryPointCreationDate }}'
+      ParentJobId: '{{ item.ParentJobId }}'
+      PercentDone: '{{ item.PercentDone }}'
+      RecoveryPointArn: '{{ item.RecoveryPointArn }}'
+      RecoveryPointCreationDate: '{{ item.RecoveryPointCreationDate }}'
+      ResourceType: '{{ item.ResourceType }}'
+      RestoreJobId: '{{ item.RestoreJobId }}'
+      SourceResourceArn: '{{ item.SourceResourceArn }}'
+      Status: '{{ item.Status }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      ValidationStatus: '{{ item.ValidationStatus }}'
+      ValidationStatusMessage: '{{ item.ValidationStatusMessage }}'
+    items_for: '{{ response.RestoreJobs }}'
+  resource_type: backup_restore_job
+- calls:
+  - action: list_copy_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.backup.list_copy_jobs
+  emit:
+    as: item
+    item:
+      AccountId: '{{ item.AccountId }}'
+      BackupSizeInBytes: '{{ item.BackupSizeInBytes }}'
+      ChildJobsInState: '{{ item.ChildJobsInState }}'
+      CompletionDate: '{{ item.CompletionDate }}'
+      CompositeMemberIdentifier: '{{ item.CompositeMemberIdentifier }}'
+      CopyJobId: '{{ item.CopyJobId }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      CreatedByBackupJobId: '{{ item.CreatedByBackupJobId }}'
+      CreationDate: '{{ item.CreationDate }}'
+      DestinationBackupVaultArn: '{{ item.DestinationBackupVaultArn }}'
+      DestinationEncryptionKeyArn: '{{ item.DestinationEncryptionKeyArn }}'
+      DestinationRecoveryPointArn: '{{ item.DestinationRecoveryPointArn }}'
+      DestinationRecoveryPointLifecycle: '{{ item.DestinationRecoveryPointLifecycle }}'
+      DestinationVaultLockState: '{{ item.DestinationVaultLockState }}'
+      DestinationVaultType: '{{ item.DestinationVaultType }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      IsParent: '{{ item.IsParent }}'
+      MessageCategory: '{{ item.MessageCategory }}'
+      NumberOfChildJobs: '{{ item.NumberOfChildJobs }}'
+      ParentJobId: '{{ item.ParentJobId }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      ResourceName: '{{ item.ResourceName }}'
+      ResourceType: '{{ item.ResourceType }}'
+      SourceBackupVaultArn: '{{ item.SourceBackupVaultArn }}'
+      SourceRecoveryPointArn: '{{ item.SourceRecoveryPointArn }}'
+      State: '{{ item.State }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+    items_for: '{{ response.CopyJobs }}'
+  resource_type: backup_copy_job
+- calls:
+  - action: list_recovery_points_by_backup_vault
+    on_error: continue
+    params:
+      BackupVaultName: '{{ item.BackupVaultName }}'
+    save_as: response
+  discovery_id: aws.backup.list_recovery_points_by_backup_vault
+  emit:
+    as: item
+    item:
+      AggregatedScanResult: '{{ item.AggregatedScanResult }}'
+      BackupJobs: '{{ item }}'
+      BackupSizeInBytes: '{{ item.BackupSizeInBytes }}'
+      BackupVaultArn: '{{ item.BackupVaultArn }}'
+      BackupVaultList: '{{ item }}'
+      BackupVaultName: '{{ item.BackupVaultName }}'
+      CalculatedLifecycle: '{{ item.CalculatedLifecycle }}'
+      CompletionDate: '{{ item.CompletionDate }}'
+      CompositeMemberIdentifier: '{{ item.CompositeMemberIdentifier }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      CreationDate: '{{ item.CreationDate }}'
+      EncryptionKeyArn: '{{ item.EncryptionKeyArn }}'
+      EncryptionKeyType: '{{ item.EncryptionKeyType }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      IndexStatus: '{{ item.IndexStatus }}'
+      IndexStatusMessage: '{{ item.IndexStatusMessage }}'
+      InitiationDate: '{{ item.InitiationDate }}'
+      IsEncrypted: '{{ item.IsEncrypted }}'
+      IsParent: '{{ item.IsParent }}'
+      LastRestoreTime: '{{ item.LastRestoreTime }}'
+      Lifecycle: '{{ item.Lifecycle }}'
+      ParentRecoveryPointArn: '{{ item.ParentRecoveryPointArn }}'
+      RecoveryPointArn: '{{ item.RecoveryPointArn }}'
+      RecoveryPoints: '{{ item }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      ResourceName: '{{ item.ResourceName }}'
+      ResourceType: '{{ item.ResourceType }}'
+      SourceBackupVaultArn: '{{ item.SourceBackupVaultArn }}'
+      Status: '{{ item.Status }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      VaultType: '{{ item.VaultType }}'
+    items_for: '{{ response.RecoveryPoints }}'
+  for_each: aws.backup.list_backup_jobs
+  resource_type: backup_recovery_points_by_backup_vault

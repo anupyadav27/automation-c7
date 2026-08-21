@@ -1,0 +1,178 @@
+{
+  "version": "1.0",
+  "description": "Resource domain classification. Maps resource_type patterns to primary and secondary security domains.",
+  "metadata": {
+    "last_updated": "2026-03-14",
+    "total_domains": 14
+  },
+  "domains": {
+    "IDENTITY": {
+      "description": "IAM, authentication, federation",
+      "patterns": {
+        "aws": ["iam.*", "cognito.*", "sso.*", "sts.*", "organizations.*"],
+        "azure": ["microsoft.authorization.*", "microsoft.managedidentity.*", "microsoft.aad.*"],
+        "gcp": ["iam.*", "accesscontextmanager.*"],
+        "oci": ["identity.*"],
+        "ibm": ["iam.*"],
+        "alicloud": ["ram.*"],
+        "k8s": ["rbac.*", "core.serviceaccount"]
+      }
+    },
+    "NETWORK": {
+      "description": "VPCs, subnets, routing, DNS, ENIs, VPC endpoints",
+      "patterns": {
+        "aws": ["ec2.vpc", "ec2.subnet", "ec2.route-table", "ec2.internet-gateway", "ec2.nat-gateway", "ec2.transit-gateway*", "ec2.network-interface", "ec2.vpc-endpoint", "ec2.vpn*", "ec2.dhcp-options", "ec2.elastic-ip", "ec2.vpc-peering*", "route53.*", "directconnect.*"],
+        "azure": ["microsoft.network/virtualnetworks*", "microsoft.network/subnets", "microsoft.network/routetables", "microsoft.network/natgateways", "microsoft.network/publicipaddresses", "microsoft.network/privatednszones*", "microsoft.network/privateendpoints", "microsoft.network/virtualnetworkgateways"],
+        "gcp": ["compute.network", "compute.subnetwork", "compute.router", "compute.address", "compute.vpngateway*", "dns.*"],
+        "oci": ["core.vcn*", "core.subnet*", "core.internetgateway", "core.natgateway", "core.routetable"],
+        "ibm": ["is.vpc", "is.subnet", "is.floating-ip", "is.public-gateway", "is.network-acl", "is.routing-table"],
+        "alicloud": ["vpc.*"],
+        "k8s": ["networking.*"]
+      }
+    },
+    "NETWORK_SECURITY": {
+      "description": "Firewalls, security groups, ACLs, WAF",
+      "patterns": {
+        "aws": ["ec2.security-group", "ec2.network-acl", "waf.*", "wafv2.*", "shield.*", "firewall.*"],
+        "azure": ["microsoft.network/networksecuritygroups", "microsoft.network/firewallpolicies", "microsoft.network/azurefirewalls", "microsoft.network/applicationgatewaywafpolicies"],
+        "gcp": ["compute.firewall", "compute.securitypolicy"],
+        "oci": ["core.networksecuritygroup*"],
+        "ibm": ["is.security-group"],
+        "alicloud": ["ecs.security-group"],
+        "k8s": ["networking.networkpolicy"]
+      }
+    },
+    "COMPUTE": {
+      "description": "VMs, serverless, batch",
+      "patterns": {
+        "aws": ["ec2.instance", "ec2.image", "ec2.placement-group", "lambda.*", "batch.*", "lightsail.*"],
+        "azure": ["microsoft.compute/virtualmachines*", "microsoft.compute/disks", "microsoft.web/sites"],
+        "gcp": ["compute.instance*", "cloudfunctions.*", "run.*"],
+        "oci": ["core.instance*"],
+        "ibm": ["is.instance", "is.bare-metal-server"],
+        "alicloud": ["ecs.instance", "fc.function*"],
+        "k8s": ["core.pod", "apps.deployment", "apps.statefulset", "apps.daemonset", "apps.replicaset", "batch.job", "batch.cronjob"]
+      }
+    },
+    "CONTAINER_K8S": {
+      "description": "Container orchestration, registries",
+      "patterns": {
+        "aws": ["ecs.*", "eks.*", "ecr.*"],
+        "azure": ["microsoft.containerservice.*", "microsoft.containerregistry.*", "microsoft.containerinstance.*"],
+        "gcp": ["container.*", "artifactregistry.*"],
+        "oci": ["containerengine.*"],
+        "ibm": ["containers.*"],
+        "alicloud": ["cs.*", "cr.*"],
+        "k8s": ["core.namespace", "core.node"]
+      }
+    },
+    "STORAGE": {
+      "description": "Object, block, file storage",
+      "patterns": {
+        "aws": ["s3.*", "ebs.*", "ec2.volume", "ec2.snapshot", "efs.*", "fsx.*", "glacier.*"],
+        "azure": ["microsoft.storage/*"],
+        "gcp": ["storage.*"],
+        "oci": ["objectstorage.*", "filestorage.*", "blockstorage.*"],
+        "ibm": ["cos.*", "is.volume*"],
+        "alicloud": ["oss.*"],
+        "k8s": ["core.persistentvolume*", "storage.*"]
+      }
+    },
+    "DATABASE": {
+      "description": "Managed databases, caches, data warehouses",
+      "patterns": {
+        "aws": ["rds.*", "dynamodb.*", "elasticache.*", "redshift.*", "neptune.*", "docdb.*", "memorydb.*", "keyspaces.*", "timestream.*"],
+        "azure": ["microsoft.dbfor*", "microsoft.documentdb.*", "microsoft.cache.*", "microsoft.sql.*", "microsoft.synapse.*"],
+        "gcp": ["sqladmin.*", "bigtable.*", "spanner.*", "redis.*", "firestore.*"],
+        "oci": ["database.*", "nosql.*"],
+        "ibm": ["databases.*"],
+        "alicloud": ["rds.*", "polardb.*", "kvstore.*"],
+        "k8s": []
+      }
+    },
+    "SECRET_CRYPTO": {
+      "description": "Keys, secrets, certificates",
+      "patterns": {
+        "aws": ["kms.*", "secretsmanager.*", "acm.*"],
+        "azure": ["microsoft.keyvault.*"],
+        "gcp": ["cloudkms.*", "secretmanager.*"],
+        "oci": ["keymanagement.*", "vault.*"],
+        "ibm": ["kms.*"],
+        "alicloud": ["kms.*"],
+        "k8s": ["core.secret"]
+      }
+    },
+    "APPLICATION": {
+      "description": "API gateways, CDN, app services",
+      "patterns": {
+        "aws": ["apigateway.*", "cloudfront.*", "appsync.*", "amplify.*"],
+        "azure": ["microsoft.apimanagement.*", "microsoft.cdn.*"],
+        "gcp": ["apigateway.*", "apigee.*"],
+        "oci": ["apigateway.*"],
+        "ibm": ["apigw.*"],
+        "alicloud": ["apigateway.*", "cdn.*"],
+        "k8s": ["networking.ingress"]
+      }
+    },
+    "MESSAGING": {
+      "description": "Queues, topics, streams, event buses",
+      "patterns": {
+        "aws": ["sqs.*", "sns.*", "kinesis.*", "msk.*", "kafka.*", "eventbridge.*", "mq.*"],
+        "azure": ["microsoft.eventhub.*", "microsoft.servicebus.*", "microsoft.eventgrid.*"],
+        "gcp": ["pubsub.*"],
+        "oci": ["streaming.*"],
+        "ibm": ["messagehub.*"],
+        "alicloud": ["mns.*", "alikafka.*"],
+        "k8s": []
+      }
+    },
+    "MONITORING": {
+      "description": "Logging, metrics, alarms, tracing",
+      "patterns": {
+        "aws": ["cloudwatch.*", "cloudtrail.*", "logs.*", "xray.*", "guardduty.*", "inspector.*", "config.*"],
+        "azure": ["microsoft.insights.*", "microsoft.operationalinsights.*"],
+        "gcp": ["logging.*", "monitoring.*"],
+        "oci": ["monitoring.*", "logging.*"],
+        "ibm": ["logdna.*", "sysdig.*"],
+        "alicloud": ["cms.*", "actiontrail.*"],
+        "k8s": []
+      }
+    },
+    "GOVERNANCE": {
+      "description": "Config, compliance, organizations, SSM",
+      "patterns": {
+        "aws": ["config.*", "organizations.*", "ssm.*", "backup.*", "servicecatalog.*"],
+        "azure": ["microsoft.policyinsights.*", "microsoft.management.*"],
+        "gcp": ["orgpolicy.*", "cloudasset.*"],
+        "oci": ["governance.*"],
+        "ibm": ["compliance.*"],
+        "alicloud": ["resourcemanager.*"],
+        "k8s": ["policy.*"]
+      }
+    },
+    "DEVOPS": {
+      "description": "CI/CD, IaC, build",
+      "patterns": {
+        "aws": ["codebuild.*", "codepipeline.*", "codecommit.*", "codedeploy.*", "codeartifact.*"],
+        "azure": ["microsoft.devops.*"],
+        "gcp": ["cloudbuild.*", "sourcerepo.*"],
+        "oci": ["devops.*"],
+        "ibm": ["toolchain.*"],
+        "alicloud": ["devops.*"],
+        "k8s": []
+      }
+    },
+    "AI_ML": {
+      "description": "ML services, AI endpoints",
+      "patterns": {
+        "aws": ["sagemaker.*", "bedrock.*", "comprehend.*", "rekognition.*", "textract.*"],
+        "azure": ["microsoft.cognitiveservices.*", "microsoft.machinelearningservices.*"],
+        "gcp": ["aiplatform.*", "ml.*"],
+        "oci": ["datascience.*"],
+        "ibm": ["watson.*"],
+        "alicloud": ["pai.*"],
+        "k8s": []
+      }
+    }
+  }
+}

@@ -1,0 +1,172 @@
+version: '1.0'
+provider: aws
+service: route53domains
+services:
+  client: route53domains
+  module: boto3.client
+discovery:
+- discovery_id: aws.route53domains.get_contact_reachability_status
+  calls:
+  - action: get_contact_reachability_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ response.CreationDate }}'
+      AbuseContactEmail: '{{ response.AbuseContactEmail }}'
+      AbuseContactPhone: '{{ response.AbuseContactPhone }}'
+      AdminContact: '{{ response.AdminContact }}'
+      AdminPrivacy: '{{ response.AdminPrivacy }}'
+      BillingContact: '{{ response.BillingContact }}'
+      BillingPrivacy: '{{ response.BillingPrivacy }}'
+      DnsSec: '{{ response.DnsSec }}'
+      DnssecKeys: '{{ response.DnssecKeys }}'
+      ExpirationDate: '{{ response.ExpirationDate }}'
+      RegistrantContact: '{{ response.RegistrantContact }}'
+      RegistrantPrivacy: '{{ response.RegistrantPrivacy }}'
+      RegistrarName: '{{ response.RegistrarName }}'
+      RegistrarUrl: '{{ response.RegistrarUrl }}'
+      RegistryDomainId: '{{ response.RegistryDomainId }}'
+      StatusList: '{{ response.StatusList }}'
+      SuggestionsList: '{{ response.SuggestionsList }}'
+      TechContact: '{{ response.TechContact }}'
+      TechPrivacy: '{{ response.TechPrivacy }}'
+      WhoIsServer: '{{ response.WhoIsServer }}'
+      domainName: '{{ response.domainName }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.route53domains.list_domains
+  calls:
+  - action: list_domains
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Domains }}'
+    item:
+      AutoRenew: '{{ item.AutoRenew }}'
+      DomainName: '{{ item.DomainName }}'
+      Expiry: '{{ item.Expiry }}'
+      TransferLock: '{{ item.TransferLock }}'
+      domainName: '{{ item.domainName }}'
+      status: '{{ item.status }}'
+      NextPageMarker: '{{ response.NextPageMarker }}'
+- discovery_id: aws.route53domains.list_operations
+  calls:
+  - action: list_operations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Operations }}'
+    item:
+      Status: '{{ item.Status }}'
+      DomainName: '{{ item.DomainName }}'
+      LastUpdatedDate: '{{ item.LastUpdatedDate }}'
+      Message: '{{ item.Message }}'
+      OperationId: '{{ item.OperationId }}'
+      StatusFlag: '{{ item.StatusFlag }}'
+      SubmittedDate: '{{ item.SubmittedDate }}'
+      Type: '{{ item.Type }}'
+      NextPageMarker: '{{ response.NextPageMarker }}'
+- discovery_id: aws.route53domains.get_domain_detail
+  for_each: aws.route53domains.list_domains
+  calls:
+  - action: get_domain_detail
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Nameservers }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      Name: '{{ item.Name }}'
+      AbuseContactEmail: '{{ item.AbuseContactEmail }}'
+      AbuseContactPhone: '{{ item.AbuseContactPhone }}'
+      AdminContact: '{{ item.AdminContact.Fax }}'
+      AdminPrivacy: '{{ item.AdminPrivacy }}'
+      BillingContact: '{{ item.BillingContact.Fax }}'
+      BillingPrivacy: '{{ item.BillingPrivacy }}'
+      DnsSec: '{{ item.DnsSec }}'
+      DnssecKeys: '{{ item.DnssecKeys }}'
+      ExpirationDate: '{{ item.ExpirationDate }}'
+      GlueIps: '{{ item.GlueIps }}'
+      Nameservers: '{{ item.Nameservers }}'
+      RegistrantContact: '{{ item.RegistrantContact.Fax }}'
+      RegistrantPrivacy: '{{ item.RegistrantPrivacy }}'
+      RegistrarName: '{{ item.RegistrarName }}'
+      RegistrarUrl: '{{ item.RegistrarUrl }}'
+      RegistryDomainId: '{{ item.RegistryDomainId }}'
+      Reseller: '{{ item.Reseller }}'
+      StatusList: '{{ item.StatusList }}'
+      TechContact: '{{ item.TechContact }}'
+      TechPrivacy: '{{ item.TechPrivacy }}'
+      WhoIsServer: '{{ item.WhoIsServer }}'
+      AddressLine1: '{{ response.AdminContact.AddressLine1 }}'
+      AddressLine2: '{{ response.AdminContact.AddressLine2 }}'
+      City: '{{ response.AdminContact.City }}'
+      ContactType: '{{ response.AdminContact.ContactType }}'
+      CountryCode: '{{ response.AdminContact.CountryCode }}'
+      Email: '{{ response.AdminContact.Email }}'
+      Fax: '{{ response.AdminContact.Fax }}'
+      FirstName: '{{ response.AdminContact.FirstName }}'
+      LastName: '{{ response.AdminContact.LastName }}'
+      OrganizationName: '{{ response.AdminContact.OrganizationName }}'
+      PhoneNumber: '{{ response.AdminContact.PhoneNumber }}'
+      State: '{{ response.AdminContact.State }}'
+      ZipCode: '{{ response.AdminContact.ZipCode }}'
+      AutoRenew: '{{ response.AutoRenew }}'
+      DomainName: '{{ response.DomainName }}'
+      UpdatedDate: '{{ response.UpdatedDate }}'
+- discovery_id: aws.route53domains.get_domain_suggestions
+  for_each: aws.route53domains.list_domains
+  calls:
+  - action: get_domain_suggestions
+    params:
+      DomainName: '{{ item.DomainName }}'
+      SuggestionCount: '{{ item.SuggestionCount }}'
+      OnlyAvailable: '{{ item.OnlyAvailable }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SuggestionsList }}'
+    item:
+      Availability: '{{ item.Availability }}'
+      DomainName: '{{ item.DomainName }}'
+      SuggestionsList: '{{ item.SuggestionsList }}'
+- discovery_id: aws.route53domains.get_operation_detail
+  for_each: aws.route53domains.list_operations
+  calls:
+  - action: get_operation_detail
+    params:
+      OperationId: '{{ item.OperationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+      DomainName: '{{ response.DomainName }}'
+      LastUpdatedDate: '{{ response.LastUpdatedDate }}'
+      Message: '{{ response.Message }}'
+      OperationId: '{{ response.OperationId }}'
+      StatusFlag: '{{ response.StatusFlag }}'
+      SubmittedDate: '{{ response.SubmittedDate }}'
+      Type: '{{ response.Type }}'
+- discovery_id: aws.route53domains.list_tags_for_domain
+  for_each: aws.route53domains.list_domains
+  calls:
+  - action: list_tags_for_domain
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TagList }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

@@ -1,0 +1,181 @@
+version: '1.0'
+provider: aws
+service: qapps
+services:
+  client: qapps
+  module: boto3.client
+discovery:
+- discovery_id: aws.qapps.describe_q_app_permissions
+  calls:
+  - action: describe_q_app_permissions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.permissions }}'
+    item:
+      action: '{{ item.action }}'
+      permissions: '{{ item.permissions }}'
+      principal: '{{ item.principal }}'
+      appId: '{{ response.appId }}'
+      resourceArn: '{{ response.resourceArn }}'
+- discovery_id: aws.qapps.get_library_item
+  calls:
+  - action: get_library_item
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.categories }}'
+    item:
+      appCount: '{{ item.appCount }}'
+      color: '{{ item.color }}'
+      id: '{{ item.id }}'
+      title: '{{ item.title }}'
+      appId: '{{ response.appId }}'
+      appVersion: '{{ response.appVersion }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      isRatedByUser: '{{ response.isRatedByUser }}'
+      isVerified: '{{ response.isVerified }}'
+      libraryItemId: '{{ response.libraryItemId }}'
+      ratingCount: '{{ response.ratingCount }}'
+      status: '{{ response.status }}'
+      updatedAt: '{{ response.updatedAt }}'
+      updatedBy: '{{ response.updatedBy }}'
+      userCount: '{{ response.userCount }}'
+- discovery_id: aws.qapps.get_q_app
+  calls:
+  - action: get_q_app
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.requiredCapabilities }}'
+    item:
+      appArn: '{{ response.appArn }}'
+      appDefinitionVersion: '{{ response.appDefinition.appDefinitionVersion }}'
+      canEdit: '{{ response.appDefinition.canEdit }}'
+      appId: '{{ response.appId }}'
+      appVersion: '{{ response.appVersion }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      description: '{{ response.description }}'
+      initialPrompt: '{{ response.initialPrompt }}'
+      status: '{{ response.status }}'
+      title: '{{ response.title }}'
+      updatedAt: '{{ response.updatedAt }}'
+      updatedBy: '{{ response.updatedBy }}'
+- discovery_id: aws.qapps.get_q_app_session
+  calls:
+  - action: get_q_app_session
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      appVersion: '{{ response.appVersion }}'
+      cardStatus: '{{ response.cardStatus }}'
+      latestPublishedAppVersion: '{{ response.latestPublishedAppVersion }}'
+      sessionArn: '{{ response.sessionArn }}'
+      sessionId: '{{ response.sessionId }}'
+      sessionName: '{{ response.sessionName }}'
+      status: '{{ response.status }}'
+      userIsHost: '{{ response.userIsHost }}'
+- discovery_id: aws.qapps.get_q_app_session_metadata
+  calls:
+  - action: get_q_app_session_metadata
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.sharingConfiguration.Status }}'
+      Enabled: '{{ response.sharingConfiguration.enabled }}'
+      acceptResponses: '{{ response.sharingConfiguration.acceptResponses }}'
+      enabled: '{{ response.sharingConfiguration.enabled }}'
+      revealCards: '{{ response.sharingConfiguration.revealCards }}'
+      sessionArn: '{{ response.sessionArn }}'
+      sessionId: '{{ response.sessionId }}'
+      sessionName: '{{ response.sessionName }}'
+      sessionOwner: '{{ response.sessionOwner }}'
+- discovery_id: aws.qapps.list_categories
+  calls:
+  - action: list_categories
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.categories }}'
+    item:
+      appCount: '{{ item.appCount }}'
+      color: '{{ item.color }}'
+      id: '{{ item.id }}'
+      title: '{{ item.title }}'
+- discovery_id: aws.qapps.list_library_items
+  calls:
+  - action: list_library_items
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.libraryItems }}'
+    item:
+      appId: '{{ item.appId }}'
+      appVersion: '{{ item.appVersion }}'
+      categories: '{{ item.categories }}'
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      isRatedByUser: '{{ item.isRatedByUser }}'
+      isVerified: '{{ item.isVerified }}'
+      libraryItemId: '{{ item.libraryItemId }}'
+      ratingCount: '{{ item.ratingCount }}'
+      status: '{{ item.status }}'
+      updatedAt: '{{ item.updatedAt }}'
+      updatedBy: '{{ item.updatedBy }}'
+      userCount: '{{ item.userCount }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qapps.list_q_app_session_data
+  calls:
+  - action: list_q_app_session_data
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.sessionData }}'
+    item:
+      cardId: '{{ item.cardId }}'
+      submissionId: '{{ item.submissionId }}'
+      timestamp: '{{ item.timestamp }}'
+      user: '{{ item.user }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'
+      sessionArn: '{{ response.sessionArn }}'
+      sessionId: '{{ response.sessionId }}'
+- discovery_id: aws.qapps.list_q_apps
+  calls:
+  - action: list_q_apps
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.apps }}'
+    item:
+      appArn: '{{ item.appArn }}'
+      appId: '{{ item.appId }}'
+      canEdit: '{{ item.canEdit }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      isVerified: '{{ item.isVerified }}'
+      status: '{{ item.status }}'
+      title: '{{ item.title }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.qapps.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

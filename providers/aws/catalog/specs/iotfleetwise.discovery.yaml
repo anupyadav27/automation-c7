@@ -1,0 +1,444 @@
+version: '1.0'
+provider: aws
+service: iotfleetwise
+services:
+  client: iotfleetwise
+  module: boto3.client
+discovery:
+- discovery_id: aws.iotfleetwise.get_encryption_configuration
+  calls:
+  - action: get_encryption_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      encryptionStatus: '{{ response.encryptionStatus }}'
+      encryptionType: '{{ response.encryptionType }}'
+      kmsKeyId: '{{ response.kmsKeyId }}'
+      creationTime: '{{ response.creationTime }}'
+      errorMessage: '{{ response.errorMessage }}'
+      lastModificationTime: '{{ response.lastModificationTime }}'
+- discovery_id: aws.iotfleetwise.get_logging_options
+  calls:
+  - action: get_logging_options
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      cloudWatchLogDelivery: '{{ response.cloudWatchLogDelivery.cloudWatchLogDelivery }}'
+      logGroupName: '{{ response.cloudWatchLogDelivery.logGroupName }}'
+      logType: '{{ response.cloudWatchLogDelivery.logType }}'
+- discovery_id: aws.iotfleetwise.get_register_account_status
+  calls:
+  - action: get_register_account_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      customerAccountId: '{{ response.customerAccountId }}'
+      errorMessage: '{{ response.errorMessage }}'
+      iamRegistrationResponse: '{{ response.iamRegistrationResponse.roleArn }}'
+      registrationStatus: '{{ response.registrationStatus }}'
+      timestreamDatabaseArn: '{{ response.timestreamDatabaseArn }}'
+      timestreamDatabaseName: '{{ response.timestreamDatabaseName }}'
+      timestreamRegistrationResponse: '{{ response.timestreamRegistrationResponse }}'
+      timestreamTableArn: '{{ response.timestreamTableArn }}'
+      timestreamTableName: '{{ response.timestreamTableName }}'
+      accountStatus: '{{ response.accountStatus }}'
+      creationTime: '{{ response.creationTime }}'
+      roleArn: '{{ response.iamRegistrationResponse.roleArn }}'
+      lastModificationTime: '{{ response.lastModificationTime }}'
+- discovery_id: aws.iotfleetwise.list_campaigns
+  calls:
+  - action: list_campaigns
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.campaignSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      lastModificationTime: '{{ item.lastModificationTime }}'
+      name: '{{ item.name }}'
+      signalCatalogArn: '{{ item.signalCatalogArn }}'
+      status: '{{ item.status }}'
+      targetArn: '{{ item.targetArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotfleetwise.list_decoder_manifests
+  calls:
+  - action: list_decoder_manifests
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.summaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      lastModificationTime: '{{ item.lastModificationTime }}'
+      message: '{{ item.message }}'
+      modelManifestArn: '{{ item.modelManifestArn }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotfleetwise.list_fleets
+  calls:
+  - action: list_fleets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.fleetSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      lastModificationTime: '{{ item.lastModificationTime }}'
+      signalCatalogArn: '{{ item.signalCatalogArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotfleetwise.list_model_manifests
+  calls:
+  - action: list_model_manifests
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.summaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      lastModificationTime: '{{ item.lastModificationTime }}'
+      name: '{{ item.name }}'
+      signalCatalogArn: '{{ item.signalCatalogArn }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotfleetwise.list_signal_catalogs
+  calls:
+  - action: list_signal_catalogs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.summaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      lastModificationTime: '{{ item.lastModificationTime }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotfleetwise.list_state_templates
+  calls:
+  - action: list_state_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.summaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      lastModificationTime: '{{ item.lastModificationTime }}'
+      name: '{{ item.name }}'
+      signalCatalogArn: '{{ item.signalCatalogArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotfleetwise.list_vehicles
+  calls:
+  - action: list_vehicles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.vehicleSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      attributes: '{{ item.attributes }}'
+      creationTime: '{{ item.creationTime }}'
+      decoderManifestArn: '{{ item.decoderManifestArn }}'
+      lastModificationTime: '{{ item.lastModificationTime }}'
+      modelManifestArn: '{{ item.modelManifestArn }}'
+      vehicleName: '{{ item.vehicleName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotfleetwise.get_campaign
+  for_each: aws.iotfleetwise.list_campaigns
+  calls:
+  - action: get_campaign
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.signalsToCollect }}'
+    item:
+      dataPartitionId: '{{ item.dataPartitionId }}'
+      maxSampleCount: '{{ item.maxSampleCount }}'
+      minimumSamplingIntervalMs: '{{ item.minimumSamplingIntervalMs }}'
+      name: '{{ item.name }}'
+      arn: '{{ response.arn }}'
+      conditionLanguageVersion: '{{ response.collectionScheme.conditionBasedCollectionScheme.conditionLanguageVersion }}'
+      expression: '{{ response.collectionScheme.conditionBasedCollectionScheme.expression }}'
+      minimumTriggerIntervalMs: '{{ response.collectionScheme.conditionBasedCollectionScheme.minimumTriggerIntervalMs }}'
+      triggerMode: '{{ response.collectionScheme.conditionBasedCollectionScheme.triggerMode }}'
+      periodMs: '{{ response.collectionScheme.timeBasedCollectionScheme.periodMs }}'
+      compression: '{{ response.compression }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      diagnosticsMode: '{{ response.diagnosticsMode }}'
+      expiryTime: '{{ response.expiryTime }}'
+      lastModificationTime: '{{ response.lastModificationTime }}'
+      postTriggerCollectionDuration: '{{ response.postTriggerCollectionDuration }}'
+      priority: '{{ response.priority }}'
+      signalCatalogArn: '{{ response.signalCatalogArn }}'
+      spoolingMode: '{{ response.spoolingMode }}'
+      startTime: '{{ response.startTime }}'
+      status: '{{ response.status }}'
+      targetArn: '{{ response.targetArn }}'
+- discovery_id: aws.iotfleetwise.get_decoder_manifest
+  for_each: aws.iotfleetwise.list_campaigns
+  calls:
+  - action: get_decoder_manifest
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.arn }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      lastModificationTime: '{{ response.lastModificationTime }}'
+      message: '{{ response.message }}'
+      modelManifestArn: '{{ response.modelManifestArn }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.iotfleetwise.get_fleet
+  calls:
+  - action: get_fleet
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.arn }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      lastModificationTime: '{{ response.lastModificationTime }}'
+      signalCatalogArn: '{{ response.signalCatalogArn }}'
+- discovery_id: aws.iotfleetwise.get_model_manifest
+  for_each: aws.iotfleetwise.list_campaigns
+  calls:
+  - action: get_model_manifest
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.arn }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      lastModificationTime: '{{ response.lastModificationTime }}'
+      name: '{{ response.name }}'
+      signalCatalogArn: '{{ response.signalCatalogArn }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.iotfleetwise.get_signal_catalog
+  for_each: aws.iotfleetwise.list_campaigns
+  calls:
+  - action: get_signal_catalog
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      totalActuators: '{{ response.nodeCounts.totalActuators }}'
+      totalAttributes: '{{ response.nodeCounts.totalAttributes }}'
+      totalBranches: '{{ response.nodeCounts.totalBranches }}'
+      totalNodes: '{{ response.nodeCounts.totalNodes }}'
+      totalProperties: '{{ response.nodeCounts.totalProperties }}'
+      totalSensors: '{{ response.nodeCounts.totalSensors }}'
+      totalStructs: '{{ response.nodeCounts.totalStructs }}'
+      arn: '{{ response.arn }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      lastModificationTime: '{{ response.lastModificationTime }}'
+      name: '{{ response.name }}'
+- discovery_id: aws.iotfleetwise.get_state_template
+  calls:
+  - action: get_state_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.stateTemplateProperties }}'
+    item:
+      arn: '{{ response.arn }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      lastModificationTime: '{{ response.lastModificationTime }}'
+      name: '{{ response.name }}'
+      signalCatalogArn: '{{ response.signalCatalogArn }}'
+- discovery_id: aws.iotfleetwise.get_vehicle
+  for_each: aws.iotfleetwise.list_vehicles
+  calls:
+  - action: get_vehicle
+    params:
+      vehicleName: '{{ item.vehicleName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.stateTemplates }}'
+    item:
+      identifier: '{{ item.identifier }}'
+      stateTemplateUpdateStrategy: '{{ item.stateTemplateUpdateStrategy }}'
+      arn: '{{ response.arn }}'
+      attributes: '{{ response.attributes }}'
+      creationTime: '{{ response.creationTime }}'
+      decoderManifestArn: '{{ response.decoderManifestArn }}'
+      lastModificationTime: '{{ response.lastModificationTime }}'
+      modelManifestArn: '{{ response.modelManifestArn }}'
+      vehicleName: '{{ response.vehicleName }}'
+- discovery_id: aws.iotfleetwise.get_vehicle_status
+  for_each: aws.iotfleetwise.list_vehicles
+  calls:
+  - action: get_vehicle_status
+    params:
+      vehicleName: '{{ item.vehicleName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.campaigns }}'
+    item:
+      campaignName: '{{ item.campaignName }}'
+      campaigns: '{{ item.campaigns }}'
+      status: '{{ item.status }}'
+      vehicleName: '{{ item.vehicleName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotfleetwise.list_decoder_manifest_network_interfaces
+  for_each: aws.iotfleetwise.list_campaigns
+  calls:
+  - action: list_decoder_manifest_network_interfaces
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.networkInterfaces }}'
+    item:
+      canInterface: '{{ item.canInterface }}'
+      customDecodingInterface: '{{ item.customDecodingInterface }}'
+      interfaceId: '{{ item.interfaceId }}'
+      obdInterface: '{{ item.obdInterface }}'
+      type: '{{ item.type }}'
+      vehicleMiddleware: '{{ item.vehicleMiddleware }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotfleetwise.list_decoder_manifest_signals
+  for_each: aws.iotfleetwise.list_campaigns
+  calls:
+  - action: list_decoder_manifest_signals
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.signalDecoders }}'
+    item:
+      canSignal: '{{ item.canSignal }}'
+      customDecodingSignal: '{{ item.customDecodingSignal }}'
+      fullyQualifiedName: '{{ item.fullyQualifiedName }}'
+      interfaceId: '{{ item.interfaceId }}'
+      messageSignal: '{{ item.messageSignal }}'
+      obdSignal: '{{ item.obdSignal }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotfleetwise.list_fleets_for_vehicle
+  for_each: aws.iotfleetwise.list_vehicles
+  calls:
+  - action: list_fleets_for_vehicle
+    params:
+      vehicleName: '{{ item.vehicleName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.fleets }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotfleetwise.list_model_manifest_nodes
+  for_each: aws.iotfleetwise.list_campaigns
+  calls:
+  - action: list_model_manifest_nodes
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.nodes }}'
+    item:
+      actuator: '{{ item.actuator }}'
+      attribute: '{{ item.attribute }}'
+      branch: '{{ item.branch }}'
+      property: '{{ item.property }}'
+      sensor: '{{ item.sensor }}'
+      struct: '{{ item.struct }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotfleetwise.list_signal_catalog_nodes
+  for_each: aws.iotfleetwise.list_campaigns
+  calls:
+  - action: list_signal_catalog_nodes
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.nodes }}'
+    item:
+      actuator: '{{ item.actuator }}'
+      attribute: '{{ item.attribute }}'
+      branch: '{{ item.branch }}'
+      property: '{{ item.property }}'
+      sensor: '{{ item.sensor }}'
+      struct: '{{ item.struct }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.iotfleetwise.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.iotfleetwise.list_vehicles_in_fleet
+  calls:
+  - action: list_vehicles_in_fleet
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.vehicles }}'
+    item:
+      nextToken: '{{ response.nextToken }}'

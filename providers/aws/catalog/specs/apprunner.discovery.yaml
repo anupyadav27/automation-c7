@@ -1,0 +1,275 @@
+version: '1.0'
+provider: aws
+service: apprunner
+services:
+  client: apprunner
+  module: boto3.client
+discovery:
+- discovery_id: aws.apprunner.list_auto_scaling_configurations
+  calls:
+  - action: list_auto_scaling_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AutoScalingConfigurationSummaryList }}'
+    item:
+      Status: '{{ item.Status }}'
+      AutoScalingConfiguration: '{{ item.AutoScalingConfiguration }}'
+      AutoScalingConfigurationArn: '{{ item.AutoScalingConfigurationArn }}'
+      AutoScalingConfigurationName: '{{ item.AutoScalingConfigurationName }}'
+      AutoScalingConfigurationRevision: '{{ item.AutoScalingConfigurationRevision
+        }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Enabled: '{{ item.Enabled }}'
+      HasAssociatedService: '{{ item.HasAssociatedService }}'
+      IsDefault: '{{ item.IsDefault }}'
+- discovery_id: aws.apprunner.list_connections
+  calls:
+  - action: list_connections
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ConnectionSummaryList }}'
+    item:
+      Status: '{{ item.Status }}'
+      ConnectionArn: '{{ item.ConnectionArn }}'
+      ConnectionName: '{{ item.ConnectionName }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      ProviderType: '{{ item.ProviderType }}'
+- discovery_id: aws.apprunner.list_observability_configurations
+  calls:
+  - action: list_observability_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ObservabilityConfigurationSummaryList }}'
+    item:
+      ObservabilityConfigurationArn: '{{ item.ObservabilityConfigurationArn }}'
+      ObservabilityConfigurationName: '{{ item.ObservabilityConfigurationName }}'
+      ObservabilityConfigurationRevision: '{{ item.ObservabilityConfigurationRevision
+        }}'
+- discovery_id: aws.apprunner.list_services
+  calls:
+  - action: list_services
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ServiceSummaryList }}'
+    item:
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      ServiceArn: '{{ item.ServiceArn }}'
+      ServiceId: '{{ item.ServiceId }}'
+      ServiceName: '{{ item.ServiceName }}'
+      ServiceUrl: '{{ item.ServiceUrl }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.apprunner.list_vpc_connectors
+  calls:
+  - action: list_vpc_connectors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VpcConnectors }}'
+    item:
+      SecurityGroups: '{{ item.SecurityGroups }}'
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DeletedAt: '{{ item.DeletedAt }}'
+      Subnets: '{{ item.Subnets }}'
+      VpcConnectorArn: '{{ item.VpcConnectorArn }}'
+      VpcConnectorName: '{{ item.VpcConnectorName }}'
+      VpcConnectorRevision: '{{ item.VpcConnectorRevision }}'
+- discovery_id: aws.apprunner.list_vpc_ingress_connections
+  calls:
+  - action: list_vpc_ingress_connections
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VpcIngressConnectionSummaryList }}'
+    item:
+      ServiceArn: '{{ item.ServiceArn }}'
+      VpcIngressConnection: '{{ item.VpcIngressConnection }}'
+      VpcIngressConnectionArn: '{{ item.VpcIngressConnectionArn }}'
+- discovery_id: aws.apprunner.describe_auto_scaling_configuration
+  for_each: aws.apprunner.list_auto_scaling_configurations
+  calls:
+  - action: describe_auto_scaling_configuration
+    params:
+      AutoScalingConfigurationArn: '{{ item.AutoScalingConfigurationArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.AutoScalingConfiguration.Status }}'
+      AutoScalingConfigurationArn: '{{ response.AutoScalingConfiguration.AutoScalingConfigurationArn
+        }}'
+      AutoScalingConfigurationName: '{{ response.AutoScalingConfiguration.AutoScalingConfigurationName
+        }}'
+      AutoScalingConfigurationRevision: '{{ response.AutoScalingConfiguration.AutoScalingConfigurationRevision
+        }}'
+      CreatedAt: '{{ response.AutoScalingConfiguration.CreatedAt }}'
+      DeletedAt: '{{ response.AutoScalingConfiguration.DeletedAt }}'
+      HasAssociatedService: '{{ response.AutoScalingConfiguration.HasAssociatedService
+        }}'
+      IsDefault: '{{ response.AutoScalingConfiguration.IsDefault }}'
+      Latest: '{{ response.AutoScalingConfiguration.Latest }}'
+      MaxConcurrency: '{{ response.AutoScalingConfiguration.MaxConcurrency }}'
+      MaxSize: '{{ response.AutoScalingConfiguration.MaxSize }}'
+      MinSize: '{{ response.AutoScalingConfiguration.MinSize }}'
+- discovery_id: aws.apprunner.describe_custom_domains
+  for_each: aws.apprunner.list_services
+  calls:
+  - action: describe_custom_domains
+    params:
+      ServiceArn: '{{ item.ServiceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CustomDomains }}'
+    item:
+      Status: '{{ item.Status }}'
+      CertificateValidationRecords: '{{ item.CertificateValidationRecords }}'
+      DomainName: '{{ item.DomainName }}'
+      EnableWWWSubdomain: '{{ item.EnableWWWSubdomain }}'
+- discovery_id: aws.apprunner.describe_observability_configuration
+  for_each: aws.apprunner.list_observability_configurations
+  calls:
+  - action: describe_observability_configuration
+    params:
+      ObservabilityConfigurationArn: '{{ item.ObservabilityConfigurationArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.ObservabilityConfiguration.Status }}'
+      CreatedAt: '{{ response.ObservabilityConfiguration.CreatedAt }}'
+      DeletedAt: '{{ response.ObservabilityConfiguration.DeletedAt }}'
+      Latest: '{{ response.ObservabilityConfiguration.Latest }}'
+      ObservabilityConfigurationArn: '{{ response.ObservabilityConfiguration.ObservabilityConfigurationArn
+        }}'
+      ObservabilityConfigurationName: '{{ response.ObservabilityConfiguration.ObservabilityConfigurationName
+        }}'
+      ObservabilityConfigurationRevision: '{{ response.ObservabilityConfiguration.ObservabilityConfigurationRevision
+        }}'
+      TraceConfiguration: '{{ response.ObservabilityConfiguration.TraceConfiguration
+        }}'
+- discovery_id: aws.apprunner.describe_service
+  for_each: aws.apprunner.list_services
+  calls:
+  - action: describe_service
+    params:
+      ServiceArn: '{{ item.ServiceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Service.Status }}'
+      AutoScalingConfigurationSummary: '{{ response.Service.AutoScalingConfigurationSummary
+        }}'
+      CreatedAt: '{{ response.Service.CreatedAt }}'
+      DeletedAt: '{{ response.Service.DeletedAt }}'
+      EncryptionConfiguration: '{{ response.Service.EncryptionConfiguration }}'
+      HealthCheckConfiguration: '{{ response.Service.HealthCheckConfiguration }}'
+      InstanceConfiguration: '{{ response.Service.InstanceConfiguration }}'
+      NetworkConfiguration: '{{ response.Service.NetworkConfiguration }}'
+      ObservabilityConfiguration: '{{ response.Service.ObservabilityConfiguration
+        }}'
+      ServiceArn: '{{ response.Service.ServiceArn }}'
+      ServiceId: '{{ response.Service.ServiceId }}'
+      ServiceName: '{{ response.Service.ServiceName }}'
+      ServiceUrl: '{{ response.Service.ServiceUrl }}'
+      SourceConfiguration: '{{ response.Service.SourceConfiguration }}'
+      UpdatedAt: '{{ response.Service.UpdatedAt }}'
+- discovery_id: aws.apprunner.describe_vpc_connector
+  for_each: aws.apprunner.list_vpc_connectors
+  calls:
+  - action: describe_vpc_connector
+    params:
+      VpcConnectorArn: '{{ item.VpcConnectorArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      SecurityGroups: '{{ response.VpcConnector.SecurityGroups }}'
+      Status: '{{ response.VpcConnector.Status }}'
+      CreatedAt: '{{ response.VpcConnector.CreatedAt }}'
+      DeletedAt: '{{ response.VpcConnector.DeletedAt }}'
+      Subnets: '{{ response.VpcConnector.Subnets }}'
+      VpcConnectorArn: '{{ response.VpcConnector.VpcConnectorArn }}'
+      VpcConnectorName: '{{ response.VpcConnector.VpcConnectorName }}'
+      VpcConnectorRevision: '{{ response.VpcConnector.VpcConnectorRevision }}'
+- discovery_id: aws.apprunner.describe_vpc_ingress_connection
+  for_each: aws.apprunner.list_vpc_ingress_connections
+  calls:
+  - action: describe_vpc_ingress_connection
+    params:
+      VpcIngressConnectionArn: '{{ item.VpcIngressConnectionArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccountId: '{{ response.VpcIngressConnection.AccountId }}'
+      Status: '{{ response.VpcIngressConnection.Status }}'
+      CreatedAt: '{{ response.VpcIngressConnection.CreatedAt }}'
+      DeletedAt: '{{ response.VpcIngressConnection.DeletedAt }}'
+      DomainName: '{{ response.VpcIngressConnection.DomainName }}'
+      IngressVpcConfiguration: '{{ response.VpcIngressConnection.IngressVpcConfiguration
+        }}'
+      ServiceArn: '{{ response.VpcIngressConnection.ServiceArn }}'
+      VpcIngressConnectionArn: '{{ response.VpcIngressConnection.VpcIngressConnectionArn
+        }}'
+      VpcIngressConnectionName: '{{ response.VpcIngressConnection.VpcIngressConnectionName
+        }}'
+- discovery_id: aws.apprunner.list_operations
+  for_each: aws.apprunner.list_services
+  calls:
+  - action: list_operations
+    params:
+      ServiceArn: '{{ item.ServiceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.OperationSummaryList }}'
+    item:
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      EndedAt: '{{ item.EndedAt }}'
+      StartedAt: '{{ item.StartedAt }}'
+      TargetArn: '{{ item.TargetArn }}'
+      Type: '{{ item.Type }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.apprunner.list_services_for_auto_scaling_configuration
+  for_each: aws.apprunner.list_auto_scaling_configurations
+  calls:
+  - action: list_services_for_auto_scaling_configuration
+    params:
+      AutoScalingConfigurationArn: '{{ item.AutoScalingConfigurationArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ServiceArnList }}'
+- discovery_id: aws.apprunner.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

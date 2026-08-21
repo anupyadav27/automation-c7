@@ -1,0 +1,274 @@
+version: '1.0'
+provider: aws
+service: s3tables
+services:
+  client: s3tables
+  module: boto3.client
+discovery:
+- discovery_id: aws.s3tables.get_table
+  calls:
+  - action: get_table
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.namespace }}'
+    item:
+      encryptionConfiguration: '{{ item.encryptionConfiguration }}'
+      format: '{{ item.format }}'
+      kmsKeyArn: '{{ item.kmsKeyArn }}'
+      managedByService: '{{ item.managedByService }}'
+      metadataLocation: '{{ item.metadataLocation }}'
+      modifiedBy: '{{ item.modifiedBy }}'
+      resourcePolicy: '{{ item.resourcePolicy }}'
+      sseAlgorithm: '{{ item.sseAlgorithm }}'
+      versionToken: '{{ item.versionToken }}'
+      warehouseLocation: '{{ item.warehouseLocation }}'
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      modifiedAt: '{{ response.modifiedAt }}'
+      name: '{{ response.name }}'
+      namespaceId: '{{ response.namespaceId }}'
+      ownerAccountId: '{{ response.ownerAccountId }}'
+      tableARN: '{{ response.tableARN }}'
+      tableBucketId: '{{ response.tableBucketId }}'
+      type: '{{ response.type }}'
+- discovery_id: aws.s3tables.list_table_buckets
+  calls:
+  - action: list_table_buckets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tableBuckets }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      format: '{{ item.format }}'
+      id: '{{ item.id }}'
+      managedByService: '{{ item.managedByService }}'
+      metadataLocation: '{{ item.metadataLocation }}'
+      modifiedBy: '{{ item.modifiedBy }}'
+      name: '{{ item.name }}'
+      ownerAccountId: '{{ item.ownerAccountId }}'
+      tableBucketARN: '{{ item.tableBucketARN }}'
+      tableBucketId: '{{ item.tableBucketId }}'
+      type: '{{ item.type }}'
+      versionToken: '{{ item.versionToken }}'
+      warehouseLocation: '{{ item.warehouseLocation }}'
+      continuationToken: '{{ response.continuationToken }}'
+- discovery_id: aws.s3tables.get_namespace
+  for_each: aws.s3tables.get_table
+  calls:
+  - action: get_namespace
+    params:
+      tableBucketARN: '{{ item.tableBucketARN }}'
+      namespace: '{{ item.namespace }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.namespace }}'
+    item:
+      createdAt: '{{ response.createdAt }}'
+      createdBy: '{{ response.createdBy }}'
+      namespaceId: '{{ response.namespaceId }}'
+      ownerAccountId: '{{ response.ownerAccountId }}'
+      tableBucketId: '{{ response.tableBucketId }}'
+- discovery_id: aws.s3tables.get_table_bucket
+  for_each: aws.s3tables.list_table_buckets
+  calls:
+  - action: get_table_bucket
+    params:
+      tableBucketARN: '{{ item.tableBucketARN }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.arn }}'
+      createdAt: '{{ response.createdAt }}'
+      name: '{{ response.name }}'
+      ownerAccountId: '{{ response.ownerAccountId }}'
+      tableBucketId: '{{ response.tableBucketId }}'
+      type: '{{ response.type }}'
+- discovery_id: aws.s3tables.get_table_bucket_encryption
+  for_each: aws.s3tables.list_table_buckets
+  calls:
+  - action: get_table_bucket_encryption
+    params:
+      tableBucketARN: '{{ item.tableBucketARN }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.encryptionConfiguration.Status }}'
+      Enabled: '{{ response.encryptionConfiguration.Enabled }}'
+      encryptionConfiguration: '{{ response.encryptionConfiguration.encryptionConfiguration }}'
+      kmsKeyArn: '{{ response.encryptionConfiguration.kmsKeyArn }}'
+      sseAlgorithm: '{{ response.encryptionConfiguration.sseAlgorithm }}'
+- discovery_id: aws.s3tables.get_table_bucket_maintenance_configuration
+  for_each: aws.s3tables.list_table_buckets
+  calls:
+  - action: get_table_bucket_maintenance_configuration
+    params:
+      tableBucketARN: '{{ item.tableBucketARN }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      configuration: '{{ response.configuration }}'
+      tableBucketARN: '{{ response.tableBucketARN }}'
+- discovery_id: aws.s3tables.get_table_bucket_metrics_configuration
+  for_each: aws.s3tables.list_table_buckets
+  calls:
+  - action: get_table_bucket_metrics_configuration
+    params:
+      tableBucketARN: '{{ item.tableBucketARN }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      id: '{{ response.id }}'
+- discovery_id: aws.s3tables.get_table_bucket_policy
+  for_each: aws.s3tables.list_table_buckets
+  calls:
+  - action: get_table_bucket_policy
+    params:
+      tableBucketARN: '{{ item.tableBucketARN }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+      resourcePolicy: '{{ response.resourcePolicy }}'
+- discovery_id: aws.s3tables.get_table_encryption
+  for_each: aws.s3tables.get_table
+  calls:
+  - action: get_table_encryption
+    params:
+      tableBucketARN: '{{ item.tableBucketARN }}'
+      namespace: '{{ item.namespace }}'
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      encryptionConfiguration: '{{ response.encryptionConfiguration.encryptionConfiguration }}'
+      kmsKeyArn: '{{ response.encryptionConfiguration.kmsKeyArn }}'
+      sseAlgorithm: '{{ response.encryptionConfiguration.sseAlgorithm }}'
+- discovery_id: aws.s3tables.get_table_maintenance_configuration
+  for_each: aws.s3tables.get_table
+  calls:
+  - action: get_table_maintenance_configuration
+    params:
+      tableBucketARN: '{{ item.tableBucketARN }}'
+      namespace: '{{ item.namespace }}'
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      configuration: '{{ response.configuration }}'
+      tableARN: '{{ response.tableARN }}'
+- discovery_id: aws.s3tables.get_table_maintenance_job_status
+  for_each: aws.s3tables.get_table
+  calls:
+  - action: get_table_maintenance_job_status
+    params:
+      tableBucketARN: '{{ item.tableBucketARN }}'
+      namespace: '{{ item.namespace }}'
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      status: '{{ response.status }}'
+      tableARN: '{{ response.tableARN }}'
+- discovery_id: aws.s3tables.get_table_metadata_location
+  for_each: aws.s3tables.get_table
+  calls:
+  - action: get_table_metadata_location
+    params:
+      tableBucketARN: '{{ item.tableBucketARN }}'
+      namespace: '{{ item.namespace }}'
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      metadataLocation: '{{ response.metadataLocation }}'
+      versionToken: '{{ response.versionToken }}'
+      warehouseLocation: '{{ response.warehouseLocation }}'
+- discovery_id: aws.s3tables.get_table_policy
+  for_each: aws.s3tables.get_table
+  calls:
+  - action: get_table_policy
+    params:
+      tableBucketARN: '{{ item.tableBucketARN }}'
+      namespace: '{{ item.namespace }}'
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      resourcePolicy: '{{ response.resourcePolicy }}'
+- discovery_id: aws.s3tables.list_namespaces
+  for_each: aws.s3tables.list_table_buckets
+  calls:
+  - action: list_namespaces
+    params:
+      tableBucketARN: '{{ item.tableBucketARN }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.namespaces }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      namespace: '{{ item.namespace }}'
+      namespaceId: '{{ item.namespaceId }}'
+      ownerAccountId: '{{ item.ownerAccountId }}'
+      tableBucketId: '{{ item.tableBucketId }}'
+      continuationToken: '{{ response.continuationToken }}'
+- discovery_id: aws.s3tables.list_tables
+  for_each: aws.s3tables.list_table_buckets
+  calls:
+  - action: list_tables
+    params:
+      tableBucketARN: '{{ item.tableBucketARN }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tables }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      name: '{{ item.name }}'
+      namespace: '{{ item.namespace }}'
+      namespaceId: '{{ item.namespaceId }}'
+      tableARN: '{{ item.tableARN }}'
+      tableBucketId: '{{ item.tableBucketId }}'
+      type: '{{ item.type }}'
+      continuationToken: '{{ response.continuationToken }}'
+- discovery_id: aws.s3tables.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

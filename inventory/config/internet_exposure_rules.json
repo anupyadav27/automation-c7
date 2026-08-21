@@ -1,0 +1,163 @@
+{
+  "version": "1.0",
+  "description": "Data-driven internet exposure detection rules. Each rule defines how to detect if a resource type is publicly accessible.",
+  "metadata": {
+    "last_updated": "2026-03-14",
+    "note": "Rules are evaluated per-asset. 'check' defines a field path + expected value. Multiple checks use AND logic. 'check_absent' means the field must be absent or empty for exposure."
+  },
+  "rules": [
+    {
+      "resource_type": "ec2.instance",
+      "exposure_type": "public_ip",
+      "description": "EC2 instance with public IP",
+      "checks": [
+        {"field": "PublicIpAddress", "alt_field": "public_ip", "condition": "truthy"}
+      ],
+      "properties_extract": {
+        "public_ip": {"field": "PublicIpAddress", "alt_field": "public_ip"}
+      }
+    },
+    {
+      "resource_type": "s3.bucket",
+      "exposure_type": "public_bucket",
+      "description": "S3 bucket with public access",
+      "checks": [
+        {"field": "public_access", "condition": "truthy"}
+      ],
+      "tag_checks": [
+        {"tag": "Public", "condition": "truthy"}
+      ],
+      "check_logic": "OR",
+      "properties_static": {"public_access": true}
+    },
+    {
+      "resource_type": "lambda.function",
+      "exposure_type": "function_url",
+      "description": "Lambda with public function URL (AuthType=NONE)",
+      "checks": [
+        {"field": "FunctionUrlConfig.AuthType", "alt_field": "function_url_config.AuthType", "condition": "equals", "value": "NONE"}
+      ],
+      "properties_extract": {
+        "function_url": {"field": "FunctionUrlConfig.FunctionUrl", "alt_field": "function_url_config.FunctionUrl"}
+      },
+      "properties_static": {"auth_type": "NONE"}
+    },
+    {
+      "resource_type": "apigateway.rest-api",
+      "exposure_type": "api_gateway",
+      "description": "API Gateway (public unless PRIVATE endpoint)",
+      "checks": [
+        {"field": "EndpointConfiguration.Types", "alt_field": "endpoint_configuration.Types", "condition": "not_contains", "value": "PRIVATE"}
+      ],
+      "properties_extract": {
+        "endpoint_types": {"field": "EndpointConfiguration.Types", "alt_field": "endpoint_configuration.Types"}
+      }
+    },
+    {
+      "resource_type": "elasticloadbalancingv2.loadbalancer",
+      "exposure_type": "load_balancer",
+      "description": "Internet-facing ALB/NLB",
+      "checks": [
+        {"field": "Scheme", "alt_field": "scheme", "condition": "equals", "value": "internet-facing"}
+      ],
+      "properties_static": {"scheme": "internet-facing"}
+    },
+    {
+      "resource_type": "elasticloadbalancing.loadbalancer",
+      "exposure_type": "load_balancer",
+      "description": "Internet-facing classic ELB",
+      "checks": [
+        {"field": "Scheme", "alt_field": "scheme", "condition": "equals", "value": "internet-facing"}
+      ],
+      "properties_static": {"scheme": "internet-facing"}
+    },
+    {
+      "resource_type": "cloudfront.distribution",
+      "exposure_type": "cdn",
+      "description": "CloudFront distribution (always public)",
+      "checks": [],
+      "always_exposed": true,
+      "properties_extract": {
+        "domain_name": {"field": "DomainName", "alt_field": "domain_name"}
+      }
+    },
+    {
+      "resource_type": "rds.db-instance",
+      "exposure_type": "public_database",
+      "description": "RDS instance with PubliclyAccessible",
+      "checks": [
+        {"field": "PubliclyAccessible", "alt_field": "publicly_accessible", "condition": "truthy"}
+      ],
+      "properties_static": {"publicly_accessible": true}
+    },
+    {
+      "resource_type": "opensearch.domain",
+      "exposure_type": "public_search_domain",
+      "description": "OpenSearch domain without VPC (public endpoint)",
+      "checks": [
+        {"field": "VPCOptions.VPCId", "alt_field": "vpc_options.vpc_id", "condition": "absent"}
+      ],
+      "properties_extract": {
+        "endpoint": {"field": "Endpoint", "alt_field": "endpoint"}
+      }
+    },
+    {
+      "resource_type": "es.domain",
+      "exposure_type": "public_search_domain",
+      "description": "Elasticsearch domain without VPC (public endpoint)",
+      "checks": [
+        {"field": "VPCOptions.VPCId", "alt_field": "vpc_options.vpc_id", "condition": "absent"}
+      ],
+      "properties_extract": {
+        "endpoint": {"field": "Endpoint", "alt_field": "endpoint"}
+      }
+    },
+    {
+      "resource_type": "redshift.cluster",
+      "exposure_type": "public_data_warehouse",
+      "description": "Redshift cluster with PubliclyAccessible",
+      "checks": [
+        {"field": "PubliclyAccessible", "alt_field": "publicly_accessible", "condition": "truthy"}
+      ],
+      "properties_static": {"publicly_accessible": true}
+    },
+    {
+      "resource_type": "eks.cluster",
+      "exposure_type": "public_k8s_api",
+      "description": "EKS cluster with public API endpoint",
+      "checks": [
+        {"field": "ResourcesVpcConfig.EndpointPublicAccess", "alt_field": "resources_vpc_config.endpoint_public_access", "condition": "truthy"}
+      ],
+      "properties_extract": {
+        "public_access_cidrs": {"field": "ResourcesVpcConfig.PublicAccessCidrs", "alt_field": "resources_vpc_config.public_access_cidrs"}
+      }
+    },
+    {
+      "resource_type": "rds.db-cluster",
+      "exposure_type": "public_database",
+      "description": "Aurora cluster with PubliclyAccessible endpoints",
+      "checks": [
+        {"field": "PubliclyAccessible", "alt_field": "publicly_accessible", "condition": "truthy"}
+      ],
+      "properties_static": {"publicly_accessible": true}
+    },
+    {
+      "resource_type": "docdb.cluster",
+      "exposure_type": "public_database",
+      "description": "DocumentDB cluster publicly accessible",
+      "checks": [
+        {"field": "PubliclyAccessible", "alt_field": "publicly_accessible", "condition": "truthy"}
+      ],
+      "properties_static": {"publicly_accessible": true}
+    },
+    {
+      "resource_type": "neptune.cluster",
+      "exposure_type": "public_database",
+      "description": "Neptune cluster publicly accessible",
+      "checks": [
+        {"field": "PubliclyAccessible", "alt_field": "publicly_accessible", "condition": "truthy"}
+      ],
+      "properties_static": {"publicly_accessible": true}
+    }
+  ]
+}

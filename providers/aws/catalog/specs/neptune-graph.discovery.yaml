@@ -1,0 +1,258 @@
+version: '1.0'
+provider: aws
+service: neptune-graph
+services:
+  client: neptune-graph
+  module: boto3.client
+discovery:
+- discovery_id: aws.neptune-graph.list_export_tasks
+  calls:
+  - action: list_export_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tasks }}'
+    item:
+      destination: '{{ item.destination }}'
+      format: '{{ item.format }}'
+      graphId: '{{ item.graphId }}'
+      kmsKeyIdentifier: '{{ item.kmsKeyIdentifier }}'
+      parquetType: '{{ item.parquetType }}'
+      roleArn: '{{ item.roleArn }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      taskId: '{{ item.taskId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.neptune-graph.list_graph_snapshots
+  calls:
+  - action: list_graph_snapshots
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.graphSnapshots }}'
+    item:
+      arn: '{{ item.arn }}'
+      createTime: '{{ item.createTime }}'
+      id: '{{ item.id }}'
+      kmsKeyIdentifier: '{{ item.kmsKeyIdentifier }}'
+      name: '{{ item.name }}'
+      snapshotCreateTime: '{{ item.snapshotCreateTime }}'
+      sourceGraphId: '{{ item.sourceGraphId }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.neptune-graph.list_graphs
+  calls:
+  - action: list_graphs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.graphs }}'
+    item:
+      arn: '{{ item.arn }}'
+      deletionProtection: '{{ item.deletionProtection }}'
+      endpoint: '{{ item.endpoint }}'
+      id: '{{ item.id }}'
+      kmsKeyIdentifier: '{{ item.kmsKeyIdentifier }}'
+      name: '{{ item.name }}'
+      provisionedMemory: '{{ item.provisionedMemory }}'
+      publicConnectivity: '{{ item.publicConnectivity }}'
+      replicaCount: '{{ item.replicaCount }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.neptune-graph.list_import_tasks
+  calls:
+  - action: list_import_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tasks }}'
+    item:
+      format: '{{ item.format }}'
+      graphId: '{{ item.graphId }}'
+      parquetType: '{{ item.parquetType }}'
+      roleArn: '{{ item.roleArn }}'
+      source: '{{ item.source }}'
+      status: '{{ item.status }}'
+      taskId: '{{ item.taskId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.neptune-graph.get_export_task
+  calls:
+  - action: get_export_task
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      numEdgesWritten: '{{ response.exportTaskDetails.numEdgesWritten }}'
+      numVerticesWritten: '{{ response.exportTaskDetails.numVerticesWritten }}'
+      progressPercentage: '{{ response.exportTaskDetails.progressPercentage }}'
+      startTime: '{{ response.exportTaskDetails.startTime }}'
+      timeElapsedSeconds: '{{ response.exportTaskDetails.timeElapsedSeconds }}'
+      destination: '{{ response.destination }}'
+      edgeFilter: '{{ response.exportFilter.edgeFilter }}'
+      vertexFilter: '{{ response.exportFilter.vertexFilter }}'
+      format: '{{ response.format }}'
+      graphId: '{{ response.graphId }}'
+      kmsKeyIdentifier: '{{ response.kmsKeyIdentifier }}'
+      parquetType: '{{ response.parquetType }}'
+      roleArn: '{{ response.roleArn }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+      taskId: '{{ response.taskId }}'
+- discovery_id: aws.neptune-graph.get_graph
+  calls:
+  - action: get_graph
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      dimension: '{{ response.vectorSearchConfiguration.dimension }}'
+      arn: '{{ response.arn }}'
+      buildNumber: '{{ response.buildNumber }}'
+      createTime: '{{ response.createTime }}'
+      deletionProtection: '{{ response.deletionProtection }}'
+      endpoint: '{{ response.endpoint }}'
+      id: '{{ response.id }}'
+      kmsKeyIdentifier: '{{ response.kmsKeyIdentifier }}'
+      name: '{{ response.name }}'
+      provisionedMemory: '{{ response.provisionedMemory }}'
+      publicConnectivity: '{{ response.publicConnectivity }}'
+      replicaCount: '{{ response.replicaCount }}'
+      sourceSnapshotId: '{{ response.sourceSnapshotId }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+- discovery_id: aws.neptune-graph.get_graph_snapshot
+  calls:
+  - action: get_graph_snapshot
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.arn }}'
+      id: '{{ response.id }}'
+      kmsKeyIdentifier: '{{ response.kmsKeyIdentifier }}'
+      name: '{{ response.name }}'
+      snapshotCreateTime: '{{ response.snapshotCreateTime }}'
+      sourceGraphId: '{{ response.sourceGraphId }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.neptune-graph.get_graph_summary
+  calls:
+  - action: get_graph_summary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      edgeLabels: '{{ response.graphSummary.numEdgeLabels }}'
+      edgeProperties: '{{ response.graphSummary.numEdgeProperties }}'
+      edgeStructures: '{{ response.graphSummary.edgeStructures[].count }}'
+      nodeLabels: '{{ response.graphSummary.numNodeLabels }}'
+      nodeProperties: '{{ response.graphSummary.numNodeProperties }}'
+      nodeStructures: '{{ response.graphSummary.nodeStructures[].count }}'
+      numEdgeLabels: '{{ response.graphSummary.numEdgeLabels }}'
+      numEdgeProperties: '{{ response.graphSummary.numEdgeProperties }}'
+      numEdges: '{{ response.graphSummary.numEdges }}'
+      numNodeLabels: '{{ response.graphSummary.numNodeLabels }}'
+      numNodeProperties: '{{ response.graphSummary.numNodeProperties }}'
+      numNodes: '{{ response.graphSummary.numNodes }}'
+      totalEdgePropertyValues: '{{ response.graphSummary.totalEdgePropertyValues }}'
+      totalNodePropertyValues: '{{ response.graphSummary.totalNodePropertyValues }}'
+      lastStatisticsComputationTime: '{{ response.lastStatisticsComputationTime }}'
+      version: '{{ response.version }}'
+- discovery_id: aws.neptune-graph.get_import_task
+  calls:
+  - action: get_import_task
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      neptune: '{{ response.importOptions.neptune }}'
+      attemptNumber: '{{ response.attemptNumber }}'
+      format: '{{ response.format }}'
+      graphId: '{{ response.graphId }}'
+      preserveDefaultVertexLabels: '{{ response.importOptions.neptune.preserveDefaultVertexLabels }}'
+      preserveEdgeIds: '{{ response.importOptions.neptune.preserveEdgeIds }}'
+      s3ExportKmsKeyId: '{{ response.importOptions.neptune.s3ExportKmsKeyId }}'
+      s3ExportPath: '{{ response.importOptions.neptune.s3ExportPath }}'
+      dictionaryEntryCount: '{{ response.importTaskDetails.dictionaryEntryCount }}'
+      errorCount: '{{ response.importTaskDetails.errorCount }}'
+      errorDetails: '{{ response.importTaskDetails.errorDetails }}'
+      progressPercentage: '{{ response.importTaskDetails.progressPercentage }}'
+      startTime: '{{ response.importTaskDetails.startTime }}'
+      statementCount: '{{ response.importTaskDetails.statementCount }}'
+      status: '{{ response.importTaskDetails.status }}'
+      timeElapsedSeconds: '{{ response.importTaskDetails.timeElapsedSeconds }}'
+      parquetType: '{{ response.parquetType }}'
+      roleArn: '{{ response.roleArn }}'
+      source: '{{ response.source }}'
+      statusReason: '{{ response.statusReason }}'
+      taskId: '{{ response.taskId }}'
+- discovery_id: aws.neptune-graph.get_private_graph_endpoint
+  calls:
+  - action: get_private_graph_endpoint
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.subnetIds }}'
+    item:
+      status: '{{ response.status }}'
+      vpcEndpointId: '{{ response.vpcEndpointId }}'
+      vpcId: '{{ response.vpcId }}'
+- discovery_id: aws.neptune-graph.get_query
+  calls:
+  - action: get_query
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      elapsed: '{{ response.elapsed }}'
+      id: '{{ response.id }}'
+      queryString: '{{ response.queryString }}'
+      state: '{{ response.state }}'
+      waited: '{{ response.waited }}'
+- discovery_id: aws.neptune-graph.list_private_graph_endpoints
+  calls:
+  - action: list_private_graph_endpoints
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.privateGraphEndpoints }}'
+    item:
+      status: '{{ item.status }}'
+      subnetIds: '{{ item.subnetIds }}'
+      vpcEndpointId: '{{ item.vpcEndpointId }}'
+      vpcId: '{{ item.vpcId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.neptune-graph.list_queries
+  calls:
+  - action: list_queries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.queries }}'
+    item:
+      elapsed: '{{ item.elapsed }}'
+      id: '{{ item.id }}'
+      queryString: '{{ item.queryString }}'
+      state: '{{ item.state }}'
+      waited: '{{ item.waited }}'
+- discovery_id: aws.neptune-graph.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

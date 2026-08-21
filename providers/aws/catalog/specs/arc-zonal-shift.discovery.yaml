@@ -1,0 +1,92 @@
+version: '1.0'
+provider: aws
+service: arc-zonal-shift
+services:
+  client: arc-zonal-shift
+  module: boto3.client
+discovery:
+- discovery_id: aws.arc-zonal-shift.get_autoshift_observer_notification_status
+  calls:
+  - action: get_autoshift_observer_notification_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      status: '{{ response.status }}'
+- discovery_id: aws.arc-zonal-shift.list_autoshifts
+  calls:
+  - action: list_autoshifts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      awayFrom: '{{ item.awayFrom }}'
+      endTime: '{{ item.endTime }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.arc-zonal-shift.list_managed_resources
+  calls:
+  - action: list_managed_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      appliedWeights: '{{ item.appliedWeights }}'
+      arn: '{{ item.arn }}'
+      autoshifts: '{{ item.autoshifts }}'
+      availabilityZones: '{{ item.availabilityZones }}'
+      name: '{{ item.name }}'
+      practiceRunStatus: '{{ item.practiceRunStatus }}'
+      zonalAutoshiftStatus: '{{ item.zonalAutoshiftStatus }}'
+      zonalShifts: '{{ item.zonalShifts }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.arc-zonal-shift.list_zonal_shifts
+  calls:
+  - action: list_zonal_shifts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      awayFrom: '{{ item.awayFrom }}'
+      comment: '{{ item.comment }}'
+      expiryTime: '{{ item.expiryTime }}'
+      practiceRunOutcome: '{{ item.practiceRunOutcome }}'
+      resourceIdentifier: '{{ item.resourceIdentifier }}'
+      shiftType: '{{ item.shiftType }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      zonalShiftId: '{{ item.zonalShiftId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.arc-zonal-shift.get_managed_resource
+  for_each: aws.arc-zonal-shift.list_zonal_shifts
+  calls:
+  - action: get_managed_resource
+    params:
+      resourceIdentifier: '{{ item.resourceIdentifier }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.zonalShifts }}'
+    item:
+      appliedStatus: '{{ item.appliedStatus }}'
+      awayFrom: '{{ item.awayFrom }}'
+      comment: '{{ item.comment }}'
+      expiryTime: '{{ item.expiryTime }}'
+      practiceRunOutcome: '{{ item.practiceRunOutcome }}'
+      resourceIdentifier: '{{ item.resourceIdentifier }}'
+      shiftType: '{{ item.shiftType }}'
+      startTime: '{{ item.startTime }}'
+      zonalShiftId: '{{ item.zonalShiftId }}'
+      appliedWeights: '{{ response.appliedWeights }}'
+      arn: '{{ response.arn }}'
+      name: '{{ response.name }}'
+      zonalAutoshiftStatus: '{{ response.zonalAutoshiftStatus }}'

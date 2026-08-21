@@ -1,0 +1,220 @@
+version: '1.0'
+provider: aws
+service: internetmonitor
+services:
+  client: internetmonitor
+  module: boto3.client
+discovery:
+- discovery_id: aws.internetmonitor.list_internet_events
+  calls:
+  - action: list_internet_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.InternetEvents }}'
+    item:
+      ClientLocation: '{{ item.ClientLocation }}'
+      EndedAt: '{{ item.EndedAt }}'
+      EventArn: '{{ item.EventArn }}'
+      EventId: '{{ item.EventId }}'
+      EventStatus: '{{ item.EventStatus }}'
+      EventType: '{{ item.EventType }}'
+      StartedAt: '{{ item.StartedAt }}'
+- discovery_id: aws.internetmonitor.list_monitors
+  calls:
+  - action: list_monitors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Monitors }}'
+    item:
+      Status: '{{ item.Status }}'
+      ASName: '{{ item.ASName }}'
+      ASNumber: '{{ item.ASNumber }}'
+      CausedBy: '{{ item.CausedBy }}'
+      City: '{{ item.City }}'
+      Country: '{{ item.Country }}'
+      CountryCode: '{{ item.CountryCode }}'
+      InternetHealth: '{{ item.InternetHealth }}'
+      Ipv4Prefixes: '{{ item.Ipv4Prefixes }}'
+      Latitude: '{{ item.Latitude }}'
+      Longitude: '{{ item.Longitude }}'
+      Metro: '{{ item.Metro }}'
+      MonitorArn: '{{ item.MonitorArn }}'
+      MonitorName: '{{ item.MonitorName }}'
+      ProcessingStatus: '{{ item.ProcessingStatus }}'
+      ProcessingStatusInfo: '{{ item.ProcessingStatusInfo }}'
+      Resources: '{{ item.Resources }}'
+      ServiceLocation: '{{ item.ServiceLocation }}'
+      Subdivision: '{{ item.Subdivision }}'
+      SubdivisionCode: '{{ item.SubdivisionCode }}'
+- discovery_id: aws.internetmonitor.get_health_event
+  for_each: aws.internetmonitor.list_internet_events
+  calls:
+  - action: get_health_event
+    params:
+      MonitorName: '{{ item.MonitorName }}'
+      EventId: '{{ item.EventId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ImpactedLocations }}'
+    item:
+      Status: '{{ item.Status }}'
+      ASName: '{{ item.ASName }}'
+      ASNumber: '{{ item.ASNumber }}'
+      CausedBy: '{{ item.CausedBy }}'
+      City: '{{ item.City }}'
+      Country: '{{ item.Country }}'
+      CountryCode: '{{ item.CountryCode }}'
+      InternetHealth: '{{ item.InternetHealth }}'
+      Ipv4Prefixes: '{{ item.Ipv4Prefixes }}'
+      Latitude: '{{ item.Latitude }}'
+      Longitude: '{{ item.Longitude }}'
+      Metro: '{{ item.Metro }}'
+      ServiceLocation: '{{ item.ServiceLocation }}'
+      Subdivision: '{{ item.Subdivision }}'
+      SubdivisionCode: '{{ item.SubdivisionCode }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      EndedAt: '{{ response.EndedAt }}'
+      EventArn: '{{ response.EventArn }}'
+      EventId: '{{ response.EventId }}'
+      HealthScoreThreshold: '{{ response.HealthScoreThreshold }}'
+      ImpactType: '{{ response.ImpactType }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      PercentOfTotalTrafficImpacted: '{{ response.PercentOfTotalTrafficImpacted }}'
+      StartedAt: '{{ response.StartedAt }}'
+- discovery_id: aws.internetmonitor.get_internet_event
+  for_each: aws.internetmonitor.list_internet_events
+  calls:
+  - action: get_internet_event
+    params:
+      EventId: '{{ item.EventId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ASName: '{{ response.ClientLocation.ASName }}'
+      ASNumber: '{{ response.ClientLocation.ASNumber }}'
+      City: '{{ response.ClientLocation.City }}'
+      Country: '{{ response.ClientLocation.Country }}'
+      Latitude: '{{ response.ClientLocation.Latitude }}'
+      Longitude: '{{ response.ClientLocation.Longitude }}'
+      Metro: '{{ response.ClientLocation.Metro }}'
+      Subdivision: '{{ response.ClientLocation.Subdivision }}'
+      EndedAt: '{{ response.EndedAt }}'
+      EventArn: '{{ response.EventArn }}'
+      EventId: '{{ response.EventId }}'
+      EventStatus: '{{ response.EventStatus }}'
+      EventType: '{{ response.EventType }}'
+      StartedAt: '{{ response.StartedAt }}'
+- discovery_id: aws.internetmonitor.get_monitor
+  for_each: aws.internetmonitor.list_monitors
+  calls:
+  - action: get_monitor
+    params:
+      MonitorName: '{{ item.MonitorName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Resources }}'
+    item:
+      ProcessingStatusInfo: '{{ item.ProcessingStatusInfo }}'
+      Resources: '{{ item.Resources }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      HealthScoreThreshold: '{{ response.HealthEventsConfig.AvailabilityLocalHealthEventsConfig.HealthScoreThreshold }}'
+      MinTrafficImpact: '{{ response.HealthEventsConfig.AvailabilityLocalHealthEventsConfig.MinTrafficImpact }}'
+      Status: '{{ response.HealthEventsConfig.AvailabilityLocalHealthEventsConfig.Status }}'
+      AvailabilityScoreThreshold: '{{ response.HealthEventsConfig.AvailabilityScoreThreshold }}'
+      PerformanceScoreThreshold: '{{ response.HealthEventsConfig.PerformanceScoreThreshold }}'
+      BucketName: '{{ response.InternetMeasurementsLogDelivery.S3Config.BucketName }}'
+      BucketPrefix: '{{ response.InternetMeasurementsLogDelivery.S3Config.BucketPrefix }}'
+      LogDeliveryStatus: '{{ response.InternetMeasurementsLogDelivery.S3Config.LogDeliveryStatus }}'
+      MaxCityNetworksToMonitor: '{{ response.MaxCityNetworksToMonitor }}'
+      ModifiedAt: '{{ response.ModifiedAt }}'
+      MonitorArn: '{{ response.MonitorArn }}'
+      MonitorName: '{{ response.MonitorName }}'
+      ProcessingStatus: '{{ response.ProcessingStatus }}'
+      Tags: '{{ response.Tags }}'
+      TrafficPercentageToMonitor: '{{ response.TrafficPercentageToMonitor }}'
+- discovery_id: aws.internetmonitor.get_query_results
+  for_each: aws.internetmonitor.list_monitors
+  calls:
+  - action: get_query_results
+    params:
+      MonitorName: '{{ item.MonitorName }}'
+      QueryId: '{{ item.QueryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Fields }}'
+    item:
+      Name: '{{ item.Name }}'
+      Data: '{{ item.Data }}'
+      Fields: '{{ item.Fields }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.internetmonitor.get_query_status
+  for_each: aws.internetmonitor.list_monitors
+  calls:
+  - action: get_query_status
+    params:
+      MonitorName: '{{ item.MonitorName }}'
+      QueryId: '{{ item.QueryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+- discovery_id: aws.internetmonitor.list_health_events
+  for_each: aws.internetmonitor.list_monitors
+  calls:
+  - action: list_health_events
+    params:
+      MonitorName: '{{ item.MonitorName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HealthEvents }}'
+    item:
+      Status: '{{ item.Status }}'
+      ASName: '{{ item.ASName }}'
+      ASNumber: '{{ item.ASNumber }}'
+      CausedBy: '{{ item.CausedBy }}'
+      City: '{{ item.City }}'
+      Country: '{{ item.Country }}'
+      CountryCode: '{{ item.CountryCode }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      EndedAt: '{{ item.EndedAt }}'
+      EventArn: '{{ item.EventArn }}'
+      EventId: '{{ item.EventId }}'
+      HealthScoreThreshold: '{{ item.HealthScoreThreshold }}'
+      ImpactType: '{{ item.ImpactType }}'
+      ImpactedLocations: '{{ item.ImpactedLocations }}'
+      InternetHealth: '{{ item.InternetHealth }}'
+      Ipv4Prefixes: '{{ item.Ipv4Prefixes }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      Latitude: '{{ item.Latitude }}'
+      Longitude: '{{ item.Longitude }}'
+      Metro: '{{ item.Metro }}'
+      PercentOfTotalTrafficImpacted: '{{ item.PercentOfTotalTrafficImpacted }}'
+      ServiceLocation: '{{ item.ServiceLocation }}'
+      StartedAt: '{{ item.StartedAt }}'
+      Subdivision: '{{ item.Subdivision }}'
+      SubdivisionCode: '{{ item.SubdivisionCode }}'
+- discovery_id: aws.internetmonitor.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

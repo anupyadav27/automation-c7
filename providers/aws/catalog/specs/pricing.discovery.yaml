@@ -1,0 +1,74 @@
+version: '1.0'
+provider: aws
+service: pricing
+services:
+  client: pricing
+  module: boto3.client
+discovery:
+- discovery_id: aws.pricing.describe_services
+  calls:
+  - action: describe_services
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Services }}'
+    item:
+      AttributeNames: '{{ item.AttributeNames }}'
+      FormatVersion: '{{ item.FormatVersion }}'
+      ServiceCode: '{{ item.ServiceCode }}'
+      Services: '{{ item.Services }}'
+- discovery_id: aws.pricing.get_attribute_values
+  for_each: aws.pricing.describe_services
+  calls:
+  - action: get_attribute_values
+    params:
+      ServiceCode: '{{ item.ServiceCode }}'
+      AttributeName: '{{ item.AttributeName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AttributeValues }}'
+    item:
+      Value: '{{ item.Value }}'
+- discovery_id: aws.pricing.get_price_list_file_url
+  calls:
+  - action: get_price_list_file_url
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Url: '{{ response.Url }}'
+- discovery_id: aws.pricing.get_products
+  for_each: aws.pricing.describe_services
+  calls:
+  - action: get_products
+    params:
+      ServiceCode: '{{ item.ServiceCode }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PriceList }}'
+    item:
+      FormatVersion: '{{ response.FormatVersion }}'
+- discovery_id: aws.pricing.list_price_lists
+  for_each: aws.pricing.describe_services
+  calls:
+  - action: list_price_lists
+    params:
+      ServiceCode: '{{ item.ServiceCode }}'
+      EffectiveDate: '{{ item.EffectiveDate }}'
+      CurrencyCode: '{{ item.CurrencyCode }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PriceLists }}'
+    item:
+      CurrencyCode: '{{ item.CurrencyCode }}'
+      FileFormats: '{{ item.FileFormats }}'
+      PriceListArn: '{{ item.PriceListArn }}'
+      RegionCode: '{{ item.RegionCode }}'

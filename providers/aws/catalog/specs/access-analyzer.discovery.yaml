@@ -1,0 +1,186 @@
+# ============================================================
+# Discovery YAML — accessanalyzer (AWS)
+# Generated: 2026-02-21T04:56:57Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: accessanalyzer
+services:
+  client: accessanalyzer
+  module: boto3.client
+discovery:
+  # ── ListAnalyzers ──
+  - discovery_id: aws.accessanalyzer.list_analyzers
+    calls:
+      - action: list_analyzers
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.analyzers }}'
+  # ── ListPolicyGenerations ──
+  - discovery_id: aws.accessanalyzer.list_policy_generations
+    calls:
+      - action: list_policy_generations
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.policyGenerations }}'
+  # ── Dependent read operations (require identifiers) ──
+  # ── GetAccessPreview ──
+  - discovery_id: aws.accessanalyzer.get_access_preview
+    calls:
+      - action: get_access_preview
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        accessPreview: '{{ response.accessPreview }}'
+  # ── GetAnalyzedResource ──
+  - discovery_id: aws.accessanalyzer.get_analyzed_resource
+    calls:
+      - action: get_analyzed_resource
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        resource: '{{ response.resource }}'
+  # ── GetAnalyzer ──
+  - discovery_id: aws.accessanalyzer.get_analyzer
+    calls:
+      - action: get_analyzer
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        analyzer: '{{ response.analyzer }}'
+  # ── GetArchiveRule ──
+  - discovery_id: aws.accessanalyzer.get_archive_rule
+    calls:
+      - action: get_archive_rule
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        archiveRule: '{{ response.archiveRule }}'
+  # ── GetFinding ──
+  - discovery_id: aws.accessanalyzer.get_finding
+    calls:
+      - action: get_finding
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        finding: '{{ response.finding }}'
+  # ── GetFindingRecommendation ──
+  - discovery_id: aws.accessanalyzer.get_finding_recommendation
+    calls:
+      - action: get_finding_recommendation
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.recommendedSteps }}'
+  # ── GetFindingV2 ──
+  - discovery_id: aws.accessanalyzer.get_finding_v2
+    calls:
+      - action: get_finding_v2
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.findingDetails }}'
+  # ── GetFindingsStatistics ──
+  - discovery_id: aws.accessanalyzer.get_findings_statistics
+    calls:
+      - action: get_findings_statistics
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.findingsStatistics }}'
+  # ── GetGeneratedPolicy ──
+  - discovery_id: aws.accessanalyzer.get_generated_policy
+    for_each: aws.accessanalyzer.list_policy_generations
+    calls:
+      - action: get_generated_policy
+        params:
+          jobId: '{{ item.jobId }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        generatedPolicyResult: '{{ response.generatedPolicyResult }}'
+        jobDetails: '{{ response.jobDetails }}'
+  # ── ListAccessPreviewFindings ──
+  - discovery_id: aws.accessanalyzer.list_access_preview_findings
+    calls:
+      - action: list_access_preview_findings
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.findings }}'
+  # ── ListAccessPreviews ──
+  - discovery_id: aws.accessanalyzer.list_access_previews
+    calls:
+      - action: list_access_previews
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.accessPreviews }}'
+  # ── ListAnalyzedResources ──
+  - discovery_id: aws.accessanalyzer.list_analyzed_resources
+    calls:
+      - action: list_analyzed_resources
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.analyzedResources }}'
+  # ── ListArchiveRules ──
+  - discovery_id: aws.accessanalyzer.list_archive_rules
+    calls:
+      - action: list_archive_rules
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.archiveRules }}'
+  # ── ListFindings ──
+  - discovery_id: aws.accessanalyzer.list_findings
+    calls:
+      - action: list_findings
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.findings }}'
+  # ── ListFindingsV2 ──
+  - discovery_id: aws.accessanalyzer.list_findings_v2
+    calls:
+      - action: list_findings_v2
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.findings }}'
+  # ── ListTagsForResource ──
+  - discovery_id: aws.accessanalyzer.list_tags_for_resource
+    calls:
+      - action: list_tags_for_resource
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        tags: '{{ response.tags }}'

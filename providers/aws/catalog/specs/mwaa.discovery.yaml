@@ -1,0 +1,76 @@
+version: '1.0'
+provider: aws
+service: mwaa
+services:
+  client: mwaa
+  module: boto3.client
+discovery:
+- discovery_id: aws.mwaa.list_environments
+  calls:
+  - action: list_environments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Environments }}'
+    item:
+      Environment: '{{ item.Environment }}'
+- discovery_id: aws.mwaa.get_environment
+  calls:
+  - action: get_environment
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Environment.Arn }}'
+      ExecutionRoleArn: '{{ response.Environment.ExecutionRoleArn }}'
+      Name: '{{ response.Environment.Name }}'
+      Status: '{{ response.Environment.Status }}'
+      Tags: '{{ response.Environment.Tags }}'
+      AirflowConfigurationOptions: '{{ response.Environment.AirflowConfigurationOptions }}'
+      AirflowVersion: '{{ response.Environment.AirflowVersion }}'
+      CeleryExecutorQueue: '{{ response.Environment.CeleryExecutorQueue }}'
+      CreatedAt: '{{ response.Environment.CreatedAt }}'
+      DagS3Path: '{{ response.Environment.DagS3Path }}'
+      DatabaseVpcEndpointService: '{{ response.Environment.DatabaseVpcEndpointService }}'
+      Enabled: '{{ response.Environment.Enabled }}'
+      EndpointManagement: '{{ response.Environment.EndpointManagement }}'
+      Environment: '{{ response.Environment.EnvironmentClass }}'
+      EnvironmentClass: '{{ response.Environment.EnvironmentClass }}'
+      KmsKey: '{{ response.Environment.KmsKey }}'
+      LastUpdate: '{{ response.Environment.LastUpdate.Status }}'
+      LoggingConfiguration: '{{ response.Environment.LoggingConfiguration }}'
+      MaxWebservers: '{{ response.Environment.MaxWebservers }}'
+      MaxWorkers: '{{ response.Environment.MaxWorkers }}'
+      MinWebservers: '{{ response.Environment.MinWebservers }}'
+      MinWorkers: '{{ response.Environment.MinWorkers }}'
+      NetworkConfiguration: '{{ response.Environment.NetworkConfiguration }}'
+      PluginsS3ObjectVersion: '{{ response.Environment.PluginsS3ObjectVersion }}'
+      PluginsS3Path: '{{ response.Environment.PluginsS3Path }}'
+      RequirementsS3ObjectVersion: '{{ response.Environment.RequirementsS3ObjectVersion }}'
+      RequirementsS3Path: '{{ response.Environment.RequirementsS3Path }}'
+      Schedulers: '{{ response.Environment.Schedulers }}'
+      ServiceRoleArn: '{{ response.Environment.ServiceRoleArn }}'
+      SourceBucketArn: '{{ response.Environment.SourceBucketArn }}'
+      StartupScriptS3ObjectVersion: '{{ response.Environment.StartupScriptS3ObjectVersion }}'
+      StartupScriptS3Path: '{{ response.Environment.StartupScriptS3Path }}'
+      WebserverAccessMode: '{{ response.Environment.WebserverAccessMode }}'
+      WebserverUrl: '{{ response.Environment.WebserverUrl }}'
+      WebserverVpcEndpointService: '{{ response.Environment.WebserverVpcEndpointService }}'
+      WeeklyMaintenanceWindowStart: '{{ response.Environment.WeeklyMaintenanceWindowStart }}'
+      ErrorCode: '{{ response.Environment.LastUpdate.Error.ErrorCode }}'
+      ErrorMessage: '{{ response.Environment.LastUpdate.Error.ErrorMessage }}'
+      Source: '{{ response.Environment.LastUpdate.Source }}'
+      WorkerReplacementStrategy: '{{ response.Environment.LastUpdate.WorkerReplacementStrategy }}'
+      CloudWatchLogGroupArn: '{{ response.Environment.LoggingConfiguration.DagProcessingLogs.CloudWatchLogGroupArn }}'
+      LogLevel: '{{ response.Environment.LoggingConfiguration.DagProcessingLogs.LogLevel }}'
+- discovery_id: aws.mwaa.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

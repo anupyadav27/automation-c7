@@ -1,0 +1,375 @@
+version: '1.0'
+provider: aws
+service: lightsail
+discovery:
+- calls:
+  - action: get_container_services
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lightsail.get_container_services
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      containerImages: '{{ item.containerImages }}'
+      containerServiceName: '{{ item.containerServiceName }}'
+      containerServices: '{{ item.containerServices[].url }}'
+      containers: '{{ item.containers }}'
+      createdAt: '{{ item.createdAt }}'
+      currentDeployment: '{{ item.currentDeployment }}'
+      deployments: '{{ item.deployments }}'
+      digest: '{{ item.digest }}'
+      image: '{{ item.image }}'
+      isDisabled: '{{ item.isDisabled }}'
+      location: '{{ item.location }}'
+      logEvents: '{{ item.logEvents }}'
+      message: '{{ item.message }}'
+      nextDeployment: '{{ item.nextDeployment }}'
+      power: '{{ item.power }}'
+      powerId: '{{ item.powerId }}'
+      principalArn: '{{ item.principalArn }}'
+      privateDomainName: '{{ item.privateDomainName }}'
+      privateRegistryAccess: '{{ item.privateRegistryAccess }}'
+      publicDomainNames: '{{ item.publicDomainNames }}'
+      publicEndpoint: '{{ item.publicEndpoint }}'
+      resourceType: '{{ item.resourceType }}'
+      scale: '{{ item.scale }}'
+      state: '{{ item.state }}'
+      stateDetail: '{{ item.stateDetail }}'
+      tags: '{{ item.tags }}'
+      url: '{{ item.url }}'
+    items_for: '{{ response.containerServices }}'
+- calls:
+  - action: get_disk_snapshots
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lightsail.get_disk_snapshots
+  emit:
+    as: item
+    item:
+      accessDetails: '{{ item.accessDetails }}'
+      arn: '{{ item.arn }}'
+      cidrListAliases: '{{ item.cidrListAliases }}'
+      cidrs: '{{ item.cidrs }}'
+      code: '{{ item.code }}'
+      createdAt: '{{ item.createdAt }}'
+      disk: '{{ item.disk }}'
+      diskSnapshots: '{{ item.diskSnapshots }}'
+      fromDiskArn: '{{ item.fromDiskArn }}'
+      fromDiskName: '{{ item.fromDiskName }}'
+      fromInstanceArn: '{{ item.fromInstanceArn }}'
+      fromInstanceName: '{{ item.fromInstanceName }}'
+      fromPort: '{{ item.fromPort }}'
+      instance: '{{ item.instance }}'
+      ipv6Cidrs: '{{ item.ipv6Cidrs }}'
+      isFromAutoSnapshot: '{{ item.isFromAutoSnapshot }}'
+      location: '{{ item.location }}'
+      name: '{{ item.name }}'
+      portStates: '{{ item.portStates }}'
+      progress: '{{ item.progress }}'
+      resourceType: '{{ item.resourceType }}'
+      sizeInGb: '{{ item.sizeInGb }}'
+      state: '{{ item.state }}'
+      staticIp: '{{ item.staticIp }}'
+      supportCode: '{{ item.supportCode }}'
+      tags: '{{ item.tags }}'
+      toPort: '{{ item.toPort }}'
+      nextPageToken: '{{ response.nextPageToken }}'
+    items_for: '{{ response.diskSnapshots }}'
+- calls:
+  - action: get_export_snapshot_records
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lightsail.get_export_snapshot_records
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      destinationInfo: '{{ item.destinationInfo }}'
+      exportSnapshotRecords: '{{ item.exportSnapshotRecords[].arn }}'
+      location: '{{ item.location }}'
+      name: '{{ item.name }}'
+      resourceType: '{{ item.resourceType }}'
+      sourceInfo: '{{ item.sourceInfo }}'
+      state: '{{ item.state }}'
+      nextPageToken: '{{ response.nextPageToken }}'
+    items_for: '{{ response.exportSnapshotRecords }}'
+- calls:
+  - action: get_load_balancers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lightsail.get_load_balancers
+  emit:
+    as: item
+    item:
+      Statement: '{{ item.Statement }}'
+      Status: '{{ item.Status }}'
+      Version: '{{ item.Version }}'
+      arn: '{{ item.arn }}'
+      configurationOptions: '{{ item.configurationOptions }}'
+      createdAt: '{{ item.createdAt }}'
+      dnsName: '{{ item.dnsName }}'
+      healthCheckPath: '{{ item.healthCheckPath }}'
+      httpsRedirectionEnabled: '{{ item.httpsRedirectionEnabled }}'
+      instanceHealthSummary: '{{ item.instanceHealthSummary }}'
+      instancePort: '{{ item.instancePort }}'
+      ipAddressType: '{{ item.ipAddressType }}'
+      loadBalancers: '{{ item.loadBalancers }}'
+      location: '{{ item.location }}'
+      name: '{{ item.name }}'
+      protocol: '{{ item.protocol }}'
+      publicPorts: '{{ item.publicPorts }}'
+      resourceType: '{{ item.resourceType }}'
+      state: '{{ item.state }}'
+      supportCode: '{{ item.supportCode }}'
+      tags: '{{ item.tags }}'
+      tlsCertificateSummaries: '{{ item.tlsCertificateSummaries }}'
+      tlsPolicyName: '{{ item.tlsPolicyName }}'
+      nextPageToken: '{{ response.nextPageToken }}'
+    items_for: '{{ response.loadBalancers }}'
+- calls:
+  - action: get_relational_database_snapshots
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lightsail.get_relational_database_snapshots
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      engine: '{{ item.engine }}'
+      engineVersion: '{{ item.engineVersion }}'
+      fromRelationalDatabaseArn: '{{ item.fromRelationalDatabaseArn }}'
+      fromRelationalDatabaseBlueprintId: '{{ item.fromRelationalDatabaseBlueprintId }}'
+      fromRelationalDatabaseBundleId: '{{ item.fromRelationalDatabaseBundleId }}'
+      fromRelationalDatabaseName: '{{ item.fromRelationalDatabaseName }}'
+      location: '{{ item.location }}'
+      name: '{{ item.name }}'
+      relationalDatabaseSnapshots: '{{ item.relationalDatabaseSnapshots[].arn }}'
+      resourceType: '{{ item.resourceType }}'
+      sizeInGb: '{{ item.sizeInGb }}'
+      state: '{{ item.state }}'
+      supportCode: '{{ item.supportCode }}'
+      tags: '{{ item.tags }}'
+      nextPageToken: '{{ response.nextPageToken }}'
+    items_for: '{{ response.relationalDatabaseSnapshots }}'
+- calls:
+  - action: get_contact_methods
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lightsail.get_contact_methods
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      contactEndpoint: '{{ item.contactEndpoint }}'
+      contactMethods: '{{ item.contactMethods }}'
+      createdAt: '{{ item.createdAt }}'
+      location: '{{ item.location }}'
+      name: '{{ item.name }}'
+      protocol: '{{ item.protocol }}'
+      resourceType: '{{ item.resourceType }}'
+      status: '{{ item.status }}'
+      supportCode: '{{ item.supportCode }}'
+    items_for: '{{ response.contactMethods }}'
+- calls:
+  - action: get_relational_databases
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lightsail.get_relational_databases
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      backupRetentionEnabled: '{{ item.backupRetentionEnabled }}'
+      caCertificateIdentifier: '{{ item.caCertificateIdentifier }}'
+      createdAt: '{{ item.createdAt }}'
+      engine: '{{ item.engine }}'
+      engineVersion: '{{ item.engineVersion }}'
+      hardware: '{{ item.hardware }}'
+      latestRestorableTime: '{{ item.latestRestorableTime }}'
+      location: '{{ item.location }}'
+      masterDatabaseName: '{{ item.masterDatabaseName }}'
+      masterEndpoint: '{{ item.masterEndpoint }}'
+      masterUsername: '{{ item.masterUsername }}'
+      name: '{{ item.name }}'
+      parameterApplyStatus: '{{ item.parameterApplyStatus }}'
+      pendingMaintenanceActions: '{{ item.pendingMaintenanceActions }}'
+      pendingModifiedValues: '{{ item.pendingModifiedValues }}'
+      preferredBackupWindow: '{{ item.preferredBackupWindow }}'
+      preferredMaintenanceWindow: '{{ item.preferredMaintenanceWindow }}'
+      publiclyAccessible: '{{ item.publiclyAccessible }}'
+      relationalDatabaseBlueprintId: '{{ item.relationalDatabaseBlueprintId }}'
+      relationalDatabaseBundleId: '{{ item.relationalDatabaseBundleId }}'
+      relationalDatabases: '{{ item.relationalDatabases[].arn }}'
+      resourceType: '{{ item.resourceType }}'
+      secondaryAvailabilityZone: '{{ item.secondaryAvailabilityZone }}'
+      state: '{{ item.state }}'
+      supportCode: '{{ item.supportCode }}'
+      tags: '{{ item.tags }}'
+      nextPageToken: '{{ response.nextPageToken }}'
+    items_for: '{{ response.relationalDatabases }}'
+- calls:
+  - action: get_certificates
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lightsail.get_certificates
+  emit:
+    as: item
+    item:
+      certificateArn: '{{ item.certificateArn }}'
+      certificateDetail: '{{ item.certificateDetail }}'
+      certificateName: '{{ item.certificateName }}'
+      certificates: '{{ item.certificates }}'
+      domainName: '{{ item.domainName }}'
+      tags: '{{ item.tags }}'
+      nextPageToken: '{{ response.nextPageToken }}'
+    items_for: '{{ response.certificates }}'
+- calls:
+  - action: get_static_ips
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lightsail.get_static_ips
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      attachedTo: '{{ item.attachedTo }}'
+      createdAt: '{{ item.createdAt }}'
+      ipAddress: '{{ item.ipAddress }}'
+      isAttached: '{{ item.isAttached }}'
+      location: '{{ item.location }}'
+      name: '{{ item.name }}'
+      resourceType: '{{ item.resourceType }}'
+      staticIps: '{{ item.staticIps }}'
+      supportCode: '{{ item.supportCode }}'
+      nextPageToken: '{{ response.nextPageToken }}'
+    items_for: '{{ response.staticIps }}'
+- calls:
+  - action: get_key_pairs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lightsail.get_key_pairs
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      fingerprint: '{{ item.fingerprint }}'
+      keyPairs: '{{ item.keyPairs }}'
+      location: '{{ item.location }}'
+      name: '{{ item.name }}'
+      resourceType: '{{ item.resourceType }}'
+      supportCode: '{{ item.supportCode }}'
+      tags: '{{ item.tags }}'
+      nextPageToken: '{{ response.nextPageToken }}'
+    items_for: '{{ response.keyPairs }}'
+- calls:
+  - action: get_instance_snapshots
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lightsail.get_instance_snapshots
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      fromAttachedDisks: '{{ item.fromAttachedDisks }}'
+      fromBlueprintId: '{{ item.fromBlueprintId }}'
+      fromBundleId: '{{ item.fromBundleId }}'
+      fromInstanceArn: '{{ item.fromInstanceArn }}'
+      fromInstanceName: '{{ item.fromInstanceName }}'
+      instanceSnapshots: '{{ item.instanceSnapshots[].arn }}'
+      isFromAutoSnapshot: '{{ item.isFromAutoSnapshot }}'
+      location: '{{ item.location }}'
+      name: '{{ item.name }}'
+      progress: '{{ item.progress }}'
+      resourceType: '{{ item.resourceType }}'
+      sizeInGb: '{{ item.sizeInGb }}'
+      state: '{{ item.state }}'
+      supportCode: '{{ item.supportCode }}'
+      tags: '{{ item.tags }}'
+      nextPageToken: '{{ response.nextPageToken }}'
+    items_for: '{{ response.instanceSnapshots }}'
+- calls:
+  - action: get_disks
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lightsail.get_disks
+  emit:
+    as: item
+    item:
+      addOns: '{{ item.addOns }}'
+      arn: '{{ item.arn }}'
+      attachedTo: '{{ item.attachedTo }}'
+      attachmentState: '{{ item.attachmentState }}'
+      autoMountStatus: '{{ item.autoMountStatus }}'
+      createdAt: '{{ item.createdAt }}'
+      disks: '{{ item.disks }}'
+      gbInUse: '{{ item.gbInUse }}'
+      iops: '{{ item.iops }}'
+      isAttached: '{{ item.isAttached }}'
+      isSystemDisk: '{{ item.isSystemDisk }}'
+      location: '{{ item.location }}'
+      name: '{{ item.name }}'
+      path: '{{ item.path }}'
+      resourceType: '{{ item.resourceType }}'
+      sizeInGb: '{{ item.sizeInGb }}'
+      state: '{{ item.state }}'
+      supportCode: '{{ item.supportCode }}'
+      tags: '{{ item.tags }}'
+      nextPageToken: '{{ response.nextPageToken }}'
+    items_for: '{{ response.disks }}'
+- calls:
+  - action: get_cloud_formation_stack_records
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lightsail.get_cloud_formation_stack_records
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      cloudFormationStackRecords: '{{ item.cloudFormationStackRecords[].arn }}'
+      createdAt: '{{ item.createdAt }}'
+      destinationInfo: '{{ item.destinationInfo }}'
+      location: '{{ item.location }}'
+      name: '{{ item.name }}'
+      resourceType: '{{ item.resourceType }}'
+      sourceInfo: '{{ item.sourceInfo }}'
+      state: '{{ item.state }}'
+      nextPageToken: '{{ response.nextPageToken }}'
+    items_for: '{{ response.cloudFormationStackRecords }}'
+- calls:
+  - action: get_instances
+    on_error: continue
+    save_as: response
+  discovery_id: aws.lightsail.get_instances
+  emit:
+    as: item
+    item:
+      addOns: '{{ item.addOns }}'
+      arn: '{{ item.arn }}'
+      blueprintId: '{{ item.blueprintId }}'
+      blueprintName: '{{ item.blueprintName }}'
+      bundleId: '{{ item.bundleId }}'
+      createdAt: '{{ item.createdAt }}'
+      hardware: '{{ item.hardware }}'
+      instances: '{{ item.instances }}'
+      ipAddressType: '{{ item.ipAddressType }}'
+      ipv6Addresses: '{{ item.ipv6Addresses }}'
+      isStaticIp: '{{ item.isStaticIp }}'
+      location: '{{ item.location }}'
+      metadataOptions: '{{ item.metadataOptions }}'
+      name: '{{ item.name }}'
+      networking: '{{ item.networking }}'
+      privateIpAddress: '{{ item.privateIpAddress }}'
+      publicIpAddress: '{{ item.publicIpAddress }}'
+      resourceType: '{{ item.resourceType }}'
+      sshKeyName: '{{ item.sshKeyName }}'
+      state: '{{ item.state }}'
+      supportCode: '{{ item.supportCode }}'
+      tags: '{{ item.tags }}'
+      username: '{{ item.username }}'
+      nextPageToken: '{{ response.nextPageToken }}'
+    items_for: '{{ response.instances }}'

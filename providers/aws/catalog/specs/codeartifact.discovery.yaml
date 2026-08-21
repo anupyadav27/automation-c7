@@ -1,0 +1,38 @@
+version: '1.0'
+provider: aws
+service: codeartifact
+discovery:
+- calls:
+  - action: describe_repository
+    on_error: continue
+    save_as: response
+  discovery_id: aws.codeartifact.describe_repository
+  emit:
+    as: item
+    item:
+      administratorAccount: '{{ response.repository.administratorAccount }}'
+      arn: '{{ response.repository.arn }}'
+      createdTime: '{{ response.repository.createdTime }}'
+      description: '{{ response.repository.description }}'
+      domainName: '{{ response.repository.domainName }}'
+      domainOwner: '{{ response.repository.domainOwner }}'
+      externalConnections: '{{ response.repository.externalConnections[].status }}'
+      name: '{{ response.repository.name }}'
+      upstreams: '{{ response.repository.upstreams }}'
+- calls:
+  - action: list_repositories
+    on_error: continue
+    save_as: response
+  discovery_id: aws.codeartifact.list_repositories
+  emit:
+    as: item
+    item:
+      administratorAccount: '{{ item.administratorAccount }}'
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      domainName: '{{ item.domainName }}'
+      domainOwner: '{{ item.domainOwner }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.repositories }}'

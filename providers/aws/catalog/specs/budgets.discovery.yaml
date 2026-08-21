@@ -1,0 +1,87 @@
+version: '1.0'
+provider: aws
+service: budgets
+discovery:
+- calls:
+  - action: describe_budget
+    on_error: continue
+    save_as: response
+  discovery_id: aws.budgets.describe_budget
+  emit:
+    as: item
+    item:
+      AutoAdjustData: '{{ response.Budget.AutoAdjustData }}'
+      BillingViewArn: '{{ response.Budget.BillingViewArn }}'
+      Budget: '{{ response.Budget.BudgetType }}'
+      BudgetLimit: '{{ response.Budget.BudgetLimit.Unit }}'
+      BudgetName: '{{ response.Budget.BudgetName }}'
+      BudgetType: '{{ response.Budget.BudgetType }}'
+      CalculatedSpend: '{{ response.Budget.CalculatedSpend }}'
+      CostFilters: '{{ response.Budget.CostFilters }}'
+      CostTypes: '{{ response.Budget.CostTypes }}'
+      FilterExpression: '{{ response.Budget.FilterExpression }}'
+      HealthStatus: '{{ response.Budget.HealthStatus }}'
+      LastUpdatedTime: '{{ response.Budget.LastUpdatedTime }}'
+      Metrics: '{{ response.Budget.Metrics }}'
+      PlannedBudgetLimits: '{{ response.Budget.PlannedBudgetLimits }}'
+      TimePeriod: '{{ response.Budget.TimePeriod.End }}'
+      TimeUnit: '{{ response.Budget.TimeUnit }}'
+      AutoAdjustType: '{{ response.Budget.AutoAdjustData.AutoAdjustType }}'
+      BudgetAdjustmentPeriod: '{{ response.Budget.AutoAdjustData.HistoricalOptions.BudgetAdjustmentPeriod }}'
+      LookBackAvailablePeriods: '{{ response.Budget.AutoAdjustData.HistoricalOptions.LookBackAvailablePeriods }}'
+      LastAutoAdjustTime: '{{ response.Budget.AutoAdjustData.LastAutoAdjustTime }}'
+      Amount: '{{ response.Budget.BudgetLimit.Amount }}'
+      Unit: '{{ response.Budget.BudgetLimit.Unit }}'
+      IncludeCredit: '{{ response.Budget.CostTypes.IncludeCredit }}'
+      IncludeDiscount: '{{ response.Budget.CostTypes.IncludeDiscount }}'
+      IncludeOtherSubscription: '{{ response.Budget.CostTypes.IncludeOtherSubscription }}'
+      IncludeRecurring: '{{ response.Budget.CostTypes.IncludeRecurring }}'
+      IncludeRefund: '{{ response.Budget.CostTypes.IncludeRefund }}'
+      IncludeSubscription: '{{ response.Budget.CostTypes.IncludeSubscription }}'
+      IncludeSupport: '{{ response.Budget.CostTypes.IncludeSupport }}'
+      IncludeTax: '{{ response.Budget.CostTypes.IncludeTax }}'
+      IncludeUpfront: '{{ response.Budget.CostTypes.IncludeUpfront }}'
+      UseAmortized: '{{ response.Budget.CostTypes.UseAmortized }}'
+      UseBlended: '{{ response.Budget.CostTypes.UseBlended }}'
+      Key: '{{ response.Budget.FilterExpression.CostCategories.Key }}'
+      End: '{{ response.Budget.TimePeriod.End }}'
+      Start: '{{ response.Budget.TimePeriod.Start }}'
+- calls:
+  - action: describe_budget_action
+    on_error: continue
+    save_as: response
+  discovery_id: aws.budgets.describe_budget_action
+  emit:
+    as: item
+    item:
+      ActionId: '{{ response.Action.ActionId }}'
+      ActionThreshold: '{{ response.Action.ActionThreshold }}'
+      ActionType: '{{ response.Action.ActionType }}'
+      ApprovalModel: '{{ response.Action.ApprovalModel }}'
+      BudgetName: '{{ response.Action.BudgetName }}'
+      Definition: '{{ response.Action.Definition }}'
+      ExecutionRoleArn: '{{ response.Action.ExecutionRoleArn }}'
+      NotificationType: '{{ response.Action.NotificationType }}'
+      Status: '{{ response.Action.Status }}'
+      Subscribers: '{{ response.Action.Subscribers }}'
+      AccountId: '{{ response.AccountId }}'
+      ActionThresholdType: '{{ response.Action.ActionThreshold.ActionThresholdType }}'
+      ActionThresholdValue: '{{ response.Action.ActionThreshold.ActionThresholdValue }}'
+      PolicyArn: '{{ response.Action.Definition.IamActionDefinition.PolicyArn }}'
+      PolicyId: '{{ response.Action.Definition.ScpActionDefinition.PolicyId }}'
+      ActionSubType: '{{ response.Action.Definition.SsmActionDefinition.ActionSubType }}'
+      Region: '{{ response.Action.Definition.SsmActionDefinition.Region }}'
+- calls:
+  - action: describe_notifications_for_budget
+    on_error: continue
+    save_as: response
+  discovery_id: aws.budgets.describe_notifications_for_budget
+  emit:
+    as: item
+    item:
+      ComparisonOperator: '{{ item.ComparisonOperator }}'
+      NotificationState: '{{ item.NotificationState }}'
+      NotificationType: '{{ item.NotificationType }}'
+      Threshold: '{{ item.Threshold }}'
+      ThresholdType: '{{ item.ThresholdType }}'
+    items_for: '{{ response.Notifications }}'

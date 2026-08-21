@@ -1,0 +1,333 @@
+version: '1.0'
+provider: aws
+service: wisdom
+services:
+  client: wisdom
+  module: boto3.client
+discovery:
+- discovery_id: aws.wisdom.list_assistants
+  calls:
+  - action: list_assistants
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assistantSummaries }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      assistant: '{{ item.assistant }}'
+      assistantAssociation: '{{ item.assistantAssociation }}'
+      associationData: '{{ item.associationData }}'
+      associationType: '{{ item.associationType }}'
+      integrationConfiguration: '{{ item.integrationConfiguration }}'
+      serverSideEncryptionConfiguration: '{{ item.serverSideEncryptionConfiguration
+        }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.wisdom.list_knowledge_bases
+  calls:
+  - action: list_knowledge_bases
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.knowledgeBaseSummaries }}'
+    item:
+      knowledgeBaseType: '{{ item.knowledgeBaseType }}'
+      renderingConfiguration: '{{ item.renderingConfiguration }}'
+      serverSideEncryptionConfiguration: '{{ item.serverSideEncryptionConfiguration
+        }}'
+      sourceConfiguration: '{{ item.sourceConfiguration }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.wisdom.get_assistant
+  calls:
+  - action: get_assistant
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      integrationConfiguration: '{{ response.assistant.integrationConfiguration }}'
+      serverSideEncryptionConfiguration: '{{ response.assistant.serverSideEncryptionConfiguration.kmsKeyId
+        }}'
+      type: '{{ response.assistant.type }}'
+      assistantArn: '{{ response.assistant.assistantArn }}'
+      assistantId: '{{ response.assistant.assistantId }}'
+      description: '{{ response.assistant.description }}'
+      topicIntegrationArn: '{{ response.assistant.integrationConfiguration.topicIntegrationArn
+        }}'
+      name: '{{ response.assistant.name }}'
+      kmsKeyId: '{{ response.assistant.serverSideEncryptionConfiguration.kmsKeyId
+        }}'
+      status: '{{ response.assistant.status }}'
+      tags: '{{ response.assistant.tags }}'
+- discovery_id: aws.wisdom.get_assistant_association
+  calls:
+  - action: get_assistant_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      assistantAssociation: '{{ response.assistantAssociation.assistantAssociationId
+        }}'
+      assistantAssociationArn: '{{ response.assistantAssociation.assistantAssociationArn
+        }}'
+      assistantAssociationId: '{{ response.assistantAssociation.assistantAssociationId
+        }}'
+      assistantArn: '{{ response.assistantAssociation.assistantArn }}'
+      assistantId: '{{ response.assistantAssociation.assistantId }}'
+      knowledgeBaseArn: '{{ response.assistantAssociation.associationData.knowledgeBaseAssociation.knowledgeBaseArn
+        }}'
+      knowledgeBaseId: '{{ response.assistantAssociation.associationData.knowledgeBaseAssociation.knowledgeBaseId
+        }}'
+      associationType: '{{ response.assistantAssociation.associationType }}'
+      tags: '{{ response.assistantAssociation.tags }}'
+- discovery_id: aws.wisdom.get_content
+  calls:
+  - action: get_content
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      linkOutUri: '{{ response.content.linkOutUri }}'
+      url: '{{ response.content.url }}'
+      urlExpiry: '{{ response.content.urlExpiry }}'
+      contentArn: '{{ response.content.contentArn }}'
+      contentId: '{{ response.content.contentId }}'
+      contentType: '{{ response.content.contentType }}'
+      knowledgeBaseArn: '{{ response.content.knowledgeBaseArn }}'
+      knowledgeBaseId: '{{ response.content.knowledgeBaseId }}'
+      metadata: '{{ response.content.metadata }}'
+      name: '{{ response.content.name }}'
+      revisionId: '{{ response.content.revisionId }}'
+      status: '{{ response.content.status }}'
+      tags: '{{ response.content.tags }}'
+      title: '{{ response.content.title }}'
+- discovery_id: aws.wisdom.get_content_summary
+  calls:
+  - action: get_content_summary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      contentSummary: '{{ response.contentSummary.contentArn }}'
+      contentArn: '{{ response.contentSummary.contentArn }}'
+      contentId: '{{ response.contentSummary.contentId }}'
+      contentType: '{{ response.contentSummary.contentType }}'
+      knowledgeBaseArn: '{{ response.contentSummary.knowledgeBaseArn }}'
+      knowledgeBaseId: '{{ response.contentSummary.knowledgeBaseId }}'
+      metadata: '{{ response.contentSummary.metadata }}'
+      name: '{{ response.contentSummary.name }}'
+      revisionId: '{{ response.contentSummary.revisionId }}'
+      status: '{{ response.contentSummary.status }}'
+      tags: '{{ response.contentSummary.tags }}'
+      title: '{{ response.contentSummary.title }}'
+- discovery_id: aws.wisdom.get_import_job
+  calls:
+  - action: get_import_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      externalSourceConfiguration: '{{ response.importJob.externalSourceConfiguration.source
+        }}'
+      failedRecordReport: '{{ response.importJob.failedRecordReport }}'
+      importJobId: '{{ response.importJob.importJobId }}'
+      importJobType: '{{ response.importJob.importJobType }}'
+      uploadId: '{{ response.importJob.uploadId }}'
+      url: '{{ response.importJob.url }}'
+      urlExpiry: '{{ response.importJob.urlExpiry }}'
+      createdTime: '{{ response.importJob.createdTime }}'
+      instanceId: '{{ response.importJob.externalSourceConfiguration.configuration.connectConfiguration.instanceId
+        }}'
+      source: '{{ response.importJob.externalSourceConfiguration.source }}'
+      knowledgeBaseArn: '{{ response.importJob.knowledgeBaseArn }}'
+      knowledgeBaseId: '{{ response.importJob.knowledgeBaseId }}'
+      lastModifiedTime: '{{ response.importJob.lastModifiedTime }}'
+      metadata: '{{ response.importJob.metadata }}'
+      status: '{{ response.importJob.status }}'
+- discovery_id: aws.wisdom.get_knowledge_base
+  calls:
+  - action: get_knowledge_base
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      knowledgeBaseType: '{{ response.knowledgeBase.knowledgeBaseType }}'
+      lastContentModificationTime: '{{ response.knowledgeBase.lastContentModificationTime
+        }}'
+      renderingConfiguration: '{{ response.knowledgeBase.renderingConfiguration.templateUri
+        }}'
+      serverSideEncryptionConfiguration: '{{ response.knowledgeBase.serverSideEncryptionConfiguration.kmsKeyId
+        }}'
+      sourceConfiguration: '{{ response.knowledgeBase.sourceConfiguration }}'
+      description: '{{ response.knowledgeBase.description }}'
+      knowledgeBaseArn: '{{ response.knowledgeBase.knowledgeBaseArn }}'
+      knowledgeBaseId: '{{ response.knowledgeBase.knowledgeBaseId }}'
+      name: '{{ response.knowledgeBase.name }}'
+      templateUri: '{{ response.knowledgeBase.renderingConfiguration.templateUri }}'
+      kmsKeyId: '{{ response.knowledgeBase.serverSideEncryptionConfiguration.kmsKeyId
+        }}'
+      appIntegrationArn: '{{ response.knowledgeBase.sourceConfiguration.appIntegrations.appIntegrationArn
+        }}'
+      status: '{{ response.knowledgeBase.status }}'
+      tags: '{{ response.knowledgeBase.tags }}'
+- discovery_id: aws.wisdom.get_quick_response
+  calls:
+  - action: get_quick_response
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      contentType: '{{ response.quickResponse.contentType }}'
+      content: '{{ response.quickResponse.contents.markdown.content }}'
+      createdTime: '{{ response.quickResponse.createdTime }}'
+      description: '{{ response.quickResponse.description }}'
+      criteria: '{{ response.quickResponse.groupingConfiguration.criteria }}'
+      isActive: '{{ response.quickResponse.isActive }}'
+      knowledgeBaseArn: '{{ response.quickResponse.knowledgeBaseArn }}'
+      knowledgeBaseId: '{{ response.quickResponse.knowledgeBaseId }}'
+      language: '{{ response.quickResponse.language }}'
+      lastModifiedBy: '{{ response.quickResponse.lastModifiedBy }}'
+      lastModifiedTime: '{{ response.quickResponse.lastModifiedTime }}'
+      name: '{{ response.quickResponse.name }}'
+      quickResponseArn: '{{ response.quickResponse.quickResponseArn }}'
+      quickResponseId: '{{ response.quickResponse.quickResponseId }}'
+      shortcutKey: '{{ response.quickResponse.shortcutKey }}'
+      status: '{{ response.quickResponse.status }}'
+      tags: '{{ response.quickResponse.tags }}'
+- discovery_id: aws.wisdom.get_recommendations
+  calls:
+  - action: get_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recommendations }}'
+    item:
+      document: '{{ item.document }}'
+      recommendationId: '{{ item.recommendationId }}'
+      recommendations: '{{ item.recommendations }}'
+      relevanceLevel: '{{ item.relevanceLevel }}'
+      relevanceScore: '{{ item.relevanceScore }}'
+      type: '{{ item.type }}'
+- discovery_id: aws.wisdom.get_session
+  calls:
+  - action: get_session
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      integrationConfiguration: '{{ response.session.integrationConfiguration }}'
+      description: '{{ response.session.description }}'
+      topicIntegrationArn: '{{ response.session.integrationConfiguration.topicIntegrationArn
+        }}'
+      name: '{{ response.session.name }}'
+      sessionArn: '{{ response.session.sessionArn }}'
+      sessionId: '{{ response.session.sessionId }}'
+      tags: '{{ response.session.tags }}'
+- discovery_id: aws.wisdom.list_assistant_associations
+  calls:
+  - action: list_assistant_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.assistantAssociationSummaries }}'
+    item:
+      assistantAssociationArn: '{{ item.assistantAssociationArn }}'
+      assistantAssociationId: '{{ item.assistantAssociationId }}'
+      associationData: '{{ item.associationData }}'
+      associationType: '{{ item.associationType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.wisdom.list_contents
+  calls:
+  - action: list_contents
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.contentSummaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.wisdom.list_import_jobs
+  calls:
+  - action: list_import_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.importJobSummaries }}'
+    item:
+      externalSourceConfiguration: '{{ item.externalSourceConfiguration }}'
+      importJobId: '{{ item.importJobId }}'
+      importJobType: '{{ item.importJobType }}'
+      uploadId: '{{ item.uploadId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.wisdom.list_quick_responses
+  calls:
+  - action: list_quick_responses
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.quickResponseSummaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.wisdom.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.wisdom.query_assistant
+  calls:
+  - action: query_assistant
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.results }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.wisdom.search_content
+  calls:
+  - action: search_content
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.contentSummaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.wisdom.search_quick_responses
+  calls:
+  - action: search_quick_responses
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.results }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.wisdom.search_sessions
+  calls:
+  - action: search_sessions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.sessionSummaries }}'
+    item:
+      nextToken: '{{ response.nextToken }}'

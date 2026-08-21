@@ -1,0 +1,30 @@
+# ============================================================
+# Discovery YAML — marketplace-entitlement (AWS)
+# Generated: 2026-02-21T04:56:59Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: marketplace-entitlement
+services:
+  client: marketplace-entitlement
+  module: boto3.client
+discovery:
+  # ── Dependent read operations (require identifiers) ──
+  # ── GetEntitlements ──
+  - discovery_id: aws.marketplace-entitlement.get_entitlements
+    calls:
+      - action: get_entitlements
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Entitlements }}'
+      item:
+        CustomerAWSAccountId: '{{ item.CustomerAWSAccountId }}'
+        CustomerIdentifier: '{{ item.CustomerIdentifier }}'
+        Dimension: '{{ item.Dimension }}'
+        Entitlements: '{{ item.Entitlements }}'
+        ExpirationDate: '{{ item.ExpirationDate }}'
+        ProductCode: '{{ item.ProductCode }}'
+        Value: '{{ item.Value }}'

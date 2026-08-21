@@ -1,0 +1,83 @@
+# =============================================================================
+# IEDS Tier 3 — AWS EC2 full internet exposure chain
+# Tier 3 = multi-step graph traversal across network resources.
+# The evaluator walks: EC2 → subnet (public?) → SG (any 0.0.0.0/0 inbound?)
+# If all three conditions are met the instance is internet-exposed.
+# =============================================================================
+
+rules:
+
+  - rule_id: IEDS-T3-AWS-001
+    tier: 3
+    csp: aws
+    resource_type: ec2_instance
+    origin_type: internet
+    title: "AWS EC2 instance reachable from internet via public subnet + open SG"
+    description: >
+      Full chain: EC2 instance is in a public subnet (has route to IGW) AND has an
+      attached security group with an inbound rule from 0.0.0.0/0 or ::/0.
+      This is the definitive internet-exposed flag for EC2 (replaces the hardcoded
+      list in attack-path engine).
+    severity: critical
+    required_emitted_fields:
+      - security_groups
+      - subnet_id
+      - public_ip_address
+    traversal_steps:
+      - step: 1
+        label: "check_public_ip"
+        source_type: ec2.instance
+        check_field: public_ip_address
+        operator: not_null
+
+      - step: 2
+        label: "check_public_subnet"
+        traverse_field: subnet_id
+        target_type: ec2.subnet
+        relation: in_subnet
+        check_field: map_public_ip_on_launch
+        operator: eq
+        value: true
+
+      - step: 3
+        label: "check_open_sg"
+        traverse_field: security_groups
+        target_type: ec2.securitygroup
+        relation: has_sg
+        check_field: ip_permissions
+        operator: contains_cidr_any
+        value:
+          - "0.0.0.0/0"
+          - "::/0"
+
+  - rule_id: IEDS-T3-AWS-002
+    tier: 3
+    csp: aws
+    resource_type: ec2_instance
+    origin_type: internet
+    title: "AWS EC2 instance reachable via EIP directly attached"
+    description: >
+      EC2 instance has an Elastic IP directly associated (not via LB), combined with
+      a permissive SG inbound rule. The EIP makes the instance reachable regardless
+      of the subnet's map_public_ip_on_launch setting.
+    severity: critical
+    required_emitted_fields:
+      - security_groups
+      - public_ip_address
+    traversal_steps:
+      - step: 1
+        label: "check_eip"
+        source_type: ec2.instance
+        check_field: public_ip_address
+        operator: not_null
+
+      - step: 2
+        label: "check_open_sg"
+        traverse_field: security_groups
+        target_type: ec2.securitygroup
+        relation: has_sg
+        check_field: ip_permissions
+        operator: contains_cidr_any
+        value:
+          - "0.0.0.0/0"
+          - "::/0"

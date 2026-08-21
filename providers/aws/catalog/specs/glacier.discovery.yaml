@@ -1,0 +1,83 @@
+version: '1.0'
+provider: aws
+service: glacier
+discovery:
+- calls:
+  - action: get_data_retrieval_policy
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glacier.get_data_retrieval_policy
+  emit:
+    as: item
+    item:
+      Rules: '{{ response.Policy.Rules }}'
+      Statement: '{{ response.Policy.Statement }}'
+      Version: '{{ response.Policy.Version }}'
+      policy: '{{ response.Policy.policy }}'
+  resource_type: glacier_data_retrieval_policy
+- calls:
+  - action: get_vault_lock
+    on_error: continue
+    save_as: response
+    params:
+      vaultName: '{{ item.VaultName }}'
+      accountId: '-'
+  discovery_id: aws.glacier.get_vault_lock
+  emit:
+    as: item
+    item:
+      State: '{{ response.State }}'
+      CreationDate: '{{ response.CreationDate }}'
+      ExpirationDate: '{{ response.ExpirationDate }}'
+      Policy: '{{ response.Policy }}'
+  for_each: aws.glacier.list_vaults
+  resource_type: glacier_vault_lock
+- calls:
+  - action: get_vault_access_policy
+    on_error: continue
+    save_as: response
+    params:
+      vaultName: '{{ item.VaultName }}'
+      accountId: '-'
+  discovery_id: aws.glacier.get_vault_access_policy
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.policy.Policy }}'
+  for_each: aws.glacier.list_vaults
+  resource_type: glacier_vault_access_policy
+- calls:
+  - action: describe_vault
+    on_error: continue
+    save_as: response
+    params:
+      vaultName: '{{ item.VaultName }}'
+      accountId: '-'
+  discovery_id: aws.glacier.describe_vault
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ response.CreationDate }}'
+      LastInventoryDate: '{{ response.LastInventoryDate }}'
+      NumberOfArchives: '{{ response.NumberOfArchives }}'
+      SizeInBytes: '{{ response.SizeInBytes }}'
+      VaultARN: '{{ response.VaultARN }}'
+      VaultName: '{{ response.VaultName }}'
+  for_each: aws.glacier.list_vaults
+  resource_type: glacier_vault
+- calls:
+  - action: list_vaults
+    on_error: continue
+    save_as: response
+  discovery_id: aws.glacier.list_vaults
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      LastInventoryDate: '{{ item.LastInventoryDate }}'
+      NumberOfArchives: '{{ item.NumberOfArchives }}'
+      SizeInBytes: '{{ item.SizeInBytes }}'
+      VaultARN: '{{ item.VaultARN }}'
+      VaultName: '{{ item.VaultName }}'
+    items_for: '{{ response.VaultList }}'
+  resource_type: glacier_vault

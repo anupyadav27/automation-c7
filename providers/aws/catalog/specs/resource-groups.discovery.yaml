@@ -1,0 +1,169 @@
+version: '1.0'
+provider: aws
+service: resource-groups
+services:
+  client: resource-groups
+  module: boto3.client
+discovery:
+- discovery_id: aws.resource-groups.get_account_settings
+  calls:
+  - action: get_account_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccountSettings: '{{ response.AccountSettings.AccountSettings }}'
+      DestinationArn: '{{ response.AccountSettings.DestinationArn }}'
+      Enabled: '{{ response.AccountSettings.Enabled }}'
+      Format: '{{ response.AccountSettings.Format }}'
+      GroupLifecycleEventsDesiredStatus: '{{ response.AccountSettings.GroupLifecycleEventsDesiredStatus }}'
+      GroupLifecycleEventsStatus: '{{ response.AccountSettings.GroupLifecycleEventsStatus }}'
+      GroupLifecycleEventsStatusMessage: '{{ response.AccountSettings.GroupLifecycleEventsStatusMessage }}'
+      Level: '{{ response.AccountSettings.Level }}'
+- discovery_id: aws.resource-groups.get_group
+  calls:
+  - action: get_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ApplicationTag: '{{ response.Group.ApplicationTag }}'
+      Criticality: '{{ response.Group.Criticality }}'
+      Description: '{{ response.Group.Description }}'
+      DisplayName: '{{ response.Group.DisplayName }}'
+      GroupArn: '{{ response.Group.GroupArn }}'
+      Owner: '{{ response.Group.Owner }}'
+      Name: '{{ response.Group.Name }}'
+- discovery_id: aws.resource-groups.get_group_configuration
+  calls:
+  - action: get_group_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.GroupConfiguration.Status }}'
+      Configuration: '{{ response.GroupConfiguration.Configuration[].Type }}'
+      FailureReason: '{{ response.GroupConfiguration.FailureReason }}'
+      GroupConfiguration: '{{ response.GroupConfiguration.GroupConfiguration }}'
+      ProposedConfiguration: '{{ response.GroupConfiguration.ProposedConfiguration[].Type }}'
+- discovery_id: aws.resource-groups.get_group_query
+  calls:
+  - action: get_group_query
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      GroupName: '{{ response.GroupQuery.GroupName }}'
+      GroupQuery: '{{ response.GroupQuery.GroupQuery }}'
+      ResourceQuery: '{{ response.GroupQuery.ResourceQuery.Type }}'
+      Query: '{{ response.GroupQuery.ResourceQuery.Query }}'
+      Type: '{{ response.GroupQuery.ResourceQuery.Type }}'
+- discovery_id: aws.resource-groups.list_group_resources
+  calls:
+  - action: list_group_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Resources }}'
+    item:
+      Status: '{{ item.Status }}'
+      Identifier: '{{ item.Identifier }}'
+- discovery_id: aws.resource-groups.list_groups
+  calls:
+  - action: list_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.GroupIdentifiers }}'
+    item:
+      Name: '{{ item.Name }}'
+      Tags: '{{ item.Tags }}'
+      Criticality: '{{ item.Criticality }}'
+      Description: '{{ item.Description }}'
+      DisplayName: '{{ item.DisplayName }}'
+      GroupArn: '{{ item.GroupArn }}'
+      GroupName: '{{ item.GroupName }}'
+      Owner: '{{ item.Owner }}'
+- discovery_id: aws.resource-groups.list_tag_sync_tasks
+  calls:
+  - action: list_tag_sync_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TagSyncTasks }}'
+    item:
+      RoleArn: '{{ item.RoleArn }}'
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      ErrorMessage: '{{ item.ErrorMessage }}'
+      GroupArn: '{{ item.GroupArn }}'
+      GroupName: '{{ item.GroupName }}'
+      ResourceQuery: '{{ item.ResourceQuery }}'
+      TagKey: '{{ item.TagKey }}'
+      TagValue: '{{ item.TagValue }}'
+      TaskArn: '{{ item.TaskArn }}'
+- discovery_id: aws.resource-groups.get_tag_sync_task
+  for_each: aws.resource-groups.list_tag_sync_tasks
+  calls:
+  - action: get_tag_sync_task
+    params:
+      TaskArn: '{{ item.TaskArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Query: '{{ response.ResourceQuery.Query }}'
+      Type: '{{ response.ResourceQuery.Type }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      ErrorMessage: '{{ response.ErrorMessage }}'
+      GroupArn: '{{ response.GroupArn }}'
+      GroupName: '{{ response.GroupName }}'
+      RoleArn: '{{ response.RoleArn }}'
+      Status: '{{ response.Status }}'
+      TagKey: '{{ response.TagKey }}'
+      TagValue: '{{ response.TagValue }}'
+      TaskArn: '{{ response.TaskArn }}'
+- discovery_id: aws.resource-groups.get_tags
+  calls:
+  - action: get_tags
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.resource-groups.list_grouping_statuses
+  for_each: aws.resource-groups.get_group
+  calls:
+  - action: list_grouping_statuses
+    params:
+      Group: '{{ item.Group }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.GroupingStatuses }}'
+    item:
+      Status: '{{ item.Status }}'
+      Action: '{{ item.Action }}'
+      ErrorCode: '{{ item.ErrorCode }}'
+      ErrorMessage: '{{ item.ErrorMessage }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+      Group: '{{ response.Group }}'
+- discovery_id: aws.resource-groups.search_resources
+  calls:
+  - action: search_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceIdentifiers }}'

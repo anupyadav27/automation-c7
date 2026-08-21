@@ -1,0 +1,584 @@
+version: '1.0'
+provider: aws
+service: finspace
+services:
+  client: finspace
+  module: boto3.client
+discovery:
+- discovery_id: aws.finspace.list_environments
+  calls:
+  - action: list_environments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.environments }}'
+    item:
+      activeFromTimestamp: '{{ item.activeFromTimestamp }}'
+      activeVersions: '{{ item.activeVersions }}'
+      attachedClusters: '{{ item.attachedClusters }}'
+      autoScalingConfiguration: '{{ item.autoScalingConfiguration }}'
+      autoUpdate: '{{ item.autoUpdate }}'
+      awsAccountId: '{{ item.awsAccountId }}'
+      cacheStorageConfigurations: '{{ item.cacheStorageConfigurations }}'
+      capacityConfiguration: '{{ item.capacityConfiguration }}'
+      changeRequests: '{{ item.changeRequests }}'
+      changeType: '{{ item.changeType }}'
+      clusters: '{{ item.clusters }}'
+      commandLineArguments: '{{ item.commandLineArguments }}'
+      createTimestamp: '{{ item.createTimestamp }}'
+      createdTimestamp: '{{ item.createdTimestamp }}'
+      customDNSServerIP: '{{ item.customDNSServerIP }}'
+      customDNSServerName: '{{ item.customDNSServerName }}'
+      databaseArn: '{{ item.databaseArn }}'
+      databases: '{{ item.databases }}'
+      dbPath: '{{ item.dbPath }}'
+      dedicatedServiceAccountId: '{{ item.dedicatedServiceAccountId }}'
+      description: '{{ item.description }}'
+      environment: '{{ item.environment }}'
+      environmentArn: '{{ item.environmentArn }}'
+      environmentId: '{{ item.environmentId }}'
+      environmentUrl: '{{ item.environmentUrl }}'
+      errorInfo: '{{ item.errorInfo }}'
+      federationMode: '{{ item.federationMode }}'
+      federationParameters: '{{ item.federationParameters }}'
+      hostType: '{{ item.hostType }}'
+      iamRole: '{{ item.iamRole }}'
+      kmsKeyId: '{{ item.kmsKeyId }}'
+      lastCompletedChangesetId: '{{ item.lastCompletedChangesetId }}'
+      lastModifiedTimestamp: '{{ item.lastModifiedTimestamp }}'
+      launchTime: '{{ item.launchTime }}'
+      name: '{{ item.name }}'
+      nas1Configuration: '{{ item.nas1Configuration }}'
+      numBytes: '{{ item.numBytes }}'
+      numChangesets: '{{ item.numChangesets }}'
+      numFiles: '{{ item.numFiles }}'
+      readWrite: '{{ item.readWrite }}'
+      s3Path: '{{ item.s3Path }}'
+      sageMakerStudioDomainUrl: '{{ item.sageMakerStudioDomainUrl }}'
+      savedownStorageConfiguration: '{{ item.savedownStorageConfiguration }}'
+      scalingGroupArn: '{{ item.scalingGroupArn }}'
+      scalingGroupConfiguration: '{{ item.scalingGroupConfiguration }}'
+      segmentConfigurations: '{{ item.segmentConfigurations }}'
+      status: '{{ item.status }}'
+      tickerplantLogConfiguration: '{{ item.tickerplantLogConfiguration }}'
+      volumeArn: '{{ item.volumeArn }}'
+      volumeType: '{{ item.volumeType }}'
+      vpcConfiguration: '{{ item.vpcConfiguration }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.finspace.list_kx_environments
+  calls:
+  - action: list_kx_environments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.environments }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      availabilityZoneIds: '{{ item.availabilityZoneIds }}'
+      awsAccountId: '{{ item.awsAccountId }}'
+      certificateAuthorityArn: '{{ item.certificateAuthorityArn }}'
+      creationTimestamp: '{{ item.creationTimestamp }}'
+      customDNSConfiguration: '{{ item.customDNSConfiguration }}'
+      dedicatedServiceAccountId: '{{ item.dedicatedServiceAccountId }}'
+      description: '{{ item.description }}'
+      dnsStatus: '{{ item.dnsStatus }}'
+      environmentArn: '{{ item.environmentArn }}'
+      environmentId: '{{ item.environmentId }}'
+      errorMessage: '{{ item.errorMessage }}'
+      kmsKeyId: '{{ item.kmsKeyId }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      tgwStatus: '{{ item.tgwStatus }}'
+      transitGatewayConfiguration: '{{ item.transitGatewayConfiguration }}'
+      updateTimestamp: '{{ item.updateTimestamp }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.finspace.get_environment
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: get_environment
+    params:
+      environmentId: '{{ item.environmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      awsAccountId: '{{ response.environment.awsAccountId }}'
+      changeRequests: '{{ response.environment.changeRequests }}'
+      changeType: '{{ response.environment.changeType }}'
+      dbPath: '{{ response.environment.dbPath }}'
+      dedicatedServiceAccountId: '{{ response.environment.dedicatedServiceAccountId }}'
+      description: '{{ response.environment.description }}'
+      environment: '{{ response.environment.environmentId }}'
+      environmentArn: '{{ response.environment.environmentArn }}'
+      environmentId: '{{ response.environment.environmentId }}'
+      environmentUrl: '{{ response.environment.environmentUrl }}'
+      errorInfo: '{{ response.environment.errorInfo }}'
+      federationMode: '{{ response.environment.federationMode }}'
+      federationParameters: '{{ response.environment.federationParameters }}'
+      kmsKeyId: '{{ response.environment.kmsKeyId }}'
+      name: '{{ response.environment.name }}'
+      s3Path: '{{ response.environment.s3Path }}'
+      sageMakerStudioDomainUrl: '{{ response.environment.sageMakerStudioDomainUrl }}'
+      status: '{{ response.environment.status }}'
+      applicationCallBackURL: '{{ response.environment.federationParameters.applicationCallBackURL }}'
+      attributeMap: '{{ response.environment.federationParameters.attributeMap }}'
+      federationProviderName: '{{ response.environment.federationParameters.federationProviderName }}'
+      federationURN: '{{ response.environment.federationParameters.federationURN }}'
+      samlMetadataDocument: '{{ response.environment.federationParameters.samlMetadataDocument }}'
+      samlMetadataURL: '{{ response.environment.federationParameters.samlMetadataURL }}'
+- discovery_id: aws.finspace.get_kx_changeset
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: get_kx_changeset
+    params:
+      environmentId: '{{ item.environmentId }}'
+      databaseName: '{{ item.databaseName }}'
+      changesetId: '{{ item.changesetId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.changeRequests }}'
+    item:
+      changeRequests: '{{ item.changeRequests }}'
+      changeType: '{{ item.changeType }}'
+      dbPath: '{{ item.dbPath }}'
+      errorInfo: '{{ item.errorInfo }}'
+      s3Path: '{{ item.s3Path }}'
+      activeFromTimestamp: '{{ response.activeFromTimestamp }}'
+      changesetId: '{{ response.changesetId }}'
+      createdTimestamp: '{{ response.createdTimestamp }}'
+      databaseName: '{{ response.databaseName }}'
+      environmentId: '{{ response.environmentId }}'
+      errorMessage: '{{ response.errorInfo.errorMessage }}'
+      errorType: '{{ response.errorInfo.errorType }}'
+      lastModifiedTimestamp: '{{ response.lastModifiedTimestamp }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.finspace.get_kx_cluster
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: get_kx_cluster
+    params:
+      environmentId: '{{ item.environmentId }}'
+      clusterName: '{{ item.clusterName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.volumes }}'
+    item:
+      autoScalingConfiguration: '{{ item.autoScalingConfiguration }}'
+      cacheStorageConfigurations: '{{ item.cacheStorageConfigurations[].type }}'
+      capacityConfiguration: '{{ item.capacityConfiguration }}'
+      commandLineArguments: '{{ item.commandLineArguments[].key }}'
+      databases: '{{ item.databases }}'
+      savedownStorageConfiguration: '{{ item.savedownStorageConfiguration.type }}'
+      scalingGroupConfiguration: '{{ item.scalingGroupConfiguration.cpu }}'
+      tickerplantLogConfiguration: '{{ item.tickerplantLogConfiguration }}'
+      volumeName: '{{ item.volumeName }}'
+      volumeType: '{{ item.volumeType }}'
+      vpcConfiguration: '{{ item.vpcConfiguration }}'
+      autoScalingMetric: '{{ response.autoScalingConfiguration.autoScalingMetric }}'
+      maxNodeCount: '{{ response.autoScalingConfiguration.maxNodeCount }}'
+      metricTarget: '{{ response.autoScalingConfiguration.metricTarget }}'
+      minNodeCount: '{{ response.autoScalingConfiguration.minNodeCount }}'
+      scaleInCooldownSeconds: '{{ response.autoScalingConfiguration.scaleInCooldownSeconds }}'
+      scaleOutCooldownSeconds: '{{ response.autoScalingConfiguration.scaleOutCooldownSeconds }}'
+      availabilityZoneId: '{{ response.availabilityZoneId }}'
+      azMode: '{{ response.azMode }}'
+      nodeCount: '{{ response.capacityConfiguration.nodeCount }}'
+      nodeType: '{{ response.capacityConfiguration.nodeType }}'
+      clusterDescription: '{{ response.clusterDescription }}'
+      clusterName: '{{ response.clusterName }}'
+      clusterType: '{{ response.clusterType }}'
+      s3Bucket: '{{ response.code.s3Bucket }}'
+      s3Key: '{{ response.code.s3Key }}'
+      s3ObjectVersion: '{{ response.code.s3ObjectVersion }}'
+      createdTimestamp: '{{ response.createdTimestamp }}'
+      executionRole: '{{ response.executionRole }}'
+      initializationScript: '{{ response.initializationScript }}'
+      lastModifiedTimestamp: '{{ response.lastModifiedTimestamp }}'
+      releaseLabel: '{{ response.releaseLabel }}'
+      size: '{{ response.savedownStorageConfiguration.size }}'
+      type: '{{ response.savedownStorageConfiguration.type }}'
+      cpu: '{{ response.scalingGroupConfiguration.cpu }}'
+      memoryLimit: '{{ response.scalingGroupConfiguration.memoryLimit }}'
+      memoryReservation: '{{ response.scalingGroupConfiguration.memoryReservation }}'
+      scalingGroupName: '{{ response.scalingGroupConfiguration.scalingGroupName }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+      ipAddressType: '{{ response.vpcConfiguration.ipAddressType }}'
+      vpcId: '{{ response.vpcConfiguration.vpcId }}'
+- discovery_id: aws.finspace.get_kx_connection_string
+  calls:
+  - action: get_kx_connection_string
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      signedConnectionString: '{{ response.signedConnectionString }}'
+- discovery_id: aws.finspace.get_kx_database
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: get_kx_database
+    params:
+      environmentId: '{{ item.environmentId }}'
+      databaseName: '{{ item.databaseName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      changeRequests: '{{ response.changeRequests }}'
+      changeType: '{{ response.changeType }}'
+      databaseArn: '{{ response.databaseArn }}'
+      dbPath: '{{ response.dbPath }}'
+      errorInfo: '{{ response.errorInfo }}'
+      lastCompletedChangesetId: '{{ response.lastCompletedChangesetId }}'
+      numBytes: '{{ response.numBytes }}'
+      numChangesets: '{{ response.numChangesets }}'
+      numFiles: '{{ response.numFiles }}'
+      s3Path: '{{ response.s3Path }}'
+      createdTimestamp: '{{ response.createdTimestamp }}'
+      databaseName: '{{ response.databaseName }}'
+      description: '{{ response.description }}'
+      environmentId: '{{ response.environmentId }}'
+      lastModifiedTimestamp: '{{ response.lastModifiedTimestamp }}'
+- discovery_id: aws.finspace.get_kx_dataview
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: get_kx_dataview
+    params:
+      environmentId: '{{ item.environmentId }}'
+      databaseName: '{{ item.databaseName }}'
+      dataviewName: '{{ item.dataviewName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.segmentConfigurations }}'
+    item:
+      dbPaths: '{{ item.dbPaths }}'
+      onDemand: '{{ item.onDemand }}'
+      volumeName: '{{ item.volumeName }}'
+      autoUpdate: '{{ response.autoUpdate }}'
+      availabilityZoneId: '{{ response.availabilityZoneId }}'
+      azMode: '{{ response.azMode }}'
+      changesetId: '{{ response.changesetId }}'
+      createdTimestamp: '{{ response.createdTimestamp }}'
+      databaseName: '{{ response.databaseName }}'
+      dataviewName: '{{ response.dataviewName }}'
+      description: '{{ response.description }}'
+      environmentId: '{{ response.environmentId }}'
+      lastModifiedTimestamp: '{{ response.lastModifiedTimestamp }}'
+      readWrite: '{{ response.readWrite }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+- discovery_id: aws.finspace.get_kx_environment
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: get_kx_environment
+    params:
+      environmentId: '{{ item.environmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.customDNSConfiguration }}'
+    item:
+      customDNSServerIP: '{{ item.customDNSServerIP }}'
+      customDNSServerName: '{{ item.customDNSServerName }}'
+      awsAccountId: '{{ response.awsAccountId }}'
+      certificateAuthorityArn: '{{ response.certificateAuthorityArn }}'
+      creationTimestamp: '{{ response.creationTimestamp }}'
+      dedicatedServiceAccountId: '{{ response.dedicatedServiceAccountId }}'
+      description: '{{ response.description }}'
+      dnsStatus: '{{ response.dnsStatus }}'
+      environmentArn: '{{ response.environmentArn }}'
+      environmentId: '{{ response.environmentId }}'
+      errorMessage: '{{ response.errorMessage }}'
+      kmsKeyId: '{{ response.kmsKeyId }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+      tgwStatus: '{{ response.tgwStatus }}'
+      routableCIDRSpace: '{{ response.transitGatewayConfiguration.routableCIDRSpace }}'
+      transitGatewayID: '{{ response.transitGatewayConfiguration.transitGatewayID }}'
+      updateTimestamp: '{{ response.updateTimestamp }}'
+- discovery_id: aws.finspace.get_kx_scaling_group
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: get_kx_scaling_group
+    params:
+      environmentId: '{{ item.environmentId }}'
+      scalingGroupName: '{{ item.scalingGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.clusters }}'
+    item:
+      scalingGroupArn: '{{ item.scalingGroupArn }}'
+      availabilityZoneId: '{{ response.availabilityZoneId }}'
+      createdTimestamp: '{{ response.createdTimestamp }}'
+      hostType: '{{ response.hostType }}'
+      lastModifiedTimestamp: '{{ response.lastModifiedTimestamp }}'
+      scalingGroupName: '{{ response.scalingGroupName }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+- discovery_id: aws.finspace.get_kx_user
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: get_kx_user
+    params:
+      userName: '{{ item.userName }}'
+      environmentId: '{{ item.environmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      environmentId: '{{ response.environmentId }}'
+      iamRole: '{{ response.iamRole }}'
+      userArn: '{{ response.userArn }}'
+      userName: '{{ response.userName }}'
+- discovery_id: aws.finspace.get_kx_volume
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: get_kx_volume
+    params:
+      environmentId: '{{ item.environmentId }}'
+      volumeName: '{{ item.volumeName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.availabilityZoneIds }}'
+    item:
+      attachedClusters: '{{ item.attachedClusters }}'
+      nas1Configuration: '{{ item.nas1Configuration.type }}'
+      volumeArn: '{{ item.volumeArn }}'
+      azMode: '{{ response.azMode }}'
+      createdTimestamp: '{{ response.createdTimestamp }}'
+      description: '{{ response.description }}'
+      environmentId: '{{ response.environmentId }}'
+      lastModifiedTimestamp: '{{ response.lastModifiedTimestamp }}'
+      size: '{{ response.nas1Configuration.size }}'
+      type: '{{ response.nas1Configuration.type }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+      volumeName: '{{ response.volumeName }}'
+      volumeType: '{{ response.volumeType }}'
+- discovery_id: aws.finspace.list_kx_changesets
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: list_kx_changesets
+    params:
+      environmentId: '{{ item.environmentId }}'
+      databaseName: '{{ item.databaseName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.kxChangesets }}'
+    item:
+      activeFromTimestamp: '{{ item.activeFromTimestamp }}'
+      changesetId: '{{ item.changesetId }}'
+      createdTimestamp: '{{ item.createdTimestamp }}'
+      lastCompletedChangesetId: '{{ item.lastCompletedChangesetId }}'
+      lastModifiedTimestamp: '{{ item.lastModifiedTimestamp }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.finspace.list_kx_cluster_nodes
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: list_kx_cluster_nodes
+    params:
+      clusterName: '{{ item.clusterName }}'
+      environmentId: '{{ item.environmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.nodes }}'
+    item:
+      availabilityZoneId: '{{ item.availabilityZoneId }}'
+      launchTime: '{{ item.launchTime }}'
+      nodeId: '{{ item.nodeId }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.finspace.list_kx_clusters
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: list_kx_clusters
+    params:
+      environmentId: '{{ item.environmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.kxClusterSummaries }}'
+    item:
+      autoScalingConfiguration: '{{ item.autoScalingConfiguration }}'
+      availabilityZoneId: '{{ item.availabilityZoneId }}'
+      azMode: '{{ item.azMode }}'
+      cacheStorageConfigurations: '{{ item.cacheStorageConfigurations }}'
+      capacityConfiguration: '{{ item.capacityConfiguration }}'
+      clusterDescription: '{{ item.clusterDescription }}'
+      clusterName: '{{ item.clusterName }}'
+      clusterType: '{{ item.clusterType }}'
+      commandLineArguments: '{{ item.commandLineArguments }}'
+      createdTimestamp: '{{ item.createdTimestamp }}'
+      databases: '{{ item.databases }}'
+      executionRole: '{{ item.executionRole }}'
+      initializationScript: '{{ item.initializationScript }}'
+      lastModifiedTimestamp: '{{ item.lastModifiedTimestamp }}'
+      launchTime: '{{ item.launchTime }}'
+      releaseLabel: '{{ item.releaseLabel }}'
+      savedownStorageConfiguration: '{{ item.savedownStorageConfiguration }}'
+      scalingGroupConfiguration: '{{ item.scalingGroupConfiguration }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      tickerplantLogConfiguration: '{{ item.tickerplantLogConfiguration }}'
+      volumeType: '{{ item.volumeType }}'
+      volumes: '{{ item.volumes }}'
+      vpcConfiguration: '{{ item.vpcConfiguration }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.finspace.list_kx_databases
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: list_kx_databases
+    params:
+      environmentId: '{{ item.environmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.kxDatabases }}'
+    item:
+      activeFromTimestamp: '{{ item.activeFromTimestamp }}'
+      activeVersions: '{{ item.activeVersions }}'
+      autoUpdate: '{{ item.autoUpdate }}'
+      changeRequests: '{{ item.changeRequests }}'
+      changeType: '{{ item.changeType }}'
+      createdTimestamp: '{{ item.createdTimestamp }}'
+      databaseArn: '{{ item.databaseArn }}'
+      databaseName: '{{ item.databaseName }}'
+      dbPath: '{{ item.dbPath }}'
+      errorInfo: '{{ item.errorInfo }}'
+      lastCompletedChangesetId: '{{ item.lastCompletedChangesetId }}'
+      lastModifiedTimestamp: '{{ item.lastModifiedTimestamp }}'
+      numBytes: '{{ item.numBytes }}'
+      numChangesets: '{{ item.numChangesets }}'
+      numFiles: '{{ item.numFiles }}'
+      readWrite: '{{ item.readWrite }}'
+      s3Path: '{{ item.s3Path }}'
+      segmentConfigurations: '{{ item.segmentConfigurations }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.finspace.list_kx_dataviews
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: list_kx_dataviews
+    params:
+      environmentId: '{{ item.environmentId }}'
+      databaseName: '{{ item.databaseName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.kxDataviews }}'
+    item:
+      activeVersions: '{{ item.activeVersions }}'
+      autoUpdate: '{{ item.autoUpdate }}'
+      availabilityZoneId: '{{ item.availabilityZoneId }}'
+      azMode: '{{ item.azMode }}'
+      changesetId: '{{ item.changesetId }}'
+      createdTimestamp: '{{ item.createdTimestamp }}'
+      databaseName: '{{ item.databaseName }}'
+      dataviewName: '{{ item.dataviewName }}'
+      description: '{{ item.description }}'
+      environmentId: '{{ item.environmentId }}'
+      lastModifiedTimestamp: '{{ item.lastModifiedTimestamp }}'
+      readWrite: '{{ item.readWrite }}'
+      segmentConfigurations: '{{ item.segmentConfigurations }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.finspace.list_kx_scaling_groups
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: list_kx_scaling_groups
+    params:
+      environmentId: '{{ item.environmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.scalingGroups }}'
+    item:
+      availabilityZoneId: '{{ item.availabilityZoneId }}'
+      clusters: '{{ item.clusters }}'
+      createdTimestamp: '{{ item.createdTimestamp }}'
+      hostType: '{{ item.hostType }}'
+      lastModifiedTimestamp: '{{ item.lastModifiedTimestamp }}'
+      scalingGroupArn: '{{ item.scalingGroupArn }}'
+      scalingGroupName: '{{ item.scalingGroupName }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.finspace.list_kx_users
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: list_kx_users
+    params:
+      environmentId: '{{ item.environmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.users }}'
+    item:
+      createTimestamp: '{{ item.createTimestamp }}'
+      iamRole: '{{ item.iamRole }}'
+      updateTimestamp: '{{ item.updateTimestamp }}'
+      userArn: '{{ item.userArn }}'
+      userName: '{{ item.userName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.finspace.list_kx_volumes
+  for_each: aws.finspace.list_environments
+  calls:
+  - action: list_kx_volumes
+    params:
+      environmentId: '{{ item.environmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.kxVolumeSummaries }}'
+    item:
+      attachedClusters: '{{ item.attachedClusters }}'
+      availabilityZoneIds: '{{ item.availabilityZoneIds }}'
+      azMode: '{{ item.azMode }}'
+      createdTimestamp: '{{ item.createdTimestamp }}'
+      description: '{{ item.description }}'
+      lastModifiedTimestamp: '{{ item.lastModifiedTimestamp }}'
+      nas1Configuration: '{{ item.nas1Configuration }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      volumeArn: '{{ item.volumeArn }}'
+      volumeName: '{{ item.volumeName }}'
+      volumeType: '{{ item.volumeType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.finspace.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

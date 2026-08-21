@@ -1,0 +1,260 @@
+version: '1.0'
+provider: aws
+service: rekognition
+discovery:
+- calls:
+  - action: describe_projects
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.describe_projects
+  emit:
+    as: item
+    item:
+      AutoUpdate: '{{ item.AutoUpdate }}'
+      BaseModelVersion: '{{ item.BaseModelVersion }}'
+      BillableTrainingTimeInSeconds: '{{ item.BillableTrainingTimeInSeconds }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      Datasets: '{{ item.Datasets }}'
+      EvaluationResult: '{{ item.EvaluationResult }}'
+      FaceModelVersion: '{{ item.FaceModelVersion }}'
+      Feature: '{{ item.Feature }}'
+      FeatureConfig: '{{ item.FeatureConfig }}'
+      MaxInferenceUnits: '{{ item.MaxInferenceUnits }}'
+      MinInferenceUnits: '{{ item.MinInferenceUnits }}'
+      ModerationModelVersion: '{{ item.ModerationModelVersion }}'
+      PolicyDocument: '{{ item.PolicyDocument }}'
+      PolicyRevisionId: '{{ item.PolicyRevisionId }}'
+      ProjectArn: '{{ item.ProjectArn }}'
+      ProjectDescriptions: '{{ item.ProjectDescriptions }}'
+      ProjectVersionDescriptions: '{{ item.ProjectVersionDescriptions }}'
+      Status: '{{ item.Status }}'
+      TestingDataResult: '{{ item.TestingDataResult }}'
+      TextModelVersion: '{{ item.TextModelVersion }}'
+      TrainingDataResult: '{{ item.TrainingDataResult }}'
+      TrainingEndTimestamp: '{{ item.TrainingEndTimestamp }}'
+      VersionDescription: '{{ item.VersionDescription }}'
+    items_for: '{{ response.ProjectDescriptions }}'
+- calls:
+  - action: list_collections
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.list_collections
+  emit:
+    as: item
+    items_for: '{{ response.CollectionIds }}'
+- calls:
+  - action: list_media_analysis_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.list_media_analysis_jobs
+  emit:
+    as: item
+    item:
+      CompletionTimestamp: '{{ item.CompletionTimestamp }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      FailureDetails: '{{ item.FailureDetails }}'
+      Input: '{{ item.Input }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      ManifestSummary: '{{ item.ManifestSummary }}'
+      OperationsConfig: '{{ item.OperationsConfig }}'
+      OutputConfig: '{{ item.OutputConfig }}'
+      Results: '{{ item.Results }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.MediaAnalysisJobs }}'
+- calls:
+  - action: list_stream_processors
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.list_stream_processors
+  emit:
+    as: item
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.StreamProcessors }}'
+- calls:
+  - action: describe_collection
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.describe_collection
+  emit:
+    as: item
+    item:
+      CollectionARN: '{{ response.CollectionARN }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      FaceCount: '{{ response.FaceCount }}'
+      FaceModelVersion: '{{ response.FaceModelVersion }}'
+      UserCount: '{{ response.UserCount }}'
+- calls:
+  - action: describe_dataset
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.describe_dataset
+  emit:
+    as: item
+    item:
+      CreationTimestamp: '{{ response.DatasetDescription.CreationTimestamp }}'
+      DatasetStats: '{{ response.DatasetDescription.Status }}'
+      LastUpdatedTimestamp: '{{ response.DatasetDescription.LastUpdatedTimestamp }}'
+      Status: '{{ response.DatasetDescription.Status }}'
+      StatusMessage: '{{ response.DatasetDescription.StatusMessage }}'
+      StatusMessageCode: '{{ response.DatasetDescription.StatusMessageCode }}'
+      ErrorEntries: '{{ response.DatasetDescription.DatasetStats.ErrorEntries }}'
+      LabeledEntries: '{{ response.DatasetDescription.DatasetStats.LabeledEntries }}'
+      TotalEntries: '{{ response.DatasetDescription.DatasetStats.TotalEntries }}'
+      TotalLabels: '{{ response.DatasetDescription.DatasetStats.TotalLabels }}'
+- calls:
+  - action: get_celebrity_info
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.get_celebrity_info
+  emit:
+    as: item
+    item:
+      Urls: '{{ item.Urls }}'
+      Type: '{{ response.KnownGender.Type }}'
+      Name: '{{ response.Name }}'
+    items_for: '{{ response.Urls }}'
+- calls:
+  - action: get_face_liveness_session_results
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.get_face_liveness_session_results
+  emit:
+    as: item
+    item:
+      BoundingBox: '{{ item.BoundingBox }}'
+      Bytes: '{{ item.Bytes }}'
+      Challenge: '{{ item.Challenge }}'
+      S3Object: '{{ item.S3Object }}'
+      Confidence: '{{ response.Confidence }}'
+      Height: '{{ response.ReferenceImage.BoundingBox.Height }}'
+      Left: '{{ response.ReferenceImage.BoundingBox.Left }}'
+      Top: '{{ response.ReferenceImage.BoundingBox.Top }}'
+      Width: '{{ response.ReferenceImage.BoundingBox.Width }}'
+      Bucket: '{{ response.ReferenceImage.S3Object.Bucket }}'
+      Name: '{{ response.ReferenceImage.S3Object.Name }}'
+      Version: '{{ response.ReferenceImage.S3Object.Version }}'
+      SessionId: '{{ response.SessionId }}'
+      Status: '{{ response.Status }}'
+    items_for: '{{ response.AuditImages }}'
+- calls:
+  - action: list_dataset_entries
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.list_dataset_entries
+  emit:
+    as: item
+    items_for: '{{ response.DatasetEntries }}'
+- calls:
+  - action: list_dataset_labels
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.list_dataset_labels
+  emit:
+    as: item
+    item:
+      LabelName: '{{ item.LabelName }}'
+      LabelStats: '{{ item.LabelStats }}'
+    items_for: '{{ response.DatasetLabelDescriptions }}'
+- calls:
+  - action: list_faces
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.list_faces
+  emit:
+    as: item
+    item:
+      BoundingBox: '{{ item.BoundingBox }}'
+      Confidence: '{{ item.Confidence }}'
+      ExternalImageId: '{{ item.ExternalImageId }}'
+      FaceId: '{{ item.FaceId }}'
+      ImageId: '{{ item.ImageId }}'
+      IndexFacesModelVersion: '{{ item.IndexFacesModelVersion }}'
+      UserId: '{{ item.UserId }}'
+      FaceModelVersion: '{{ response.FaceModelVersion }}'
+    items_for: '{{ response.Faces }}'
+- calls:
+  - action: list_tags_for_resource
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.list_tags_for_resource
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'
+- calls:
+  - action: list_users
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.list_users
+  emit:
+    as: item
+    item:
+      UserId: '{{ item.UserId }}'
+      UserStatus: '{{ item.UserStatus }}'
+    items_for: '{{ response.Users }}'
+- calls:
+  - action: search_faces
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.search_faces
+  emit:
+    as: item
+    items_for: '{{ response.FaceMatches }}'
+    item:
+      FaceModelVersion: '{{ response.FaceModelVersion }}'
+      SearchedFaceId: '{{ response.SearchedFaceId }}'
+- calls:
+  - action: search_faces_by_image
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.search_faces_by_image
+  emit:
+    as: item
+    items_for: '{{ response.FaceMatches }}'
+    item:
+      FaceModelVersion: '{{ response.FaceModelVersion }}'
+      Height: '{{ response.SearchedFaceBoundingBox.Height }}'
+      Left: '{{ response.SearchedFaceBoundingBox.Left }}'
+      Top: '{{ response.SearchedFaceBoundingBox.Top }}'
+      Width: '{{ response.SearchedFaceBoundingBox.Width }}'
+      SearchedFaceConfidence: '{{ response.SearchedFaceConfidence }}'
+- calls:
+  - action: search_users
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.search_users
+  emit:
+    as: item
+    items_for: '{{ response.UserMatches }}'
+    item:
+      FaceModelVersion: '{{ response.FaceModelVersion }}'
+      FaceId: '{{ response.SearchedFace.FaceId }}'
+      UserId: '{{ response.SearchedUser.UserId }}'
+- calls:
+  - action: search_users_by_image
+    on_error: continue
+    save_as: response
+  discovery_id: aws.rekognition.search_users_by_image
+  emit:
+    as: item
+    items_for: '{{ response.UserMatches }}'
+    item:
+      FaceModelVersion: '{{ response.FaceModelVersion }}'
+      High: '{{ response.SearchedFace.FaceDetail.AgeRange.High }}'
+      Low: '{{ response.SearchedFace.FaceDetail.AgeRange.Low }}'
+      Confidence: '{{ response.SearchedFace.FaceDetail.Beard.Confidence }}'
+      Value: '{{ response.SearchedFace.FaceDetail.Beard.Value }}'
+      Height: '{{ response.SearchedFace.FaceDetail.BoundingBox.Height }}'
+      Left: '{{ response.SearchedFace.FaceDetail.BoundingBox.Left }}'
+      Top: '{{ response.SearchedFace.FaceDetail.BoundingBox.Top }}'
+      Width: '{{ response.SearchedFace.FaceDetail.BoundingBox.Width }}'
+      Pitch: '{{ response.SearchedFace.FaceDetail.EyeDirection.Pitch }}'
+      Yaw: '{{ response.SearchedFace.FaceDetail.EyeDirection.Yaw }}'
+      Roll: '{{ response.SearchedFace.FaceDetail.Pose.Roll }}'
+      Brightness: '{{ response.SearchedFace.FaceDetail.Quality.Brightness }}'
+      Sharpness: '{{ response.SearchedFace.FaceDetail.Quality.Sharpness }}'

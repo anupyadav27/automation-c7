@@ -1,0 +1,43 @@
+version: '1.0'
+provider: aws
+service: firehose
+discovery:
+- calls:
+  - action: describe_delivery_stream
+    on_error: continue
+    save_as: response
+  discovery_id: aws.firehose.describe_delivery_stream
+  emit:
+    as: item
+    item:
+      CreateTimestamp: '{{ response.DeliveryStreamDescription.CreateTimestamp }}'
+      DeliveryStreamARN: '{{ response.DeliveryStreamDescription.DeliveryStreamARN }}'
+      DeliveryStreamEncryptionConfiguration: '{{ response.DeliveryStreamDescription.DeliveryStreamEncryptionConfiguration.Status }}'
+      DeliveryStreamName: '{{ response.DeliveryStreamDescription.DeliveryStreamName }}'
+      DeliveryStreamStatus: '{{ response.DeliveryStreamDescription.DeliveryStreamStatus }}'
+      DeliveryStreamType: '{{ response.DeliveryStreamDescription.DeliveryStreamType }}'
+      Destinations: '{{ response.DeliveryStreamDescription.HasMoreDestinations }}'
+      Enabled: '{{ response.DeliveryStreamDescription.Enabled }}'
+      FailureDescription: '{{ response.DeliveryStreamDescription.FailureDescription.Type }}'
+      HasMoreDestinations: '{{ response.DeliveryStreamDescription.HasMoreDestinations }}'
+      LastUpdateTimestamp: '{{ response.DeliveryStreamDescription.LastUpdateTimestamp }}'
+      Source: '{{ response.DeliveryStreamDescription.Source }}'
+      Status: '{{ response.DeliveryStreamDescription.Status }}'
+      VersionId: '{{ response.DeliveryStreamDescription.VersionId }}'
+      Details: '{{ response.DeliveryStreamDescription.DeliveryStreamEncryptionConfiguration.FailureDescription.Details }}'
+      Type: '{{ response.DeliveryStreamDescription.DeliveryStreamEncryptionConfiguration.FailureDescription.Type }}'
+      KeyARN: '{{ response.DeliveryStreamDescription.DeliveryStreamEncryptionConfiguration.KeyARN }}'
+      KeyType: '{{ response.DeliveryStreamDescription.DeliveryStreamEncryptionConfiguration.KeyType }}'
+      VpcEndpointServiceName: '{{ response.DeliveryStreamDescription.Source.DatabaseSourceDescription.DatabaseSourceVPCConfiguration.VpcEndpointServiceName }}'
+      Endpoint: '{{ response.DeliveryStreamDescription.Source.DatabaseSourceDescription.Endpoint }}'
+      Port: '{{ response.DeliveryStreamDescription.Source.DatabaseSourceDescription.Port }}'
+      SSLMode: '{{ response.DeliveryStreamDescription.Source.DatabaseSourceDescription.SSLMode }}'
+      SnapshotWatermarkTable: '{{ response.DeliveryStreamDescription.Source.DatabaseSourceDescription.SnapshotWatermarkTable }}'
+      ThroughputHintInMBs: '{{ response.DeliveryStreamDescription.Source.DirectPutSourceDescription.ThroughputHintInMBs }}'
+      DeliveryStartTimestamp: '{{ response.DeliveryStreamDescription.Source.KinesisStreamSourceDescription.DeliveryStartTimestamp }}'
+      KinesisStreamARN: '{{ response.DeliveryStreamDescription.Source.KinesisStreamSourceDescription.KinesisStreamARN }}'
+      RoleARN: '{{ response.DeliveryStreamDescription.Source.KinesisStreamSourceDescription.RoleARN }}'
+      Connectivity: '{{ response.DeliveryStreamDescription.Source.MSKSourceDescription.AuthenticationConfiguration.Connectivity }}'
+      MSKClusterARN: '{{ response.DeliveryStreamDescription.Source.MSKSourceDescription.MSKClusterARN }}'
+      ReadFromTimestamp: '{{ response.DeliveryStreamDescription.Source.MSKSourceDescription.ReadFromTimestamp }}'
+      TopicName: '{{ response.DeliveryStreamDescription.Source.MSKSourceDescription.TopicName }}'

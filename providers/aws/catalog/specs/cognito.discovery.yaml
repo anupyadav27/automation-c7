@@ -1,0 +1,62 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: cognito
+# 1 ops (1 from checks, +0 for inventory)
+version: '1.0'
+provider: aws
+service: cognito
+discovery:
+  - calls:
+    - action: list_user_pools
+      on_error: continue
+      params:
+        MaxResults: 60
+      save_as: response
+    discovery_id: aws.cognito.list_user_pools
+    emit:
+      as: item
+      items_for: '{{ response.UserPools }}'
+  - calls:
+    - action: describe_user_pool
+      on_error: continue
+      params:
+        UserPoolId: '{{ item.Id }}'
+      save_as: response
+    discovery_id: aws.cognito.describe_user_pool
+    emit:
+      as: item
+      item:
+        AccountRecoverySetting: '{{ response.AccountRecoverySetting }}'
+        AdminCreateUserConfig: '{{ response.AdminCreateUserConfig }}'
+        AliasAttributes: '{{ response.AliasAttributes }}'
+        Arn: '{{ response.Arn }}'
+        AutoVerifiedAttributes: '{{ response.AutoVerifiedAttributes }}'
+        CreationDate: '{{ response.CreationDate }}'
+        CustomDomain: '{{ response.CustomDomain }}'
+        DeletionProtection: '{{ response.DeletionProtection }}'
+        DeviceConfiguration: '{{ response.DeviceConfiguration }}'
+        Domain: '{{ response.Domain }}'
+        EmailConfiguration: '{{ response.EmailConfiguration }}'
+        EmailConfigurationFailure: '{{ response.EmailConfigurationFailure }}'
+        EmailVerificationMessage: '{{ response.EmailVerificationMessage }}'
+        EmailVerificationSubject: '{{ response.EmailVerificationSubject }}'
+        EstimatedNumberOfUsers: '{{ response.EstimatedNumberOfUsers }}'
+        Id: '{{ response.Id }}'
+        LambdaConfig: '{{ response.LambdaConfig }}'
+        LastModifiedDate: '{{ response.LastModifiedDate }}'
+        MfaConfiguration: '{{ response.MfaConfiguration }}'
+        Name: '{{ response.Name }}'
+        Policies: '{{ response.Policies }}'
+        SchemaAttributes: '{{ response.SchemaAttributes }}'
+        SmsAuthenticationMessage: '{{ response.SmsAuthenticationMessage }}'
+        SmsConfiguration: '{{ response.SmsConfiguration }}'
+        SmsConfigurationFailure: '{{ response.SmsConfigurationFailure }}'
+        SmsVerificationMessage: '{{ response.SmsVerificationMessage }}'
+        Status: '{{ response.Status }}'
+        UserAttributeUpdateSettings: '{{ response.UserAttributeUpdateSettings }}'
+        UserPoolAddOns: '{{ response.UserPoolAddOns }}'
+        UserPoolTags: '{{ response.UserPoolTags }}'
+        UserPoolTier: '{{ response.UserPoolTier }}'
+        UsernameAttributes: '{{ response.UsernameAttributes }}'
+        UsernameConfiguration: '{{ response.UsernameConfiguration }}'
+        VerificationMessageTemplate: '{{ response.VerificationMessageTemplate }}'
+    for_each: aws.cognito.list_user_pools

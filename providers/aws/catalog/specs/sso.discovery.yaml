@@ -1,0 +1,57 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: sso-admin
+# 3 ops (3 from checks, +0 for inventory)
+version: '1.0'
+provider: aws
+service: sso
+discovery:
+  - calls:
+    - action: get_inline_policy_for_permission_set
+      on_error: continue
+      save_as: response
+    discovery_id: aws.sso-admin.get_inline_policy_for_permission_set
+    emit:
+      as: item
+      item:
+        Statement: '{{ response.Statement }}'
+        Version: '{{ response.Version }}'
+  - calls:
+    - action: list_instances
+      on_error: continue
+      save_as: response
+    discovery_id: aws.sso-admin.list_instances
+    emit:
+      as: item
+      item:
+        AccessControlAttributes: '{{ item.AccessControlAttributes }}'
+        AccountAssignmentCreationStatus: '{{ item.AccountAssignmentCreationStatus }}'
+        CreatedDate: '{{ item.CreatedDate }}'
+        EncryptionConfigurationDetails: '{{ item.EncryptionConfigurationDetails }}'
+        IdentityStoreId: '{{ item.IdentityStoreId }}'
+        InstanceAccessControlAttributeConfiguration: '{{ item.InstanceAccessControlAttributeConfiguration
+          }}'
+        InstanceArn: '{{ item.InstanceArn }}'
+        Name: '{{ item.Name }}'
+        OwnerAccountId: '{{ item.OwnerAccountId }}'
+        PermissionSetProvisioningStatus: '{{ item.PermissionSetProvisioningStatus }}'
+        Status: '{{ item.Status }}'
+        StatusReason: '{{ item.StatusReason }}'
+      items_for: '{{ response.Instances }}'
+  - calls:
+    - action: describe_permission_set
+      on_error: continue
+      params:
+        InstanceArn: '{{ item.InstanceArn }}'
+        PermissionSetArn: '{{ item.PermissionSetArn }}'
+      save_as: response
+    discovery_id: aws.sso-admin.describe_permission_set
+    emit:
+      as: item
+      item:
+        CreatedDate: '{{ response.PermissionSet.CreatedDate }}'
+        Description: '{{ response.PermissionSet.Description }}'
+        Name: '{{ response.PermissionSet.Name }}'
+        PermissionSetArn: '{{ response.PermissionSet.PermissionSetArn }}'
+        RelayState: '{{ response.PermissionSet.RelayState }}'
+        SessionDuration: '{{ response.PermissionSet.SessionDuration }}'
+    for_each: aws.sso-admin.list_instances

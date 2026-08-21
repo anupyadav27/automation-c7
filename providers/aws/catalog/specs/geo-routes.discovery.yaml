@@ -1,0 +1,8 @@
+version: '1.0'
+provider: aws
+service: geo-routes
+services:
+  client: geo-routes
+  module: boto3.client
+discovery:
+checks: []

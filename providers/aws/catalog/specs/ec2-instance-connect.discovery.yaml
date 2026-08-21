@@ -1,0 +1,8 @@
+version: '1.0'
+provider: aws
+service: ec2-instance-connect
+services:
+  client: ec2-instance-connect
+  module: boto3.client
+discovery:
+checks: []

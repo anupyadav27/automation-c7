@@ -1,0 +1,171 @@
+version: '1.0'
+provider: aws
+service: appintegrations
+services:
+  client: appintegrations
+  module: boto3.client
+discovery:
+- discovery_id: aws.appintegrations.list_applications
+  calls:
+  - action: list_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Applications }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      Name: '{{ item.Name }}'
+      ClientId: '{{ item.ClientId }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      IsService: '{{ item.IsService }}'
+      Namespace: '{{ item.Namespace }}'
+      Permissions: '{{ item.Permissions }}'
+      Publications: '{{ item.Publications }}'
+- discovery_id: aws.appintegrations.list_data_integrations
+  calls:
+  - action: list_data_integrations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DataIntegrations }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Name: '{{ item.Name }}'
+      SourceURI: '{{ item.SourceURI }}'
+- discovery_id: aws.appintegrations.list_event_integrations
+  calls:
+  - action: list_event_integrations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EventIntegrations }}'
+    item:
+      Name: '{{ item.Name }}'
+      Tags: '{{ item.Tags }}'
+      Description: '{{ item.Description }}'
+      EventBridgeBus: '{{ item.EventBridgeBus }}'
+      EventFilter: '{{ item.EventFilter }}'
+      EventIntegrationArn: '{{ item.EventIntegrationArn }}'
+- discovery_id: aws.appintegrations.get_application
+  for_each: aws.appintegrations.list_applications
+  calls:
+  - action: get_application
+    params:
+      Arn: '{{ item.Arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Subscriptions }}'
+    item:
+      Description: '{{ item.Description }}'
+      Event: '{{ item.Event }}'
+      Permissions: '{{ item.Permissions }}'
+      Publications: '{{ item.Publications }}'
+      AccessUrl: '{{ response.ApplicationSourceConfig.ExternalUrlConfig.AccessUrl
+        }}'
+      Arn: '{{ response.Arn }}'
+      CreatedTime: '{{ response.CreatedTime }}'
+      Id: '{{ response.Id }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+      Name: '{{ response.Name }}'
+      Namespace: '{{ response.Namespace }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.appintegrations.get_data_integration
+  calls:
+  - action: get_data_integration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      FirstExecutionFrom: '{{ response.ScheduleConfiguration.FirstExecutionFrom }}'
+      Object: '{{ response.ScheduleConfiguration.Object }}'
+      ScheduleExpression: '{{ response.ScheduleConfiguration.ScheduleExpression }}'
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      Tags: '{{ response.Tags }}'
+      Description: '{{ response.Description }}'
+      KmsKey: '{{ response.KmsKey }}'
+      ObjectConfiguration: '{{ response.ObjectConfiguration }}'
+      ScheduleConfiguration: '{{ response.ScheduleConfiguration.Object }}'
+      SourceURI: '{{ response.SourceURI }}'
+      Filters: '{{ response.FileConfiguration.Filters }}'
+- discovery_id: aws.appintegrations.get_event_integration
+  for_each: aws.appintegrations.list_applications
+  calls:
+  - action: get_event_integration
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Source: '{{ response.EventFilter.Source }}'
+      Name: '{{ response.Name }}'
+      Tags: '{{ response.Tags }}'
+      Description: '{{ response.Description }}'
+      EventBridgeBus: '{{ response.EventBridgeBus }}'
+      EventIntegrationArn: '{{ response.EventIntegrationArn }}'
+- discovery_id: aws.appintegrations.list_application_associations
+  for_each: aws.appintegrations.list_applications
+  calls:
+  - action: list_application_associations
+    params:
+      ApplicationId: '{{ item.ApplicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ApplicationAssociations }}'
+    item:
+      ApplicationArn: '{{ item.ApplicationArn }}'
+      ApplicationAssociationArn: '{{ item.ApplicationAssociationArn }}'
+      ClientId: '{{ item.ClientId }}'
+- discovery_id: aws.appintegrations.list_data_integration_associations
+  calls:
+  - action: list_data_integration_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DataIntegrationAssociations }}'
+    item:
+      ClientId: '{{ item.ClientId }}'
+      DataIntegrationArn: '{{ item.DataIntegrationArn }}'
+      DataIntegrationAssociationArn: '{{ item.DataIntegrationAssociationArn }}'
+      DestinationURI: '{{ item.DestinationURI }}'
+      ExecutionConfiguration: '{{ item.ExecutionConfiguration }}'
+      LastExecutionStatus: '{{ item.LastExecutionStatus }}'
+- discovery_id: aws.appintegrations.list_event_integration_associations
+  calls:
+  - action: list_event_integration_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EventIntegrationAssociations }}'
+    item:
+      ClientAssociationMetadata: '{{ item.ClientAssociationMetadata }}'
+      ClientId: '{{ item.ClientId }}'
+      EventBridgeRuleName: '{{ item.EventBridgeRuleName }}'
+      EventIntegrationAssociationArn: '{{ item.EventIntegrationAssociationArn }}'
+      EventIntegrationAssociationId: '{{ item.EventIntegrationAssociations[].ClientId
+        }}'
+      EventIntegrationName: '{{ item.EventIntegrationName }}'
+- discovery_id: aws.appintegrations.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

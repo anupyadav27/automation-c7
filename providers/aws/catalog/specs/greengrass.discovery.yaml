@@ -1,0 +1,665 @@
+version: '1.0'
+provider: aws
+service: greengrass
+is_active: false
+services:
+  client: greengrass
+  module: boto3.client
+discovery:
+- discovery_id: aws.greengrass.get_service_role_for_account
+  calls:
+  - action: get_service_role_for_account
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      RoleArn: '{{ response.RoleArn }}'
+      AssociatedAt: '{{ response.AssociatedAt }}'
+- discovery_id: aws.greengrass.list_bulk_deployments
+  calls:
+  - action: list_bulk_deployments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.BulkDeployments }}'
+    item:
+      BulkDeploymentArn: '{{ item.BulkDeploymentArn }}'
+      BulkDeploymentId: '{{ item.BulkDeploymentId }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+- discovery_id: aws.greengrass.list_connector_definitions
+  calls:
+  - action: list_connector_definitions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Definitions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Tags: '{{ item.Tags }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ item.LatestVersion }}'
+      LatestVersionArn: '{{ item.LatestVersionArn }}'
+- discovery_id: aws.greengrass.list_core_definitions
+  calls:
+  - action: list_core_definitions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Definitions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Tags: '{{ item.Tags }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ item.LatestVersion }}'
+      LatestVersionArn: '{{ item.LatestVersionArn }}'
+- discovery_id: aws.greengrass.list_device_definitions
+  calls:
+  - action: list_device_definitions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Definitions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Tags: '{{ item.Tags }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ item.LatestVersion }}'
+      LatestVersionArn: '{{ item.LatestVersionArn }}'
+- discovery_id: aws.greengrass.list_function_definitions
+  calls:
+  - action: list_function_definitions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Definitions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Tags: '{{ item.Tags }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ item.LatestVersion }}'
+      LatestVersionArn: '{{ item.LatestVersionArn }}'
+- discovery_id: aws.greengrass.list_groups
+  calls:
+  - action: list_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Groups }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      GroupId: '{{ item.GroupId }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ item.LatestVersion }}'
+      LatestVersionArn: '{{ item.LatestVersionArn }}'
+- discovery_id: aws.greengrass.list_logger_definitions
+  calls:
+  - action: list_logger_definitions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Definitions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Tags: '{{ item.Tags }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ item.LatestVersion }}'
+      LatestVersionArn: '{{ item.LatestVersionArn }}'
+- discovery_id: aws.greengrass.list_resource_definitions
+  calls:
+  - action: list_resource_definitions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Definitions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Tags: '{{ item.Tags }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ item.LatestVersion }}'
+      LatestVersionArn: '{{ item.LatestVersionArn }}'
+- discovery_id: aws.greengrass.list_subscription_definitions
+  calls:
+  - action: list_subscription_definitions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Definitions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Tags: '{{ item.Tags }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ item.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ item.LatestVersion }}'
+      LatestVersionArn: '{{ item.LatestVersionArn }}'
+- discovery_id: aws.greengrass.get_associated_role
+  calls:
+  - action: get_associated_role
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      RoleArn: '{{ response.RoleArn }}'
+      AssociatedAt: '{{ response.AssociatedAt }}'
+- discovery_id: aws.greengrass.get_bulk_deployment_status
+  for_each: aws.greengrass.list_bulk_deployments
+  calls:
+  - action: get_bulk_deployment_status
+    params:
+      BulkDeploymentId: '{{ item.BulkDeploymentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ErrorDetails }}'
+    item:
+      DetailedErrorCode: '{{ item.DetailedErrorCode }}'
+      DetailedErrorMessage: '{{ item.DetailedErrorMessage }}'
+      InvalidInputRecords: '{{ response.BulkDeploymentMetrics.InvalidInputRecords }}'
+      RecordsProcessed: '{{ response.BulkDeploymentMetrics.RecordsProcessed }}'
+      RetryAttempts: '{{ response.BulkDeploymentMetrics.RetryAttempts }}'
+      BulkDeploymentStatus: '{{ response.BulkDeploymentStatus }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      ErrorMessage: '{{ response.ErrorMessage }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.greengrass.get_connectivity_info
+  calls:
+  - action: get_connectivity_info
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ConnectivityInfo }}'
+    item:
+      Id: '{{ item.Id }}'
+      HostAddress: '{{ item.HostAddress }}'
+      Metadata: '{{ item.Metadata }}'
+      PortNumber: '{{ item.PortNumber }}'
+      Message: '{{ response.Message }}'
+- discovery_id: aws.greengrass.get_connector_definition
+  calls:
+  - action: get_connector_definition
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ response.LatestVersion }}'
+      LatestVersionArn: '{{ response.LatestVersionArn }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.greengrass.get_connector_definition_version
+  calls:
+  - action: get_connector_definition_version
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Connectors: '{{ response.Definition.Connectors[].Id }}'
+      Definition: '{{ response.Definition.Definition }}'
+      Arn: '{{ response.Arn }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      Id: '{{ response.Id }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.greengrass.get_core_definition
+  calls:
+  - action: get_core_definition
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ response.LatestVersion }}'
+      LatestVersionArn: '{{ response.LatestVersionArn }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.greengrass.get_core_definition_version
+  calls:
+  - action: get_core_definition_version
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Cores: '{{ response.Definition.Cores[].Id }}'
+      Arn: '{{ response.Arn }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      Id: '{{ response.Id }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.greengrass.get_deployment_status
+  calls:
+  - action: get_deployment_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ErrorDetails }}'
+    item:
+      DetailedErrorCode: '{{ item.DetailedErrorCode }}'
+      DetailedErrorMessage: '{{ item.DetailedErrorMessage }}'
+      DeploymentStatus: '{{ response.DeploymentStatus }}'
+      DeploymentType: '{{ response.DeploymentType }}'
+      ErrorMessage: '{{ response.ErrorMessage }}'
+      UpdatedAt: '{{ response.UpdatedAt }}'
+- discovery_id: aws.greengrass.get_device_definition
+  calls:
+  - action: get_device_definition
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ response.LatestVersion }}'
+      LatestVersionArn: '{{ response.LatestVersionArn }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.greengrass.get_device_definition_version
+  calls:
+  - action: get_device_definition_version
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Devices: '{{ response.Definition.Devices[].Id }}'
+      Arn: '{{ response.Arn }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      Id: '{{ response.Id }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.greengrass.get_function_definition
+  calls:
+  - action: get_function_definition
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ response.LatestVersion }}'
+      LatestVersionArn: '{{ response.LatestVersionArn }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.greengrass.get_function_definition_version
+  calls:
+  - action: get_function_definition_version
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DefaultConfig: '{{ response.Definition.DefaultConfig }}'
+      Definition: '{{ response.Definition.Definition }}'
+      Functions: '{{ response.Definition.Functions[].Id }}'
+      Arn: '{{ response.Arn }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      IsolationMode: '{{ response.Definition.DefaultConfig.Execution.IsolationMode }}'
+      Gid: '{{ response.Definition.DefaultConfig.Execution.RunAs.Gid }}'
+      Uid: '{{ response.Definition.DefaultConfig.Execution.RunAs.Uid }}'
+      Id: '{{ response.Id }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.greengrass.get_group
+  calls:
+  - action: get_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ response.LatestVersion }}'
+      LatestVersionArn: '{{ response.LatestVersionArn }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.greengrass.get_group_certificate_authority
+  calls:
+  - action: get_group_certificate_authority
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      GroupCertificateAuthorityArn: '{{ response.GroupCertificateAuthorityArn }}'
+      GroupCertificateAuthorityId: '{{ response.GroupCertificateAuthorityId }}'
+      PemEncodedCertificate: '{{ response.PemEncodedCertificate }}'
+- discovery_id: aws.greengrass.get_group_certificate_configuration
+  calls:
+  - action: get_group_certificate_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      GroupId: '{{ response.GroupId }}'
+      CertificateAuthorityExpiryInMilliseconds: '{{ response.CertificateAuthorityExpiryInMilliseconds }}'
+      CertificateExpiryInMilliseconds: '{{ response.CertificateExpiryInMilliseconds }}'
+- discovery_id: aws.greengrass.get_group_version
+  calls:
+  - action: get_group_version
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ConnectorDefinitionVersionArn: '{{ response.Definition.ConnectorDefinitionVersionArn }}'
+      CoreDefinitionVersionArn: '{{ response.Definition.CoreDefinitionVersionArn }}'
+      DeviceDefinitionVersionArn: '{{ response.Definition.DeviceDefinitionVersionArn }}'
+      FunctionDefinitionVersionArn: '{{ response.Definition.FunctionDefinitionVersionArn }}'
+      LoggerDefinitionVersionArn: '{{ response.Definition.LoggerDefinitionVersionArn }}'
+      ResourceDefinitionVersionArn: '{{ response.Definition.ResourceDefinitionVersionArn }}'
+      SubscriptionDefinitionVersionArn: '{{ response.Definition.SubscriptionDefinitionVersionArn }}'
+      Arn: '{{ response.Arn }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      Id: '{{ response.Id }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.greengrass.get_logger_definition
+  calls:
+  - action: get_logger_definition
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ response.LatestVersion }}'
+      LatestVersionArn: '{{ response.LatestVersionArn }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.greengrass.get_logger_definition_version
+  calls:
+  - action: get_logger_definition_version
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Loggers: '{{ response.Definition.Loggers[].Id }}'
+      Arn: '{{ response.Arn }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      Id: '{{ response.Id }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.greengrass.get_resource_definition
+  calls:
+  - action: get_resource_definition
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ response.LatestVersion }}'
+      LatestVersionArn: '{{ response.LatestVersionArn }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.greengrass.get_resource_definition_version
+  calls:
+  - action: get_resource_definition_version
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Resources: '{{ response.Definition.Resources[].Id }}'
+      Arn: '{{ response.Arn }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      Id: '{{ response.Id }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.greengrass.get_subscription_definition
+  calls:
+  - action: get_subscription_definition
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      LastUpdatedTimestamp: '{{ response.LastUpdatedTimestamp }}'
+      LatestVersion: '{{ response.LatestVersion }}'
+      LatestVersionArn: '{{ response.LatestVersionArn }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.greengrass.get_subscription_definition_version
+  calls:
+  - action: get_subscription_definition_version
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Subscriptions: '{{ response.Definition.Subscriptions[].Id }}'
+      Arn: '{{ response.Arn }}'
+      CreationTimestamp: '{{ response.CreationTimestamp }}'
+      Id: '{{ response.Id }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.greengrass.get_thing_runtime_configuration
+  calls:
+  - action: get_thing_runtime_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.RuntimeConfiguration.Status }}'
+      Enabled: '{{ response.RuntimeConfiguration.Enabled }}'
+      TelemetryConfiguration: '{{ response.RuntimeConfiguration.TelemetryConfiguration.Telemetry }}'
+      ConfigurationSyncStatus: '{{ response.RuntimeConfiguration.TelemetryConfiguration.ConfigurationSyncStatus }}'
+      Telemetry: '{{ response.RuntimeConfiguration.TelemetryConfiguration.Telemetry }}'
+- discovery_id: aws.greengrass.list_bulk_deployment_detailed_reports
+  for_each: aws.greengrass.list_bulk_deployments
+  calls:
+  - action: list_bulk_deployment_detailed_reports
+    params:
+      BulkDeploymentId: '{{ item.BulkDeploymentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Deployments }}'
+    item:
+      CreatedAt: '{{ item.CreatedAt }}'
+      DeploymentArn: '{{ item.DeploymentArn }}'
+      DeploymentId: '{{ item.DeploymentId }}'
+      DeploymentStatus: '{{ item.DeploymentStatus }}'
+      DeploymentType: '{{ item.DeploymentType }}'
+      ErrorDetails: '{{ item.ErrorDetails }}'
+      ErrorMessage: '{{ item.ErrorMessage }}'
+      GroupArn: '{{ item.GroupArn }}'
+- discovery_id: aws.greengrass.list_connector_definition_versions
+  calls:
+  - action: list_connector_definition_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Versions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      Definition: '{{ item.Definition }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.greengrass.list_core_definition_versions
+  calls:
+  - action: list_core_definition_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Versions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.greengrass.list_deployments
+  calls:
+  - action: list_deployments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Deployments }}'
+    item:
+      CreatedAt: '{{ item.CreatedAt }}'
+      DeploymentArn: '{{ item.DeploymentArn }}'
+      DeploymentId: '{{ item.DeploymentId }}'
+      DeploymentType: '{{ item.DeploymentType }}'
+      GroupArn: '{{ item.GroupArn }}'
+- discovery_id: aws.greengrass.list_device_definition_versions
+  calls:
+  - action: list_device_definition_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Versions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.greengrass.list_function_definition_versions
+  calls:
+  - action: list_function_definition_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Versions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      Definition: '{{ item.Definition }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.greengrass.list_group_certificate_authorities
+  calls:
+  - action: list_group_certificate_authorities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.GroupCertificateAuthorities }}'
+    item:
+      GroupCertificateAuthorityArn: '{{ item.GroupCertificateAuthorityArn }}'
+      GroupCertificateAuthorityId: '{{ item.GroupCertificateAuthorityId }}'
+- discovery_id: aws.greengrass.list_group_versions
+  calls:
+  - action: list_group_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Versions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.greengrass.list_logger_definition_versions
+  calls:
+  - action: list_logger_definition_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Versions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.greengrass.list_resource_definition_versions
+  calls:
+  - action: list_resource_definition_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Versions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.greengrass.list_subscription_definition_versions
+  calls:
+  - action: list_subscription_definition_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Versions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.greengrass.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

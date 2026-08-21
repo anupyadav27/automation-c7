@@ -1,0 +1,1368 @@
+# AWS binding for the universal topology model.
+#
+# The model in providers/common/topology/model.yaml defines WHERE things draw,
+# in terms of roles. This file says which AWS types play which role, and nothing
+# else. No ranks, no anchors, no layout logic - those belong to the model, and
+# duplicating them here is how two clouds drift apart.
+#
+# Resolution order, first match wins:
+#
+#     1. discriminators   the resource's own data decides (a gateway endpoint
+#                         and an interface endpoint are the same TYPE and
+#                         different PLACES)
+#     2. overrides        this exact resource_key
+#     2b. suffixes        what the type NAME says it is
+#     3. services         the service segment of the key
+#     4. unplaced         visible, named, and loud - never a silent default
+#
+# That order matters. Discriminators first, because data beats a lookup table:
+# two Lambdas in the same account legitimately land in different boxes depending
+# on whether their own payload carried a VpcConfig.
+
+version: 1
+model: providers/common/topology/model.yaml
+
+
+# ══════════════════════════════════════════════════════════════════════
+# SPINE — which AWS types are the containers
+# ══════════════════════════════════════════════════════════════════════
+#
+# `scope` is stated per provider because it genuinely differs: an AWS VPC is
+# regional, a GCP VPC is global. The model carries the difference rather than
+# assuming AWS's answer is universal.
+
+# Each role lists the COLLECTED type slug and any SYNTHETIC one the tree mints
+# for the same role. LayerTree invents `vpc:` and `az:` nodes when a subnet
+# names a container that was never collected, and those play the identical role
+# - listing only the collected slug would leave half the spine unrecognised.
+
+spine:
+  org:        {types: [organizations.organization], scope: global}
+  account:    {types: [account],                    scope: global}
+  region:     {types: [region],                     scope: regional}
+  network:    {types: [ec2.vpc, vpc],               scope: regional}
+  zone:       {types: [az],                         scope: zonal}
+  segment:    {types: [ec2.subnet, subnet],         scope: zonal}
+
+
+# ══════════════════════════════════════════════════════════════════════
+# DISCRIMINATORS — placement decided by the resource's own data
+# ══════════════════════════════════════════════════════════════════════
+
+discriminators:
+
+  ec2.vpc_endpoint:
+    field: VpcEndpointType
+    cases:
+      Gateway:   door.service   # a route-table entry. No ENI, so it is a border.
+      Interface: resident.ingress       # has an ENI in a subnet, so it is a resident.
+      GatewayLoadBalancer: resident.ingress
+    default: resident.ingress
+
+  elbv2.load_balancer:
+    field: Scheme
+    cases:
+      internet-facing: resident.balancer
+      internal:        resident.balancer
+    default: resident.balancer
+    entry_when: {Scheme: internet-facing}
+
+  elb.load_balancer:
+    field: Scheme
+    cases:
+      internet-facing: resident.balancer
+      internal:        resident.balancer
+    default: resident.balancer
+    entry_when: {Scheme: internet-facing}
+
+  lambda.function:
+    field: VpcConfig.SubnetIds
+    cases:
+      non_empty: resident.compute       # attached to the VPC - a resident of a subnet
+    default: resident.serverless             # no VpcConfig - a regional service
+
+  ec2.instance:
+    field: PublicIpAddress
+    default: resident.compute
+    entry_when: {PublicIpAddress: present}
+
+  apigateway.rest_api:
+    field: EndpointConfiguration.Types
+    cases:
+      PRIVATE: resident.ingress         # private APIs terminate on an interface endpoint
+    # A public API is an ingress too. The split used to be ingress-vs-api, which
+    # read as "only a private API is an entry point" - but both terminate
+    # inbound traffic at the boundary, which is what L2 means. What differs is
+    # WHERE they terminate, and the role's container already says that:
+    # [region, segment]. A private one lands in the segment its endpoint is in,
+    # a public one in the region.
+    default: resident.ingress
+    entry_when: {EndpointConfiguration.Types: not PRIVATE}
+
+
+# ══════════════════════════════════════════════════════════════════════
+# SUFFIXES — what the type name already tells us
+# ══════════════════════════════════════════════════════════════════════
+#
+# A parameter group, a snapshot and a version hold no address and serve no
+# traffic, whatever service they belong to. Falling through to the service
+# default made 66 of them residents: `rds.rds_snapshot` inherited `rds ->
+# resident.data` and was drawn as though it were a database, and `lambda.version`
+# was drawn as though it were a function.
+#
+# The renderer already knew better - it labels these "configuration" and
+# "snapshots" - which is the tell that the rule belongs in the data and not in
+# the view. Overrides still win, so `acm.certificate` stays a platform binding
+# while `rds.certificate` becomes an artifact.
+
+suffixes:
+  - {match: 'snapshot',            role: record}
+  - {match: '[._]parameter_group$',   role: record}
+  - {match: '[._]option_group$',      role: record}
+  - {match: '[._]subnet_group$',      role: record}
+  - {match: '[._]schedule_group$',    role: record}
+  - {match: '\.version$',          role: record}
+  - {match: 'certificate$',        role: record}
+  # A target group is part of exactly one load balancer - a component, so it
+  # nests inside it rather than sitting beside it as a peer.
+  # A security group is a security group whichever service names it.
+  - {match: '[._]security_group$',    role: rule.network}
+  - {match: '[._]target_group$',      role: part}
+  # A definition is a template, not a running thing. 41 types match, from
+  # `ecs.task_definition` to the seven Greengrass `*_definition`s that were
+  # filling `compute.edge` with seven groups of one apiece. You deploy FROM a
+  # definition; the deployment is the architecture.
+  - {match: '[._]definition$',        role: record}
+  # Same argument, 181 types: `apprunner.auto_scaling_configuration` and
+  # `autoscaling.launch_configuration` describe how something should be built.
+  # Anchored, so `config.configuration_recorder` - which is a live governance
+  # control - is untouched.
+  - {match: '[._]configuration$',     role: record}
+  # A listener belongs to exactly one load balancer, the way a target group
+  # does. Drawing it as a peer of the balancer doubles the box count and says
+  # the port is a separate piece of infrastructure.
+  - {match: '[._]listener$',          role: part}
+
+
+# ══════════════════════════════════════════════════════════════════════
+# OVERRIDES — exact keys the service segment would get wrong
+# ══════════════════════════════════════════════════════════════════════
+
+overrides:
+
+  # ── borders. These are not IN the network, they ARE its edge (C2) ──
+  # A Security Hub standard is CIS, PCI DSS, NIST — a yardstick the account is
+  # measured against, not a thing in the architecture. It drew 13 tabs on the
+  # region's west wall because Security Hub's API returns them as objects, which
+  # is a fact about the API and not about the estate.
+  securityhub.standard:                      record
+  ec2.internet_gateway:             door.internet
+  ec2.egress_only_internet_gateway: door.internet
+  ec2.vpn_gateway:                  door.onprem
+  ec2.vpn_connection:               door.onprem
+  directconnect.connection:         door.onprem
+  directconnect.virtual_interface:  door.onprem
+  ec2.vpc_peering_connection:       door.lateral
+  ec2.transit_gateway_attachment:   door.lateral
+  ec2.transit_gateway:              door.lateral
+
+  # ── control planes. What runs is an instance, a task or a function, and
+  #    those are drawn already; a cluster, a state machine or a training hub
+  #    is the thing that DRIVES them. Drawn as residents they read as a second
+  #    fleet standing beside the real one.
+  ecs.cluster:                      rule.orchestration
+  eks.cluster:                      rule.orchestration
+  eks.fargate_profile:              rule.orchestration
+  batch.job_queue:                  rule.orchestration
+  stepfunctions.state_machine:      rule.orchestration
+  sagemaker.hub:                    rule.orchestration
+  sagemaker.domain:                 rule.orchestration
+  autoscaling-plans.scaling_plan:   rule.orchestration
+  # NOT here, deliberately: an autoscaling group and a capacity provider are
+  # already `rule.scaling`, which is the same idea scoped to the network
+  # rather than the region - and a scaling group really is per-VPC. Nor a
+  # nodegroup, an EMR cluster or a Batch compute environment: those ARE the
+  # instances, not the thing driving them, and they stay `resident.compute`.
+  # A registry is not architecture. ECR orchestrates nothing and serves no
+  # traffic - it is what an image is pulled FROM, which is provenance, and
+  # provenance belongs in the panel of the thing it built. On canvas it put 16
+  # repositories beside 3 instances and made the registry look bigger than the
+  # fleet it feeds.
+  ecr.repository:                   record
+  ecr.image:                        record
+  # A launch configuration and a launch template describe how to build an
+  # instance. The scaling group that USES them is a real control plane and
+  # stays on the network border; the recipes it reads do not.
+  autoscaling.launch_configuration: record
+
+  # ── things a service scopes to itself, which the service segment reads as
+  #    workloads. An ElastiCache "user" is a Redis ACL entry scoped to a cache,
+  #    not a person and not a running thing; a work group is a query policy.
+  elasticache.user:                 rule.identity
+  memorydb.user:                    rule.identity
+  athena.work_group:                rule.governance
+  ivs.playback_restriction_policy:  rule.governance
+  # A stage is one deployment of one API - a component of it, not a peer.
+  apigateway.stage:                 part
+  apigatewayv2.stage:               part
+  # `gamelift.location` is a list of region names returned as resources. It is
+  # a lookup table, and drawing "ap-south-1" as a box inside ap-south-1 is the
+  # kind of thing that makes a reader distrust the whole diagram.
+  gamelift.location:                record
+
+  # ── the traffic path inside a network ──
+  ec2.nat_gateway:                  door.egress
+  appsync.api:                      resident.api
+  apigatewayv2.api:                 resident.ingress
+  apprunner.service:                resident.api
+
+  # ── zonal workloads ──
+  rds.db_instance:                  resident.data
+  rds.db_cluster:                   resident.data
+  elasticache.cache_cluster:        resident.data
+  elasticache.replication_group:    resident.data
+  redshift.cluster:                 resident.data
+  opensearch.domain:                resident.data
+  es.elasticsearch_domain:          resident.data
+  efs.mount_target:                 resident.data
+  fsx.file_system:                  resident.data
+  docdb.db_cluster:                 resident.data
+  memorydb.cluster:                 resident.data
+  neptune.db_cluster:               resident.data
+
+  ec2.instance:                     resident.compute
+  ecs.service:                      resident.compute
+  eks.nodegroup:                    resident.compute
+  emr.cluster:                      resident.compute
+  batch.compute_environment:        resident.compute
+  sagemaker.notebook_instance:      resident.compute
+
+  # ── things bound to a workload, not to the network ──
+  ec2.volume:                       part
+  ec2.network_interface:            part
+  ec2.eip:                          part
+
+  # ── fleet bindings: govern workloads, own no address ──
+  autoscaling.auto_scaling_group:   rule.scaling
+  ecs.capacity_provider:            rule.scaling
+
+  # ── bindings: they govern residents and hold no address (C1) ──
+  ec2.security_group:               rule.network
+  ec2.network_acl:                  rule.network
+  ec2.route_table:                  rule.network
+  ec2.prefix_list:                  rule.network
+  ec2.dhcp_options:                 rule.network
+  ec2.flow_log:                     rule.network
+
+  # ── artefacts: provenance, saved settings and output ──
+  # None of these governs anything. Filed as bindings they were drawn on a
+  # border, which said a key pair controls the network.
+  ec2.ami:                          record
+  ec2.image:                        record
+  ec2.ebs_snapshot:                 record
+  ec2.snapshot:                     record
+  ec2.key_pair:                     record
+  ec2.launch_template:              record
+  ec2.spot_instance_request:        record
+  ec2.principal_id_format:          record
+  ec2.verified_access_instance:     record
+  ec2.network_insights_access_scope: record
+  ec2.transit_gateway_route_table:  rule.network
+  logs.log_group:                   record
+  logs.log_group_field:             record
+  logs.log_stream:                  record
+  cloudformation.stack:             rule.governance
+  appconfig.extension:              record
+  appconfig.deployment_strategy:    record
+  snowball.compatible_image:        record
+  ssm.ssm_managed_instance:         record
+  service-quotas.service_quota_request: record
+
+  # The certificate service itself, not provenance from another one - so it
+  # outranks the `certificate$` suffix that makes rds.certificate an artifact.
+  acm.certificate:                  rule.platform
+  acm-pca.certificate_authority:    rule.platform
+
+  # ── global edge: upstream of every region (A1) ──
+  cloudfront.distribution:          door.ingress
+  # Same object, older protocol. It resolved to resident.edge through the
+  # service-level fallback and drew inline while its sibling sat on the border,
+  # which reads as two kinds of CDN rather than one.
+  cloudfront.streaming_distribution: door.ingress
+  globalaccelerator.accelerator:    resident.edge
+  wafv2.web_acl:                    resident.edge
+  waf.web_acl:                      resident.edge
+  shield.protection:                resident.edge
+  route53.hosted_zone:              door.ingress
+  # ── account-wide identity (C1: applies to everything, so a rail) ──
+  organizations.organization:       rule.identity
+  organizations.account:            rule.identity
+  sso-admin.instance:               rule.identity
+  ram.resource_share:               rule.identity
+
+
+
+# ══════════════════════════════════════════════════════════════════════
+# SERVICES — the bulk default, by service segment of the resource_key
+# ══════════════════════════════════════════════════════════════════════
+#
+# This is where the thousands of long-tail types get placed. `sqs.queue`,
+# `sqs.queue_attribute` and every other `sqs.*` resolve through one row.
+
+services:
+
+  # ── resident.regional, category: api ──
+  # Only `rest_api` and `apigatewayv2.api` are entry points; the service
+  # default covers 38 config types — keys, methods, usage plans — that are
+  # not on the traffic path at all. Those two are bound explicitly above.
+  apigateway: resident.api
+  apigatewayv2: resident.api
+  appsync: resident.api
+  apprunner: resident.api
+  amplify: resident.api
+
+  # ── resident.regional, category: integration ──
+  sqs: resident.integration
+  sns: resident.integration
+  mediaconvert: resident.application
+  ivs: resident.application
+  ivschat: resident.application
+  medialive: resident.application
+  mediapackage: resident.application
+  pinpoint: resident.application
+  pinpoint-sms-voice-v2: resident.application
+  ses: resident.application
+  sesv2: resident.application
+  chime: resident.application
+  connect: resident.application
+  events: resident.integration
+  eventbridge: resident.integration
+  scheduler: resident.integration
+  stepfunctions: resident.integration
+  swf: resident.integration
+  mq: resident.integration
+  kinesis: resident.integration
+  firehose: resident.integration
+  kinesisanalytics: resident.integration
+  kafka: resident.integration
+  pipes: resident.integration
+
+  # ── resident.regional, category: serverless ──
+  lambda: resident.serverless
+  gamelift: resident.application
+  batch: resident.serverless
+  greengrass: resident.serverless # edge runtime definitions, no network presence
+  iot: resident.application
+  iotanalytics: resident.application
+
+  # ── scaling machinery: describes compute, so it rides the compute lane ──
+  autoscaling: resident.compute
+  autoscaling-plans: rule.governance
+  application-autoscaling: rule.governance
+  service-quotas: rule.governance
+
+  # ── resident.regional, category: api (managed app hosting) ──
+  elasticbeanstalk: resident.api
+
+  # ── resident.regional, category: containers ──
+  ecs: resident.containers
+  eks: resident.containers
+  ecr: resident.containers
+  ecr-public: resident.containers
+
+  # ── resident.regional, category: datastore ──
+  s3: resident.datastore
+  s3control: resident.datastore
+  s3tables: resident.datastore
+  dynamodb: resident.datastore
+  timestream: resident.datastore
+  keyspaces: resident.datastore
+  qldb: resident.datastore
+  simpledb: resident.datastore
+  efs: resident.datastore
+  fsx: resident.datastore
+  storagegateway: resident.datastore
+  backup: resident.datastore
+
+  # ── resident.regional, category: analytics ──
+  athena: resident.analytics
+  glue: resident.analytics
+  emr: resident.analytics
+  redshift: resident.analytics
+  redshift-serverless: resident.analytics
+  opensearch: resident.analytics
+  opensearchserverless: resident.analytics
+  es: resident.analytics
+  quicksight: resident.analytics
+  datazone: resident.analytics
+  lakeformation: resident.analytics
+  datapipeline: resident.analytics
+  dataexchange: resident.analytics
+
+  # ── resident.regional, category: ai ──
+  sagemaker: resident.ai
+  bedrock: resident.ai
+  bedrock-agent: resident.ai
+  comprehend: resident.ai
+  textract: resident.ai
+  rekognition: resident.ai
+  transcribe: resident.ai
+  translate: resident.ai
+  polly: resident.ai
+  personalize: resident.ai
+  forecast: resident.ai
+  kendra: resident.ai
+  lex: resident.ai
+  lexv2-models: resident.ai
+  q: resident.ai
+
+  # ── databases that are network residents when they have subnets ──
+  rds: resident.data
+  docdb: resident.data
+  neptune: resident.data
+  memorydb: resident.data
+  elasticache: resident.data
+  timestream-influxdb: resident.data
+
+  # ── rule.platform: encryption, secrets, identity, delivery ──
+  kms: rule.platform
+  cloudhsm: rule.platform
+  secretsmanager: rule.platform
+  acm: rule.platform
+  acm-pca: rule.platform
+  iam: rule.identity          # account-scoped, so the account rail - not the region's
+  sts: rule.identity
+  cognito-idp: rule.platform
+  cognito-identity: rule.platform
+  signer: rule.platform
+  codebuild: rule.platform
+  codepipeline: rule.platform
+  codedeploy: rule.governance
+  codecommit: rule.platform
+  codeartifact: rule.platform
+  codestar-connections: rule.platform
+  guardduty: rule.governance
+  securityhub: rule.governance
+  inspector: rule.platform
+  inspector2: rule.governance
+  macie: rule.governance
+  macie2: rule.governance
+  detective: rule.platform
+  accessanalyzer: rule.governance
+  waf-regional: rule.platform
+  network-firewall: rule.platform
+  shield: rule.platform
+
+  # ── rule.governance: observe, audit, prove ──
+  cloudwatch: rule.governance
+  logs: record
+  xray: rule.governance
+  synthetics: rule.governance
+  cloudtrail: rule.governance
+  config: rule.governance
+  auditmanager: rule.governance
+  ssm: rule.governance
+  ssm-incidents: rule.governance
+  ssm-contacts: rule.governance
+  appconfig: rule.governance
+  snowball: rule.governance
+  datasync: rule.governance
+  dms: rule.governance
+  mgn: rule.governance
+  transfer: rule.governance
+  ram: rule.identity
+  organizations: rule.governance
+  servicecatalog: rule.governance
+  cloudformation: rule.governance
+  resourcegroupstaggingapi: rule.governance
+  resource-groups: rule.governance
+  drs: rule.governance
+  dlm: rule.governance
+  ce: rule.governance
+  budgets: rule.governance
+  cur: rule.governance
+  compute-optimizer: rule.governance
+  trustedadvisor: rule.governance
+  health: rule.governance
+  support: rule.governance
+
+  # ── network plumbing that is neither border nor resident ──
+  # The genuine network bindings are named explicitly above; anything else
+  # carrying an `ec2.` prefix is configuration or provenance, so the fallback
+  # is governance rather than the VPC rail.
+  ec2: record
+  networkmanager: rule.network
+  globalaccelerator: resident.edge
+  cloudfront: resident.edge
+  route53: resident.edge
+  route53resolver: rule.network
+  route53domains: resident.edge
+  directconnect: door.onprem
+  elb: resident.balancer
+  elbv2: resident.balancer
+  vpc-lattice: resident.balancer
+
+
+# ══════════════════════════════════════════════════════════════════════
+# CLUSTERS — which AWS facts prove an ownership claim
+# ══════════════════════════════════════════════════════════════════════
+#
+# Precedence is the model's (cluster_precedence). This file only supplies the
+# evidence that a claim holds. A workload can satisfy several at once - an EKS
+# node is also in an ASG - and the model's order decides which box wins.
+
+  # ── the long tail, classified in bulk ──────────────────────────────
+  # 320 services that had no binding at all, so every one of their types
+  # resolved to the `unplaced` band the day an account produced it -
+  # loud, which is the right default, but not an answer.
+  #
+  # The role is DERIVED from the domain rather than typed per service, so
+  # a service cannot be filed as analytics and drawn as a firewall. Review
+  # with scripts/aws-grid.py --gaps.
+  account: rule.governance
+  aiops: rule.governance
+  amp: rule.governance
+  amplifybackend: resident.api
+  amplifyuibuilder: resident.api
+  apigatewaymanagementapi: resident.api
+  appconfigdata: rule.governance
+  appfabric: resident.integration
+  appflow: resident.integration
+  appintegrations: resident.integration
+  application-insights: rule.governance
+  application-signals: rule.governance
+  applicationcostprofiler: rule.governance
+  appmesh: resident.edge
+  appstream: resident.application
+  arc-region-switch: rule.governance
+  arc-zonal-shift: rule.governance
+  artifact: rule.governance
+  b2bi: resident.integration
+  backup-gateway: record
+  bcm-data-exports: rule.governance
+  bcm-pricing-calculator: rule.governance
+  bcm-recommended-actions: rule.governance
+  bedrock-agent-runtime: resident.ai
+  bedrockagentcore: resident.ai
+  bedrock-agentcore-control: resident.ai
+  bedrock-data-automation: resident.ai
+  billing: rule.governance
+  billingconductor: rule.governance
+  braket: resident.application
+  chatbot: rule.governance
+  chime-sdk-identity: resident.application
+  chime-sdk-media-pipelines: resident.application
+  chime-sdk-meetings: resident.application
+  chime-sdk-messaging: resident.application
+  chime-sdk-voice: resident.application
+  cleanrooms: resident.analytics
+  cleanroomsml: resident.analytics
+  cloud9: resident.application
+  cloudcontrol: rule.governance
+  clouddirectory: resident.datastore
+  cloudfront-keyvaluestore: resident.edge
+  cloudhsmv2: rule.platform
+  cloudsearch: resident.analytics
+  cloudsearchdomain: resident.analytics
+  codecatalyst: rule.governance
+  codeconnections: rule.governance
+  codeguru-reviewer: resident.ai
+  codeguru-security: rule.governance
+  codeguruprofiler: rule.governance
+  codestar-notifications: rule.governance
+  cognito: rule.identity
+  cognito-sync: rule.identity
+  comprehendmedical: resident.ai
+  compute-optimizer-automation: rule.governance
+  connect-contact-lens: resident.application
+  connectcampaigns: resident.application
+  connectcampaignsv2: resident.application
+  connectcases: resident.application
+  connectparticipant: resident.application
+  controlcatalog: rule.governance
+  controltower: rule.governance
+  cost-optimization-hub: rule.governance
+  costexplorer: rule.governance
+  custom: resident.integration
+  customer-profiles: resident.analytics
+  databrew: resident.analytics
+  dax: resident.datastore
+  deadline: resident.application
+  devicefarm: resident.application
+  devops-guru: rule.governance
+  directoryservice: rule.identity
+  discovery: rule.governance
+  docdb-elastic: resident.datastore
+  ds: rule.identity
+  dsql: resident.datastore
+  dynamodbstreams: resident.integration
+  edr: rule.governance
+  elastic: resident.analytics
+  elastictranscoder: resident.application
+  emr-containers: resident.analytics
+  emr-serverless: resident.analytics
+  entityresolution: resident.analytics
+  event: resident.integration
+  eventschemas: resident.integration
+  evidently: rule.governance
+  evs: rule.network
+  fargate: resident.containers
+  finspace: resident.analytics
+  finspace-data: resident.analytics
+  fis: rule.governance
+  fms: rule.governance
+  frauddetector: resident.ai
+  gameliftstreams: resident.application
+  geo-places: resident.api
+  glacier: record
+  grafana: rule.governance
+  greengrassv2: resident.edge
+  groundstation: resident.application
+  healthlake: resident.application
+  identitystore: rule.identity
+  imagebuilder: rule.governance
+  importexport: rule.governance
+  inspector-scan: rule.governance
+  internetmonitor: rule.governance
+  invoicing: rule.governance
+  iot-data: resident.application
+  iot-jobs-data: resident.application
+  iot-managed-integrations: resident.application
+  iotdeviceadvisor: resident.application
+  iotevents: resident.application
+  iotevents-data: resident.application
+  iotfleetwise: resident.application
+  iotsecuretunneling: resident.application
+  iotsitewise: resident.application
+  iotthingsgraph: resident.application
+  iottwinmaker: resident.application
+  iotwireless: resident.application
+  ivs-realtime: resident.application
+  kafkaconnect: resident.analytics
+  kendra-ranking: resident.analytics
+  kinesis-video-archived-media: resident.integration
+  kinesis-video-media: resident.integration
+  kinesis-video-signaling: resident.integration
+  kinesisanalyticsv2: resident.integration
+  kinesisfirehose: resident.integration
+  kinesisvideo: resident.integration
+  kinesisvideostreams: resident.integration
+  launch-wizard: rule.governance
+  lex-models: resident.ai
+  lex-runtime: resident.ai
+  lexv2-runtime: resident.ai
+  license-manager: rule.governance
+  license-manager-linux-subscriptions: rule.governance
+  license-manager-user-subscriptions: rule.governance
+  lightsail: resident.compute
+  location: resident.api
+  lookoutequipment: resident.ai
+  lookoutvision: resident.ai
+  m2: resident.compute
+  machinelearning: resident.ai
+  mailmanager: resident.application
+  managedblockchain: resident.api
+  managedblockchain-query: resident.api
+  marketplace-agreement: rule.governance
+  marketplace-catalog: rule.governance
+  marketplace-entitlement: rule.governance
+  mediaconnect: resident.application
+  mediapackage-vod: resident.application
+  mediapackagev2: resident.application
+  mediastore: resident.application
+  mediastore-data: resident.application
+  mediatailor: resident.application
+  medical-imaging: resident.application
+  mgh: rule.governance
+  migration-hub-refactor-spaces: rule.governance
+  migrationhub-config: rule.governance
+  migrationhuborchestrator: resident.integration
+  migrationhubstrategy: rule.governance
+  mpa: rule.identity
+  mturk: resident.application
+  mwaa: resident.integration
+  neptune-graph: resident.datastore
+  neptunedata: resident.datastore
+  networkflowmonitor: rule.governance
+  networkmonitor: rule.governance
+  notifications: rule.governance
+  notificationscontacts: rule.governance
+  oam: rule.governance
+  observabilityadmin: rule.governance
+  odb: resident.compute
+  omics: resident.application
+  osis: resident.analytics
+  outposts: rule.network
+  panorama: resident.edge
+  partnercentral-channel: rule.governance
+  partnercentral-selling: rule.governance
+  payment-cryptography: rule.platform
+  pca-connector-ad: rule.platform
+  pca-connector-scep: rule.platform
+  pcs: resident.compute
+  personalize-runtime: resident.ai
+  pi: rule.governance
+  pinpoint-email: resident.application
+  pinpoint-sms-voice: resident.application
+  pricing: rule.governance
+  proton: rule.governance
+  qapps: resident.ai
+  qbusiness: resident.ai
+  qconnect: resident.ai
+  rbin: record
+  redshift-data: resident.datastore
+  repostspace: resident.application
+  resiliencehub: rule.governance
+  resource-explorer-2: rule.governance
+  robomaker: resident.edge
+  rolesanywhere: rule.identity
+  route53-recovery-cluster: rule.network
+  route53-recovery-control-config: rule.network
+  route53-recovery-readiness: rule.network
+  route53profiles: rule.network
+  rtbfabric: rule.network
+  rum: rule.governance
+  s3express: resident.datastore
+  s3outposts: resident.datastore
+  s3vectors: resident.datastore
+  savingsplans: rule.governance
+  schemas: resident.integration
+  sdb: resident.datastore
+  security-ir: rule.governance
+  securitylake: rule.governance
+  serverlessrepo: resident.api
+  servicecatalog-appregistry: rule.governance
+  servicediscovery: rule.network
+  simspaceweaver: resident.application
+  sms-voice: resident.application
+  snow-device-management: rule.network
+  socialmessaging: resident.application
+  ssm-quicksetup: rule.governance
+  ssm-sap: rule.governance
+  sso: rule.identity
+  sso-admin: rule.identity
+  supplychain: resident.application
+  support-app: rule.governance
+  taxsettings: rule.governance
+  timestream-query: resident.datastore
+  timestream-write: resident.datastore
+  tnb: rule.network
+  verifiedpermissions: rule.identity
+  virtualmachine: resident.compute
+  voice-id: resident.ai
+  vpc: rule.network
+  vpcflowlogs: rule.governance
+  vpn: rule.network
+  waf: rule.network
+  wafv2: rule.network
+  wellarchitected: rule.governance
+  wisdom: resident.ai
+  workdocs: resident.application
+  workflows: resident.integration
+  workmail: resident.application
+  workmailmessageflow: resident.application
+  workspaces: resident.application
+  workspaces-instances: resident.application
+  workspaces-thin-client: resident.application
+  workspaces-web: resident.application
+clusters:
+
+  kubernetes:
+    owner_types: [eks.cluster, eks.nodegroup]
+    claims:
+      - {tag_prefix: "kubernetes.io/cluster/"}
+      - {edge: contained-in, target_type: eks.nodegroup}
+
+  bigdata:
+    owner_types: [emr.cluster]
+    claims:
+      - {tag: "aws:elasticmapreduce:job-flow-id"}
+
+  ml:
+    owner_types: [sagemaker.notebook_instance, sagemaker.endpoint]
+    claims:
+      - {tag_prefix: "aws:sagemaker:"}
+
+  containers:
+    owner_types: [ecs.cluster]
+    claims:
+      - {edge: contained-in, target_type: ecs.cluster}
+
+  batch:
+    owner_types: [batch.compute_environment]
+    claims:
+      - {tag: "AWSBatchServiceTag"}
+
+  autoscaling:
+    owner_types: [autoscaling.auto_scaling_group]
+    claims:
+      - {tag: "aws:autoscaling:groupName"}
+
+
+# ══════════════════════════════════════════════════════════════════════
+# ATTACHMENT ORDER — inside a workload box
+# ══════════════════════════════════════════════════════════════════════
+
+attachment_order:
+  - {match: {type: ec2.volume, root: true},   rank: 10, label: root volume}
+  - {match: {type: ec2.volume},               rank: 20, label: data volume}
+  - {match: {type: ec2.network_interface, primary: true}, rank: 30, label: primary interface}
+  - {match: {type: ec2.network_interface},    rank: 40, label: interface}
+  - {match: {type: ec2.eip},                  rank: 50, label: elastic ip}
+
+
+# ══════════════════════════════════════════════════════════════════════
+# TAXONOMY — which of this cloud's services fills each slot
+# ══════════════════════════════════════════════════════════════════════
+#
+# `category.subcategory` from the model. Independent of placement: a security
+# group is a `binding` on the network's rail AND a `network.firewall` service,
+# and neither fact follows from the other.
+#
+# Keyed by service segment, with type-level overrides where one service spans
+# slots - `ec2` alone covers instances, block storage, firewall and routing,
+# which is exactly the lumping that made "NETWORK 59" useless as a filter row.
+
+taxonomy_types:
+  # Logging and telemetry, kept apart in the data and rolled up to one
+  # `observability` tab on the border — see `rollup` in the model.
+  ec2.flow_log:                              governance.flow-logs
+  vpcflowlogs.flow_log:                      governance.flow-logs
+  cloudwatch.alarm:                          governance.alarms
+  cloudwatch.composite_alarm:                governance.alarms
+  cloudwatch.alarms_for_metric:              governance.alarms
+  cloudwatch.anomaly_detector:               governance.alarms
+  cloudwatch.dashboard:                      governance.metrics
+  cloudwatch.insight_rule:                   governance.metrics
+  cloudwatch.metric_stream:                  governance.metrics
+  synthetics.canary:                         governance.synthetics
+  synthetics.canary_run:                     governance.synthetics
+  synthetics.group:                          governance.synthetics
+  synthetics.associated_group:               governance.synthetics
+  # Named individually because these are the things people look for BY NAME.
+  # As one `connectivity` bucket an internet gateway, a transit gateway, a
+  # Direct Connect and an ENI were indistinguishable on the border - 103
+  # types under one word, and the word was the least useful one available.
+  ec2.internet_gateway:                      network.igw
+  ec2.egress_only_internet_gateway:          network.igw
+  ec2.nat_gateway:                           network.nat
+  ec2.transit_gateway:                       network.tgw
+  ec2.transit_gateway_attachment:            network.tgw
+  ec2.vpc_peering_connection:                network.peering
+  ec2.vpn_connection:                        network.vpn
+  ec2.vpn_gateway:                           network.vpn
+  ec2.customer_gateway:                      network.vpn
+  ec2.network_interface:                     network.interface
+  ec2.security_group:                        network.security-group
+  ec2.security_group_rule:                   network.security-group
+  ec2.network_acl:                           network.nacl
+  ec2.vpc_endpoint:                          network.private-link
+  ec2.vpc_endpoint_service:                  network.private-link
+  # An API gateway is a proxy, not an integration: it terminates inbound traffic
+  # at the boundary exactly as a load balancer does. `network.proxy` is for
+  # entry points that are NOT subnet-deployed; a balancer that is stays in
+  # `network.loadbalancing`. Per TYPE, because the other 38 apigateway.* types
+  # are the API's configuration and belong with integration.
+  # A cache USER is a principal, not a cache. Bound to `rule.identity` and so
+  # drawn on the north arm, it inherited `database.cache` from its service and
+  # put a tab reading `CACHE 2` beside `IDENTITY 191` — which says "two caches"
+  # about two login accounts. The role was right; the domain was the service's.
+  elasticache.user:        security.identity
+  elasticache.user_group:  security.identity
+  memorydb.user:           security.identity
+  # A permission document is not a principal. `iam` as a service binds to
+  # security.identity, which swept roles, groups, instance profiles AND every
+  # policy into one tab — so the map could say how many IAM objects exist and
+  # not which of them can act. Per TYPE, because the same service legitimately
+  # supplies both halves.
+  #
+  # Inline policies (`user_policy`, `role_policy`, `group_policy`) are named
+  # alongside the managed ones: a permission granted inline is still a
+  # permission, and filing it with the principal is what hid it.
+  iam.policy:                    security.policy
+  iam.policy_version:            security.policy
+  iam.attached_role_policy:      security.policy
+  iam.attached_user_policy:      security.policy
+  iam.attached_group_policy:     security.policy
+  iam.role_policy:               security.policy
+  iam.user_policy:               security.policy
+  iam.group_policy:              security.policy
+  iam.permissions_boundary:      security.policy
+  iam.service_linked_role_policy: security.policy
+  apigateway.rest_api:     network.proxy
+  apigatewayv2.api:        network.proxy
+  ec2.instance:            compute.instances
+  ec2.spot_instance_request: compute.instances
+  ec2.volume:              storage.block
+  ec2.ebs_snapshot:        storage.backup
+  ec2.ami:                 compute.instances
+  ec2.image:               compute.instances
+  ec2.key_pair:            security.identity
+  ec2.launch_template:     compute.instances
+  ec2.eip:                 network.connectivity
+  # Every other door is network.connectivity; this one inherited the ec2
+  # service default and was filed as compute.instances. It DRAWS — a door sits
+  # on the container border — so the domain was visible in the filter panel and
+  # in its own tab. The sibling test keys on name EXTENSION, and
+  # `egress_only_internet_gateway` prefixes rather than extends
+  # `internet_gateway`, so nothing caught it.
+  ec2.route_table:         network.routing
+  ec2.prefix_list:         network.routing
+  ec2.transit_gateway_route_table: network.routing
+  ec2.dhcp_options:        network.routing
+  ec2.vpc:                 network.connectivity
+  ec2.subnet:              network.connectivity
+  ec2.network_insights_access_scope: network.firewall
+  ec2.verified_access_instance: security.identity
+  rds.db_security_group:   network.firewall
+  # A registry stores the images a container is built from. That is supply, not
+  # compute - and filing 16 repositories under compute.containers made a fleet
+  # of one ECS cluster look like a fleet of seventeen.
+  ecr.repository:          devops.artifact
+
+  # Types that extend another type's name and must not disagree with it. Every
+  # one of these fell through to the `ec2` or `ecr` service default: a firewall
+  # rule filed under compute, a VPC endpoint association filed under compute.
+  # Surfaced by scripts/aws-grid.py, which compares a type against the longest
+  # explicitly-classified type its name extends.
+  ec2.security_group_vpc_association: network.firewall
+  ec2.transit_gateway_connect:              network.connectivity
+  ec2.transit_gateway_connect_peer:         network.connectivity
+  ec2.transit_gateway_multicast_domain:     network.connectivity
+  ec2.transit_gateway_peering_attachment:   network.connectivity
+  ec2.transit_gateway_policy_table:         network.connectivity
+  ec2.transit_gateway_vpc_attachment:       network.connectivity
+  ec2.vpc_block_public_access_exclusion:    network.connectivity
+  ec2.vpc_block_public_access_options:      network.connectivity
+  ec2.vpc_endpoint_association:             network.private-link
+  ec2.vpc_endpoint_connection:              network.private-link
+  ec2.vpc_endpoint_connection_notification: network.private-link
+  ecr.repository_creation_template:         devops.artifact
+  ecr.repository_policy:                    devops.artifact
+
+  # Load balancing, split out of `delivery` so a CDN and an ALB stop sharing a
+  # filter row. Listeners and target groups follow their balancer.
+  elbv2.load_balancer:     network.loadbalancing
+  elbv2.listener:          network.loadbalancing
+  elbv2.listener_certificate: network.loadbalancing
+  elbv2.rule:              network.loadbalancing
+  elbv2.target_group:      network.loadbalancing
+  elbv2.target_health:     network.loadbalancing
+  elbv2.ssl_policy:        network.loadbalancing
+  elbv2.trust_store:       network.loadbalancing
+  elb.load_balancer:       network.loadbalancing
+  elb.load_balancer_policy: network.loadbalancing
+
+taxonomy:
+  # compute
+  ec2: compute.instances
+  autoscaling: compute.instances
+  autoscaling-plans: compute.instances
+  lambda: compute.serverless
+  batch: compute.batch
+  ecs: compute.containers
+  eks: compute.containers
+  ecr: compute.containers
+  apprunner: compute.serverless
+  elasticbeanstalk: compute.serverless
+  gamelift: application.media
+  greengrass: compute.edge
+  # storage
+  s3: storage.object
+  efs: storage.file
+  fsx: storage.file
+  backup: storage.backup
+  storagegateway: storage.transfer
+  snowball: migration.transfer
+  # database
+  rds: database.relational
+  docdb: database.document
+  neptune: database.graph
+  elasticache: database.cache
+  memorydb: database.cache
+  redshift: database.warehouse
+  dynamodb: database.nosql
+  opensearch: analytics.search
+  es: analytics.search
+  # network
+  elb: network.loadbalancing
+  elbv2: network.loadbalancing
+  cloudfront: network.delivery
+  route53: network.dns-zones
+  route53resolver: network.dns-resolver
+  directconnect: network.direct-connect
+  globalaccelerator: network.delivery
+  vpc: network.connectivity
+  # security
+  iam: security.identity
+  sts: security.identity
+  organizations: management.account
+  ram: security.identity
+  kms: security.encryption
+  cloudhsm: security.encryption
+  secretsmanager: security.secrets
+  acm: security.certificates
+  acm-pca: security.certificates
+  guardduty: security.detection
+  securityhub: security.posture
+  inspector2: security.detection
+  macie: security.detection
+  accessanalyzer: security.posture
+  wafv2: network.firewall
+  network-firewall: network.firewall
+  # governance
+  cloudtrail: governance.audit
+  config: governance.config
+  cloudwatch: governance.observability
+  logs: governance.logs
+  xray: governance.traces
+  ssm: governance.config
+  appconfig: governance.config
+  cloudformation: governance.provisioning
+  servicecatalog: management.catalog
+  service-quotas: management.quota
+  account: management.account
+  ce: governance.cost
+  budgets: governance.cost
+  # integration
+  sqs: integration.messaging
+  sns: integration.messaging
+  events: integration.events
+  scheduler: integration.events
+  stepfunctions: integration.workflow
+  apigateway: integration.api
+  apigatewayv2: integration.api
+  appsync: integration.api
+  kinesis: integration.streaming
+  mediaconvert: application.media
+  ivs: application.media
+  ivschat: application.media
+  pinpoint-sms-voice-v2: application.communications
+  # analytics / ai
+  athena: analytics.query
+  glue: analytics.etl
+  emr: analytics.etl
+  quicksight: analytics.bi
+  sagemaker: ai.training
+  bedrock: ai.foundation
+  # devtools
+  codeartifact: devops.artifact
+  codebuild: devops.build
+  codepipeline: devops.deploy
+  codecommit: devops.repo
+  codedeploy: devops.deploy
+  # ── the long tail ──────────────────────────────────────────────────
+  aiops: governance.observability
+  amp: governance.observability
+  amplify: integration.api
+  amplifybackend: integration.api
+  amplifyuibuilder: integration.api
+  apigatewaymanagementapi: integration.api
+  appconfigdata: governance.config
+  appfabric: integration.workflow
+  appflow: integration.workflow
+  appintegrations: integration.workflow
+  application-autoscaling: governance.config
+  application-insights: governance.observability
+  application-signals: governance.observability
+  applicationcostprofiler: governance.cost
+  appmesh: network.delivery
+  appstream: application.enduser
+  arc-region-switch: governance.config
+  arc-zonal-shift: governance.config
+  artifact: governance.audit
+  auditmanager: governance.audit
+  b2bi: integration.workflow
+  backup-gateway: storage.backup
+  bcm-data-exports: governance.cost
+  bcm-pricing-calculator: governance.cost
+  bcm-recommended-actions: governance.cost
+  bedrock-agent: ai.foundation
+  bedrock-agent-runtime: ai.foundation
+  bedrockagentcore: ai.foundation
+  bedrock-agentcore-control: ai.foundation
+  bedrock-data-automation: ai.foundation
+  billing: governance.cost
+  billingconductor: governance.cost
+  braket: application.business
+  chatbot: management.account
+  chime: application.communications
+  chime-sdk-identity: application.communications
+  chime-sdk-media-pipelines: application.communications
+  chime-sdk-meetings: application.communications
+  chime-sdk-messaging: application.communications
+  chime-sdk-voice: application.communications
+  cleanrooms: analytics.query
+  cleanroomsml: analytics.query
+  cloud9: application.enduser
+  cloudcontrol: governance.provisioning
+  clouddirectory: database.nosql
+  cloudfront-keyvaluestore: network.delivery
+  cloudhsmv2: security.encryption
+  cloudsearch: analytics.search
+  cloudsearchdomain: analytics.search
+  codecatalyst: devops.repo
+  codeconnections: devops.repo
+  codeguru-reviewer: ai.inference
+  codeguru-security: security.detection
+  codeguruprofiler: governance.traces
+  codestar-connections: devops.repo
+  codestar-notifications: devops.repo
+  cognito: security.identity
+  cognito-identity: security.identity
+  cognito-idp: security.identity
+  cognito-sync: security.identity
+  comprehend: ai.inference
+  comprehendmedical: ai.inference
+  compute-optimizer: governance.cost
+  compute-optimizer-automation: governance.cost
+  connect: application.communications
+  connect-contact-lens: application.communications
+  connectcampaigns: application.communications
+  connectcampaignsv2: application.communications
+  connectcases: application.communications
+  connectparticipant: application.communications
+  controlcatalog: governance.config
+  controltower: governance.config
+  cost-optimization-hub: governance.cost
+  costexplorer: governance.cost
+  cur: governance.cost
+  custom: integration.events
+  customer-profiles: analytics.query
+  databrew: analytics.etl
+  dataexchange: analytics.etl
+  datapipeline: analytics.etl
+  datasync: storage.transfer
+  datazone: analytics.etl
+  dax: database.cache
+  deadline: application.business
+  detective: security.detection
+  devicefarm: application.business
+  devops-guru: governance.observability
+  directoryservice: security.identity
+  discovery: migration.transfer
+  dlm: storage.backup
+  dms: migration.replication
+  docdb-elastic: database.document
+  drs: migration.replication
+  ds: security.identity
+  dsql: database.timeseries
+  dynamodbstreams: integration.streaming
+  ecr-public: devops.artifact
+  edr: security.detection
+  elastic: analytics.search
+  elastictranscoder: application.media
+  emr-containers: analytics.etl
+  emr-serverless: analytics.etl
+  entityresolution: analytics.etl
+  event: integration.events
+  eventbridge: integration.events
+  eventschemas: integration.events
+  evidently: governance.config
+  evs: network.connectivity
+  fargate: compute.containers
+  finspace: analytics.query
+  finspace-data: analytics.query
+  firehose: integration.streaming
+  fis: governance.config
+  fms: security.posture
+  forecast: ai.inference
+  frauddetector: ai.inference
+  gameliftstreams: application.media
+  geo-places: integration.api
+  glacier: storage.backup
+  grafana: governance.observability
+  greengrassv2: compute.edge
+  groundstation: application.devices
+  health: governance.observability
+  healthlake: application.business
+  identitystore: security.identity
+  imagebuilder: devops.build
+  importexport: migration.transfer
+  inspector: security.detection
+  inspector-scan: security.detection
+  internetmonitor: governance.observability
+  invoicing: governance.cost
+  iot: application.devices
+  iot-data: application.devices
+  iot-jobs-data: application.devices
+  iot-managed-integrations: application.devices
+  iotanalytics: application.devices
+  iotdeviceadvisor: application.devices
+  iotevents: application.devices
+  iotevents-data: application.devices
+  iotfleetwise: application.devices
+  iotsecuretunneling: application.devices
+  iotsitewise: application.devices
+  iotthingsgraph: application.devices
+  iottwinmaker: application.devices
+  iotwireless: application.devices
+  ivs-realtime: application.media
+  kafka: integration.messaging
+  kafkaconnect: analytics.etl
+  kendra: analytics.search
+  kendra-ranking: analytics.search
+  kinesis-video-archived-media: integration.streaming
+  kinesis-video-media: integration.streaming
+  kinesis-video-signaling: integration.streaming
+  kinesisanalytics: integration.streaming
+  kinesisanalyticsv2: integration.streaming
+  kinesisfirehose: integration.streaming
+  kinesisvideo: integration.streaming
+  kinesisvideostreams: integration.streaming
+  lakeformation: analytics.etl
+  launch-wizard: governance.provisioning
+  lex-models: ai.inference
+  lex-runtime: ai.inference
+  lexv2-models: ai.inference
+  lexv2-runtime: ai.inference
+  license-manager: management.catalog
+  license-manager-linux-subscriptions: management.catalog
+  license-manager-user-subscriptions: management.catalog
+  lightsail: compute.instances
+  location: integration.api
+  lookoutequipment: ai.inference
+  lookoutvision: ai.inference
+  m2: compute.instances
+  machinelearning: ai.inference
+  macie2: security.detection
+  mailmanager: application.communications
+  managedblockchain: integration.api
+  managedblockchain-query: integration.api
+  marketplace-agreement: management.catalog
+  marketplace-catalog: management.catalog
+  marketplace-entitlement: management.catalog
+  mediaconnect: application.media
+  medialive: application.media
+  mediapackage: application.media
+  mediapackage-vod: application.media
+  mediapackagev2: application.media
+  mediastore: application.media
+  mediastore-data: application.media
+  mediatailor: application.media
+  medical-imaging: application.business
+  mgh: migration.transfer
+  mgn: migration.replication
+  migration-hub-refactor-spaces: migration.transfer
+  migrationhub-config: migration.transfer
+  migrationhuborchestrator: integration.workflow
+  migrationhubstrategy: migration.transfer
+  mpa: security.identity
+  mq: integration.messaging
+  mturk: application.business
+  mwaa: integration.workflow
+  neptune-graph: database.graph
+  neptunedata: database.graph
+  networkflowmonitor: governance.observability
+  networkmanager: network.connectivity
+  networkmonitor: governance.observability
+  notifications: management.account
+  notificationscontacts: management.account
+  oam: governance.observability
+  observabilityadmin: governance.observability
+  odb: compute.instances
+  omics: application.business
+  opensearchserverless: analytics.search
+  osis: analytics.etl
+  outposts: network.connectivity
+  panorama: compute.edge
+  partnercentral-channel: management.catalog
+  partnercentral-selling: management.catalog
+  payment-cryptography: security.encryption
+  pca-connector-ad: security.certificates
+  pca-connector-scep: security.certificates
+  pcs: compute.batch
+  personalize: ai.inference
+  personalize-runtime: ai.inference
+  pi: governance.observability
+  pinpoint: application.communications
+  pinpoint-email: application.communications
+  pinpoint-sms-voice: application.communications
+  pipes: integration.events
+  polly: ai.inference
+  pricing: governance.cost
+  proton: devops.deploy
+  qapps: ai.foundation
+  qbusiness: ai.foundation
+  qconnect: ai.foundation
+  qldb: database.nosql
+  rbin: storage.backup
+  redshift-data: database.warehouse
+  redshift-serverless: database.warehouse
+  rekognition: ai.inference
+  repostspace: application.business
+  resiliencehub: governance.config
+  resource-explorer-2: management.catalog
+  resource-groups: management.catalog
+  resourcegroupstaggingapi: management.catalog
+  robomaker: compute.edge
+  rolesanywhere: security.identity
+  route53-recovery-cluster: network.dns-zones
+  route53-recovery-control-config: network.dns-zones
+  route53-recovery-readiness: network.dns-zones
+  route53domains: network.dns-zones
+  route53profiles: network.dns-resolver
+  rtbfabric: network.connectivity
+  rum: governance.observability
+  s3control: storage.object
+  s3express: storage.object
+  s3outposts: storage.object
+  s3tables: storage.object
+  s3vectors: storage.object
+  savingsplans: governance.cost
+  schemas: integration.events
+  sdb: database.nosql
+  security-ir: security.detection
+  securitylake: security.detection
+  serverlessrepo: integration.api
+  servicecatalog-appregistry: management.catalog
+  servicediscovery: network.dns-discovery
+  ses: application.communications
+  sesv2: application.communications
+  shield: network.firewall
+  signer: security.certificates
+  simspaceweaver: application.business
+  sms-voice: application.communications
+  snow-device-management: network.connectivity
+  socialmessaging: application.communications
+  ssm-contacts: management.account
+  ssm-incidents: management.account
+  ssm-quicksetup: governance.config
+  ssm-sap: migration.transfer
+  sso: security.identity
+  sso-admin: security.identity
+  supplychain: application.business
+  support: management.account
+  support-app: management.account
+  swf: integration.workflow
+  synthetics: governance.observability
+  taxsettings: governance.cost
+  textract: ai.inference
+  timestream: database.timeseries
+  timestream-influxdb: database.timeseries
+  timestream-query: database.timeseries
+  timestream-write: database.timeseries
+  tnb: network.connectivity
+  transcribe: ai.inference
+  transfer: storage.transfer
+  translate: ai.inference
+  trustedadvisor: security.posture
+  verifiedpermissions: security.identity
+  virtualmachine: compute.instances
+  voice-id: ai.inference
+  vpc-lattice: network.connectivity
+  vpcflowlogs: governance.observability
+  vpn: network.connectivity
+  waf: network.firewall
+  waf-regional: network.firewall
+  wellarchitected: security.posture
+  wisdom: ai.foundation
+  workdocs: application.enduser
+  workflows: integration.workflow
+  workmail: application.communications
+  workmailmessageflow: application.communications
+  workspaces: application.enduser
+  workspaces-instances: application.enduser
+  workspaces-thin-client: application.enduser
+  workspaces-web: application.enduser
+

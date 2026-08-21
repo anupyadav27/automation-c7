@@ -1,0 +1,30 @@
+# ============================================================
+# Discovery YAML — bcm-recommended-actions (AWS)
+# Generated: 2026-02-21T04:56:57Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: bcm-recommended-actions
+services:
+  client: bcm-recommended-actions
+  module: boto3.client
+discovery:
+  # ── ListRecommendedActions ──
+  - discovery_id: aws.bcm-recommended-actions.list_recommended_actions
+    calls:
+      - action: list_recommended_actions
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.recommendedActions }}'
+      item:
+        accountId: '{{ item.accountId }}'
+        context: '{{ item.context }}'
+        feature: '{{ item.feature }}'
+        id: '{{ item.id }}'
+        lastUpdatedTimeStamp: '{{ item.lastUpdatedTimeStamp }}'
+        nextSteps: '{{ item.nextSteps }}'
+        severity: '{{ item.severity }}'
+        type: '{{ item.type }}'

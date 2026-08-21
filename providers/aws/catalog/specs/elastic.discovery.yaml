@@ -1,0 +1,56 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: elastic
+# 2 ops (2 from checks, +0 for inventory)
+version: '1.0'
+provider: aws
+service: elastic
+discovery:
+  - calls:
+    - action: list_domain_names
+      on_error: continue
+      save_as: response
+    discovery_id: aws.elastic.list_domain_names
+    emit:
+      as: item
+      item:
+        DomainName: '{{ response.DomainName }}'
+        EngineType: '{{ response.EngineType }}'
+  - calls:
+    - action: describe_elasticsearch_domains
+      on_error: continue
+      params:
+        DomainNames: '{{ item.DomainNames }}'
+      save_as: response
+    discovery_id: aws.elastic.describe_elasticsearch_domains
+    emit:
+      as: item
+      item:
+        ARN: '{{ response.ARN }}'
+        AccessPolicies: '{{ response.AccessPolicies }}'
+        AdvancedOptions: '{{ response.AdvancedOptions }}'
+        AdvancedSecurityOptions: '{{ response.AdvancedSecurityOptions }}'
+        AutoTuneOptions: '{{ response.AutoTuneOptions }}'
+        ChangeProgressDetails: '{{ response.ChangeProgressDetails }}'
+        CognitoOptions: '{{ response.CognitoOptions }}'
+        Created: '{{ response.Created }}'
+        Deleted: '{{ response.Deleted }}'
+        DomainEndpointOptions: '{{ response.DomainEndpointOptions }}'
+        DomainId: '{{ response.DomainId }}'
+        DomainName: '{{ response.DomainName }}'
+        DomainProcessingStatus: '{{ response.DomainProcessingStatus }}'
+        DomainStatusList: '{{ response.DomainStatusList }}'
+        EBSOptions: '{{ response.EBSOptions }}'
+        ElasticsearchClusterConfig: '{{ response.ElasticsearchClusterConfig }}'
+        ElasticsearchVersion: '{{ response.ElasticsearchVersion }}'
+        EncryptionAtRestOptions: '{{ response.EncryptionAtRestOptions }}'
+        Endpoint: '{{ response.Endpoint }}'
+        Endpoints: '{{ response.Endpoints }}'
+        LogPublishingOptions: '{{ response.LogPublishingOptions }}'
+        ModifyingProperties: '{{ response.ModifyingProperties }}'
+        NodeToNodeEncryptionOptions: '{{ response.NodeToNodeEncryptionOptions }}'
+        Processing: '{{ response.Processing }}'
+        ServiceSoftwareOptions: '{{ response.ServiceSoftwareOptions }}'
+        SnapshotOptions: '{{ response.SnapshotOptions }}'
+        UpgradeProcessing: '{{ response.UpgradeProcessing }}'
+        VPCOptions: '{{ response.VPCOptions }}'
+    for_each: aws.elastic.list_domain_names

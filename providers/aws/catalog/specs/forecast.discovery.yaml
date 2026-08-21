@@ -1,0 +1,220 @@
+# Auto-generated: minimum discoveries for check rules + inventory + engine requirements
+# Sources: forecast
+# 13 ops total
+version: '1.0'
+provider: aws
+service: forecast
+discovery:
+  - calls:
+    - action: list_dataset_groups
+      on_error: continue
+      save_as: response
+    discovery_id: aws.forecast.list_dataset_groups
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        DatasetGroupArn: '{{ item.DatasetGroupArn }}'
+        DatasetGroupName: '{{ item.DatasetGroupName }}'
+        LastModificationTime: '{{ item.LastModificationTime }}'
+        Schema: '{{ item.Schema }}'
+      items_for: '{{ response.DatasetGroups }}'
+  - calls:
+    - action: list_dataset_import_jobs
+      on_error: continue
+      save_as: response
+    discovery_id: aws.forecast.list_dataset_import_jobs
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        DataSource: '{{ item.DataSource }}'
+        DatasetImportJobArn: '{{ item.DatasetImportJobArn }}'
+        DatasetImportJobName: '{{ item.DatasetImportJobName }}'
+        ImportMode: '{{ item.ImportMode }}'
+        LastModificationTime: '{{ item.LastModificationTime }}'
+        Message: '{{ item.Message }}'
+        Status: '{{ item.Status }}'
+      items_for: '{{ response.DatasetImportJobs }}'
+  - calls:
+    - action: list_datasets
+      on_error: continue
+      save_as: response
+    discovery_id: aws.forecast.list_datasets
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        DatasetArn: '{{ item.DatasetArn }}'
+        DatasetName: '{{ item.DatasetName }}'
+        DatasetType: '{{ item.DatasetType }}'
+        Domain: '{{ item.Domain }}'
+        LastModificationTime: '{{ item.LastModificationTime }}'
+      items_for: '{{ response.Datasets }}'
+  - calls:
+    - action: list_explainabilities
+      on_error: continue
+      save_as: response
+    discovery_id: aws.forecast.list_explainabilities
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        ExplainabilityArn: '{{ item.ExplainabilityArn }}'
+        ExplainabilityConfig: '{{ item.ExplainabilityConfig }}'
+        ExplainabilityName: '{{ item.ExplainabilityName }}'
+        LastModificationTime: '{{ item.LastModificationTime }}'
+        Message: '{{ item.Message }}'
+        ResourceArn: '{{ item.ResourceArn }}'
+        Status: '{{ item.Status }}'
+      items_for: '{{ response.Explainabilities }}'
+  - calls:
+    - action: list_explainability_exports
+      on_error: continue
+      save_as: response
+    discovery_id: aws.forecast.list_explainability_exports
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        Destination: '{{ item.Destination }}'
+        ExplainabilityExportArn: '{{ item.ExplainabilityExportArn }}'
+        ExplainabilityExportName: '{{ item.ExplainabilityExportName }}'
+        LastModificationTime: '{{ item.LastModificationTime }}'
+        Message: '{{ item.Message }}'
+        Status: '{{ item.Status }}'
+      items_for: '{{ response.ExplainabilityExports }}'
+  - calls:
+    - action: list_forecast_export_jobs
+      on_error: continue
+      save_as: response
+    discovery_id: aws.forecast.list_forecast_export_jobs
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        Destination: '{{ item.Destination }}'
+        ForecastExportJobArn: '{{ item.ForecastExportJobArn }}'
+        ForecastExportJobName: '{{ item.ForecastExportJobName }}'
+        LastModificationTime: '{{ item.LastModificationTime }}'
+        Message: '{{ item.Message }}'
+        Status: '{{ item.Status }}'
+      items_for: '{{ response.ForecastExportJobs }}'
+  - calls:
+    - action: list_forecasts
+      on_error: continue
+      save_as: response
+    discovery_id: aws.forecast.list_forecasts
+    emit:
+      as: item
+      item:
+        CreatedUsingAutoPredictor: '{{ item.CreatedUsingAutoPredictor }}'
+        CreationTime: '{{ item.CreationTime }}'
+        DatasetGroupArn: '{{ item.DatasetGroupArn }}'
+        ForecastArn: '{{ item.ForecastArn }}'
+        ForecastName: '{{ item.ForecastName }}'
+        LastModificationTime: '{{ item.LastModificationTime }}'
+        Message: '{{ item.Message }}'
+        PredictorArn: '{{ item.PredictorArn }}'
+        Status: '{{ item.Status }}'
+      items_for: '{{ response.Forecasts }}'
+  - calls:
+    - action: list_monitors
+      on_error: continue
+      save_as: response
+    discovery_id: aws.forecast.list_monitors
+    emit:
+      as: item
+      item:
+        Baseline: '{{ item.Baseline }}'
+        CreationTime: '{{ item.CreationTime }}'
+        LastEvaluationTime: '{{ item.LastEvaluationTime }}'
+        LastModificationTime: '{{ item.LastModificationTime }}'
+        MonitorArn: '{{ item.MonitorArn }}'
+        MonitorName: '{{ item.MonitorName }}'
+        ResourceArn: '{{ item.ResourceArn }}'
+        Status: '{{ item.Status }}'
+      items_for: '{{ response.Monitors }}'
+  - calls:
+    - action: list_predictor_backtest_export_jobs
+      on_error: continue
+      save_as: response
+    discovery_id: aws.forecast.list_predictor_backtest_export_jobs
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        Destination: '{{ item.Destination }}'
+        LastModificationTime: '{{ item.LastModificationTime }}'
+        Message: '{{ item.Message }}'
+        PredictorBacktestExportJobArn: '{{ item.PredictorBacktestExportJobArn }}'
+        PredictorBacktestExportJobName: '{{ item.PredictorBacktestExportJobName }}'
+        Status: '{{ item.Status }}'
+      items_for: '{{ response.PredictorBacktestExportJobs }}'
+  - calls:
+    - action: list_predictors
+      on_error: continue
+      save_as: response
+    discovery_id: aws.forecast.list_predictors
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        DatasetGroupArn: '{{ item.DatasetGroupArn }}'
+        IsAutoPredictor: '{{ item.IsAutoPredictor }}'
+        LastModificationTime: '{{ item.LastModificationTime }}'
+        Message: '{{ item.Message }}'
+        PredictorArn: '{{ item.PredictorArn }}'
+        PredictorName: '{{ item.PredictorName }}'
+        ReferencePredictorSummary: '{{ item.ReferencePredictorSummary }}'
+        Status: '{{ item.Status }}'
+      items_for: '{{ response.Predictors }}'
+  - calls:
+    - action: list_what_if_analyses
+      on_error: continue
+      save_as: response
+    discovery_id: aws.forecast.list_what_if_analyses
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        ForecastArn: '{{ item.ForecastArn }}'
+        LastModificationTime: '{{ item.LastModificationTime }}'
+        Message: '{{ item.Message }}'
+        Status: '{{ item.Status }}'
+        WhatIfAnalysisArn: '{{ item.WhatIfAnalysisArn }}'
+        WhatIfAnalysisName: '{{ item.WhatIfAnalysisName }}'
+      items_for: '{{ response.WhatIfAnalyses }}'
+  - calls:
+    - action: list_what_if_forecast_exports
+      on_error: continue
+      save_as: response
+    discovery_id: aws.forecast.list_what_if_forecast_exports
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        Destination: '{{ item.Destination }}'
+        LastModificationTime: '{{ item.LastModificationTime }}'
+        Message: '{{ item.Message }}'
+        Status: '{{ item.Status }}'
+        WhatIfForecastArns: '{{ item.WhatIfForecastArns }}'
+        WhatIfForecastExportArn: '{{ item.WhatIfForecastExportArn }}'
+        WhatIfForecastExportName: '{{ item.WhatIfForecastExportName }}'
+      items_for: '{{ response.WhatIfForecastExports }}'
+  - calls:
+    - action: list_what_if_forecasts
+      on_error: continue
+      save_as: response
+    discovery_id: aws.forecast.list_what_if_forecasts
+    emit:
+      as: item
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        LastModificationTime: '{{ item.LastModificationTime }}'
+        Message: '{{ item.Message }}'
+        Status: '{{ item.Status }}'
+        WhatIfAnalysisArn: '{{ item.WhatIfAnalysisArn }}'
+        WhatIfForecastArn: '{{ item.WhatIfForecastArn }}'
+        WhatIfForecastName: '{{ item.WhatIfForecastName }}'
+      items_for: '{{ response.WhatIfForecasts }}'

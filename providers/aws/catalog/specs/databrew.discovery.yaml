@@ -1,0 +1,427 @@
+version: '1.0'
+provider: aws
+service: databrew
+services:
+  client: databrew
+  module: boto3.client
+discovery:
+- discovery_id: aws.databrew.list_datasets
+  calls:
+  - action: list_datasets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Datasets }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      Name: '{{ item.Name }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      Tags: '{{ item.Tags }}'
+      CreateDate: '{{ item.CreateDate }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      Format: '{{ item.Format }}'
+      FormatOptions: '{{ item.FormatOptions }}'
+      Input: '{{ item.Input }}'
+      LastModifiedBy: '{{ item.LastModifiedBy }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      PathOptions: '{{ item.PathOptions }}'
+      Source: '{{ item.Source }}'
+- discovery_id: aws.databrew.list_jobs
+  calls:
+  - action: list_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Jobs }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      Name: '{{ item.Name }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      RoleArn: '{{ item.RoleArn }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      CreateDate: '{{ item.CreateDate }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      DataCatalogOutputs: '{{ item.DataCatalogOutputs }}'
+      DatabaseOutputs: '{{ item.DatabaseOutputs }}'
+      DatasetName: '{{ item.DatasetName }}'
+      Enabled: '{{ item.Enabled }}'
+      EncryptionKeyArn: '{{ item.EncryptionKeyArn }}'
+      EncryptionMode: '{{ item.EncryptionMode }}'
+      JobSample: '{{ item.JobSample }}'
+      LastModifiedBy: '{{ item.LastModifiedBy }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      LogSubscription: '{{ item.LogSubscription }}'
+      MaxCapacity: '{{ item.MaxCapacity }}'
+      MaxRetries: '{{ item.MaxRetries }}'
+      Outputs: '{{ item.Outputs }}'
+      ProjectName: '{{ item.ProjectName }}'
+      RecipeReference: '{{ item.RecipeReference }}'
+      Timeout: '{{ item.Timeout }}'
+      Type: '{{ item.Type }}'
+      ValidationConfigurations: '{{ item.ValidationConfigurations }}'
+- discovery_id: aws.databrew.list_projects
+  calls:
+  - action: list_projects
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Projects }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      Name: '{{ item.Name }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      RoleArn: '{{ item.RoleArn }}'
+      Tags: '{{ item.Tags }}'
+      CreateDate: '{{ item.CreateDate }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      DatasetName: '{{ item.DatasetName }}'
+      LastModifiedBy: '{{ item.LastModifiedBy }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      OpenDate: '{{ item.OpenDate }}'
+      OpenedBy: '{{ item.OpenedBy }}'
+      RecipeName: '{{ item.RecipeName }}'
+      Sample: '{{ item.Sample }}'
+- discovery_id: aws.databrew.list_recipes
+  calls:
+  - action: list_recipes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Recipes }}'
+    item:
+      Name: '{{ item.Name }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      Tags: '{{ item.Tags }}'
+      CreateDate: '{{ item.CreateDate }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      Description: '{{ item.Description }}'
+      LastModifiedBy: '{{ item.LastModifiedBy }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      ProjectName: '{{ item.ProjectName }}'
+      PublishedBy: '{{ item.PublishedBy }}'
+      PublishedDate: '{{ item.PublishedDate }}'
+      RecipeVersion: '{{ item.RecipeVersion }}'
+      Steps: '{{ item.Steps }}'
+- discovery_id: aws.databrew.list_rulesets
+  calls:
+  - action: list_rulesets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Rulesets }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      Name: '{{ item.Name }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      Tags: '{{ item.Tags }}'
+      CreateDate: '{{ item.CreateDate }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      Description: '{{ item.Description }}'
+      LastModifiedBy: '{{ item.LastModifiedBy }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      RuleCount: '{{ item.RuleCount }}'
+      Rules: '{{ item.Rules }}'
+      TargetArn: '{{ item.TargetArn }}'
+- discovery_id: aws.databrew.list_schedules
+  calls:
+  - action: list_schedules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Schedules }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      Name: '{{ item.Name }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      Tags: '{{ item.Tags }}'
+      CreateDate: '{{ item.CreateDate }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      CronExpression: '{{ item.CronExpression }}'
+      JobNames: '{{ item.JobNames }}'
+      LastModifiedBy: '{{ item.LastModifiedBy }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+- discovery_id: aws.databrew.describe_dataset
+  for_each: aws.databrew.list_datasets
+  calls:
+  - action: describe_dataset
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Csv: '{{ response.FormatOptions.Csv }}'
+      Excel: '{{ response.FormatOptions.Excel }}'
+      Json: '{{ response.FormatOptions.Json }}'
+      CreateDate: '{{ response.CreateDate }}'
+      CreatedBy: '{{ response.CreatedBy }}'
+      Format: '{{ response.Format }}'
+      Delimiter: '{{ response.FormatOptions.Csv.Delimiter }}'
+      HeaderRow: '{{ response.FormatOptions.Csv.HeaderRow }}'
+      MultiLine: '{{ response.FormatOptions.Json.MultiLine }}'
+      CatalogId: '{{ response.Input.DataCatalogInputDefinition.CatalogId }}'
+      DatabaseName: '{{ response.Input.DataCatalogInputDefinition.DatabaseName }}'
+      TableName: '{{ response.Input.DataCatalogInputDefinition.TableName }}'
+      Bucket: '{{ response.Input.DataCatalogInputDefinition.TempDirectory.Bucket }}'
+      BucketOwner: '{{ response.Input.DataCatalogInputDefinition.TempDirectory.BucketOwner }}'
+      Key: '{{ response.Input.DataCatalogInputDefinition.TempDirectory.Key }}'
+      DatabaseTableName: '{{ response.Input.DatabaseInputDefinition.DatabaseTableName }}'
+      GlueConnectionName: '{{ response.Input.DatabaseInputDefinition.GlueConnectionName }}'
+      QueryString: '{{ response.Input.DatabaseInputDefinition.QueryString }}'
+      SourceArn: '{{ response.Input.Metadata.SourceArn }}'
+      LastModifiedBy: '{{ response.LastModifiedBy }}'
+      LastModifiedDate: '{{ response.LastModifiedDate }}'
+      Name: '{{ response.Name }}'
+      MaxFiles: '{{ response.PathOptions.FilesLimit.MaxFiles }}'
+      Order: '{{ response.PathOptions.FilesLimit.Order }}'
+      OrderedBy: '{{ response.PathOptions.FilesLimit.OrderedBy }}'
+      Expression: '{{ response.PathOptions.LastModifiedDateCondition.Expression }}'
+      ValuesMap: '{{ response.PathOptions.LastModifiedDateCondition.ValuesMap }}'
+      Parameters: '{{ response.PathOptions.Parameters }}'
+      ResourceArn: '{{ response.ResourceArn }}'
+      Source: '{{ response.Source }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.databrew.describe_job
+  for_each: aws.databrew.list_datasets
+  calls:
+  - action: describe_job
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Outputs }}'
+    item:
+      Location: '{{ item.Location }}'
+      CompressionFormat: '{{ item.CompressionFormat }}'
+      Format: '{{ item.Format }}'
+      FormatOptions: '{{ item.FormatOptions }}'
+      MaxOutputFiles: '{{ item.MaxOutputFiles }}'
+      Overwrite: '{{ item.Overwrite }}'
+      PartitionColumns: '{{ item.PartitionColumns }}'
+      CreateDate: '{{ response.CreateDate }}'
+      CreatedBy: '{{ response.CreatedBy }}'
+      DatasetName: '{{ response.DatasetName }}'
+      EncryptionKeyArn: '{{ response.EncryptionKeyArn }}'
+      EncryptionMode: '{{ response.EncryptionMode }}'
+      Mode: '{{ response.JobSample.Mode }}'
+      Size: '{{ response.JobSample.Size }}'
+      LastModifiedBy: '{{ response.LastModifiedBy }}'
+      LastModifiedDate: '{{ response.LastModifiedDate }}'
+      LogSubscription: '{{ response.LogSubscription }}'
+      MaxCapacity: '{{ response.MaxCapacity }}'
+      MaxRetries: '{{ response.MaxRetries }}'
+      Name: '{{ response.Name }}'
+      ProjectName: '{{ response.ProjectName }}'
+      RecipeVersion: '{{ response.RecipeReference.RecipeVersion }}'
+      ResourceArn: '{{ response.ResourceArn }}'
+      RoleArn: '{{ response.RoleArn }}'
+      Tags: '{{ response.Tags }}'
+      Timeout: '{{ response.Timeout }}'
+      Type: '{{ response.Type }}'
+- discovery_id: aws.databrew.describe_job_run
+  for_each: aws.databrew.list_datasets
+  calls:
+  - action: describe_job_run
+    params:
+      Name: '{{ item.Name }}'
+      RunId: '{{ item.RunId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ValidationConfigurations }}'
+    item:
+      RulesetArn: '{{ item.RulesetArn }}'
+      ValidationMode: '{{ item.ValidationMode }}'
+      Attempt: '{{ response.Attempt }}'
+      CompletedOn: '{{ response.CompletedOn }}'
+      DatasetName: '{{ response.DatasetName }}'
+      ErrorMessage: '{{ response.ErrorMessage }}'
+      ExecutionTime: '{{ response.ExecutionTime }}'
+      JobName: '{{ response.JobName }}'
+      Mode: '{{ response.JobSample.Mode }}'
+      Size: '{{ response.JobSample.Size }}'
+      LogGroupName: '{{ response.LogGroupName }}'
+      LogSubscription: '{{ response.LogSubscription }}'
+      Name: '{{ response.RecipeReference.Name }}'
+      RecipeVersion: '{{ response.RecipeReference.RecipeVersion }}'
+      RunId: '{{ response.RunId }}'
+      StartedBy: '{{ response.StartedBy }}'
+      StartedOn: '{{ response.StartedOn }}'
+      State: '{{ response.State }}'
+- discovery_id: aws.databrew.describe_project
+  for_each: aws.databrew.list_datasets
+  calls:
+  - action: describe_project
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Size: '{{ response.Sample.Size }}'
+      Type: '{{ response.Sample.Type }}'
+      CreateDate: '{{ response.CreateDate }}'
+      CreatedBy: '{{ response.CreatedBy }}'
+      DatasetName: '{{ response.DatasetName }}'
+      LastModifiedBy: '{{ response.LastModifiedBy }}'
+      LastModifiedDate: '{{ response.LastModifiedDate }}'
+      Name: '{{ response.Name }}'
+      OpenDate: '{{ response.OpenDate }}'
+      OpenedBy: '{{ response.OpenedBy }}'
+      RecipeName: '{{ response.RecipeName }}'
+      ResourceArn: '{{ response.ResourceArn }}'
+      RoleArn: '{{ response.RoleArn }}'
+      SessionStatus: '{{ response.SessionStatus }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.databrew.describe_recipe
+  for_each: aws.databrew.list_datasets
+  calls:
+  - action: describe_recipe
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Steps }}'
+    item:
+      Action: '{{ item.Action }}'
+      ConditionExpressions: '{{ item.ConditionExpressions }}'
+      CreateDate: '{{ response.CreateDate }}'
+      CreatedBy: '{{ response.CreatedBy }}'
+      Description: '{{ response.Description }}'
+      LastModifiedBy: '{{ response.LastModifiedBy }}'
+      LastModifiedDate: '{{ response.LastModifiedDate }}'
+      Name: '{{ response.Name }}'
+      ProjectName: '{{ response.ProjectName }}'
+      PublishedBy: '{{ response.PublishedBy }}'
+      PublishedDate: '{{ response.PublishedDate }}'
+      RecipeVersion: '{{ response.RecipeVersion }}'
+      ResourceArn: '{{ response.ResourceArn }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.databrew.describe_ruleset
+  for_each: aws.databrew.list_datasets
+  calls:
+  - action: describe_ruleset
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Rules }}'
+    item:
+      Name: '{{ item.Name }}'
+      CheckExpression: '{{ item.CheckExpression }}'
+      ColumnSelectors: '{{ item.ColumnSelectors }}'
+      Disabled: '{{ item.Disabled }}'
+      Rules: '{{ item.Rules }}'
+      SubstitutionMap: '{{ item.SubstitutionMap }}'
+      Threshold: '{{ item.Threshold }}'
+      CreateDate: '{{ response.CreateDate }}'
+      CreatedBy: '{{ response.CreatedBy }}'
+      Description: '{{ response.Description }}'
+      LastModifiedBy: '{{ response.LastModifiedBy }}'
+      LastModifiedDate: '{{ response.LastModifiedDate }}'
+      ResourceArn: '{{ response.ResourceArn }}'
+      Tags: '{{ response.Tags }}'
+      TargetArn: '{{ response.TargetArn }}'
+- discovery_id: aws.databrew.describe_schedule
+  for_each: aws.databrew.list_datasets
+  calls:
+  - action: describe_schedule
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.JobNames }}'
+    item:
+      CreateDate: '{{ response.CreateDate }}'
+      CreatedBy: '{{ response.CreatedBy }}'
+      CronExpression: '{{ response.CronExpression }}'
+      LastModifiedBy: '{{ response.LastModifiedBy }}'
+      LastModifiedDate: '{{ response.LastModifiedDate }}'
+      Name: '{{ response.Name }}'
+      ResourceArn: '{{ response.ResourceArn }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.databrew.list_job_runs
+  for_each: aws.databrew.list_datasets
+  calls:
+  - action: list_job_runs
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.JobRuns }}'
+    item:
+      State: '{{ item.State }}'
+      Attempt: '{{ item.Attempt }}'
+      CompletedOn: '{{ item.CompletedOn }}'
+      DataCatalogOutputs: '{{ item.DataCatalogOutputs }}'
+      DatabaseOutputs: '{{ item.DatabaseOutputs }}'
+      DatasetName: '{{ item.DatasetName }}'
+      ErrorMessage: '{{ item.ErrorMessage }}'
+      ExecutionTime: '{{ item.ExecutionTime }}'
+      JobName: '{{ item.JobName }}'
+      JobSample: '{{ item.JobSample }}'
+      LogGroupName: '{{ item.LogGroupName }}'
+      LogSubscription: '{{ item.LogSubscription }}'
+      Outputs: '{{ item.Outputs }}'
+      RecipeReference: '{{ item.RecipeReference }}'
+      RunId: '{{ item.RunId }}'
+      StartedBy: '{{ item.StartedBy }}'
+      StartedOn: '{{ item.StartedOn }}'
+      ValidationConfigurations: '{{ item.ValidationConfigurations }}'
+- discovery_id: aws.databrew.list_recipe_versions
+  for_each: aws.databrew.list_datasets
+  calls:
+  - action: list_recipe_versions
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Recipes }}'
+    item:
+      Name: '{{ item.Name }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      Tags: '{{ item.Tags }}'
+      CreateDate: '{{ item.CreateDate }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      Description: '{{ item.Description }}'
+      LastModifiedBy: '{{ item.LastModifiedBy }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      ProjectName: '{{ item.ProjectName }}'
+      PublishedBy: '{{ item.PublishedBy }}'
+      PublishedDate: '{{ item.PublishedDate }}'
+      RecipeVersion: '{{ item.RecipeVersion }}'
+      Steps: '{{ item.Steps }}'
+- discovery_id: aws.databrew.list_tags_for_resource
+  for_each: aws.databrew.list_datasets
+  calls:
+  - action: list_tags_for_resource
+    params:
+      ResourceArn: '{{ item.ResourceArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

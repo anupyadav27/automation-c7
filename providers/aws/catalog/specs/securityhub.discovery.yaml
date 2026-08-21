@@ -1,0 +1,216 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: securityhub
+# 12 ops (4 from checks, +8 for inventory)
+version: '1.0'
+provider: aws
+service: securityhub
+discovery:
+  - calls:
+    - action: get_enabled_standards
+      on_error: continue
+      save_as: response
+    discovery_id: aws.securityhub.get_enabled_standards
+    emit:
+      as: item
+      item:
+        StandardsArn: '{{ item.StandardsArn }}'
+        StandardsControlsUpdatable: '{{ item.StandardsControlsUpdatable }}'
+        StandardsInput: '{{ item.StandardsInput }}'
+        StandardsStatus: '{{ item.StandardsStatus }}'
+        StandardsStatusReason: '{{ item.StandardsStatusReason }}'
+        StandardsSubscriptionArn: '{{ item.StandardsSubscriptionArn }}'
+        StandardsSubscriptions: '{{ item.StandardsSubscriptions }}'
+      items_for: '{{ response.StandardsSubscriptions }}'
+  - calls:
+    - action: list_configuration_policies
+      on_error: continue
+      save_as: response
+    discovery_id: aws.securityhub.list_configuration_policies
+    emit:
+      as: item
+      item:
+        Arn: '{{ item.Arn }}'
+        Description: '{{ item.Description }}'
+        Id: '{{ item.Id }}'
+        Name: '{{ item.Name }}'
+        ServiceEnabled: '{{ item.ServiceEnabled }}'
+        UpdatedAt: '{{ item.UpdatedAt }}'
+      items_for: '{{ response.ConfigurationPolicySummaries }}'
+  - calls:
+    - action: describe_action_targets
+      on_error: continue
+      save_as: response
+    discovery_id: aws.securityhub.describe_action_targets
+    emit:
+      as: item
+      item:
+        ActionTargetArn: '{{ item.ActionTargetArn }}'
+        ActionTargets: '{{ item.ActionTargets }}'
+        Description: '{{ item.Description }}'
+        Name: '{{ item.Name }}'
+      items_for: '{{ response.ActionTargets }}'
+  - calls:
+    - action: list_aggregators_v2
+      on_error: continue
+      save_as: response
+    discovery_id: aws.securityhub.list_aggregators_v2
+    emit:
+      as: item
+      item:
+        AggregatorV2Arn: '{{ item.AggregatorV2Arn }}'
+      items_for: '{{ response.AggregatorsV2 }}'
+  - calls:
+    - action: get_master_account
+      on_error: continue
+      save_as: response
+    discovery_id: aws.securityhub.get_master_account
+    emit:
+      as: item
+      item:
+        AccountId: '{{ response.Master.AccountId }}'
+        InvitationId: '{{ response.Master.InvitationId }}'
+        InvitedAt: '{{ response.Master.InvitedAt }}'
+        Master: '{{ response.Master.Master }}'
+        MemberStatus: '{{ response.Master.MemberStatus }}'
+  - calls:
+    - action: list_finding_aggregators
+      on_error: continue
+      save_as: response
+    discovery_id: aws.securityhub.list_finding_aggregators
+    emit:
+      as: item
+      item:
+        FindingAggregatorArn: '{{ item.FindingAggregatorArn }}'
+      items_for: '{{ response.FindingAggregators }}'
+  - calls:
+    - action: list_connectors_v2
+      on_error: continue
+      save_as: response
+    discovery_id: aws.securityhub.list_connectors_v2
+    emit:
+      as: item
+      item:
+        ConnectorArn: '{{ item.ConnectorArn }}'
+        ConnectorId: '{{ item.ConnectorId }}'
+        ConnectorStatus: '{{ item.ConnectorStatus }}'
+        CreatedAt: '{{ item.CreatedAt }}'
+        Description: '{{ item.Description }}'
+        Health: '{{ item.Health }}'
+        KmsKeyArn: '{{ item.KmsKeyArn }}'
+        LastCheckedAt: '{{ item.LastCheckedAt }}'
+        LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+        Message: '{{ item.Message }}'
+        Name: '{{ item.Name }}'
+        ProviderDetail: '{{ item.ProviderDetail }}'
+        ProviderSummary: '{{ item.ProviderSummary }}'
+      items_for: '{{ response.Connectors }}'
+  - calls:
+    - action: list_automation_rules
+      on_error: continue
+      save_as: response
+    discovery_id: aws.securityhub.list_automation_rules
+    emit:
+      as: item
+      item:
+        CreatedAt: '{{ item.CreatedAt }}'
+        CreatedBy: '{{ item.CreatedBy }}'
+        Description: '{{ item.Description }}'
+        IsTerminal: '{{ item.IsTerminal }}'
+        RuleArn: '{{ item.RuleArn }}'
+        RuleName: '{{ item.RuleName }}'
+        RuleOrder: '{{ item.RuleOrder }}'
+        RuleStatus: '{{ item.RuleStatus }}'
+        UpdatedAt: '{{ item.UpdatedAt }}'
+      items_for: '{{ response.AutomationRulesMetadata }}'
+  - calls:
+    - action: describe_security_hub_v2
+      on_error: continue
+      save_as: response
+    discovery_id: aws.securityhub.describe_security_hub_v2
+    emit:
+      as: item
+      item:
+        HubV2Arn: '{{ response.HubV2Arn }}'
+  - calls:
+    - action: get_findings
+      on_error: continue
+      save_as: response
+    discovery_id: aws.securityhub.get_findings
+    emit:
+      as: item
+      item:
+        Action: '{{ item.Action }}'
+        AwsAccountId: '{{ item.AwsAccountId }}'
+        AwsAccountName: '{{ item.AwsAccountName }}'
+        CompanyName: '{{ item.CompanyName }}'
+        Compliance: '{{ item.Compliance }}'
+        Confidence: '{{ item.Confidence }}'
+        CreatedAt: '{{ item.CreatedAt }}'
+        Criticality: '{{ item.Criticality }}'
+        Description: '{{ item.Description }}'
+        Detection: '{{ item.Detection }}'
+        FindingProviderFields: '{{ item.FindingProviderFields }}'
+        Findings: '{{ item.Findings }}'
+        FirstObservedAt: '{{ item.FirstObservedAt }}'
+        GeneratorDetails: '{{ item.GeneratorDetails }}'
+        GeneratorId: '{{ item.GeneratorId }}'
+        Id: '{{ item.Id }}'
+        LastObservedAt: '{{ item.LastObservedAt }}'
+        Malware: '{{ item.Malware }}'
+        Network: '{{ item.Network }}'
+        NetworkPath: '{{ item.NetworkPath }}'
+        Note: '{{ item.Note }}'
+        PatchSummary: '{{ item.PatchSummary }}'
+        Process: '{{ item.Process }}'
+        ProcessedAt: '{{ item.ProcessedAt }}'
+        ProductArn: '{{ item.ProductArn }}'
+        ProductFields: '{{ item.ProductFields }}'
+        ProductName: '{{ item.ProductName }}'
+        RecordState: '{{ item.RecordState }}'
+        Region: '{{ item.Region }}'
+        RelatedFindings: '{{ item.RelatedFindings }}'
+        Remediation: '{{ item.Remediation }}'
+        Resources: '{{ item.Resources }}'
+        Sample: '{{ item.Sample }}'
+        SchemaVersion: '{{ item.SchemaVersion }}'
+        Severity: '{{ item.Severity }}'
+        SourceUrl: '{{ item.SourceUrl }}'
+        ThreatIntelIndicators: '{{ item.ThreatIntelIndicators }}'
+        Threats: '{{ item.Threats }}'
+        Title: '{{ item.Title }}'
+        Types: '{{ item.Types }}'
+        UpdatedAt: '{{ item.UpdatedAt }}'
+        UserDefinedFields: '{{ item.UserDefinedFields }}'
+        VerificationState: '{{ item.VerificationState }}'
+        Vulnerabilities: '{{ item.Vulnerabilities }}'
+        Workflow: '{{ item.Workflow }}'
+        WorkflowState: '{{ item.WorkflowState }}'
+      items_for: '{{ response.Findings }}'
+  - calls:
+    - action: describe_hub
+      on_error: continue
+      save_as: response
+    discovery_id: aws.securityhub.describe_hub
+    emit:
+      as: item
+      item:
+        AutoEnableControls: '{{ response.AutoEnableControls }}'
+        ControlFindingGenerator: '{{ response.ControlFindingGenerator }}'
+        HubArn: '{{ response.HubArn }}'
+        SubscribedAt: '{{ response.SubscribedAt }}'
+  - calls:
+    - action: get_insights
+      on_error: continue
+      save_as: response
+    discovery_id: aws.securityhub.get_insights
+    emit:
+      as: item
+      item:
+        Filters: '{{ item.Filters }}'
+        GroupByAttribute: '{{ item.GroupByAttribute }}'
+        InsightArn: '{{ item.InsightArn }}'
+        InsightResults: '{{ item.InsightResults }}'
+        Insights: '{{ item.Insights }}'
+        Name: '{{ item.Name }}'
+        ResultValues: '{{ item.ResultValues }}'
+      items_for: '{{ response.Insights }}'

@@ -1,0 +1,173 @@
+version: '1.0'
+provider: aws
+service: elbv2
+discovery:
+- calls:
+  - action: describe_load_balancers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.elbv2.describe_load_balancers
+  emit:
+    as: item
+    item:
+      resource_type: elbv2_load_balancer
+      AvailabilityZones: '{{ item.AvailabilityZones }}'
+      CanonicalHostedZoneId: '{{ item.CanonicalHostedZoneId }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      CustomerOwnedIpv4Pool: '{{ item.CustomerOwnedIpv4Pool }}'
+      DNSName: '{{ item.DNSName }}'
+      EnablePrefixForIpv6SourceNat: '{{ item.EnablePrefixForIpv6SourceNat }}'
+      EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic: '{{ item.LoadBalancers[].EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic }}'
+      IpAddressType: '{{ item.IpAddressType }}'
+      IpamPools: '{{ item.IpamPools }}'
+      LoadBalancerArn: '{{ item.LoadBalancerArn }}'
+      LoadBalancerName: '{{ item.LoadBalancerName }}'
+      LoadBalancers: '{{ item.LoadBalancers }}'
+      Scheme: '{{ item.Scheme }}'
+      SecurityGroups: '{{ item.SecurityGroups }}'
+      State: '{{ item.State }}'
+      Type: '{{ item.Type }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.LoadBalancers }}'
+- calls:
+  - action: describe_target_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.elbv2.describe_target_groups
+  emit:
+    as: item
+    item:
+      resource_type: elbv2_target_group
+      HealthCheckEnabled: '{{ item.HealthCheckEnabled }}'
+      HealthCheckIntervalSeconds: '{{ item.HealthCheckIntervalSeconds }}'
+      HealthCheckPath: '{{ item.HealthCheckPath }}'
+      HealthCheckPort: '{{ item.HealthCheckPort }}'
+      HealthCheckProtocol: '{{ item.HealthCheckProtocol }}'
+      HealthCheckTimeoutSeconds: '{{ item.HealthCheckTimeoutSeconds }}'
+      HealthyThresholdCount: '{{ item.HealthyThresholdCount }}'
+      IpAddressType: '{{ item.IpAddressType }}'
+      LoadBalancerArns: '{{ item.LoadBalancerArns }}'
+      Matcher: '{{ item.Matcher }}'
+      Port: '{{ item.Port }}'
+      Protocol: '{{ item.Protocol }}'
+      ProtocolVersion: '{{ item.ProtocolVersion }}'
+      TargetControlPort: '{{ item.TargetControlPort }}'
+      TargetGroupArn: '{{ item.TargetGroupArn }}'
+      TargetGroupName: '{{ item.TargetGroupName }}'
+      TargetGroups: '{{ item.TargetGroups }}'
+      TargetType: '{{ item.TargetType }}'
+      UnhealthyThresholdCount: '{{ item.UnhealthyThresholdCount }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.TargetGroups }}'
+- calls:
+  - action: describe_load_balancer_attributes
+    on_error: continue
+    params:
+      LoadBalancerArn: '{{ item.LoadBalancerArn }}'
+    save_as: response
+  discovery_id: aws.elbv2.describe_load_balancer_attributes
+  emit:
+    as: item
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+    items_for: '{{ response.Attributes }}'
+  for_each: aws.elbv2.describe_load_balancers
+- calls:
+  - action: describe_trust_stores
+    on_error: continue
+    save_as: response
+  discovery_id: aws.elbv2.describe_trust_stores
+  emit:
+    as: item
+    item:
+      Name: '{{ item.Name }}'
+      NumberOfCaCertificates: '{{ item.NumberOfCaCertificates }}'
+      Status: '{{ item.Status }}'
+      TotalRevokedEntries: '{{ item.TotalRevokedEntries }}'
+      TrustStoreArn: '{{ item.TrustStoreArn }}'
+      TrustStores: '{{ item.TrustStores }}'
+    items_for: '{{ response.TrustStores }}'
+- calls:
+  - action: describe_rules
+    on_error: continue
+    save_as: response
+  discovery_id: aws.elbv2.describe_rules
+  emit:
+    as: item
+    item:
+      Actions: '{{ item.Actions }}'
+      Conditions: '{{ item.Conditions }}'
+      IsDefault: '{{ item.IsDefault }}'
+      Priority: '{{ item.Priority }}'
+      RuleArn: '{{ item.RuleArn }}'
+      Rules: '{{ item.Rules }}'
+      Transforms: '{{ item.Transforms }}'
+    items_for: '{{ response.Rules }}'
+- calls:
+  - action: describe_listeners
+    on_error: continue
+    save_as: response
+  discovery_id: aws.elbv2.describe_listeners
+  emit:
+    as: item
+    item:
+      AlpnPolicy: '{{ item.AlpnPolicy }}'
+      CertificateArn: '{{ item.CertificateArn }}'
+      Certificates: '{{ item.Certificates }}'
+      DefaultActions: '{{ item.DefaultActions }}'
+      ListenerArn: '{{ item.ListenerArn }}'
+      Listeners: '{{ item.Listeners }}'
+      LoadBalancerArn: '{{ item.LoadBalancerArn }}'
+      MutualAuthentication: '{{ item.MutualAuthentication }}'
+      Port: '{{ item.Port }}'
+      Protocol: '{{ item.Protocol }}'
+      SslPolicy: '{{ item.SslPolicy }}'
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+    items_for: '{{ response.Listeners }}'
+- calls:
+  - action: describe_ssl_policies
+    on_error: continue
+    save_as: response
+  discovery_id: aws.elbv2.describe_ssl_policies
+  emit:
+    as: item
+    item:
+      Ciphers: '{{ item.Ciphers }}'
+      Name: '{{ item.Name }}'
+      SslPolicies: '{{ item.SslPolicies }}'
+      SslProtocols: '{{ item.SslProtocols }}'
+      SupportedLoadBalancerTypes: '{{ item.SupportedLoadBalancerTypes }}'
+    items_for: '{{ response.SslPolicies }}'
+- calls:
+  - action: describe_listener_certificates
+    on_error: continue
+    params:
+      ListenerArn: '{{ item.ListenerArn }}'
+    save_as: response
+  discovery_id: aws.elbv2.describe_listener_certificates
+  emit:
+    as: item
+    item:
+      CertificateArn: '{{ item.CertificateArn }}'
+      IsDefault: '{{ item.IsDefault }}'
+    items_for: '{{ response.Certificates }}'
+  for_each: aws.elbv2.describe_listeners
+- calls:
+  - action: describe_target_health
+    on_error: continue
+    params:
+      TargetGroupArn: '{{ item.TargetGroupArn }}'
+    save_as: response
+  discovery_id: aws.elbv2.describe_target_health
+  emit:
+    as: item
+    item:
+      AdministrativeOverride: '{{ item.AdministrativeOverride }}'
+      AnomalyDetection: '{{ item.AnomalyDetection }}'
+      HealthCheckPort: '{{ item.HealthCheckPort }}'
+      Target: '{{ item.Target }}'
+      TargetHealth: '{{ item.TargetHealth }}'
+    items_for: '{{ response.TargetHealthDescriptions }}'
+  for_each: aws.elbv2.describe_target_groups

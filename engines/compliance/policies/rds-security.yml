@@ -1,0 +1,175 @@
+policies:
+
+  # ---------------------------------------------------------------
+  # 1. RDS instances publicly accessible
+  # ---------------------------------------------------------------
+  - name: rds-public-access
+    resource: rds
+    description: >
+      RDS instances with PubliclyAccessible=true. These databases
+      are reachable from the public internet — a critical security
+      violation unless behind a verified network control.
+    filters:
+      - type: value
+        key: PubliclyAccessible
+        value: true
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "rds-publicly-accessible"
+      - type: notify
+        template: default.html
+        subject: "[c7n] CRITICAL: RDS instance is publicly accessible"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 2. RDS instances without storage encryption
+  # ---------------------------------------------------------------
+  - name: rds-unencrypted
+    resource: rds
+    description: >
+      RDS instances with StorageEncrypted=false. Data at rest is
+      unprotected. Encryption must be enabled at instance creation
+      (requires snapshot-restore migration for existing instances).
+    filters:
+      - type: value
+        key: StorageEncrypted
+        value: false
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "rds-storage-unencrypted"
+      - type: notify
+        template: default.html
+        subject: "[c7n] SECURITY: RDS instance storage is not encrypted"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 3. RDS instances without Multi-AZ
+  # ---------------------------------------------------------------
+  - name: rds-no-multi-az
+    resource: rds
+    description: >
+      RDS production instances not configured for Multi-AZ. Single-AZ
+      instances have no automatic failover and incur downtime during
+      maintenance or AZ failure.
+    filters:
+      - type: value
+        key: MultiAZ
+        value: false
+      - type: value
+        key: tag:Environment
+        op: in
+        value:
+          - prod
+          - production
+          - prd
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "enable-rds-multi-az"
+      - type: notify
+        template: default.html
+        subject: "[c7n] RDS production instance running Single-AZ — no automatic failover"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 4. RDS instances with backup retention period < 7 days
+  # ---------------------------------------------------------------
+  - name: rds-no-backup
+    resource: rds
+    description: >
+      RDS instances with automated backup retention period less than
+      7 days. Short retention windows limit point-in-time recovery
+      options and violate most compliance frameworks.
+    filters:
+      - type: value
+        key: BackupRetentionPeriod
+        value: 7
+        op: less-than
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "rds-insufficient-backup-retention"
+      - type: notify
+        template: default.html
+        subject: "[c7n] RDS backup retention < 7 days — insufficient for recovery"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 5. RDS manual snapshots older than 90 days
+  # ---------------------------------------------------------------
+  - name: rds-old-snapshot
+    resource: rds-snapshot
+    description: >
+      Manual RDS snapshots older than 90 days. Old snapshots accumulate
+      storage cost and often represent forgotten one-off backups.
+      Review and delete if no longer required for compliance.
+    filters:
+      - type: value
+        key: SnapshotType
+        value: manual
+      - type: age
+        days: 90
+        op: greater-than
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "rds-snapshot-older-than-90d"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Manual RDS snapshot older than 90 days — review for deletion"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # 6. RDS instances with deletion protection disabled
+  # ---------------------------------------------------------------
+  - name: rds-no-deletion-protection
+    resource: rds
+    description: >
+      RDS instances without deletion protection enabled. Without this
+      flag, any IAM principal with rds:DeleteDBInstance permission can
+      permanently destroy the database.
+    filters:
+      - type: value
+        key: DeletionProtection
+        value: false
+      - type: value
+        key: tag:Environment
+        op: in
+        value:
+          - prod
+          - production
+          - prd
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "rds-deletion-protection-disabled"
+      - type: notify
+        template: default.html
+        subject: "[c7n] RDS production instance missing deletion protection"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

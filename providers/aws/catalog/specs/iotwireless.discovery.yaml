@@ -1,0 +1,783 @@
+version: '1.0'
+provider: aws
+service: iotwireless
+services:
+  client: iotwireless
+  module: boto3.client
+discovery:
+- discovery_id: aws.iotwireless.get_event_configuration_by_resource_types
+  calls:
+  - action: get_event_configuration_by_resource_types
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ConnectionStatus: '{{ response.DeviceRegistrationState.ConnectionStatus }}'
+      DeviceRegistrationState: '{{ response.DeviceRegistrationState.DeviceRegistrationState }}'
+      Join: '{{ response.DeviceRegistrationState.Join }}'
+      MessageDeliveryStatus: '{{ response.DeviceRegistrationState.MessageDeliveryStatus }}'
+      Proximity: '{{ response.DeviceRegistrationState.Proximity }}'
+      Sidewalk: '{{ response.DeviceRegistrationState.Sidewalk }}'
+      WirelessGatewayEventTopic: '{{ response.ConnectionStatus.LoRaWAN.WirelessGatewayEventTopic }}'
+      WirelessDeviceEventTopic: '{{ response.DeviceRegistrationState.Sidewalk.WirelessDeviceEventTopic }}'
+- discovery_id: aws.iotwireless.get_log_levels_by_resource_types
+  calls:
+  - action: get_log_levels_by_resource_types
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.WirelessGatewayLogOptions }}'
+    item:
+      DefaultLogLevel: '{{ item.DefaultLogLevel }}'
+      Events: '{{ item.Events }}'
+      FuotaTaskLogOptions: '{{ item.FuotaTaskLogOptions }}'
+      LogLevel: '{{ item.LogLevel }}'
+      Type: '{{ item.Type }}'
+      WirelessDeviceLogOptions: '{{ item.WirelessDeviceLogOptions[].Type }}'
+      WirelessGatewayLogOptions: '{{ item.WirelessGatewayLogOptions[].Type }}'
+- discovery_id: aws.iotwireless.get_metric_configuration
+  calls:
+  - action: get_metric_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.SummaryMetric.Status }}'
+      SummaryMetric: '{{ response.SummaryMetric.SummaryMetric }}'
+- discovery_id: aws.iotwireless.get_metrics
+  calls:
+  - action: get_metrics
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SummaryMetricQueryResults }}'
+    item:
+      AggregationPeriod: '{{ item.AggregationPeriod }}'
+      Dimensions: '{{ item.Dimensions }}'
+      EndTimestamp: '{{ item.EndTimestamp }}'
+      Error: '{{ item.Error }}'
+      MetricName: '{{ item.MetricName }}'
+      QueryId: '{{ item.QueryId }}'
+      QueryStatus: '{{ item.QueryStatus }}'
+      StartTimestamp: '{{ item.StartTimestamp }}'
+      SummaryMetricQueryResults: '{{ item.SummaryMetricQueryResults[].Unit }}'
+      Timestamps: '{{ item.Timestamps }}'
+      Unit: '{{ item.Unit }}'
+      Values: '{{ item.Values }}'
+- discovery_id: aws.iotwireless.get_position_estimate
+  calls:
+  - action: get_position_estimate
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      GeoJsonPayload: '{{ response.GeoJsonPayload }}'
+- discovery_id: aws.iotwireless.get_service_endpoint
+  calls:
+  - action: get_service_endpoint
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ServerTrust: '{{ response.ServerTrust }}'
+      ServiceEndpoint: '{{ response.ServiceEndpoint }}'
+      ServiceType: '{{ response.ServiceType }}'
+- discovery_id: aws.iotwireless.list_destinations
+  calls:
+  - action: list_destinations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DestinationList }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Name: '{{ item.Name }}'
+      RoleArn: '{{ item.RoleArn }}'
+      Description: '{{ item.Description }}'
+      Expression: '{{ item.Expression }}'
+      ExpressionType: '{{ item.ExpressionType }}'
+- discovery_id: aws.iotwireless.list_device_profiles
+  calls:
+  - action: list_device_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DeviceProfileList }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+- discovery_id: aws.iotwireless.list_fuota_tasks
+  calls:
+  - action: list_fuota_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.FuotaTaskList }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Descriptor: '{{ item.Descriptor }}'
+- discovery_id: aws.iotwireless.list_multicast_groups
+  calls:
+  - action: list_multicast_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MulticastGroupList }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+- discovery_id: aws.iotwireless.list_network_analyzer_configurations
+  calls:
+  - action: list_network_analyzer_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.NetworkAnalyzerConfigurationList }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Name: '{{ item.Name }}'
+      Enabled: '{{ item.Enabled }}'
+- discovery_id: aws.iotwireless.list_partner_accounts
+  calls:
+  - action: list_partner_accounts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Sidewalk }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      AmazonId: '{{ item.AmazonId }}'
+      Fingerprint: '{{ item.Fingerprint }}'
+- discovery_id: aws.iotwireless.list_position_configurations
+  calls:
+  - action: list_position_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PositionConfigurationList }}'
+    item:
+      Accuracy: '{{ item.Accuracy }}'
+      Destination: '{{ item.Destination }}'
+      Position: '{{ item.Position }}'
+      ResourceIdentifier: '{{ item.ResourceIdentifier }}'
+      ResourceType: '{{ item.ResourceType }}'
+      Solvers: '{{ item.Solvers }}'
+- discovery_id: aws.iotwireless.list_service_profiles
+  calls:
+  - action: list_service_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ServiceProfileList }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+- discovery_id: aws.iotwireless.list_wireless_device_import_tasks
+  calls:
+  - action: list_wireless_device_import_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.WirelessDeviceImportTaskList }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      DestinationName: '{{ item.DestinationName }}'
+      FailedImportedDeviceCount: '{{ item.FailedImportedDeviceCount }}'
+      InitializedImportedDeviceCount: '{{ item.InitializedImportedDeviceCount }}'
+      OnboardedImportedDeviceCount: '{{ item.OnboardedImportedDeviceCount }}'
+      PendingImportedDeviceCount: '{{ item.PendingImportedDeviceCount }}'
+      Positioning: '{{ item.Positioning }}'
+      Sidewalk: '{{ item.Sidewalk }}'
+      StatusReason: '{{ item.StatusReason }}'
+- discovery_id: aws.iotwireless.list_wireless_devices
+  calls:
+  - action: list_wireless_devices
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.WirelessDeviceList }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      DestinationName: '{{ item.DestinationName }}'
+      FuotaDeviceStatus: '{{ item.FuotaDeviceStatus }}'
+      LastUplinkReceivedAt: '{{ item.LastUplinkReceivedAt }}'
+      LoRaWAN: '{{ item.LoRaWAN }}'
+      McGroupId: '{{ item.McGroupId }}'
+      MulticastDeviceStatus: '{{ item.MulticastDeviceStatus }}'
+      Positioning: '{{ item.Positioning }}'
+      Sidewalk: '{{ item.Sidewalk }}'
+      Type: '{{ item.Type }}'
+      WirelessDeviceId: '{{ item.WirelessDeviceId }}'
+- discovery_id: aws.iotwireless.list_wireless_gateway_task_definitions
+  calls:
+  - action: list_wireless_gateway_task_definitions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TaskDefinitions }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      LoRaWAN: '{{ item.LoRaWAN }}'
+- discovery_id: aws.iotwireless.list_wireless_gateways
+  calls:
+  - action: list_wireless_gateways
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.WirelessGatewayList }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Description: '{{ item.Description }}'
+      LastUplinkReceivedAt: '{{ item.LastUplinkReceivedAt }}'
+      LoRaWAN: '{{ item.LoRaWAN }}'
+      WirelessGatewayId: '{{ item.WirelessGatewayId }}'
+- discovery_id: aws.iotwireless.get_destination
+  for_each: aws.iotwireless.list_destinations
+  calls:
+  - action: get_destination
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Name: '{{ response.Name }}'
+      RoleArn: '{{ response.RoleArn }}'
+      Description: '{{ response.Description }}'
+      Expression: '{{ response.Expression }}'
+      ExpressionType: '{{ response.ExpressionType }}'
+- discovery_id: aws.iotwireless.get_device_profile
+  for_each: aws.iotwireless.list_device_profiles
+  calls:
+  - action: get_device_profile
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ClassBTimeout: '{{ response.LoRaWAN.ClassBTimeout }}'
+      ClassCTimeout: '{{ response.LoRaWAN.ClassCTimeout }}'
+      FactoryPresetFreqsList: '{{ response.LoRaWAN.FactoryPresetFreqsList }}'
+      MacVersion: '{{ response.LoRaWAN.MacVersion }}'
+      MaxDutyCycle: '{{ response.LoRaWAN.MaxDutyCycle }}'
+      MaxEirp: '{{ response.LoRaWAN.MaxEirp }}'
+      PingSlotDr: '{{ response.LoRaWAN.PingSlotDr }}'
+      PingSlotFreq: '{{ response.LoRaWAN.PingSlotFreq }}'
+      PingSlotPeriod: '{{ response.LoRaWAN.PingSlotPeriod }}'
+      RegParamsRevision: '{{ response.LoRaWAN.RegParamsRevision }}'
+      RfRegion: '{{ response.LoRaWAN.RfRegion }}'
+      RxDataRate2: '{{ response.LoRaWAN.RxDataRate2 }}'
+      RxDelay1: '{{ response.LoRaWAN.RxDelay1 }}'
+      RxDrOffset1: '{{ response.LoRaWAN.RxDrOffset1 }}'
+      RxFreq2: '{{ response.LoRaWAN.RxFreq2 }}'
+      Supports32BitFCnt: '{{ response.LoRaWAN.Supports32BitFCnt }}'
+      SupportsClassB: '{{ response.LoRaWAN.SupportsClassB }}'
+      SupportsClassC: '{{ response.LoRaWAN.SupportsClassC }}'
+      SupportsJoin: '{{ response.LoRaWAN.SupportsJoin }}'
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      ApplicationServerPublicKey: '{{ response.Sidewalk.ApplicationServerPublicKey }}'
+      QualificationStatus: '{{ response.Sidewalk.QualificationStatus }}'
+- discovery_id: aws.iotwireless.get_fuota_task
+  for_each: aws.iotwireless.list_device_profiles
+  calls:
+  - action: get_fuota_task
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Descriptor: '{{ response.LoRaWAN.Descriptor }}'
+      RfRegion: '{{ response.LoRaWAN.RfRegion }}'
+      StartTime: '{{ response.LoRaWAN.StartTime }}'
+      Arn: '{{ response.Arn }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      Description: '{{ response.Description }}'
+      FirmwareUpdateImage: '{{ response.FirmwareUpdateImage }}'
+      FirmwareUpdateRole: '{{ response.FirmwareUpdateRole }}'
+      FragmentIntervalMS: '{{ response.FragmentIntervalMS }}'
+      FragmentSizeBytes: '{{ response.FragmentSizeBytes }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+      RedundancyPercent: '{{ response.RedundancyPercent }}'
+      Status: '{{ response.Status }}'
+- discovery_id: aws.iotwireless.get_multicast_group
+  for_each: aws.iotwireless.list_device_profiles
+  calls:
+  - action: get_multicast_group
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DlClass: '{{ response.LoRaWAN.DlClass }}'
+      NumberOfDevicesInGroup: '{{ response.LoRaWAN.NumberOfDevicesInGroup }}'
+      NumberOfDevicesRequested: '{{ response.LoRaWAN.NumberOfDevicesRequested }}'
+      ParticipatingGateways: '{{ response.LoRaWAN.ParticipatingGateways }}'
+      RfRegion: '{{ response.LoRaWAN.RfRegion }}'
+      Arn: '{{ response.Arn }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      Description: '{{ response.Description }}'
+      Id: '{{ response.Id }}'
+      TransmissionInterval: '{{ response.LoRaWAN.ParticipatingGateways.TransmissionInterval }}'
+      Name: '{{ response.Name }}'
+      Status: '{{ response.Status }}'
+- discovery_id: aws.iotwireless.get_multicast_group_session
+  for_each: aws.iotwireless.list_device_profiles
+  calls:
+  - action: get_multicast_group_session
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DlDr: '{{ response.LoRaWAN.DlDr }}'
+      DlFreq: '{{ response.LoRaWAN.DlFreq }}'
+      PingSlotPeriod: '{{ response.LoRaWAN.PingSlotPeriod }}'
+      SessionStartTime: '{{ response.LoRaWAN.SessionStartTime }}'
+      SessionTimeout: '{{ response.LoRaWAN.SessionTimeout }}'
+- discovery_id: aws.iotwireless.get_network_analyzer_configuration
+  calls:
+  - action: get_network_analyzer_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.WirelessDevices }}'
+    item:
+      Arn: '{{ response.Arn }}'
+      Description: '{{ response.Description }}'
+      Name: '{{ response.Name }}'
+      LogLevel: '{{ response.TraceContent.LogLevel }}'
+      MulticastFrameInfo: '{{ response.TraceContent.MulticastFrameInfo }}'
+      WirelessDeviceFrameInfo: '{{ response.TraceContent.WirelessDeviceFrameInfo }}'
+- discovery_id: aws.iotwireless.get_partner_account
+  calls:
+  - action: get_partner_account
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Sidewalk.Arn }}'
+      AmazonId: '{{ response.Sidewalk.AmazonId }}'
+      Fingerprint: '{{ response.Sidewalk.Fingerprint }}'
+      AccountLinked: '{{ response.AccountLinked }}'
+- discovery_id: aws.iotwireless.get_position
+  for_each: aws.iotwireless.list_position_configurations
+  calls:
+  - action: get_position
+    params:
+      ResourceIdentifier: '{{ item.ResourceIdentifier }}'
+      ResourceType: '{{ item.ResourceType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Position }}'
+    item:
+      Accuracy: '{{ item.Accuracy }}'
+      Position: '{{ item.Position }}'
+      HorizontalAccuracy: '{{ response.Accuracy.HorizontalAccuracy }}'
+      VerticalAccuracy: '{{ response.Accuracy.VerticalAccuracy }}'
+      SolverProvider: '{{ response.SolverProvider }}'
+      SolverType: '{{ response.SolverType }}'
+      SolverVersion: '{{ response.SolverVersion }}'
+      Timestamp: '{{ response.Timestamp }}'
+- discovery_id: aws.iotwireless.get_position_configuration
+  for_each: aws.iotwireless.list_position_configurations
+  calls:
+  - action: get_position_configuration
+    params:
+      ResourceIdentifier: '{{ item.ResourceIdentifier }}'
+      ResourceType: '{{ item.ResourceType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      SemtechGnss: '{{ response.Solvers.SemtechGnss.Fec }}'
+      Destination: '{{ response.Destination }}'
+      Fec: '{{ response.Solvers.SemtechGnss.Fec }}'
+      Provider: '{{ response.Solvers.SemtechGnss.Provider }}'
+      Status: '{{ response.Solvers.SemtechGnss.Status }}'
+      Type: '{{ response.Solvers.SemtechGnss.Type }}'
+- discovery_id: aws.iotwireless.get_resource_event_configuration
+  calls:
+  - action: get_resource_event_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Sidewalk: '{{ response.DeviceRegistrationState.Sidewalk }}'
+      WirelessDeviceIdEventTopic: '{{ response.DeviceRegistrationState.WirelessDeviceIdEventTopic }}'
+      GatewayEuiEventTopic: '{{ response.ConnectionStatus.LoRaWAN.GatewayEuiEventTopic }}'
+      WirelessGatewayIdEventTopic: '{{ response.ConnectionStatus.WirelessGatewayIdEventTopic }}'
+      AmazonIdEventTopic: '{{ response.DeviceRegistrationState.Sidewalk.AmazonIdEventTopic }}'
+      DevEuiEventTopic: '{{ response.Join.LoRaWAN.DevEuiEventTopic }}'
+- discovery_id: aws.iotwireless.get_resource_log_level
+  for_each: aws.iotwireless.list_position_configurations
+  calls:
+  - action: get_resource_log_level
+    params:
+      ResourceIdentifier: '{{ item.ResourceIdentifier }}'
+      ResourceType: '{{ item.ResourceType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      LogLevel: '{{ response.LogLevel }}'
+- discovery_id: aws.iotwireless.get_resource_position
+  for_each: aws.iotwireless.list_position_configurations
+  calls:
+  - action: get_resource_position
+    params:
+      ResourceIdentifier: '{{ item.ResourceIdentifier }}'
+      ResourceType: '{{ item.ResourceType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      GeoJsonPayload: '{{ response.GeoJsonPayload }}'
+- discovery_id: aws.iotwireless.get_service_profile
+  for_each: aws.iotwireless.list_device_profiles
+  calls:
+  - action: get_service_profile
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AddGwMetadata: '{{ response.LoRaWAN.AddGwMetadata }}'
+      ChannelMask: '{{ response.LoRaWAN.ChannelMask }}'
+      DevStatusReqFreq: '{{ response.LoRaWAN.DevStatusReqFreq }}'
+      DlBucketSize: '{{ response.LoRaWAN.DlBucketSize }}'
+      DlRate: '{{ response.LoRaWAN.DlRate }}'
+      DlRatePolicy: '{{ response.LoRaWAN.DlRatePolicy }}'
+      DrMax: '{{ response.LoRaWAN.DrMax }}'
+      DrMin: '{{ response.LoRaWAN.DrMin }}'
+      HrAllowed: '{{ response.LoRaWAN.HrAllowed }}'
+      MinGwDiversity: '{{ response.LoRaWAN.MinGwDiversity }}'
+      NbTransMax: '{{ response.LoRaWAN.NbTransMax }}'
+      NbTransMin: '{{ response.LoRaWAN.NbTransMin }}'
+      NwkGeoLoc: '{{ response.LoRaWAN.NwkGeoLoc }}'
+      PrAllowed: '{{ response.LoRaWAN.PrAllowed }}'
+      RaAllowed: '{{ response.LoRaWAN.RaAllowed }}'
+      ReportDevStatusBattery: '{{ response.LoRaWAN.ReportDevStatusBattery }}'
+      ReportDevStatusMargin: '{{ response.LoRaWAN.ReportDevStatusMargin }}'
+      Statement: '{{ response.LoRaWAN.Statement }}'
+      TargetPer: '{{ response.LoRaWAN.TargetPer }}'
+      TxPowerIndexMax: '{{ response.LoRaWAN.TxPowerIndexMax }}'
+      TxPowerIndexMin: '{{ response.LoRaWAN.TxPowerIndexMin }}'
+      UlBucketSize: '{{ response.LoRaWAN.UlBucketSize }}'
+      UlRate: '{{ response.LoRaWAN.UlRate }}'
+      UlRatePolicy: '{{ response.LoRaWAN.UlRatePolicy }}'
+      Version: '{{ response.LoRaWAN.Version }}'
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      Name: '{{ response.Name }}'
+- discovery_id: aws.iotwireless.get_wireless_device
+  calls:
+  - action: get_wireless_device
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AbpV1_0_x: '{{ response.LoRaWAN.AbpV1_0_x }}'
+      AbpV1_1: '{{ response.LoRaWAN.AbpV1_1 }}'
+      DevEui: '{{ response.LoRaWAN.DevEui }}'
+      DeviceProfileId: '{{ response.LoRaWAN.DeviceProfileId }}'
+      FPorts: '{{ response.LoRaWAN.FPorts }}'
+      OtaaV1_0_x: '{{ response.LoRaWAN.OtaaV1_0_x }}'
+      OtaaV1_1: '{{ response.LoRaWAN.OtaaV1_1 }}'
+      ServiceProfileId: '{{ response.LoRaWAN.ServiceProfileId }}'
+      Arn: '{{ response.Arn }}'
+      Description: '{{ response.Description }}'
+      DestinationName: '{{ response.DestinationName }}'
+      Id: '{{ response.Id }}'
+      DevAddr: '{{ response.LoRaWAN.AbpV1_0_x.DevAddr }}'
+      FCntStart: '{{ response.LoRaWAN.AbpV1_0_x.FCntStart }}'
+      AppSKey: '{{ response.LoRaWAN.AbpV1_0_x.SessionKeys.AppSKey }}'
+      NwkSKey: '{{ response.LoRaWAN.AbpV1_0_x.SessionKeys.NwkSKey }}'
+      FNwkSIntKey: '{{ response.LoRaWAN.AbpV1_1.SessionKeys.FNwkSIntKey }}'
+      NwkSEncKey: '{{ response.LoRaWAN.AbpV1_1.SessionKeys.NwkSEncKey }}'
+      SNwkSIntKey: '{{ response.LoRaWAN.AbpV1_1.SessionKeys.SNwkSIntKey }}'
+      ClockSync: '{{ response.LoRaWAN.FPorts.ClockSync }}'
+      Fuota: '{{ response.LoRaWAN.FPorts.Fuota }}'
+      Multicast: '{{ response.LoRaWAN.FPorts.Multicast }}'
+      Gnss: '{{ response.LoRaWAN.FPorts.Positioning.Gnss }}'
+      Stream: '{{ response.LoRaWAN.FPorts.Positioning.Stream }}'
+      AppEui: '{{ response.LoRaWAN.OtaaV1_0_x.AppEui }}'
+      AppKey: '{{ response.LoRaWAN.OtaaV1_0_x.AppKey }}'
+      GenAppKey: '{{ response.LoRaWAN.OtaaV1_0_x.GenAppKey }}'
+      JoinEui: '{{ response.LoRaWAN.OtaaV1_0_x.JoinEui }}'
+      NwkKey: '{{ response.LoRaWAN.OtaaV1_1.NwkKey }}'
+      Name: '{{ response.Name }}'
+      Positioning: '{{ response.Positioning }}'
+      AmazonId: '{{ response.Sidewalk.AmazonId }}'
+      CertificateId: '{{ response.Sidewalk.CertificateId }}'
+      SidewalkId: '{{ response.Sidewalk.SidewalkId }}'
+      SidewalkManufacturingSn: '{{ response.Sidewalk.SidewalkManufacturingSn }}'
+      Status: '{{ response.Sidewalk.Status }}'
+      ThingArn: '{{ response.ThingArn }}'
+      ThingName: '{{ response.ThingName }}'
+      Type: '{{ response.Type }}'
+- discovery_id: aws.iotwireless.get_wireless_device_import_task
+  for_each: aws.iotwireless.list_device_profiles
+  calls:
+  - action: get_wireless_device_import_task
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DeviceCreationFileList: '{{ response.Sidewalk.DeviceCreationFileList }}'
+      Positioning: '{{ response.Sidewalk.Positioning }}'
+      Role: '{{ response.Sidewalk.Role }}'
+      Arn: '{{ response.Arn }}'
+      CreationTime: '{{ response.CreationTime }}'
+      DestinationName: '{{ response.DestinationName }}'
+      FailedImportedDeviceCount: '{{ response.FailedImportedDeviceCount }}'
+      Id: '{{ response.Id }}'
+      InitializedImportedDeviceCount: '{{ response.InitializedImportedDeviceCount }}'
+      OnboardedImportedDeviceCount: '{{ response.OnboardedImportedDeviceCount }}'
+      PendingImportedDeviceCount: '{{ response.PendingImportedDeviceCount }}'
+      Status: '{{ response.Status }}'
+      StatusReason: '{{ response.StatusReason }}'
+- discovery_id: aws.iotwireless.get_wireless_device_statistics
+  calls:
+  - action: get_wireless_device_statistics
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DataRate: '{{ response.LoRaWAN.DataRate }}'
+      DevEui: '{{ response.LoRaWAN.DevEui }}'
+      FPort: '{{ response.LoRaWAN.FPort }}'
+      Frequency: '{{ response.LoRaWAN.Frequency }}'
+      Gateways: '{{ response.LoRaWAN.Gateways }}'
+      PublicGateways: '{{ response.LoRaWAN.PublicGateways[].Id }}'
+      Timestamp: '{{ response.LoRaWAN.Timestamp }}'
+      WirelessDeviceId: '{{ response.LoRaWAN.WirelessDeviceId }}'
+      LastUplinkReceivedAt: '{{ response.LastUplinkReceivedAt }}'
+      BatteryLevel: '{{ response.Sidewalk.BatteryLevel }}'
+      DeviceState: '{{ response.Sidewalk.DeviceState }}'
+      Event: '{{ response.Sidewalk.Event }}'
+      Rssi: '{{ response.Sidewalk.Rssi }}'
+- discovery_id: aws.iotwireless.get_wireless_gateway
+  calls:
+  - action: get_wireless_gateway
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Beaconing: '{{ response.LoRaWAN.Beaconing }}'
+      GatewayEui: '{{ response.LoRaWAN.GatewayEui }}'
+      JoinEuiFilters: '{{ response.LoRaWAN.JoinEuiFilters }}'
+      MaxEirp: '{{ response.LoRaWAN.MaxEirp }}'
+      NetIdFilters: '{{ response.LoRaWAN.NetIdFilters }}'
+      RfRegion: '{{ response.LoRaWAN.RfRegion }}'
+      SubBands: '{{ response.LoRaWAN.SubBands }}'
+      Arn: '{{ response.Arn }}'
+      Description: '{{ response.Description }}'
+      Id: '{{ response.Id }}'
+      DataRate: '{{ response.LoRaWAN.Beaconing.DataRate }}'
+      Name: '{{ response.Name }}'
+      ThingArn: '{{ response.ThingArn }}'
+      ThingName: '{{ response.ThingName }}'
+- discovery_id: aws.iotwireless.get_wireless_gateway_certificate
+  calls:
+  - action: get_wireless_gateway_certificate
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      IotCertificateId: '{{ response.IotCertificateId }}'
+      LoRaWANNetworkServerCertificateId: '{{ response.LoRaWANNetworkServerCertificateId }}'
+- discovery_id: aws.iotwireless.get_wireless_gateway_firmware_information
+  for_each: aws.iotwireless.list_device_profiles
+  calls:
+  - action: get_wireless_gateway_firmware_information
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CurrentVersion: '{{ response.LoRaWAN.CurrentVersion.Model }}'
+      Model: '{{ response.LoRaWAN.CurrentVersion.Model }}'
+      PackageVersion: '{{ response.LoRaWAN.CurrentVersion.PackageVersion }}'
+      Station: '{{ response.LoRaWAN.CurrentVersion.Station }}'
+- discovery_id: aws.iotwireless.get_wireless_gateway_statistics
+  calls:
+  - action: get_wireless_gateway_statistics
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      WirelessGatewayId: '{{ response.WirelessGatewayId }}'
+      ConnectionStatus: '{{ response.ConnectionStatus }}'
+      LastUplinkReceivedAt: '{{ response.LastUplinkReceivedAt }}'
+- discovery_id: aws.iotwireless.get_wireless_gateway_task
+  for_each: aws.iotwireless.list_device_profiles
+  calls:
+  - action: get_wireless_gateway_task
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+      LastUplinkReceivedAt: '{{ response.LastUplinkReceivedAt }}'
+      TaskCreatedAt: '{{ response.TaskCreatedAt }}'
+      WirelessGatewayId: '{{ response.WirelessGatewayId }}'
+      WirelessGatewayTaskDefinitionId: '{{ response.WirelessGatewayTaskDefinitionId }}'
+- discovery_id: aws.iotwireless.get_wireless_gateway_task_definition
+  for_each: aws.iotwireless.list_device_profiles
+  calls:
+  - action: get_wireless_gateway_task_definition
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      LoRaWAN: '{{ response.Update.LoRaWAN }}'
+      UpdateDataRole: '{{ response.Update.UpdateDataRole }}'
+      UpdateDataSource: '{{ response.Update.UpdateDataSource }}'
+      Arn: '{{ response.Arn }}'
+      AutoCreateTasks: '{{ response.AutoCreateTasks }}'
+      Name: '{{ response.Name }}'
+      Model: '{{ response.Update.LoRaWAN.CurrentVersion.Model }}'
+      PackageVersion: '{{ response.Update.LoRaWAN.CurrentVersion.PackageVersion }}'
+      Station: '{{ response.Update.LoRaWAN.CurrentVersion.Station }}'
+      SigKeyCrc: '{{ response.Update.LoRaWAN.SigKeyCrc }}'
+      UpdateSignature: '{{ response.Update.LoRaWAN.UpdateSignature }}'
+- discovery_id: aws.iotwireless.list_devices_for_wireless_device_import_task
+  for_each: aws.iotwireless.list_device_profiles
+  calls:
+  - action: list_devices_for_wireless_device_import_task
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ImportedWirelessDeviceList }}'
+    item:
+      Sidewalk: '{{ item.Sidewalk }}'
+      DestinationName: '{{ response.DestinationName }}'
+- discovery_id: aws.iotwireless.list_event_configurations
+  for_each: aws.iotwireless.list_position_configurations
+  calls:
+  - action: list_event_configurations
+    params:
+      ResourceType: '{{ item.ResourceType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EventConfigurationsList }}'
+    item:
+      Events: '{{ item.Events }}'
+      Identifier: '{{ item.Identifier }}'
+      IdentifierType: '{{ item.IdentifierType }}'
+      PartnerType: '{{ item.PartnerType }}'
+- discovery_id: aws.iotwireless.list_multicast_groups_by_fuota_task
+  for_each: aws.iotwireless.list_device_profiles
+  calls:
+  - action: list_multicast_groups_by_fuota_task
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MulticastGroupList }}'
+    item:
+      Id: '{{ item.Id }}'
+- discovery_id: aws.iotwireless.list_queued_messages
+  for_each: aws.iotwireless.list_device_profiles
+  calls:
+  - action: list_queued_messages
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DownlinkQueueMessagesList }}'
+    item:
+      LoRaWAN: '{{ item.LoRaWAN }}'
+      MessageId: '{{ item.MessageId }}'
+      ReceivedAt: '{{ item.ReceivedAt }}'
+      TransmitMode: '{{ item.TransmitMode }}'
+- discovery_id: aws.iotwireless.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

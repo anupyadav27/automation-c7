@@ -1,0 +1,106 @@
+version: '1.0'
+provider: aws
+service: drs
+discovery:
+- calls:
+  - action: describe_recovery_instances
+    on_error: continue
+    save_as: response
+  discovery_id: aws.drs.describe_recovery_instances
+  emit:
+    as: item
+    item:
+      agentVersion: '{{ item.agentVersion }}'
+      arn: '{{ item.arn }}'
+      dataReplicationInfo: '{{ item.dataReplicationInfo }}'
+      ec2InstanceID: '{{ item.ec2InstanceID }}'
+      ec2InstanceState: '{{ item.ec2InstanceState }}'
+      failback: '{{ item.failback }}'
+      isDrill: '{{ item.isDrill }}'
+      jobID: '{{ item.jobID }}'
+      launchIntoInstanceProperties: '{{ item.launchIntoInstanceProperties }}'
+      originAvailabilityZone: '{{ item.originAvailabilityZone }}'
+      originEnvironment: '{{ item.originEnvironment }}'
+      pointInTimeSnapshotDateTime: '{{ item.items[].pointInTimeSnapshotDateTime }}'
+      recoveryInstanceID: '{{ item.recoveryInstanceID }}'
+      recoveryInstanceProperties: '{{ item.recoveryInstanceProperties }}'
+      sourceOutpostArn: '{{ item.sourceOutpostArn }}'
+      sourceServerID: '{{ item.sourceServerID }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.items }}'
+- calls:
+  - action: describe_replication_configuration_templates
+    on_error: continue
+    save_as: response
+  discovery_id: aws.drs.describe_replication_configuration_templates
+  emit:
+    as: item
+    item:
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+      arn: '{{ item.arn }}'
+      associateDefaultSecurityGroup: '{{ item.items[].associateDefaultSecurityGroup }}'
+      autoReplicateNewDisks: '{{ item.autoReplicateNewDisks }}'
+      bandwidthThrottling: '{{ item.bandwidthThrottling }}'
+      createPublicIP: '{{ item.createPublicIP }}'
+      dataPlaneRouting: '{{ item.dataPlaneRouting }}'
+      defaultLargeStagingDiskType: '{{ item.items[].defaultLargeStagingDiskType }}'
+      ebsEncryption: '{{ item.ebsEncryption }}'
+      ebsEncryptionKeyArn: '{{ item.ebsEncryptionKeyArn }}'
+      pitPolicy: '{{ item.pitPolicy }}'
+      replicationConfigurationTemplateID: '{{ item.items[].replicationConfigurationTemplateID }}'
+      replicationServerInstanceType: '{{ item.items[].replicationServerInstanceType }}'
+      replicationServersSecurityGroupsIDs: '{{ item.replicationServersSecurityGroupsIDs }}'
+      stagingAreaSubnetId: '{{ item.stagingAreaSubnetId }}'
+      stagingAreaTags: '{{ item.stagingAreaTags }}'
+      tags: '{{ item.tags }}'
+      useDedicatedReplicationServer: '{{ item.items[].useDedicatedReplicationServer }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.items }}'
+- calls:
+  - action: describe_launch_configuration_templates
+    on_error: continue
+    save_as: response
+  discovery_id: aws.drs.describe_launch_configuration_templates
+  emit:
+    as: item
+    item:
+      arn: '{{ item.arn }}'
+      copyPrivateIp: '{{ item.copyPrivateIp }}'
+      copyTags: '{{ item.copyTags }}'
+      ec2LaunchTemplateID: '{{ item.ec2LaunchTemplateID }}'
+      exportBucketArn: '{{ item.exportBucketArn }}'
+      launchConfigurationTemplateID: '{{ item.items[].launchConfigurationTemplateID }}'
+      launchDisposition: '{{ item.launchDisposition }}'
+      launchIntoSourceInstance: '{{ item.items[].launchIntoSourceInstance }}'
+      licensing: '{{ item.licensing }}'
+      postLaunchEnabled: '{{ item.postLaunchEnabled }}'
+      tags: '{{ item.tags }}'
+      targetInstanceTypeRightSizingMethod: '{{ item.items[].targetInstanceTypeRightSizingMethod }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.items }}'
+- calls:
+  - action: describe_source_servers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.drs.describe_source_servers
+  emit:
+    as: item
+    item:
+      agentVersion: '{{ item.agentVersion }}'
+      arn: '{{ item.arn }}'
+      dataReplicationInfo: '{{ item.dataReplicationInfo }}'
+      lastLaunchResult: '{{ item.lastLaunchResult }}'
+      lifeCycle: '{{ item.lifeCycle }}'
+      recoveryInstanceId: '{{ item.recoveryInstanceId }}'
+      replicationDirection: '{{ item.replicationDirection }}'
+      reversedDirectionSourceServerArn: '{{ item.items[].reversedDirectionSourceServerArn }}'
+      sourceCloudProperties: '{{ item.sourceCloudProperties }}'
+      sourceNetworkID: '{{ item.sourceNetworkID }}'
+      sourceProperties: '{{ item.sourceProperties }}'
+      sourceServerID: '{{ item.sourceServerID }}'
+      stagingArea: '{{ item.stagingArea }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+    items_for: '{{ response.items }}'

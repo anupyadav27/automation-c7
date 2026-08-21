@@ -1,0 +1,182 @@
+version: '1.0'
+provider: aws
+service: rolesanywhere
+services:
+  client: rolesanywhere
+  module: boto3.client
+discovery:
+- discovery_id: aws.rolesanywhere.list_crls
+  calls:
+  - action: list_crls
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.crls }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      crlArn: '{{ item.crlArn }}'
+      crlData: '{{ item.crlData }}'
+      crlId: '{{ item.crlId }}'
+      enabled: '{{ item.enabled }}'
+      name: '{{ item.name }}'
+      trustAnchorArn: '{{ item.trustAnchorArn }}'
+      updatedAt: '{{ item.updatedAt }}'
+- discovery_id: aws.rolesanywhere.list_profiles
+  calls:
+  - action: list_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.profiles }}'
+    item:
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+      acceptRoleSessionName: '{{ item.acceptRoleSessionName }}'
+      attributeMappings: '{{ item.attributeMappings }}'
+      createdAt: '{{ item.createdAt }}'
+      createdBy: '{{ item.createdBy }}'
+      durationSeconds: '{{ item.durationSeconds }}'
+      enabled: '{{ item.enabled }}'
+      managedPolicyArns: '{{ item.managedPolicyArns }}'
+      name: '{{ item.name }}'
+      profileArn: '{{ item.profileArn }}'
+      profileId: '{{ item.profileId }}'
+      requireInstanceProperties: '{{ item.requireInstanceProperties }}'
+      roleArns: '{{ item.roleArns }}'
+      sessionPolicy: '{{ item.sessionPolicy }}'
+      updatedAt: '{{ item.updatedAt }}'
+- discovery_id: aws.rolesanywhere.list_subjects
+  calls:
+  - action: list_subjects
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.subjects }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      enabled: '{{ item.enabled }}'
+      lastSeenAt: '{{ item.lastSeenAt }}'
+      subject: '{{ item.subject }}'
+      subjectArn: '{{ item.subjectArn }}'
+      subjectId: '{{ item.subjectId }}'
+      updatedAt: '{{ item.updatedAt }}'
+      x509Subject: '{{ item.x509Subject }}'
+- discovery_id: aws.rolesanywhere.list_trust_anchors
+  calls:
+  - action: list_trust_anchors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.trustAnchors }}'
+    item:
+      DestinationArn: '{{ item.DestinationArn }}'
+      Enabled: '{{ item.Enabled }}'
+      Format: '{{ item.Format }}'
+      Level: '{{ item.Level }}'
+      createdAt: '{{ item.createdAt }}'
+      enabled: '{{ item.enabled }}'
+      name: '{{ item.name }}'
+      notificationSettings: '{{ item.notificationSettings }}'
+      source: '{{ item.source }}'
+      trustAnchorArn: '{{ item.trustAnchorArn }}'
+      trustAnchorId: '{{ item.trustAnchorId }}'
+      updatedAt: '{{ item.updatedAt }}'
+- discovery_id: aws.rolesanywhere.get_crl
+  for_each: aws.rolesanywhere.list_crls
+  calls:
+  - action: get_crl
+    params:
+      crlId: '{{ item.crlId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdAt: '{{ response.crl.createdAt }}'
+      crlArn: '{{ response.crl.crlArn }}'
+      crlData: '{{ response.crl.crlData }}'
+      crlId: '{{ response.crl.crlId }}'
+      enabled: '{{ response.crl.enabled }}'
+      name: '{{ response.crl.name }}'
+      trustAnchorArn: '{{ response.crl.trustAnchorArn }}'
+      updatedAt: '{{ response.crl.updatedAt }}'
+- discovery_id: aws.rolesanywhere.get_profile
+  for_each: aws.rolesanywhere.list_profiles
+  calls:
+  - action: get_profile
+    params:
+      profileId: '{{ item.profileId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      acceptRoleSessionName: '{{ response.profile.acceptRoleSessionName }}'
+      attributeMappings: '{{ response.profile.attributeMappings }}'
+      createdAt: '{{ response.profile.createdAt }}'
+      createdBy: '{{ response.profile.createdBy }}'
+      durationSeconds: '{{ response.profile.durationSeconds }}'
+      enabled: '{{ response.profile.enabled }}'
+      managedPolicyArns: '{{ response.profile.managedPolicyArns }}'
+      name: '{{ response.profile.name }}'
+      profileArn: '{{ response.profile.profileArn }}'
+      profileId: '{{ response.profile.profileId }}'
+      requireInstanceProperties: '{{ response.profile.requireInstanceProperties }}'
+      roleArns: '{{ response.profile.roleArns }}'
+      sessionPolicy: '{{ response.profile.sessionPolicy }}'
+      updatedAt: '{{ response.profile.updatedAt }}'
+- discovery_id: aws.rolesanywhere.get_subject
+  for_each: aws.rolesanywhere.list_subjects
+  calls:
+  - action: get_subject
+    params:
+      subjectId: '{{ item.subjectId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdAt: '{{ response.subject.createdAt }}'
+      credentials: '{{ response.subject.credentials }}'
+      enabled: '{{ response.subject.enabled }}'
+      instanceProperties: '{{ response.subject.instanceProperties }}'
+      lastSeenAt: '{{ response.subject.lastSeenAt }}'
+      subject: '{{ response.subject.subject }}'
+      subjectArn: '{{ response.subject.subjectArn }}'
+      subjectId: '{{ response.subject.subjectId }}'
+      updatedAt: '{{ response.subject.updatedAt }}'
+      x509Subject: '{{ response.subject.x509Subject }}'
+- discovery_id: aws.rolesanywhere.get_trust_anchor
+  for_each: aws.rolesanywhere.list_trust_anchors
+  calls:
+  - action: get_trust_anchor
+    params:
+      trustAnchorId: '{{ item.trustAnchorId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdAt: '{{ response.trustAnchor.createdAt }}'
+      enabled: '{{ response.trustAnchor.enabled }}'
+      name: '{{ response.trustAnchor.name }}'
+      notificationSettings: '{{ response.trustAnchor.notificationSettings }}'
+      source: '{{ response.trustAnchor.source }}'
+      trustAnchorArn: '{{ response.trustAnchor.trustAnchorArn }}'
+      trustAnchorId: '{{ response.trustAnchor.trustAnchorId }}'
+      updatedAt: '{{ response.trustAnchor.updatedAt }}'
+- discovery_id: aws.rolesanywhere.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'

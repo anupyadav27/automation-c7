@@ -1,0 +1,306 @@
+version: '1.0'
+provider: aws
+service: ssm
+discovery:
+- calls:
+  - action: describe_maintenance_windows
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ssm.describe_maintenance_windows
+  emit:
+    as: item
+    item:
+      Cutoff: '{{ item.Cutoff }}'
+      Description: '{{ item.Description }}'
+      Duration: '{{ item.Duration }}'
+      Enabled: '{{ item.Enabled }}'
+      EndDate: '{{ item.EndDate }}'
+      Name: '{{ item.Name }}'
+      NextExecutionTime: '{{ item.NextExecutionTime }}'
+      Schedule: '{{ item.Schedule }}'
+      ScheduleOffset: '{{ item.ScheduleOffset }}'
+      ScheduleTimezone: '{{ item.ScheduleTimezone }}'
+      StartDate: '{{ item.StartDate }}'
+      WindowId: '{{ item.WindowId }}'
+      WindowIdentities: '{{ item.WindowIdentities }}'
+    items_for: '{{ response.WindowIdentities }}'
+- calls:
+  - action: list_nodes
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ssm.list_nodes
+  emit:
+    as: item
+    item:
+      CaptureTime: '{{ item.CaptureTime }}'
+      Id: '{{ item.Id }}'
+      NodeType: '{{ item.NodeType }}'
+      Owner: '{{ item.Owner }}'
+      Region: '{{ item.Region }}'
+    items_for: '{{ response.Nodes }}'
+- calls:
+  - action: describe_instance_information
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ssm.describe_instance_information
+  emit:
+    as: item
+    item:
+      InstanceId: '{{ item.InstanceId }}'
+      PingStatus: '{{ item.PingStatus }}'
+      AgentVersion: '{{ item.AgentVersion }}'
+      ComputerName: '{{ item.ComputerName }}'
+      PlatformName: '{{ item.PlatformName }}'
+      PlatformType: '{{ item.PlatformType }}'
+      PlatformVersion: '{{ item.PlatformVersion }}'
+      IPAddress: '{{ item.IPAddress }}'
+      ResourceType: '{{ item.ResourceType }}'
+      AssociationStatus: '{{ item.AssociationStatus }}'
+      LastAssociationExecutionDate: '{{ item.LastAssociationExecutionDate }}'
+      LastSuccessfulAssociationExecutionDate: '{{ item.LastSuccessfulAssociationExecutionDate }}'
+    items_for: '{{ response.InstanceInformationList }}'
+- calls:
+  - action: describe_parameters
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ssm.describe_parameters
+  emit:
+    as: item
+    item:
+      ARN: '{{ item.ARN }}'
+      AllowedPattern: '{{ item.AllowedPattern }}'
+      DataType: '{{ item.DataType }}'
+      Description: '{{ item.Description }}'
+      KeyId: '{{ item.KeyId }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      LastModifiedUser: '{{ item.LastModifiedUser }}'
+      Name: '{{ item.Name }}'
+      Policies: '{{ item.Policies }}'
+      Tier: '{{ item.Tier }}'
+      Type: '{{ item.Type }}'
+      Version: '{{ item.Version }}'
+    items_for: '{{ response.Parameters }}'
+- calls:
+  - action: describe_association
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ssm.describe_association
+  emit:
+    as: item
+    item:
+      AlarmConfiguration: '{{ response.AssociationDescription.AlarmConfiguration.Alarms[].Name }}'
+      ApplyOnlyAtCronInterval: '{{ response.AssociationDescription.ApplyOnlyAtCronInterval }}'
+      AssociationDescription: '{{ response.AssociationDescription.AssociationVersion }}'
+      AssociationExecutions: '{{ response.AssociationDescription.AssociationVersion }}'
+      AssociationId: '{{ response.AssociationDescription.AssociationId }}'
+      AssociationName: '{{ response.AssociationDescription.AssociationName }}'
+      AssociationVersion: '{{ response.AssociationDescription.AssociationVersion }}'
+      AutomationTargetParameterName: '{{ response.AssociationDescription.AutomationTargetParameterName }}'
+      CalendarNames: '{{ response.AssociationDescription.Name }}'
+      ComplianceSeverity: '{{ response.AssociationDescription.ComplianceSeverity }}'
+      Date: '{{ response.AssociationDescription.Date }}'
+      DocumentVersion: '{{ response.AssociationDescription.DocumentVersion }}'
+      Duration: '{{ response.AssociationDescription.Duration }}'
+      InstanceId: '{{ response.AssociationDescription.InstanceId }}'
+      LastExecutionDate: '{{ response.AssociationDescription.LastExecutionDate }}'
+      LastSuccessfulExecutionDate: '{{ response.AssociationDescription.LastSuccessfulExecutionDate }}'
+      LastUpdateAssociationDate: '{{ response.AssociationDescription.LastUpdateAssociationDate }}'
+      MaxConcurrency: '{{ response.AssociationDescription.MaxConcurrency }}'
+      MaxErrors: '{{ response.AssociationDescription.MaxErrors }}'
+      Name: '{{ response.AssociationDescription.Name }}'
+      OutputLocation: '{{ response.AssociationDescription.Duration }}'
+      Overview: '{{ response.AssociationDescription.Overview.Status }}'
+      Parameter: '{{ response.AssociationDescription.Parameters }}'
+      Parameters: '{{ response.AssociationDescription.Parameters }}'
+      ResourceCountByStatus: '{{ response.AssociationDescription.ResourceCountByStatus }}'
+      ScheduleExpression: '{{ response.AssociationDescription.ScheduleExpression }}'
+      ScheduleOffset: '{{ response.AssociationDescription.ScheduleOffset }}'
+      Status: '{{ response.AssociationDescription.Status.Name }}'
+      SyncCompliance: '{{ response.AssociationDescription.SyncCompliance }}'
+      TargetLocations: '{{ response.AssociationDescription.TargetLocations }}'
+      TargetMaps: '{{ response.AssociationDescription.Targets[].Key }}'
+      Targets: '{{ response.AssociationDescription.Targets[].Key }}'
+      TriggeredAlarms: '{{ response.AssociationDescription.TriggeredAlarms[].Name }}'
+      IgnorePollAlarmFailure: '{{ response.AssociationDescription.AlarmConfiguration.IgnorePollAlarmFailure }}'
+      OutputS3BucketName: '{{ response.AssociationDescription.OutputLocation.S3Location.OutputS3BucketName }}'
+      OutputS3KeyPrefix: '{{ response.AssociationDescription.OutputLocation.S3Location.OutputS3KeyPrefix }}'
+      OutputS3Region: '{{ response.AssociationDescription.OutputLocation.S3Location.OutputS3Region }}'
+      AssociationStatusAggregatedCount: '{{ response.AssociationDescription.Overview.AssociationStatusAggregatedCount }}'
+      DetailedStatus: '{{ response.AssociationDescription.Overview.DetailedStatus }}'
+      AdditionalInfo: '{{ response.AssociationDescription.Status.AdditionalInfo }}'
+      Message: '{{ response.AssociationDescription.Status.Message }}'
+- calls:
+  - action: list_resource_compliance_summaries
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ssm.list_resource_compliance_summaries
+  emit:
+    as: item
+    item:
+      ComplianceType: '{{ item.ComplianceType }}'
+      CompliantSummary: '{{ item.CompliantSummary }}'
+      ExecutionSummary: '{{ item.ExecutionSummary }}'
+      NonCompliantSummary: '{{ item.NonCompliantSummary }}'
+      OverallSeverity: '{{ item.OverallSeverity }}'
+      ResourceId: '{{ item.ResourceId }}'
+      ResourceType: '{{ item.ResourceType }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.ResourceComplianceSummaryItems }}'
+- calls:
+  - action: list_ops_metadata
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ssm.list_ops_metadata
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      LastModifiedUser: '{{ item.LastModifiedUser }}'
+      Metadata: '{{ item.Metadata }}'
+      OpsMetadataArn: '{{ item.OpsMetadataArn }}'
+      ResourceId: '{{ item.ResourceId }}'
+    items_for: '{{ response.OpsMetadataList }}'
+- calls:
+  - action: list_document_versions
+    on_error: continue
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+  discovery_id: aws.ssm.list_document_versions
+  emit:
+    as: item
+    item:
+      CreatedDate: '{{ item.CreatedDate }}'
+      DisplayName: '{{ item.DisplayName }}'
+      DocumentFormat: '{{ item.DocumentFormat }}'
+      DocumentVersion: '{{ item.DocumentVersion }}'
+      IsDefaultVersion: '{{ item.IsDefaultVersion }}'
+      Name: '{{ item.Name }}'
+      ReviewStatus: '{{ item.ReviewStatus }}'
+      Status: '{{ item.Status }}'
+      StatusInformation: '{{ item.StatusInformation }}'
+      VersionName: '{{ item.VersionName }}'
+    items_for: '{{ response.DocumentVersions }}'
+  for_each: aws.ssm.describe_association
+- calls:
+  - action: describe_patch_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ssm.describe_patch_groups
+  emit:
+    as: item
+    item:
+      BaselineIdentity: '{{ item.BaselineIdentity }}'
+      Mappings: '{{ item.Mappings }}'
+      PatchGroup: '{{ item.PatchGroup }}'
+    items_for: '{{ response.Mappings }}'
+- calls:
+  - action: list_documents
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ssm.list_documents
+  emit:
+    as: item
+    item:
+      Author: '{{ item.Author }}'
+      CreatedDate: '{{ item.CreatedDate }}'
+      DisplayName: '{{ item.DisplayName }}'
+      DocumentFormat: '{{ item.DocumentFormat }}'
+      DocumentType: '{{ item.DocumentType }}'
+      DocumentVersion: '{{ item.DocumentVersion }}'
+      IsDefaultVersion: '{{ item.IsDefaultVersion }}'
+      Name: '{{ item.Name }}'
+      Owner: '{{ item.Owner }}'
+      PlatformTypes: '{{ item.PlatformTypes }}'
+      Requires: '{{ item.Requires }}'
+      ReviewStatus: '{{ item.ReviewStatus }}'
+      SchemaVersion: '{{ item.SchemaVersion }}'
+      Tags: '{{ item.Tags }}'
+      TargetType: '{{ item.TargetType }}'
+      VersionName: '{{ item.VersionName }}'
+    items_for: '{{ response.DocumentIdentifiers }}'
+- calls:
+  - action: describe_maintenance_window_schedule
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ssm.describe_maintenance_window_schedule
+  emit:
+    as: item
+    item:
+      ExecutionTime: '{{ item.ExecutionTime }}'
+      Name: '{{ item.Name }}'
+      ScheduledWindowExecutions: '{{ item.ScheduledWindowExecutions[].Name }}'
+      WindowExecutions: '{{ item.WindowExecutions }}'
+      WindowId: '{{ item.WindowId }}'
+    items_for: '{{ response.ScheduledWindowExecutions }}'
+- calls:
+  - action: describe_patch_baselines
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ssm.describe_patch_baselines
+  emit:
+    as: item
+    item:
+      ApprovalRules: '{{ item.ApprovalRules }}'
+      ApprovedPatches: '{{ item.ApprovedPatches }}'
+      ApprovedPatchesComplianceLevel: '{{ item.ApprovedPatchesComplianceLevel }}'
+      ApprovedPatchesEnableNonSecurity: '{{ item.ApprovedPatchesEnableNonSecurity }}'
+      AvailableSecurityUpdatesComplianceStatus: '{{ item.AvailableSecurityUpdatesComplianceStatus }}'
+      BaselineDescription: '{{ item.BaselineDescription }}'
+      BaselineId: '{{ item.BaselineId }}'
+      BaselineIdentities: '{{ item.BaselineIdentities }}'
+      BaselineName: '{{ item.BaselineName }}'
+      DefaultBaseline: '{{ item.DefaultBaseline }}'
+      EffectivePatches: '{{ item.EffectivePatches }}'
+      GlobalFilters: '{{ item.GlobalFilters }}'
+      ModifiedDate: '{{ item.ModifiedDate }}'
+      OperatingSystem: '{{ item.OperatingSystem }}'
+      Patch: '{{ item.Patch }}'
+      PatchGroups: '{{ item.PatchGroups }}'
+      PatchStatus: '{{ item.PatchStatus }}'
+      RejectedPatches: '{{ item.RejectedPatches }}'
+      RejectedPatchesAction: '{{ item.RejectedPatchesAction }}'
+      Sources: '{{ item.Sources }}'
+    items_for: '{{ response.BaselineIdentities }}'
+- calls:
+  - action: describe_automation_executions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ssm.describe_automation_executions
+  emit:
+    as: item
+    item:
+      AlarmConfiguration: '{{ item.AlarmConfiguration }}'
+      AssociationId: '{{ item.AssociationId }}'
+      AutomationExecutionId: '{{ item.AutomationExecutionId }}'
+      AutomationExecutionMetadataList: '{{ item.AutomationExecutionMetadataList[].Mode }}'
+      AutomationExecutionStatus: '{{ item.AutomationExecutionStatus }}'
+      AutomationSubtype: '{{ item.AutomationSubtype }}'
+      AutomationType: '{{ item.AutomationType }}'
+      ChangeRequestName: '{{ item.ChangeRequestName }}'
+      CurrentAction: '{{ item.CurrentAction }}'
+      CurrentStepName: '{{ item.CurrentStepName }}'
+      DocumentName: '{{ item.DocumentName }}'
+      DocumentVersion: '{{ item.DocumentVersion }}'
+      ExecutedBy: '{{ item.ExecutedBy }}'
+      ExecutionEndTime: '{{ item.ExecutionEndTime }}'
+      ExecutionStartTime: '{{ item.ExecutionStartTime }}'
+      FailureMessage: '{{ item.FailureMessage }}'
+      LogFile: '{{ item.LogFile }}'
+      MaxConcurrency: '{{ item.MaxConcurrency }}'
+      MaxErrors: '{{ item.MaxErrors }}'
+      Mode: '{{ item.Mode }}'
+      OpsItemId: '{{ item.OpsItemId }}'
+      Outputs: '{{ item.Outputs }}'
+      ParentAutomationExecutionId: '{{ item.ParentAutomationExecutionId }}'
+      ResolvedTargets: '{{ item.ResolvedTargets }}'
+      Runbooks: '{{ item.Runbooks }}'
+      ScheduledTime: '{{ item.ScheduledTime }}'
+      Target: '{{ item.Target }}'
+      TargetLocationsURL: '{{ item.TargetLocationsURL }}'
+      TargetMaps: '{{ item.TargetMaps }}'
+      TargetParameterName: '{{ item.TargetParameterName }}'
+      Targets: '{{ item.Targets }}'
+      TriggeredAlarms: '{{ item.TriggeredAlarms }}'
+    items_for: '{{ response.AutomationExecutionMetadataList }}'

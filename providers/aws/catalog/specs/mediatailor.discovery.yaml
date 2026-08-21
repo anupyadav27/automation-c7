@@ -1,0 +1,414 @@
+version: '1.0'
+provider: aws
+service: mediatailor
+services:
+  client: mediatailor
+  module: boto3.client
+discovery:
+- discovery_id: aws.mediatailor.list_channels
+  calls:
+  - action: list_channels
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      AdBreaks: '{{ item.AdBreaks }}'
+      ApproximateDurationSeconds: '{{ item.ApproximateDurationSeconds }}'
+      ApproximateStartTime: '{{ item.ApproximateStartTime }}'
+      AudienceMedia: '{{ item.AudienceMedia }}'
+      Audiences: '{{ item.Audiences }}'
+      ChannelName: '{{ item.ChannelName }}'
+      ChannelState: '{{ item.ChannelState }}'
+      ClipRange: '{{ item.ClipRange }}'
+      DashPlaylistSettings: '{{ item.DashPlaylistSettings }}'
+      DurationMillis: '{{ item.DurationMillis }}'
+      Enabled: '{{ item.Enabled }}'
+      FillerSlate: '{{ item.FillerSlate }}'
+      HlsPlaylistSettings: '{{ item.HlsPlaylistSettings }}'
+      Items: '{{ item.Items }}'
+      LogConfiguration: '{{ item.LogConfiguration }}'
+      ManifestName: '{{ item.ManifestName }}'
+      MessageType: '{{ item.MessageType }}'
+      OffsetMillis: '{{ item.OffsetMillis }}'
+      Outputs: '{{ item.Outputs }}'
+      PlaybackMode: '{{ item.PlaybackMode }}'
+      PlaybackUrl: '{{ item.PlaybackUrl }}'
+      ScheduleAdBreaks: '{{ item.ScheduleAdBreaks }}'
+      ScheduleEntryType: '{{ item.ScheduleEntryType }}'
+      ScheduledStartTime: '{{ item.ScheduledStartTime }}'
+      Slate: '{{ item.Slate }}'
+      SourceGroup: '{{ item.SourceGroup }}'
+      SpliceInsertMessage: '{{ item.SpliceInsertMessage }}'
+      Tier: '{{ item.Tier }}'
+      TimeShiftConfiguration: '{{ item.TimeShiftConfiguration }}'
+      TimeSignalMessage: '{{ item.TimeSignalMessage }}'
+- discovery_id: aws.mediatailor.list_playback_configurations
+  calls:
+  - action: list_playback_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Name: '{{ item.Name }}'
+      Tags: '{{ item.Tags }}'
+      AdConditioningConfiguration: '{{ item.AdConditioningConfiguration }}'
+      AdDecisionServerUrl: '{{ item.AdDecisionServerUrl }}'
+      AvailSuppression: '{{ item.AvailSuppression }}'
+      Bumper: '{{ item.Bumper }}'
+      CdnConfiguration: '{{ item.CdnConfiguration }}'
+      ConfigurationAliases: '{{ item.ConfigurationAliases }}'
+      DashConfiguration: '{{ item.DashConfiguration }}'
+      HlsConfiguration: '{{ item.HlsConfiguration }}'
+      InsertionMode: '{{ item.InsertionMode }}'
+      LivePreRollConfiguration: '{{ item.LivePreRollConfiguration }}'
+      LogConfiguration: '{{ item.LogConfiguration }}'
+      ManifestProcessingRules: '{{ item.ManifestProcessingRules }}'
+      PersonalizationThresholdSeconds: '{{ item.Items[].PersonalizationThresholdSeconds }}'
+      PlaybackConfigurationArn: '{{ item.Items[].PlaybackConfigurationArn }}'
+      PlaybackEndpointPrefix: '{{ item.PlaybackEndpointPrefix }}'
+      SessionInitializationEndpointPrefix: '{{ item.Items[].SessionInitializationEndpointPrefix }}'
+      SlateAdUrl: '{{ item.SlateAdUrl }}'
+      TranscodeProfileName: '{{ item.TranscodeProfileName }}'
+      VideoContentSourceUrl: '{{ item.VideoContentSourceUrl }}'
+- discovery_id: aws.mediatailor.list_source_locations
+  calls:
+  - action: list_source_locations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      Tags: '{{ item.Tags }}'
+      AccessConfiguration: '{{ item.AccessConfiguration }}'
+      DefaultSegmentDeliveryConfiguration: '{{ item.DefaultSegmentDeliveryConfiguration }}'
+      HttpConfiguration: '{{ item.HttpConfiguration }}'
+      SegmentDeliveryConfigurations: '{{ item.SegmentDeliveryConfigurations }}'
+      SourceLocationName: '{{ item.SourceLocationName }}'
+- discovery_id: aws.mediatailor.describe_channel
+  for_each: aws.mediatailor.list_channels
+  calls:
+  - action: describe_channel
+    params:
+      ChannelName: '{{ item.ChannelName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Outputs }}'
+    item:
+      DashPlaylistSettings: '{{ item.DashPlaylistSettings }}'
+      HlsPlaylistSettings: '{{ item.HlsPlaylistSettings }}'
+      ManifestName: '{{ item.ManifestName }}'
+      PlaybackUrl: '{{ item.PlaybackUrl }}'
+      SourceGroup: '{{ item.SourceGroup }}'
+      TimeShiftConfiguration: '{{ item.TimeShiftConfiguration }}'
+      Arn: '{{ response.Arn }}'
+      ChannelName: '{{ response.ChannelName }}'
+      ChannelState: '{{ response.ChannelState }}'
+      CreationTime: '{{ response.CreationTime }}'
+      SourceLocationName: '{{ response.FillerSlate.SourceLocationName }}'
+      VodSourceName: '{{ response.FillerSlate.VodSourceName }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+      PlaybackMode: '{{ response.PlaybackMode }}'
+      Tags: '{{ response.Tags }}'
+      Tier: '{{ response.Tier }}'
+      MaxTimeDelaySeconds: '{{ response.TimeShiftConfiguration.MaxTimeDelaySeconds }}'
+- discovery_id: aws.mediatailor.describe_live_source
+  for_each: aws.mediatailor.list_source_locations
+  calls:
+  - action: describe_live_source
+    params:
+      LiveSourceName: '{{ item.LiveSourceName }}'
+      SourceLocationName: '{{ item.SourceLocationName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HttpPackageConfigurations }}'
+    item:
+      Path: '{{ item.Path }}'
+      SourceGroup: '{{ item.SourceGroup }}'
+      Type: '{{ item.Type }}'
+      Arn: '{{ response.Arn }}'
+      CreationTime: '{{ response.CreationTime }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+      LiveSourceName: '{{ response.LiveSourceName }}'
+      SourceLocationName: '{{ response.SourceLocationName }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.mediatailor.describe_program
+  for_each: aws.mediatailor.list_channels
+  calls:
+  - action: describe_program
+    params:
+      ChannelName: '{{ item.ChannelName }}'
+      ProgramName: '{{ item.ProgramName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AdBreaks }}'
+    item:
+      AdBreakMetadata: '{{ item.AdBreakMetadata }}'
+      AdBreaks: '{{ item.AdBreaks }}'
+      AudienceMedia: '{{ item.AudienceMedia }}'
+      ClipRange: '{{ item.ClipRange }}'
+      DurationMillis: '{{ item.DurationMillis }}'
+      MessageType: '{{ item.MessageType }}'
+      OffsetMillis: '{{ item.OffsetMillis }}'
+      ScheduledStartTime: '{{ item.ScheduledStartTime }}'
+      Slate: '{{ item.Slate }}'
+      SpliceInsertMessage: '{{ item.SpliceInsertMessage }}'
+      TimeSignalMessage: '{{ item.TimeSignalMessage }}'
+      Arn: '{{ response.Arn }}'
+      ChannelName: '{{ response.ChannelName }}'
+      EndOffsetMillis: '{{ response.ClipRange.EndOffsetMillis }}'
+      StartOffsetMillis: '{{ response.ClipRange.StartOffsetMillis }}'
+      CreationTime: '{{ response.CreationTime }}'
+      LiveSourceName: '{{ response.LiveSourceName }}'
+      ProgramName: '{{ response.ProgramName }}'
+      SourceLocationName: '{{ response.SourceLocationName }}'
+      VodSourceName: '{{ response.VodSourceName }}'
+- discovery_id: aws.mediatailor.describe_source_location
+  for_each: aws.mediatailor.list_source_locations
+  calls:
+  - action: describe_source_location
+    params:
+      SourceLocationName: '{{ item.SourceLocationName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SegmentDeliveryConfigurations }}'
+    item:
+      Name: '{{ item.Name }}'
+      BaseUrl: '{{ item.BaseUrl }}'
+      AccessType: '{{ response.AccessConfiguration.AccessType }}'
+      HeaderName: '{{ response.AccessConfiguration.SecretsManagerAccessTokenConfiguration.HeaderName }}'
+      SecretArn: '{{ response.AccessConfiguration.SecretsManagerAccessTokenConfiguration.SecretArn }}'
+      SecretStringKey: '{{ response.AccessConfiguration.SecretsManagerAccessTokenConfiguration.SecretStringKey }}'
+      Arn: '{{ response.Arn }}'
+      CreationTime: '{{ response.CreationTime }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+      SourceLocationName: '{{ response.SourceLocationName }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.mediatailor.describe_vod_source
+  for_each: aws.mediatailor.list_source_locations
+  calls:
+  - action: describe_vod_source
+    params:
+      SourceLocationName: '{{ item.SourceLocationName }}'
+      VodSourceName: '{{ item.VodSourceName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AdBreakOpportunities }}'
+    item:
+      OffsetMillis: '{{ item.OffsetMillis }}'
+      Arn: '{{ response.Arn }}'
+      CreationTime: '{{ response.CreationTime }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+      SourceLocationName: '{{ response.SourceLocationName }}'
+      Tags: '{{ response.Tags }}'
+      VodSourceName: '{{ response.VodSourceName }}'
+- discovery_id: aws.mediatailor.get_channel_policy
+  for_each: aws.mediatailor.list_channels
+  calls:
+  - action: get_channel_policy
+    params:
+      ChannelName: '{{ item.ChannelName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.mediatailor.get_channel_schedule
+  for_each: aws.mediatailor.list_channels
+  calls:
+  - action: get_channel_schedule
+    params:
+      ChannelName: '{{ item.ChannelName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      AdBreaks: '{{ item.AdBreaks }}'
+      ApproximateDurationSeconds: '{{ item.Items[].ApproximateDurationSeconds }}'
+      ApproximateStartTime: '{{ item.ApproximateStartTime }}'
+      AudienceMedia: '{{ item.AudienceMedia }}'
+      Audiences: '{{ item.Audiences }}'
+      ChannelName: '{{ item.ChannelName }}'
+      ClipRange: '{{ item.ClipRange }}'
+      DurationMillis: '{{ item.DurationMillis }}'
+      LiveSourceName: '{{ item.LiveSourceName }}'
+      MessageType: '{{ item.MessageType }}'
+      OffsetMillis: '{{ item.OffsetMillis }}'
+      ProgramName: '{{ item.ProgramName }}'
+      ScheduleAdBreaks: '{{ item.ScheduleAdBreaks }}'
+      ScheduleEntryType: '{{ item.ScheduleEntryType }}'
+      ScheduledStartTime: '{{ item.ScheduledStartTime }}'
+      Slate: '{{ item.Slate }}'
+      SourceLocationName: '{{ item.SourceLocationName }}'
+      SpliceInsertMessage: '{{ item.SpliceInsertMessage }}'
+      TimeSignalMessage: '{{ item.TimeSignalMessage }}'
+      VodSourceName: '{{ item.VodSourceName }}'
+- discovery_id: aws.mediatailor.get_playback_configuration
+  for_each: aws.mediatailor.list_playback_configurations
+  calls:
+  - action: get_playback_configuration
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      FillPolicy: '{{ response.AvailSuppression.FillPolicy }}'
+      Mode: '{{ response.AvailSuppression.Mode }}'
+      Value: '{{ response.AvailSuppression.Value }}'
+      StreamingMediaFileConditioning: '{{ response.AdConditioningConfiguration.StreamingMediaFileConditioning }}'
+      AdDecisionServerUrl: '{{ response.AdDecisionServerUrl }}'
+      EndUrl: '{{ response.Bumper.EndUrl }}'
+      StartUrl: '{{ response.Bumper.StartUrl }}'
+      AdSegmentUrlPrefix: '{{ response.CdnConfiguration.AdSegmentUrlPrefix }}'
+      ContentSegmentUrlPrefix: '{{ response.CdnConfiguration.ContentSegmentUrlPrefix }}'
+      ConfigurationAliases: '{{ response.ConfigurationAliases }}'
+      ManifestEndpointPrefix: '{{ response.DashConfiguration.ManifestEndpointPrefix }}'
+      MpdLocation: '{{ response.DashConfiguration.MpdLocation }}'
+      OriginManifestType: '{{ response.DashConfiguration.OriginManifestType }}'
+      InsertionMode: '{{ response.InsertionMode }}'
+      MaxDurationSeconds: '{{ response.LivePreRollConfiguration.MaxDurationSeconds }}'
+      PercentEnabled: '{{ response.LogConfiguration.PercentEnabled }}'
+      Enabled: '{{ response.ManifestProcessingRules.AdMarkerPassthrough.Enabled }}'
+      Name: '{{ response.Name }}'
+      PersonalizationThresholdSeconds: '{{ response.PersonalizationThresholdSeconds }}'
+      PlaybackConfigurationArn: '{{ response.PlaybackConfigurationArn }}'
+      PlaybackEndpointPrefix: '{{ response.PlaybackEndpointPrefix }}'
+      SessionInitializationEndpointPrefix: '{{ response.SessionInitializationEndpointPrefix }}'
+      SlateAdUrl: '{{ response.SlateAdUrl }}'
+      Tags: '{{ response.Tags }}'
+      TranscodeProfileName: '{{ response.TranscodeProfileName }}'
+      VideoContentSourceUrl: '{{ response.VideoContentSourceUrl }}'
+- discovery_id: aws.mediatailor.get_prefetch_schedule
+  for_each: aws.mediatailor.list_playback_configurations
+  calls:
+  - action: get_prefetch_schedule
+    params:
+      Name: '{{ item.Name }}'
+      PlaybackConfigurationName: '{{ item.PlaybackConfigurationName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AvailMatchingCriteria: '{{ response.Consumption.AvailMatchingCriteria[].Operator }}'
+      EndTime: '{{ response.Consumption.EndTime }}'
+      StartTime: '{{ response.Consumption.StartTime }}'
+      Arn: '{{ response.Arn }}'
+      Name: '{{ response.Name }}'
+      PlaybackConfigurationName: '{{ response.PlaybackConfigurationName }}'
+      RetrievedAdExpirationSeconds: '{{ response.RecurringPrefetchConfiguration.RecurringConsumption.RetrievedAdExpirationSeconds }}'
+      DelayAfterAvailEndSeconds: '{{ response.RecurringPrefetchConfiguration.RecurringRetrieval.DelayAfterAvailEndSeconds }}'
+      DynamicVariables: '{{ response.RecurringPrefetchConfiguration.RecurringRetrieval.DynamicVariables }}'
+      RetrievalWindowDurationSeconds: '{{ response.RecurringPrefetchConfiguration.RecurringRetrieval.TrafficShapingRetrievalWindow.RetrievalWindowDurationSeconds }}'
+      TrafficShapingType: '{{ response.RecurringPrefetchConfiguration.RecurringRetrieval.TrafficShapingType }}'
+      ScheduleType: '{{ response.ScheduleType }}'
+      StreamId: '{{ response.StreamId }}'
+- discovery_id: aws.mediatailor.list_alerts
+  calls:
+  - action: list_alerts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      AlertCode: '{{ item.AlertCode }}'
+      AlertMessage: '{{ item.AlertMessage }}'
+      Category: '{{ item.Category }}'
+      RelatedResourceArns: '{{ item.RelatedResourceArns }}'
+- discovery_id: aws.mediatailor.list_live_sources
+  for_each: aws.mediatailor.list_source_locations
+  calls:
+  - action: list_live_sources
+    params:
+      SourceLocationName: '{{ item.SourceLocationName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      Tags: '{{ item.Tags }}'
+      HttpPackageConfigurations: '{{ item.HttpPackageConfigurations }}'
+      LiveSourceName: '{{ item.LiveSourceName }}'
+      SourceLocationName: '{{ item.SourceLocationName }}'
+- discovery_id: aws.mediatailor.list_prefetch_schedules
+  calls:
+  - action: list_prefetch_schedules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Name: '{{ item.Name }}'
+      Consumption: '{{ item.Consumption }}'
+      PlaybackConfigurationName: '{{ item.Items[].PlaybackConfigurationName }}'
+      RecurringPrefetchConfiguration: '{{ item.RecurringPrefetchConfiguration }}'
+      Retrieval: '{{ item.Retrieval }}'
+      ScheduleType: '{{ item.ScheduleType }}'
+      StreamId: '{{ item.StreamId }}'
+- discovery_id: aws.mediatailor.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.mediatailor.list_vod_sources
+  for_each: aws.mediatailor.list_source_locations
+  calls:
+  - action: list_vod_sources
+    params:
+      SourceLocationName: '{{ item.SourceLocationName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Items }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      Tags: '{{ item.Tags }}'
+      HttpPackageConfigurations: '{{ item.HttpPackageConfigurations }}'
+      SourceLocationName: '{{ item.SourceLocationName }}'
+      VodSourceName: '{{ item.VodSourceName }}'

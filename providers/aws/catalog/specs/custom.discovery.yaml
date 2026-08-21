@@ -1,0 +1,51 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: custom (backed by events)
+# 2 ops (from checks)
+# Generated: 2026-04-14
+version: '1.0'
+provider: aws
+service: custom
+services:
+  client: events
+  module: boto3.client
+discovery:
+  - discovery_id: aws.custom.list_event_buses
+    calls:
+    - action: list_event_buses
+      save_as: response
+      on_error: continue
+      params:
+        Limit: 100
+    emit:
+      as: item
+      items_for: '{{ response.EventBuses }}'
+      item:
+        Arn: '{{ item.Arn }}'
+        CreationTime: '{{ item.CreationTime }}'
+        LastModifiedTime: '{{ item.LastModifiedTime }}'
+        Name: '{{ item.Name }}'
+        Policy: '{{ item.Policy }}'
+        Description: '{{ item.Description }}'
+        KmsKeyIdentifier: '{{ item.KmsKeyIdentifier }}'
+        LogConfig: '{{ item.LogConfig }}'
+  - discovery_id: aws.custom.describe_event_bus
+    for_each: aws.custom.list_event_buses
+    calls:
+    - action: describe_event_bus
+      save_as: response
+      on_error: continue
+      params:
+        Name: '{{ item.Name }}'
+    emit:
+      as: item
+      items_for: '{{ response }}'
+      item:
+        Name: '{{ item.Name }}'
+        Arn: '{{ item.Arn }}'
+        Policy: '{{ item.Policy }}'
+        CreationTime: '{{ item.CreationTime }}'
+        LastModifiedTime: '{{ item.LastModifiedTime }}'
+        DeadLetterConfig: '{{ item.DeadLetterConfig }}'
+        Description: '{{ item.Description }}'
+        KmsKeyIdentifier: '{{ item.KmsKeyIdentifier }}'
+        LogConfig: '{{ item.LogConfig }}'

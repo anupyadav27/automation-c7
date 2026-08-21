@@ -1,0 +1,218 @@
+version: '1.0'
+provider: aws
+service: chatbot
+services:
+  client: chatbot
+  module: boto3.client
+discovery:
+- discovery_id: aws.chatbot.describe_chime_webhook_configurations
+  calls:
+  - action: describe_chime_webhook_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.WebhookConfigurations }}'
+    item:
+      State: '{{ item.State }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      ChatConfigurationArn: '{{ item.ChatConfigurationArn }}'
+      ConfigurationName: '{{ item.ConfigurationName }}'
+      Enabled: '{{ item.Enabled }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      LoggingLevel: '{{ item.LoggingLevel }}'
+      SnsTopicArns: '{{ item.SnsTopicArns }}'
+      StateReason: '{{ item.StateReason }}'
+      WebhookConfigurations: '{{ item.WebhookConfigurations }}'
+      WebhookDescription: '{{ item.WebhookDescription }}'
+- discovery_id: aws.chatbot.describe_slack_channel_configurations
+  calls:
+  - action: describe_slack_channel_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SlackChannelConfigurations }}'
+    item:
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      ChatConfigurationArn: '{{ item.ChatConfigurationArn }}'
+      ConfigurationName: '{{ item.ConfigurationName }}'
+      GuardrailPolicyArns: '{{ item.GuardrailPolicyArns }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      LoggingLevel: '{{ item.LoggingLevel }}'
+      SlackChannelConfigurations: '{{ item.SlackChannelConfigurations[].State }}'
+      SlackChannelId: '{{ item.SlackChannelId }}'
+      SlackChannelName: '{{ item.SlackChannelName }}'
+      SlackTeamId: '{{ item.SlackTeamId }}'
+      SlackTeamName: '{{ item.SlackTeamName }}'
+      SnsTopicArns: '{{ item.SnsTopicArns }}'
+      StateReason: '{{ item.StateReason }}'
+      Statement: '{{ item.Statement }}'
+      UserAuthorizationRequired: '{{ item.UserAuthorizationRequired }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.chatbot.describe_slack_user_identities
+  calls:
+  - action: describe_slack_user_identities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SlackUserIdentities }}'
+    item:
+      AwsUserIdentity: '{{ item.AwsUserIdentity }}'
+      ChatConfigurationArn: '{{ item.ChatConfigurationArn }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      SlackTeamId: '{{ item.SlackTeamId }}'
+      SlackUserId: '{{ item.SlackUserId }}'
+      SlackUserIdentities: '{{ item.SlackUserIdentities }}'
+- discovery_id: aws.chatbot.describe_slack_workspaces
+  calls:
+  - action: describe_slack_workspaces
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SlackWorkspaces }}'
+    item:
+      State: '{{ item.State }}'
+      SlackTeamId: '{{ item.SlackTeamId }}'
+      SlackTeamName: '{{ item.SlackTeamName }}'
+      SlackWorkspaces: '{{ item.SlackWorkspaces }}'
+      StateReason: '{{ item.StateReason }}'
+- discovery_id: aws.chatbot.get_account_preferences
+  calls:
+  - action: get_account_preferences
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccountPreferences: '{{ response.AccountPreferences.AccountPreferences }}'
+      TrainingDataCollectionEnabled: '{{ response.AccountPreferences.TrainingDataCollectionEnabled }}'
+      UserAuthorizationRequired: '{{ response.AccountPreferences.UserAuthorizationRequired }}'
+- discovery_id: aws.chatbot.list_custom_actions
+  calls:
+  - action: list_custom_actions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CustomActions }}'
+- discovery_id: aws.chatbot.list_microsoft_teams_channel_configurations
+  calls:
+  - action: list_microsoft_teams_channel_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TeamChannelConfigurations }}'
+    item:
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      ChannelId: '{{ item.ChannelId }}'
+      ChannelName: '{{ item.ChannelName }}'
+      ChatConfigurationArn: '{{ item.ChatConfigurationArn }}'
+      ConfigurationName: '{{ item.ConfigurationName }}'
+      GuardrailPolicyArns: '{{ item.GuardrailPolicyArns }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      LoggingLevel: '{{ item.LoggingLevel }}'
+      SlackChannelConfigurations: '{{ item.SlackChannelConfigurations }}'
+      SnsTopicArns: '{{ item.SnsTopicArns }}'
+      StateReason: '{{ item.StateReason }}'
+      TeamId: '{{ item.TeamId }}'
+      TeamName: '{{ item.TeamName }}'
+      TenantId: '{{ item.TenantId }}'
+      UserAuthorizationRequired: '{{ item.UserAuthorizationRequired }}'
+- discovery_id: aws.chatbot.list_microsoft_teams_configured_teams
+  calls:
+  - action: list_microsoft_teams_configured_teams
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ConfiguredTeams }}'
+    item:
+      State: '{{ item.State }}'
+      StateReason: '{{ item.StateReason }}'
+      TeamId: '{{ item.TeamId }}'
+      TeamName: '{{ item.TeamName }}'
+      TenantId: '{{ item.TenantId }}'
+- discovery_id: aws.chatbot.list_microsoft_teams_user_identities
+  calls:
+  - action: list_microsoft_teams_user_identities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TeamsUserIdentities }}'
+    item:
+      AwsUserIdentity: '{{ item.AwsUserIdentity }}'
+      ChatConfigurationArn: '{{ item.ChatConfigurationArn }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+      TeamId: '{{ item.TeamId }}'
+      TeamsChannelId: '{{ item.TeamsChannelId }}'
+      TeamsTenantId: '{{ item.TeamsTenantId }}'
+      UserId: '{{ item.UserId }}'
+- discovery_id: aws.chatbot.get_custom_action
+  calls:
+  - action: get_custom_action
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ActionName: '{{ response.CustomAction.ActionName }}'
+      AliasName: '{{ response.CustomAction.AliasName }}'
+      Attachments: '{{ response.CustomAction.Attachments }}'
+      CustomActionArn: '{{ response.CustomAction.CustomActionArn }}'
+      Definition: '{{ response.CustomAction.Definition }}'
+      CommandText: '{{ response.CustomAction.Definition.CommandText }}'
+- discovery_id: aws.chatbot.get_microsoft_teams_channel_configuration
+  for_each: aws.chatbot.describe_chime_webhook_configurations
+  calls:
+  - action: get_microsoft_teams_channel_configuration
+    params:
+      ChatConfigurationArn: '{{ item.ChatConfigurationArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      State: '{{ response.ChannelConfiguration.State }}'
+      Tags: '{{ response.ChannelConfiguration.TeamId }}'
+      ChannelId: '{{ response.ChannelConfiguration.ChannelId }}'
+      ChannelName: '{{ response.ChannelConfiguration.ChannelName }}'
+      ChatConfigurationArn: '{{ response.ChannelConfiguration.ChatConfigurationArn }}'
+      ConfigurationName: '{{ response.ChannelConfiguration.ConfigurationName }}'
+      GuardrailPolicyArns: '{{ response.ChannelConfiguration.GuardrailPolicyArns }}'
+      IamRoleArn: '{{ response.ChannelConfiguration.IamRoleArn }}'
+      LoggingLevel: '{{ response.ChannelConfiguration.LoggingLevel }}'
+      SnsTopicArns: '{{ response.ChannelConfiguration.SnsTopicArns }}'
+      StateReason: '{{ response.ChannelConfiguration.StateReason }}'
+      TeamId: '{{ response.ChannelConfiguration.TeamId }}'
+      TeamName: '{{ response.ChannelConfiguration.TeamName }}'
+      TenantId: '{{ response.ChannelConfiguration.TenantId }}'
+      UserAuthorizationRequired: '{{ response.ChannelConfiguration.UserAuthorizationRequired }}'
+- discovery_id: aws.chatbot.list_associations
+  calls:
+  - action: list_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Associations }}'
+    item:
+      Resource: '{{ item.Resource }}'
+- discovery_id: aws.chatbot.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      TagKey: '{{ item.TagKey }}'
+      TagValue: '{{ item.TagValue }}'

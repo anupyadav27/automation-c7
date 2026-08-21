@@ -1,0 +1,66 @@
+policies:
+
+  # ---------------------------------------------------------------
+  # RDS instances using memory-optimised class (potentially oversized)
+  # ---------------------------------------------------------------
+  - name: rds-oversized-instance
+    resource: rds
+    description: >
+      RDS instances using memory-optimised classes (r5, r6g, r6i, x1, x2)
+      with low connection counts. These are the most expensive instance
+      families — downgrade to db.t3 or db.m6i if workload permits.
+    filters:
+      - type: value
+        key: DBInstanceClass
+        op: regex
+        value: "^db\\.(r5|r6g|r6i|r7g|x1|x2)\\."
+      - type: metrics
+        name: DatabaseConnections
+        namespace: AWS/RDS
+        statistics: Maximum
+        days: 14
+        value: 10
+        op: less-than
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "rds-rightsize-instance-class"
+      - type: notify
+        template: default.html
+        subject: "[c7n] RDS memory-optimised instance with low usage — rightsize to m-class"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications
+
+  # ---------------------------------------------------------------
+  # RDS instances without Reserved Instance or Savings Plan
+  # ---------------------------------------------------------------
+  - name: rds-no-reserved-instance
+    resource: rds
+    description: >
+      RDS instances running on-demand for more than 90 days without
+      a matching Reserved Instance. Reserved Instances provide up to
+      72% cost savings for steady-state workloads.
+    filters:
+      - type: value
+        key: DBInstanceStatus
+        value: available
+      - type: value
+        key: InstanceCreateTime
+        value_type: age
+        value: 90
+        op: greater-than
+    actions:
+      - type: tag
+        key: c7n:recommendation
+        value: "rds-purchase-reserved-instance"
+      - type: notify
+        template: default.html
+        subject: "[c7n] RDS on-demand for 90+ days — consider Reserved Instance for savings"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

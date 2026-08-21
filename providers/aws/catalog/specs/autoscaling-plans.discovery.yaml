@@ -1,0 +1,86 @@
+# ============================================================
+# Discovery YAML — autoscaling-plans (AWS)
+# Generated: 2026-02-21T04:56:57Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: autoscaling-plans
+services:
+  client: autoscaling-plans
+  module: boto3.client
+discovery:
+  # ── DescribeScalingPlans ──
+  - discovery_id: aws.autoscaling-plans.describe_scaling_plans
+    calls:
+      - action: describe_scaling_plans
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.ScalingPlans }}'
+      item:
+        CreationTime: '{{ item.CreationTime }}'
+        ApplicationSource: '{{ item.ApplicationSource }}'
+        ScalableDimension: '{{ item.ScalableDimension }}'
+        ScalingInstructions: '{{ item.ScalingInstructions }}'
+        ScalingPlanName: '{{ item.ScalingPlanName }}'
+        ScalingPlanResources: '{{ item.ScalingPlanResources }}'
+        ScalingPlanVersion: '{{ item.ScalingPlanVersion }}'
+        ScalingPlans: '{{ item.ScalingPlans }}'
+        ScalingPolicies: '{{ item.ScalingPolicies }}'
+        ScalingStatusCode: '{{ item.ScalingStatusCode }}'
+        ScalingStatusMessage: '{{ item.ScalingStatusMessage }}'
+        ServiceNamespace: '{{ item.ServiceNamespace }}'
+        StatusCode: '{{ item.StatusCode }}'
+        StatusMessage: '{{ item.StatusMessage }}'
+        StatusStartTime: '{{ item.StatusStartTime }}'
+        Timestamp: '{{ item.Timestamp }}'
+        Value: '{{ item.Value }}'
+  # ── Dependent read operations (require identifiers) ──
+  # ── DescribeScalingPlanResources ──
+  - discovery_id: aws.autoscaling-plans.describe_scaling_plan_resources
+    for_each: aws.autoscaling-plans.describe_scaling_plans
+    calls:
+      - action: describe_scaling_plan_resources
+        params:
+          ScalingPlanName: '{{ item.ScalingPlanName }}'
+          ScalingPlanVersion: '{{ item.ScalingPlanVersion }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.ScalingPlanResources }}'
+      item:
+        ResourceId: '{{ item.ResourceId }}'
+        ScalableDimension: '{{ item.ScalableDimension }}'
+        ScalingPlanName: '{{ item.ScalingPlanName }}'
+        ScalingPlanResources: '{{ item.ScalingPlanResources }}'
+        ScalingPlanVersion: '{{ item.ScalingPlanVersion }}'
+        ScalingPolicies: '{{ item.ScalingPolicies }}'
+        ScalingStatusCode: '{{ item.ScalingStatusCode }}'
+        ScalingStatusMessage: '{{ item.ScalingStatusMessage }}'
+        ServiceNamespace: '{{ item.ServiceNamespace }}'
+        Timestamp: '{{ item.Timestamp }}'
+        Value: '{{ item.Value }}'
+  # ── GetScalingPlanResourceForecastData ──
+  - discovery_id: aws.autoscaling-plans.get_scaling_plan_resource_forecast_data
+    for_each: aws.autoscaling-plans.describe_scaling_plans
+    calls:
+      - action: get_scaling_plan_resource_forecast_data
+        params:
+          ScalingPlanName: '{{ item.ScalingPlanName }}'
+          ScalingPlanVersion: '{{ item.ScalingPlanVersion }}'
+          ServiceNamespace: '{{ item.ServiceNamespace }}'
+          ResourceId: '{{ item.ResourceId }}'
+          ScalableDimension: '{{ item.ScalableDimension }}'
+          ForecastDataType: '{{ item.ForecastDataType }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Datapoints }}'
+      item:
+        Datapoints: '{{ item.Datapoints }}'
+        Timestamp: '{{ item.Timestamp }}'
+        Value: '{{ item.Value }}'

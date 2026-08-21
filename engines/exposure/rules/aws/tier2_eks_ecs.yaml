@@ -1,0 +1,40 @@
+# =============================================================================
+# IEDS Tier 2 — AWS EKS, ECS, Fargate
+# =============================================================================
+
+rules:
+
+  # resource_type = di_table_inventory.resource_type exact values
+  - rule_id: IEDS-T2-AWS-013
+    tier: 2
+    csp: aws
+    resource_type: eks_cluster
+    origin_type: internet
+    title: "AWS EKS API server endpoint is publicly accessible"
+    description: >
+      EKS clusters with endpoint_public_access=true expose the Kubernetes API
+      server endpoint to the internet.
+    severity: critical
+    required_emitted_fields:
+      - resources_vpc_config
+    exposure_conditions:
+      - field: resources_vpc_config.endpointPublicAccess
+        operator: eq
+        value: true
+
+  - rule_id: IEDS-T2-AWS-014
+    tier: 2
+    csp: aws
+    resource_type: ecs_service
+    origin_type: internet
+    title: "AWS ECS service has a public IP assigned"
+    description: >
+      ECS Fargate tasks with assign_public_ip=ENABLED in the awsvpc network
+      configuration are directly reachable from the internet.
+    severity: high
+    required_emitted_fields:
+      - network_configuration
+    exposure_conditions:
+      - field: network_configuration.awsvpcConfiguration.assignPublicIp
+        operator: eq
+        value: ENABLED

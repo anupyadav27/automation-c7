@@ -1,0 +1,232 @@
+version: '1.0'
+provider: aws
+service: machinelearning
+services:
+  client: machinelearning
+  module: boto3.client
+discovery:
+- discovery_id: aws.machinelearning.describe_batch_predictions
+  calls:
+  - action: describe_batch_predictions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Results }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      BatchPredictionDataSourceId: '{{ item.BatchPredictionDataSourceId }}'
+      BatchPredictionId: '{{ item.BatchPredictionId }}'
+      ComputeTime: '{{ item.ComputeTime }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      CreatedByIamUser: '{{ item.CreatedByIamUser }}'
+      FinishedAt: '{{ item.FinishedAt }}'
+      InputDataLocationS3: '{{ item.InputDataLocationS3 }}'
+      InvalidRecordCount: '{{ item.InvalidRecordCount }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      MLModelId: '{{ item.MLModelId }}'
+      Message: '{{ item.Message }}'
+      OutputUri: '{{ item.OutputUri }}'
+      Results: '{{ item.Results }}'
+      StartedAt: '{{ item.StartedAt }}'
+      TotalRecordCount: '{{ item.TotalRecordCount }}'
+- discovery_id: aws.machinelearning.describe_data_sources
+  calls:
+  - action: describe_data_sources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Results }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      ComputeStatistics: '{{ item.ComputeStatistics }}'
+      ComputeTime: '{{ item.ComputeTime }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      CreatedByIamUser: '{{ item.CreatedByIamUser }}'
+      DataLocationS3: '{{ item.DataLocationS3 }}'
+      DataRearrangement: '{{ item.DataRearrangement }}'
+      DataSizeInBytes: '{{ item.DataSizeInBytes }}'
+      DataSourceId: '{{ item.DataSourceId }}'
+      FinishedAt: '{{ item.FinishedAt }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      Message: '{{ item.Message }}'
+      NumberOfFiles: '{{ item.NumberOfFiles }}'
+      RDSMetadata: '{{ item.RDSMetadata }}'
+      RedshiftMetadata: '{{ item.RedshiftMetadata }}'
+      RoleARN: '{{ item.RoleARN }}'
+      SizeInBytes: '{{ item.SizeInBytes }}'
+      StartedAt: '{{ item.StartedAt }}'
+- discovery_id: aws.machinelearning.describe_evaluations
+  calls:
+  - action: describe_evaluations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Results }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      ComputeTime: '{{ item.ComputeTime }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      CreatedByIamUser: '{{ item.CreatedByIamUser }}'
+      EvaluationDataSourceId: '{{ item.EvaluationDataSourceId }}'
+      EvaluationId: '{{ item.EvaluationId }}'
+      FinishedAt: '{{ item.FinishedAt }}'
+      InputDataLocationS3: '{{ item.InputDataLocationS3 }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      MLModelId: '{{ item.MLModelId }}'
+      Message: '{{ item.Message }}'
+      PerformanceMetrics: '{{ item.PerformanceMetrics }}'
+      StartedAt: '{{ item.StartedAt }}'
+- discovery_id: aws.machinelearning.describe_ml_models
+  calls:
+  - action: describe_ml_models
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Results }}'
+    item:
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      Algorithm: '{{ item.Algorithm }}'
+      ComputeTime: '{{ item.ComputeTime }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      CreatedByIamUser: '{{ item.CreatedByIamUser }}'
+      EndpointInfo: '{{ item.EndpointInfo }}'
+      FinishedAt: '{{ item.FinishedAt }}'
+      InputDataLocationS3: '{{ item.InputDataLocationS3 }}'
+      LastUpdatedAt: '{{ item.LastUpdatedAt }}'
+      MLModelId: '{{ item.MLModelId }}'
+      MLModelType: '{{ item.MLModelType }}'
+      Message: '{{ item.Message }}'
+      ScoreThreshold: '{{ item.ScoreThreshold }}'
+      ScoreThresholdLastUpdatedAt: '{{ item.ScoreThresholdLastUpdatedAt }}'
+      StartedAt: '{{ item.StartedAt }}'
+      TrainingDataSourceId: '{{ item.TrainingDataSourceId }}'
+      TrainingParameters: '{{ item.TrainingParameters }}'
+- discovery_id: aws.machinelearning.describe_tags
+  calls:
+  - action: describe_tags
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+      ResourceId: '{{ response.ResourceId }}'
+      ResourceType: '{{ response.ResourceType }}'
+- discovery_id: aws.machinelearning.get_batch_prediction
+  for_each: aws.machinelearning.describe_batch_predictions
+  calls:
+  - action: get_batch_prediction
+    params:
+      BatchPredictionId: '{{ item.BatchPredictionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.Name }}'
+      Status: '{{ response.Status }}'
+      BatchPredictionDataSourceId: '{{ response.BatchPredictionDataSourceId }}'
+      BatchPredictionId: '{{ response.BatchPredictionId }}'
+      ComputeTime: '{{ response.ComputeTime }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      CreatedByIamUser: '{{ response.CreatedByIamUser }}'
+      FinishedAt: '{{ response.FinishedAt }}'
+      InputDataLocationS3: '{{ response.InputDataLocationS3 }}'
+      InvalidRecordCount: '{{ response.InvalidRecordCount }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      LogUri: '{{ response.LogUri }}'
+      MLModelId: '{{ response.MLModelId }}'
+      Message: '{{ response.Message }}'
+      OutputUri: '{{ response.OutputUri }}'
+      StartedAt: '{{ response.StartedAt }}'
+      TotalRecordCount: '{{ response.TotalRecordCount }}'
+- discovery_id: aws.machinelearning.get_data_source
+  for_each: aws.machinelearning.describe_data_sources
+  calls:
+  - action: get_data_source
+    params:
+      DataSourceId: '{{ item.DataSourceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DatabaseUserName: '{{ response.RedshiftMetadata.DatabaseUserName }}'
+      RedshiftDatabase: '{{ response.RedshiftMetadata.RedshiftDatabase }}'
+      SelectSqlQuery: '{{ response.RedshiftMetadata.SelectSqlQuery }}'
+      ComputeStatistics: '{{ response.ComputeStatistics }}'
+      ComputeTime: '{{ response.ComputeTime }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      CreatedByIamUser: '{{ response.CreatedByIamUser }}'
+      DataLocationS3: '{{ response.DataLocationS3 }}'
+      DataRearrangement: '{{ response.DataRearrangement }}'
+      DataSizeInBytes: '{{ response.DataSizeInBytes }}'
+      DataSourceId: '{{ response.DataSourceId }}'
+      DataSourceSchema: '{{ response.DataSourceSchema }}'
+      FinishedAt: '{{ response.FinishedAt }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      LogUri: '{{ response.LogUri }}'
+      Message: '{{ response.Message }}'
+      Name: '{{ response.Name }}'
+      NumberOfFiles: '{{ response.NumberOfFiles }}'
+      DataPipelineId: '{{ response.RDSMetadata.DataPipelineId }}'
+      DatabaseName: '{{ response.RDSMetadata.Database.DatabaseName }}'
+      InstanceIdentifier: '{{ response.RDSMetadata.Database.InstanceIdentifier }}'
+      ResourceRole: '{{ response.RDSMetadata.ResourceRole }}'
+      ServiceRole: '{{ response.RDSMetadata.ServiceRole }}'
+      ClusterIdentifier: '{{ response.RedshiftMetadata.RedshiftDatabase.ClusterIdentifier }}'
+      RoleARN: '{{ response.RoleARN }}'
+      StartedAt: '{{ response.StartedAt }}'
+      Status: '{{ response.Status }}'
+- discovery_id: aws.machinelearning.get_evaluation
+  for_each: aws.machinelearning.describe_evaluations
+  calls:
+  - action: get_evaluation
+    params:
+      EvaluationId: '{{ item.EvaluationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Properties: '{{ response.PerformanceMetrics.Properties }}'
+      ComputeTime: '{{ response.ComputeTime }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      CreatedByIamUser: '{{ response.CreatedByIamUser }}'
+      EvaluationDataSourceId: '{{ response.EvaluationDataSourceId }}'
+      EvaluationId: '{{ response.EvaluationId }}'
+      FinishedAt: '{{ response.FinishedAt }}'
+      InputDataLocationS3: '{{ response.InputDataLocationS3 }}'
+      LastUpdatedAt: '{{ response.LastUpdatedAt }}'
+      LogUri: '{{ response.LogUri }}'
+      MLModelId: '{{ response.MLModelId }}'
+      Message: '{{ response.Message }}'
+      Name: '{{ response.Name }}'
+      StartedAt: '{{ response.StartedAt }}'
+      Status: '{{ response.Status }}'
+- discovery_id: aws.machinelearning.get_ml_model
+  for_each: aws.machinelearning.describe_batch_predictions
+  calls:
+  - action: get_ml_model
+    params:
+      MLModelId: '{{ item.MLModelId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedAt: '{{ response.EndpointInfo.CreatedAt }}'
+      EndpointStatus: '{{ response.EndpointInfo.EndpointStatus }}'
+      EndpointUrl: '{{ response.EndpointInfo.EndpointUrl }}'
+      PeakRequestsPerSecond: '{{ response.EndpointInfo.PeakRequestsPerSecond }}'

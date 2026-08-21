@@ -1,0 +1,44 @@
+version: '1.0'
+provider: aws
+service: kinesisanalytics
+discovery:
+- calls:
+  - action: list_applications
+    on_error: continue
+    save_as: response
+  discovery_id: aws.kinesisanalytics.list_applications
+  emit:
+    as: item
+    item:
+      ApplicationARN: '{{ item.ApplicationARN }}'
+      ApplicationDetail: '{{ item.ApplicationDetail }}'
+      ApplicationName: '{{ item.ApplicationName }}'
+      ApplicationStatus: '{{ item.ApplicationStatus }}'
+      HasMoreApplications: '{{ response.HasMoreApplications }}'
+    items_for: '{{ response.ApplicationSummaries }}'
+- calls:
+  - action: describe_application
+    on_error: continue
+    params:
+      ApplicationName: '{{ item.ApplicationName }}'
+    save_as: response
+  discovery_id: aws.kinesisanalytics.describe_application
+  emit:
+    as: item
+    item:
+      ApplicationARN: '{{ response.ApplicationDetail.ApplicationARN }}'
+      ApplicationCode: '{{ response.ApplicationDetail.ApplicationCode }}'
+      ApplicationConfigurationDescription: '{{ response.ApplicationDetail.ApplicationDescription }}'
+      ApplicationDescription: '{{ response.ApplicationDetail.ApplicationDescription }}'
+      ApplicationDetail: '{{ response.ApplicationDetail.ApplicationStatus }}'
+      ApplicationName: '{{ response.ApplicationDetail.ApplicationName }}'
+      ApplicationStatus: '{{ response.ApplicationDetail.ApplicationStatus }}'
+      ApplicationVersionId: '{{ response.ApplicationDetail.ApplicationVersionId }}'
+      CloudWatchLoggingOptionDescriptions: '{{ response.ApplicationDetail.CloudWatchLoggingOptionDescriptions[].RoleARN }}'
+      CreateTimestamp: '{{ response.ApplicationDetail.CreateTimestamp }}'
+      InputDescriptions: '{{ response.ApplicationDetail.InputDescriptions[].InputId }}'
+      LastUpdateTimestamp: '{{ response.ApplicationDetail.LastUpdateTimestamp }}'
+      OutputDescriptions: '{{ response.ApplicationDetail.OutputDescriptions[].Name }}'
+      ReferenceDataSourceDescriptions: '{{ response.ApplicationDetail.ReferenceDataSourceDescriptions[].TableName }}'
+      ServiceExecutionRole: '{{ response.ApplicationDetail.ServiceExecutionRole }}'
+  for_each: aws.kinesisanalytics.list_applications

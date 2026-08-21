@@ -1,0 +1,372 @@
+version: '1.0'
+provider: aws
+service: partnercentral-selling
+services:
+  client: partnercentral-selling
+  module: boto3.client
+discovery:
+- discovery_id: aws.partnercentral-selling.get_aws_opportunity_summary
+  calls:
+  - action: get_aws_opportunity_summary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.OpportunityTeam }}'
+    item:
+      BusinessTitle: '{{ item.BusinessTitle }}'
+      Email: '{{ item.Email }}'
+      FirstName: '{{ item.FirstName }}'
+      Insights: '{{ item.Insights }}'
+      LastName: '{{ item.LastName }}'
+      Visibility: '{{ item.Visibility }}'
+      Catalog: '{{ response.Catalog }}'
+      EngagementScore: '{{ response.Insights.EngagementScore }}'
+      NextBestActions: '{{ response.Insights.NextBestActions }}'
+      InvolvementType: '{{ response.InvolvementType }}'
+      InvolvementTypeChangeReason: '{{ response.InvolvementTypeChangeReason }}'
+      ClosedLostReason: '{{ response.LifeCycle.ClosedLostReason }}'
+      NextSteps: '{{ response.LifeCycle.NextSteps }}'
+      Stage: '{{ response.LifeCycle.Stage }}'
+      TargetCloseDate: '{{ response.LifeCycle.TargetCloseDate }}'
+      Origin: '{{ response.Origin }}'
+      RelatedOpportunityId: '{{ response.RelatedOpportunityId }}'
+- discovery_id: aws.partnercentral-selling.get_engagement
+  calls:
+  - action: get_engagement
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Contexts }}'
+    item:
+      Contexts: '{{ item.Contexts }}'
+      Description: '{{ item.Description }}'
+      Payload: '{{ item.Payload }}'
+      Type: '{{ item.Type }}'
+      Arn: '{{ response.Arn }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      CreatedBy: '{{ response.CreatedBy }}'
+      Id: '{{ response.Id }}'
+      MemberCount: '{{ response.MemberCount }}'
+      Title: '{{ response.Title }}'
+- discovery_id: aws.partnercentral-selling.get_engagement_invitation
+  calls:
+  - action: get_engagement_invitation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ExistingMembers }}'
+    item:
+      CompanyName: '{{ item.CompanyName }}'
+      WebsiteUrl: '{{ item.WebsiteUrl }}'
+      Arn: '{{ response.Arn }}'
+      Catalog: '{{ response.Catalog }}'
+      EngagementDescription: '{{ response.EngagementDescription }}'
+      EngagementId: '{{ response.EngagementId }}'
+      EngagementTitle: '{{ response.EngagementTitle }}'
+      ExpirationDate: '{{ response.ExpirationDate }}'
+      Id: '{{ response.Id }}'
+      InvitationDate: '{{ response.InvitationDate }}'
+      InvitationMessage: '{{ response.InvitationMessage }}'
+      PayloadType: '{{ response.PayloadType }}'
+      CountryCode: '{{ response.Payload.OpportunityInvitation.Customer.CountryCode }}'
+      Industry: '{{ response.Payload.OpportunityInvitation.Customer.Industry }}'
+      BusinessProblem: '{{ response.Payload.OpportunityInvitation.Project.BusinessProblem }}'
+      TargetCompletionDate: '{{ response.Payload.OpportunityInvitation.Project.TargetCompletionDate }}'
+      Title: '{{ response.Payload.OpportunityInvitation.Project.Title }}'
+      Alias: '{{ response.Receiver.Account.Alias }}'
+      AwsAccountId: '{{ response.Receiver.Account.AwsAccountId }}'
+      RejectionReason: '{{ response.RejectionReason }}'
+      SenderAwsAccountId: '{{ response.SenderAwsAccountId }}'
+      SenderCompanyName: '{{ response.SenderCompanyName }}'
+      Status: '{{ response.Status }}'
+- discovery_id: aws.partnercentral-selling.get_opportunity
+  calls:
+  - action: get_opportunity
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PrimaryNeedsFromAws }}'
+    item:
+      Arn: '{{ response.Arn }}'
+      Catalog: '{{ response.Catalog }}'
+      CreatedDate: '{{ response.CreatedDate }}'
+      City: '{{ response.Customer.Account.Address.City }}'
+      CountryCode: '{{ response.Customer.Account.Address.CountryCode }}'
+      PostalCode: '{{ response.Customer.Account.Address.PostalCode }}'
+      StateOrRegion: '{{ response.Customer.Account.Address.StateOrRegion }}'
+      StreetAddress: '{{ response.Customer.Account.Address.StreetAddress }}'
+      AwsAccountId: '{{ response.Customer.Account.AwsAccountId }}'
+      CompanyName: '{{ response.Customer.Account.CompanyName }}'
+      Duns: '{{ response.Customer.Account.Duns }}'
+      Industry: '{{ response.Customer.Account.Industry }}'
+      OtherIndustry: '{{ response.Customer.Account.OtherIndustry }}'
+      WebsiteUrl: '{{ response.Customer.Account.WebsiteUrl }}'
+      Id: '{{ response.Id }}'
+      LastModifiedDate: '{{ response.LastModifiedDate }}'
+      ClosedLostReason: '{{ response.LifeCycle.ClosedLostReason }}'
+      NextSteps: '{{ response.LifeCycle.NextSteps }}'
+      ReviewComments: '{{ response.LifeCycle.ReviewComments }}'
+      ReviewStatus: '{{ response.LifeCycle.ReviewStatus }}'
+      ReviewStatusReason: '{{ response.LifeCycle.ReviewStatusReason }}'
+      Stage: '{{ response.LifeCycle.Stage }}'
+      TargetCloseDate: '{{ response.LifeCycle.TargetCloseDate }}'
+      AwsFundingUsed: '{{ response.Marketing.AwsFundingUsed }}'
+      CampaignName: '{{ response.Marketing.CampaignName }}'
+      Source: '{{ response.Marketing.Source }}'
+      NationalSecurity: '{{ response.NationalSecurity }}'
+      OpportunityType: '{{ response.OpportunityType }}'
+      PartnerOpportunityIdentifier: '{{ response.PartnerOpportunityIdentifier }}'
+      AdditionalComments: '{{ response.Project.AdditionalComments }}'
+      CompetitorName: '{{ response.Project.CompetitorName }}'
+      CustomerBusinessProblem: '{{ response.Project.CustomerBusinessProblem }}'
+      CustomerUseCase: '{{ response.Project.CustomerUseCase }}'
+      OtherCompetitorNames: '{{ response.Project.OtherCompetitorNames }}'
+      OtherSolutionDescription: '{{ response.Project.OtherSolutionDescription }}'
+      RelatedOpportunityIdentifier: '{{ response.Project.RelatedOpportunityIdentifier }}'
+      Title: '{{ response.Project.Title }}'
+      DeliveryModel: '{{ response.SoftwareRevenue.DeliveryModel }}'
+      EffectiveDate: '{{ response.SoftwareRevenue.EffectiveDate }}'
+      ExpirationDate: '{{ response.SoftwareRevenue.ExpirationDate }}'
+      Amount: '{{ response.SoftwareRevenue.Value.Amount }}'
+      CurrencyCode: '{{ response.SoftwareRevenue.Value.CurrencyCode }}'
+- discovery_id: aws.partnercentral-selling.get_resource_snapshot
+  calls:
+  - action: get_resource_snapshot
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      OpportunitySummary: '{{ response.Payload.OpportunitySummary }}'
+      Arn: '{{ response.Arn }}'
+      Catalog: '{{ response.Catalog }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      CreatedBy: '{{ response.CreatedBy }}'
+      EngagementId: '{{ response.EngagementId }}'
+      AwsAccountId: '{{ response.Payload.OpportunitySummary.Customer.Account.AwsAccountId }}'
+      CompanyName: '{{ response.Payload.OpportunitySummary.Customer.Account.CompanyName }}'
+      Duns: '{{ response.Payload.OpportunitySummary.Customer.Account.Duns }}'
+      Industry: '{{ response.Payload.OpportunitySummary.Customer.Account.Industry }}'
+      OtherIndustry: '{{ response.Payload.OpportunitySummary.Customer.Account.OtherIndustry }}'
+      WebsiteUrl: '{{ response.Payload.OpportunitySummary.Customer.Account.WebsiteUrl }}'
+      NextSteps: '{{ response.Payload.OpportunitySummary.Lifecycle.NextSteps }}'
+      ReviewStatus: '{{ response.Payload.OpportunitySummary.Lifecycle.ReviewStatus }}'
+      Stage: '{{ response.Payload.OpportunitySummary.Lifecycle.Stage }}'
+      TargetCloseDate: '{{ response.Payload.OpportunitySummary.Lifecycle.TargetCloseDate }}'
+      OpportunityType: '{{ response.Payload.OpportunitySummary.OpportunityType }}'
+      CustomerUseCase: '{{ response.Payload.OpportunitySummary.Project.CustomerUseCase }}'
+      OtherSolutionDescription: '{{ response.Payload.OpportunitySummary.Project.OtherSolutionDescription }}'
+      ResourceId: '{{ response.ResourceId }}'
+      ResourceSnapshotTemplateName: '{{ response.ResourceSnapshotTemplateName }}'
+      ResourceType: '{{ response.ResourceType }}'
+      Revision: '{{ response.Revision }}'
+- discovery_id: aws.partnercentral-selling.get_resource_snapshot_job
+  calls:
+  - action: get_resource_snapshot_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+      ResourceArn: '{{ response.ResourceArn }}'
+      ResourceId: '{{ response.ResourceId }}'
+      Status: '{{ response.Status }}'
+      Catalog: '{{ response.Catalog }}'
+      CreatedAt: '{{ response.CreatedAt }}'
+      EngagementId: '{{ response.EngagementId }}'
+      LastFailure: '{{ response.LastFailure }}'
+      LastSuccessfulExecutionDate: '{{ response.LastSuccessfulExecutionDate }}'
+      ResourceSnapshotTemplateName: '{{ response.ResourceSnapshotTemplateName }}'
+      ResourceType: '{{ response.ResourceType }}'
+- discovery_id: aws.partnercentral-selling.get_selling_system_settings
+  calls:
+  - action: get_selling_system_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Catalog: '{{ response.Catalog }}'
+      ResourceSnapshotJobRoleArn: '{{ response.ResourceSnapshotJobRoleArn }}'
+- discovery_id: aws.partnercentral-selling.list_engagement_by_accepting_invitation_tasks
+  calls:
+  - action: list_engagement_by_accepting_invitation_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TaskSummaries }}'
+    item:
+      Contexts: '{{ item.Contexts }}'
+      Description: '{{ item.Description }}'
+      EngagementInvitationId: '{{ item.EngagementInvitationId }}'
+      Message: '{{ item.Message }}'
+      OpportunityId: '{{ item.OpportunityId }}'
+      ReasonCode: '{{ item.ReasonCode }}'
+      ResourceSnapshotJobId: '{{ item.ResourceSnapshotJobId }}'
+      StartTime: '{{ item.StartTime }}'
+      TaskArn: '{{ item.TaskArn }}'
+      TaskId: '{{ item.TaskId }}'
+      TaskStatus: '{{ item.TaskStatus }}'
+- discovery_id: aws.partnercentral-selling.list_engagement_from_opportunity_tasks
+  calls:
+  - action: list_engagement_from_opportunity_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TaskSummaries }}'
+    item:
+      EngagementId: '{{ item.EngagementId }}'
+      EngagementInvitationId: '{{ item.EngagementInvitationId }}'
+      Message: '{{ item.Message }}'
+      OpportunityId: '{{ item.OpportunityId }}'
+      ReasonCode: '{{ item.ReasonCode }}'
+      ResourceSnapshotJobId: '{{ item.ResourceSnapshotJobId }}'
+      StartTime: '{{ item.StartTime }}'
+      TaskArn: '{{ item.TaskArn }}'
+      TaskId: '{{ item.TaskId }}'
+      TaskStatus: '{{ item.TaskStatus }}'
+- discovery_id: aws.partnercentral-selling.list_engagement_invitations
+  calls:
+  - action: list_engagement_invitations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EngagementInvitationSummaries }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      Catalog: '{{ item.Catalog }}'
+      EngagementId: '{{ item.EngagementId }}'
+      EngagementTitle: '{{ item.EngagementTitle }}'
+      ExpirationDate: '{{ item.ExpirationDate }}'
+      InvitationDate: '{{ item.InvitationDate }}'
+      ParticipantType: '{{ item.ParticipantType }}'
+      PayloadType: '{{ item.PayloadType }}'
+      Receiver: '{{ item.Receiver }}'
+      SenderAwsAccountId: '{{ item.SenderAwsAccountId }}'
+      SenderCompanyName: '{{ item.SenderCompanyName }}'
+- discovery_id: aws.partnercentral-selling.list_engagement_members
+  calls:
+  - action: list_engagement_members
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EngagementMemberList }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      CompanyName: '{{ item.CompanyName }}'
+      WebsiteUrl: '{{ item.WebsiteUrl }}'
+- discovery_id: aws.partnercentral-selling.list_engagement_resource_associations
+  calls:
+  - action: list_engagement_resource_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EngagementResourceAssociationSummaries }}'
+    item:
+      ResourceId: '{{ item.ResourceId }}'
+      Catalog: '{{ item.Catalog }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      EngagementId: '{{ item.EngagementId }}'
+      ResourceType: '{{ item.ResourceType }}'
+- discovery_id: aws.partnercentral-selling.list_engagements
+  calls:
+  - action: list_engagements
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EngagementSummaryList }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      MemberCount: '{{ item.MemberCount }}'
+      Title: '{{ item.Title }}'
+- discovery_id: aws.partnercentral-selling.list_opportunities
+  calls:
+  - action: list_opportunities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.OpportunitySummaries }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Catalog: '{{ item.Catalog }}'
+      CreatedDate: '{{ item.CreatedDate }}'
+      Customer: '{{ item.Customer }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      LifeCycle: '{{ item.LifeCycle }}'
+      OpportunityType: '{{ item.OpportunityType }}'
+      PartnerOpportunityIdentifier: '{{ item.PartnerOpportunityIdentifier }}'
+      Project: '{{ item.Project }}'
+- discovery_id: aws.partnercentral-selling.list_resource_snapshot_jobs
+  calls:
+  - action: list_resource_snapshot_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceSnapshotJobSummaries }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      EngagementId: '{{ item.EngagementId }}'
+- discovery_id: aws.partnercentral-selling.list_resource_snapshots
+  calls:
+  - action: list_resource_snapshots
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceSnapshotSummaries }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      ResourceId: '{{ item.ResourceId }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      ResourceSnapshotTemplateName: '{{ item.ResourceSnapshotTemplateName }}'
+      ResourceType: '{{ item.ResourceType }}'
+      Revision: '{{ item.Revision }}'
+- discovery_id: aws.partnercentral-selling.list_solutions
+  calls:
+  - action: list_solutions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SolutionSummaries }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      Catalog: '{{ item.Catalog }}'
+      Category: '{{ item.Category }}'
+      CreatedDate: '{{ item.CreatedDate }}'
+- discovery_id: aws.partnercentral-selling.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

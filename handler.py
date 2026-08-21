@@ -28,6 +28,47 @@ logger.setLevel(logging.INFO)
 POLICY_DIR = os.environ.get("POLICY_DIR", "/app/policies")
 OUTPUT_BUCKET = os.environ.get("OUTPUT_BUCKET", "")
 REGION = os.environ.get("C7N_REGION", os.environ.get("AWS_REGION", "us-east-1"))
+# Custodian resource-cache TTL (minutes) for dry-run scans: policies that
+# share a resource type reuse one describe sweep instead of each paying for
+# their own. Live runs (actions) always bypass the cache — acting on a stale
+# resource list is never acceptable.
+CACHE_PERIOD = os.environ.get("C7N_CACHE_PERIOD", "5")
+
+
+def _extract_creds(params):
+    """Pull caller-supplied AWS creds from request body without ever logging them."""
+    ak = params.get("aws_access_key_id")
+    sk = params.get("aws_secret_access_key")
+    st = params.get("aws_session_token")
+    if ak and sk:
+        return {"access_key": ak, "secret_key": sk, "session_token": st}
+    return None
+
+
+def _subprocess_env(creds):
+    """Build env for c7n subprocess. Overrides AWS creds only when caller provided them."""
+    env = os.environ.copy()
+    if creds:
+        env["AWS_ACCESS_KEY_ID"] = creds["access_key"]
+        env["AWS_SECRET_ACCESS_KEY"] = creds["secret_key"]
+        if creds.get("session_token"):
+            env["AWS_SESSION_TOKEN"] = creds["session_token"]
+        else:
+            env.pop("AWS_SESSION_TOKEN", None)
+    return env
+
+
+def _sts_client(creds):
+    """boto3 STS client honoring caller-supplied creds when present."""
+    if creds:
+        kwargs = {
+            "aws_access_key_id": creds["access_key"],
+            "aws_secret_access_key": creds["secret_key"],
+        }
+        if creds.get("session_token"):
+            kwargs["aws_session_token"] = creds["session_token"]
+        return boto3.client("sts", **kwargs)
+    return boto3.client("sts")
 
 # ---------------------------------------------------------------
 # Policy metadata — drives severity, finding text, recommendation,
@@ -695,6 +736,7 @@ def lambda_handler(event, context):
       resource_ids — list of resource IDs to target (used with action_request)
     """
     params = _parse_event(event)
+    creds  = _extract_creds(params)  # caller-supplied AWS creds; None ⇒ use Lambda role
 
     # ── Action execution mode ──────────────────────────────
     if params.get("action_request"):
@@ -704,7 +746,7 @@ def lambda_handler(event, context):
         region       = params.get("region") or REGION
         if not policy_name or not action_type:
             return _response(400, {"error": "policy and action are required"})
-        result = _run_action_on_resources(policy_name, resource_ids, action_type, region)
+        result = _run_action_on_resources(policy_name, resource_ids, action_type, region, creds)
         return _response(200, result)
 
     # ── Dynamic policy build & run ─────────────────────────
@@ -714,7 +756,7 @@ def lambda_handler(event, context):
             return _response(400, {"error": "spec.resource is required"})
         region = params.get("region") or REGION
         dryrun = str(params.get("dryrun", "true")).lower() == "true"
-        result = _run_policy_from_spec(spec, dryrun, region)
+        result = _run_policy_from_spec(spec, dryrun, region, creds)
         return _response(200, result)
 
     # ── Region override ────────────────────────────────────
@@ -745,17 +787,17 @@ def lambda_handler(event, context):
         requested_label = policy_input
 
     # ── Execute ────────────────────────────────────────────
-    results = []
-    for item in resolved:
-        result = _run_policy(item["file"], item.get("filter_name"), dryrun, region)
-        results.append(result)
+    # One custodian invocation for the whole selection: policies that share a
+    # resource type reuse a single API sweep via the c7n resource cache,
+    # instead of re-describing the same resources once per policy.
+    results = _run_policies_grouped(resolved, dryrun, region, creds)
 
     if OUTPUT_BUCKET:
         _upload_results(results)
 
     # Include account identity so the UI can show Account header
     try:
-        identity = boto3.client("sts").get_caller_identity()
+        identity = _sts_client(creds).get_caller_identity()
         account_info = {"account_id": identity["Account"], "arn": identity["Arn"], "region": region}
     except Exception:
         account_info = {"account_id": "unknown", "region": region}
@@ -802,7 +844,125 @@ def _resolve_policies(policy_input, region=None):
     return None
 
 
-def _run_policy(policy_file, filter_name=None, dryrun=True, region=None):
+def _expand_policy_items(items):
+    """
+    Expand _resolve_policies() output into one (name, spec, description)
+    per policy, preserving order and dropping duplicates. A file-level item
+    (no filter_name) contributes every policy in the file.
+    """
+    expanded = {}
+    for item in items:
+        try:
+            with open(item["file"]) as f:
+                data = yaml.safe_load(f) or {}
+        except Exception as e:
+            logger.warning(f"Failed to parse {item['file']}: {e}")
+            continue
+        wanted = item.get("filter_name")
+        for pol in data.get("policies", []):
+            name = pol.get("name")
+            if not name or (wanted and name != wanted):
+                continue
+            expanded.setdefault(name, (pol, pol.get("description", "")))
+    return [(name, spec, desc) for name, (spec, desc) in expanded.items()]
+
+
+def _run_policies_grouped(items, dryrun=True, region=None, creds=None):
+    """
+    Execute many policies in ONE custodian invocation.
+
+    Custodian's resource cache is keyed by (account, region, resource type),
+    so 17 S3 policies in one run cost one bucket sweep, not seventeen.
+    Results are read from each policy's own output directory, so the
+    per-policy result shape is identical to what _run_policy returns.
+    """
+    run_region = region or REGION
+    policies = _expand_policy_items(items)
+    if not policies:
+        return []
+
+    with tempfile.TemporaryDirectory() as output_dir:
+        merged_path = os.path.join(output_dir, "_merged_policies.yml")
+        with open(merged_path, "w") as f:
+            yaml.dump({"policies": [spec for _, spec, _ in policies]}, f,
+                      default_flow_style=False)
+
+        cmd = [
+            "custodian", "run",
+            "-s", output_dir,
+            "--cache-period", CACHE_PERIOD if dryrun else "0",
+            "--region", run_region,
+        ]
+        if dryrun:
+            cmd.append("--dryrun")
+        cmd.append(merged_path)
+
+        logger.info(f"Running {len(policies)} policies grouped: {' '.join(cmd)}")
+
+        # Lambda's hard ceiling is 900s; one sweep per resource type means
+        # wall time grows with distinct types, not with policy count.
+        timeout = min(880, 300 + 10 * len(policies))
+        try:
+            proc = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                env=_subprocess_env(creds),
+            )
+        except subprocess.TimeoutExpired:
+            return [{
+                "policy": name,
+                "status": "timeout",
+                "resources_found": {},
+                "resources": [],
+            } for name, _, _ in policies]
+        except Exception as e:
+            return [{
+                "policy": name,
+                "status": "error",
+                "error": str(e),
+                "resources_found": {},
+                "resources": [],
+            } for name, _, _ in policies]
+
+        stderr_tail = proc.stderr[-500:] if proc.stderr else ""
+        results = []
+        for name, _spec, description in policies:
+            resources_path = os.path.join(output_dir, name, "resources.json")
+            if os.path.exists(resources_path):
+                try:
+                    with open(resources_path) as f:
+                        raw = json.load(f)
+                except (json.JSONDecodeError, IOError):
+                    raw = []
+                resources = _normalize_resources(name, raw)
+                results.append({
+                    "policy": name,
+                    "description": description,
+                    "status": "success",
+                    "return_code": proc.returncode,
+                    "resources_found": {name: len(resources)},
+                    "resources": resources,
+                    "stderr": stderr_tail,
+                })
+            else:
+                # Custodian writes resources.json even for zero matches — a
+                # missing directory means this policy never executed.
+                results.append({
+                    "policy": name,
+                    "description": description,
+                    "status": "error",
+                    "return_code": proc.returncode,
+                    "error": "policy produced no output — see stderr",
+                    "resources_found": {},
+                    "resources": [],
+                    "stderr": stderr_tail,
+                })
+        return results
+
+
+def _run_policy(policy_file, filter_name=None, dryrun=True, region=None, creds=None):
     """
     Execute a c7n policy file.
     If filter_name is set, extract only that one policy into a
@@ -828,7 +988,7 @@ def _run_policy(policy_file, filter_name=None, dryrun=True, region=None):
         cmd = [
             "custodian", "run",
             "-s", output_dir,
-            "--cache-period", "0",
+            "--cache-period", CACHE_PERIOD if dryrun else "0",
             "--region", run_region,
         ]
         if dryrun:
@@ -843,6 +1003,7 @@ def _run_policy(policy_file, filter_name=None, dryrun=True, region=None):
                 capture_output=True,
                 text=True,
                 timeout=300,
+                env=_subprocess_env(creds),
             )
             # Read resources BEFORE the temp dir is cleaned up
             raw_resources = _load_raw_resources(output_dir)
@@ -1026,7 +1187,7 @@ def _get_nested(obj, dotted_key):
     return val
 
 
-def _run_action_on_resources(policy_name, resource_ids, action_type, region=None):
+def _run_action_on_resources(policy_name, resource_ids, action_type, region=None, creds=None):
     """
     Run a specific c7n action against targeted resource IDs.
     Builds a temp YAML: original policy filters + resource-ID filter + chosen action.
@@ -1070,7 +1231,7 @@ def _run_action_on_resources(policy_name, resource_ids, action_type, region=None
         logger.info(f"Action run: {' '.join(cmd)}")
 
         try:
-            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=120, env=_subprocess_env(creds))
             raw  = _load_raw_resources(output_dir)
             return {
                 "policy":             policy_name,
@@ -1277,7 +1438,7 @@ def _spec_to_yaml(spec):
     return yaml.dump({"policies": [policy]}, default_flow_style=False, sort_keys=False)
 
 
-def _run_policy_from_spec(spec, dryrun=True, region=None):
+def _run_policy_from_spec(spec, dryrun=True, region=None, creds=None):
     """
     Build a temp YAML from a dynamic spec and execute it with custodian.
     Returns scan results plus the generated YAML so the UI can preview it.
@@ -1297,7 +1458,7 @@ def _run_policy_from_spec(spec, dryrun=True, region=None):
         cmd = [
             "custodian", "run",
             "-s", output_dir,
-            "--cache-period", "0",
+            "--cache-period", CACHE_PERIOD if dryrun else "0",
             "--region", run_region,
         ]
         if dryrun:
@@ -1307,7 +1468,7 @@ def _run_policy_from_spec(spec, dryrun=True, region=None):
         logger.info(f"Dynamic policy run: {' '.join(cmd)}")
 
         try:
-            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300, env=_subprocess_env(creds))
             raw_resources = _load_raw_resources(output_dir)
 
             # Infer ID field from actual data if hint not available

@@ -1,0 +1,73 @@
+version: '1.0'
+provider: aws
+service: importexport
+services:
+  client: importexport
+  module: boto3.client
+discovery:
+- discovery_id: aws.importexport.list_jobs
+  calls:
+  - action: list_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Jobs }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      ArtifactList: '{{ item.ArtifactList }}'
+      Carrier: '{{ item.Carrier }}'
+      CurrentManifest: '{{ item.CurrentManifest }}'
+      ErrorCount: '{{ item.ErrorCount }}'
+      IsCanceled: '{{ item.IsCanceled }}'
+      JobId: '{{ item.JobId }}'
+      JobType: '{{ item.JobType }}'
+      LocationCode: '{{ item.LocationCode }}'
+      LocationMessage: '{{ item.LocationMessage }}'
+      LogBucket: '{{ item.LogBucket }}'
+      LogKey: '{{ item.LogKey }}'
+      ProgressCode: '{{ item.ProgressCode }}'
+      ProgressMessage: '{{ item.ProgressMessage }}'
+      SignatureFileContents: '{{ item.SignatureFileContents }}'
+      TrackingNumber: '{{ item.TrackingNumber }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+- discovery_id: aws.importexport.get_shipping_label
+  calls:
+  - action: get_shipping_label
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ShippingLabelURL: '{{ response.ShippingLabelURL }}'
+      Warning: '{{ response.Warning }}'
+- discovery_id: aws.importexport.get_status
+  for_each: aws.importexport.list_jobs
+  calls:
+  - action: get_status
+    params:
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ArtifactList }}'
+    item:
+      ArtifactList: '{{ item.ArtifactList }}'
+      Carrier: '{{ item.Carrier }}'
+      CurrentManifest: '{{ item.CurrentManifest }}'
+      Description: '{{ item.Description }}'
+      ErrorCount: '{{ item.ErrorCount }}'
+      LocationCode: '{{ item.LocationCode }}'
+      LocationMessage: '{{ item.LocationMessage }}'
+      LogBucket: '{{ item.LogBucket }}'
+      LogKey: '{{ item.LogKey }}'
+      ProgressCode: '{{ item.ProgressCode }}'
+      ProgressMessage: '{{ item.ProgressMessage }}'
+      SignatureFileContents: '{{ item.SignatureFileContents }}'
+      TrackingNumber: '{{ item.TrackingNumber }}'
+      URL: '{{ item.URL }}'
+      CreationDate: '{{ response.CreationDate }}'
+      JobId: '{{ response.JobId }}'
+      JobType: '{{ response.JobType }}'
+      Signature: '{{ response.Signature }}'

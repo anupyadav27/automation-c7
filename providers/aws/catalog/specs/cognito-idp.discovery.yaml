@@ -1,0 +1,624 @@
+version: '1.0'
+provider: aws
+service: cognito-idp
+services:
+  client: cognito-idp
+  module: boto3.client
+discovery:
+- discovery_id: aws.cognito-idp.describe_identity_provider
+  calls:
+  - action: describe_identity_provider
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ response.IdentityProvider.CreationDate }}'
+      AttributeMapping: '{{ response.IdentityProvider.AttributeMapping }}'
+      IdpIdentifiers: '{{ response.IdentityProvider.IdpIdentifiers }}'
+      LastModifiedDate: '{{ response.IdentityProvider.LastModifiedDate }}'
+      ProviderDetails: '{{ response.IdentityProvider.ProviderDetails }}'
+      ProviderName: '{{ response.IdentityProvider.ProviderName }}'
+      ProviderType: '{{ response.IdentityProvider.ProviderType }}'
+      UserPoolId: '{{ response.IdentityProvider.UserPoolId }}'
+- discovery_id: aws.cognito-idp.describe_managed_login_branding
+  calls:
+  - action: describe_managed_login_branding
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ response.ManagedLoginBranding.CreationDate }}'
+      Assets: '{{ response.ManagedLoginBranding.Assets[].Bytes }}'
+      LastModifiedDate: '{{ response.ManagedLoginBranding.LastModifiedDate }}'
+      ManagedLoginBranding: '{{ response.ManagedLoginBranding.ManagedLoginBrandingId }}'
+      ManagedLoginBrandingId: '{{ response.ManagedLoginBranding.ManagedLoginBrandingId }}'
+      Settings: '{{ response.ManagedLoginBranding.Settings }}'
+      UseCognitoProvidedValues: '{{ response.ManagedLoginBranding.UseCognitoProvidedValues }}'
+      UserPoolId: '{{ response.ManagedLoginBranding.UserPoolId }}'
+- discovery_id: aws.cognito-idp.describe_managed_login_branding_by_client
+  calls:
+  - action: describe_managed_login_branding_by_client
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ response.ManagedLoginBranding.CreationDate }}'
+      Assets: '{{ response.ManagedLoginBranding.Assets[].Bytes }}'
+      LastModifiedDate: '{{ response.ManagedLoginBranding.LastModifiedDate }}'
+      ManagedLoginBrandingId: '{{ response.ManagedLoginBranding.ManagedLoginBrandingId }}'
+      Settings: '{{ response.ManagedLoginBranding.Settings }}'
+      UseCognitoProvidedValues: '{{ response.ManagedLoginBranding.UseCognitoProvidedValues }}'
+      UserPoolId: '{{ response.ManagedLoginBranding.UserPoolId }}'
+- discovery_id: aws.cognito-idp.describe_resource_server
+  calls:
+  - action: describe_resource_server
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.ResourceServer.Name }}'
+      Identifier: '{{ response.ResourceServer.Identifier }}'
+      ResourceServer: '{{ response.ResourceServer.ResourceServer }}'
+      Scopes: '{{ response.ResourceServer.Scopes }}'
+      UserPoolId: '{{ response.ResourceServer.UserPoolId }}'
+- discovery_id: aws.cognito-idp.describe_risk_configuration
+  calls:
+  - action: describe_risk_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccountTakeoverRiskConfiguration: '{{ response.RiskConfiguration.AccountTakeoverRiskConfiguration }}'
+      ClientId: '{{ response.RiskConfiguration.ClientId }}'
+      CompromisedCredentialsRiskConfiguration: '{{ response.RiskConfiguration.CompromisedCredentialsRiskConfiguration.Actions.EventAction }}'
+      LastModifiedDate: '{{ response.RiskConfiguration.LastModifiedDate }}'
+      RiskConfiguration: '{{ response.RiskConfiguration.RiskConfiguration }}'
+      RiskExceptionConfiguration: '{{ response.RiskConfiguration.RiskExceptionConfiguration }}'
+      UserPoolId: '{{ response.RiskConfiguration.UserPoolId }}'
+      EventAction: '{{ response.RiskConfiguration.AccountTakeoverRiskConfiguration.Actions.HighAction.EventAction }}'
+      Notify: '{{ response.RiskConfiguration.AccountTakeoverRiskConfiguration.Actions.HighAction.Notify }}'
+      HtmlBody: '{{ response.RiskConfiguration.AccountTakeoverRiskConfiguration.NotifyConfiguration.BlockEmail.HtmlBody }}'
+      Subject: '{{ response.RiskConfiguration.AccountTakeoverRiskConfiguration.NotifyConfiguration.BlockEmail.Subject }}'
+      TextBody: '{{ response.RiskConfiguration.AccountTakeoverRiskConfiguration.NotifyConfiguration.BlockEmail.TextBody }}'
+      From: '{{ response.RiskConfiguration.AccountTakeoverRiskConfiguration.NotifyConfiguration.From }}'
+      ReplyTo: '{{ response.RiskConfiguration.AccountTakeoverRiskConfiguration.NotifyConfiguration.ReplyTo }}'
+      SourceArn: '{{ response.RiskConfiguration.AccountTakeoverRiskConfiguration.NotifyConfiguration.SourceArn }}'
+- discovery_id: aws.cognito-idp.describe_terms
+  calls:
+  - action: describe_terms
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ response.Terms.CreationDate }}'
+      ClientId: '{{ response.Terms.ClientId }}'
+      Enforcement: '{{ response.Terms.Enforcement }}'
+      LastModifiedDate: '{{ response.Terms.LastModifiedDate }}'
+      Links: '{{ response.Terms.Links }}'
+      TermsId: '{{ response.Terms.TermsId }}'
+      TermsName: '{{ response.Terms.TermsName }}'
+      TermsSource: '{{ response.Terms.TermsSource }}'
+      UserPoolId: '{{ response.Terms.UserPoolId }}'
+- discovery_id: aws.cognito-idp.describe_user_import_job
+  calls:
+  - action: describe_user_import_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ response.UserImportJob.CreationDate }}'
+      Status: '{{ response.UserImportJob.Status }}'
+      CloudWatchLogsRoleArn: '{{ response.UserImportJob.CloudWatchLogsRoleArn }}'
+      CompletionDate: '{{ response.UserImportJob.CompletionDate }}'
+      CompletionMessage: '{{ response.UserImportJob.CompletionMessage }}'
+      FailedUsers: '{{ response.UserImportJob.FailedUsers }}'
+      ImportedUsers: '{{ response.UserImportJob.ImportedUsers }}'
+      JobId: '{{ response.UserImportJob.JobId }}'
+      JobName: '{{ response.UserImportJob.JobName }}'
+      PreSignedUrl: '{{ response.UserImportJob.PreSignedUrl }}'
+      SkippedUsers: '{{ response.UserImportJob.SkippedUsers }}'
+      StartDate: '{{ response.UserImportJob.StartDate }}'
+      UserImportJob: '{{ response.UserImportJob.UserImportJob }}'
+      UserPoolId: '{{ response.UserImportJob.UserPoolId }}'
+- discovery_id: aws.cognito-idp.describe_user_pool
+  calls:
+  - action: describe_user_pool
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.UserPool.Arn }}'
+      CreationDate: '{{ response.UserPool.CreationDate }}'
+      DeletionProtection: '{{ response.UserPool.DeletionProtection }}'
+      Id: '{{ response.UserPool.Id }}'
+      Name: '{{ response.UserPool.Name }}'
+      Status: '{{ response.UserPool.Status }}'
+      AccountRecoverySetting: '{{ response.UserPool.AccountRecoverySetting }}'
+      AdminCreateUserConfig: '{{ response.UserPool.AdminCreateUserConfig }}'
+      AliasAttributes: '{{ response.UserPool.AliasAttributes }}'
+      AutoVerifiedAttributes: '{{ response.UserPool.AutoVerifiedAttributes }}'
+      CustomDomain: '{{ response.UserPool.CustomDomain }}'
+      DeviceConfiguration: '{{ response.UserPool.DeviceConfiguration }}'
+      Domain: '{{ response.UserPool.Domain }}'
+      EmailConfiguration: '{{ response.UserPool.EmailConfiguration.From }}'
+      EmailConfigurationFailure: '{{ response.UserPool.EmailConfigurationFailure }}'
+      EmailVerificationMessage: '{{ response.UserPool.EmailVerificationMessage }}'
+      EmailVerificationSubject: '{{ response.UserPool.EmailVerificationSubject }}'
+      EstimatedNumberOfUsers: '{{ response.UserPool.EstimatedNumberOfUsers }}'
+      LambdaConfig: '{{ response.UserPool.LambdaConfig }}'
+      LastModifiedDate: '{{ response.UserPool.LastModifiedDate }}'
+      MfaConfiguration: '{{ response.UserPool.MfaConfiguration }}'
+      Policies: '{{ response.UserPool.Policies }}'
+      SchemaAttributes: '{{ response.UserPool.SchemaAttributes[].Name }}'
+      SmsAuthenticationMessage: '{{ response.UserPool.SmsAuthenticationMessage }}'
+      SmsConfiguration: '{{ response.UserPool.MfaConfiguration }}'
+      SmsConfigurationFailure: '{{ response.UserPool.SmsConfigurationFailure }}'
+      SmsVerificationMessage: '{{ response.UserPool.SmsVerificationMessage }}'
+      UserAttributeUpdateSettings: '{{ response.UserPool.UserAttributeUpdateSettings }}'
+      UserPool: '{{ response.UserPool.UserPoolTier }}'
+      UserPoolAddOns: '{{ response.UserPool.UserPoolAddOns }}'
+      UserPoolTags: '{{ response.UserPool.UserPoolTags }}'
+      UserPoolTier: '{{ response.UserPool.UserPoolTier }}'
+      UsernameAttributes: '{{ response.UserPool.UsernameAttributes }}'
+      UsernameConfiguration: '{{ response.UserPool.UsernameConfiguration }}'
+      VerificationMessageTemplate: '{{ response.UserPool.VerificationMessageTemplate.SmsMessage }}'
+      AllowAdminCreateUserOnly: '{{ response.UserPool.AdminCreateUserConfig.AllowAdminCreateUserOnly }}'
+      EmailMessage: '{{ response.UserPool.AdminCreateUserConfig.InviteMessageTemplate.EmailMessage }}'
+      EmailSubject: '{{ response.UserPool.AdminCreateUserConfig.InviteMessageTemplate.EmailSubject }}'
+      SMSMessage: '{{ response.UserPool.AdminCreateUserConfig.InviteMessageTemplate.SMSMessage }}'
+      UnusedAccountValidityDays: '{{ response.UserPool.AdminCreateUserConfig.UnusedAccountValidityDays }}'
+      ChallengeRequiredOnNewDevice: '{{ response.UserPool.DeviceConfiguration.ChallengeRequiredOnNewDevice }}'
+      DeviceOnlyRememberedOnUserPrompt: '{{ response.UserPool.DeviceConfiguration.DeviceOnlyRememberedOnUserPrompt }}'
+      ConfigurationSet: '{{ response.UserPool.EmailConfiguration.ConfigurationSet }}'
+      EmailSendingAccount: '{{ response.UserPool.EmailConfiguration.EmailSendingAccount }}'
+      From: '{{ response.UserPool.EmailConfiguration.From }}'
+      ReplyToEmailAddress: '{{ response.UserPool.EmailConfiguration.ReplyToEmailAddress }}'
+      SourceArn: '{{ response.UserPool.EmailConfiguration.SourceArn }}'
+      CreateAuthChallenge: '{{ response.UserPool.LambdaConfig.CreateAuthChallenge }}'
+      LambdaArn: '{{ response.UserPool.LambdaConfig.CustomEmailSender.LambdaArn }}'
+      LambdaVersion: '{{ response.UserPool.LambdaConfig.CustomEmailSender.LambdaVersion }}'
+      CustomMessage: '{{ response.UserPool.LambdaConfig.CustomMessage }}'
+      DefineAuthChallenge: '{{ response.UserPool.LambdaConfig.DefineAuthChallenge }}'
+      KMSKeyID: '{{ response.UserPool.LambdaConfig.KMSKeyID }}'
+      PostAuthentication: '{{ response.UserPool.LambdaConfig.PostAuthentication }}'
+      PostConfirmation: '{{ response.UserPool.LambdaConfig.PostConfirmation }}'
+      PreAuthentication: '{{ response.UserPool.LambdaConfig.PreAuthentication }}'
+      PreSignUp: '{{ response.UserPool.LambdaConfig.PreSignUp }}'
+      PreTokenGeneration: '{{ response.UserPool.LambdaConfig.PreTokenGeneration }}'
+      UserMigration: '{{ response.UserPool.LambdaConfig.UserMigration }}'
+      VerifyAuthChallengeResponse: '{{ response.UserPool.LambdaConfig.VerifyAuthChallengeResponse }}'
+      MinimumLength: '{{ response.UserPool.Policies.PasswordPolicy.MinimumLength }}'
+      PasswordHistorySize: '{{ response.UserPool.Policies.PasswordPolicy.PasswordHistorySize }}'
+      RequireLowercase: '{{ response.UserPool.Policies.PasswordPolicy.RequireLowercase }}'
+      RequireNumbers: '{{ response.UserPool.Policies.PasswordPolicy.RequireNumbers }}'
+      RequireSymbols: '{{ response.UserPool.Policies.PasswordPolicy.RequireSymbols }}'
+      RequireUppercase: '{{ response.UserPool.Policies.PasswordPolicy.RequireUppercase }}'
+      TemporaryPasswordValidityDays: '{{ response.UserPool.Policies.PasswordPolicy.TemporaryPasswordValidityDays }}'
+      ExternalId: '{{ response.UserPool.SmsConfiguration.ExternalId }}'
+      SnsCallerArn: '{{ response.UserPool.SmsConfiguration.SnsCallerArn }}'
+      SnsRegion: '{{ response.UserPool.SmsConfiguration.SnsRegion }}'
+      CustomAuthMode: '{{ response.UserPool.UserPoolAddOns.AdvancedSecurityAdditionalFlows.CustomAuthMode }}'
+      AdvancedSecurityMode: '{{ response.UserPool.UserPoolAddOns.AdvancedSecurityMode }}'
+      CaseSensitive: '{{ response.UserPool.UsernameConfiguration.CaseSensitive }}'
+      DefaultEmailOption: '{{ response.UserPool.VerificationMessageTemplate.DefaultEmailOption }}'
+      EmailMessageByLink: '{{ response.UserPool.VerificationMessageTemplate.EmailMessageByLink }}'
+      EmailSubjectByLink: '{{ response.UserPool.VerificationMessageTemplate.EmailSubjectByLink }}'
+      SmsMessage: '{{ response.UserPool.VerificationMessageTemplate.SmsMessage }}'
+- discovery_id: aws.cognito-idp.describe_user_pool_client
+  calls:
+  - action: describe_user_pool_client
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ response.UserPoolClient.CreationDate }}'
+      AccessTokenValidity: '{{ response.UserPoolClient.AccessTokenValidity }}'
+      AllowedOAuthFlows: '{{ response.UserPoolClient.AllowedOAuthFlows }}'
+      AllowedOAuthFlowsUserPoolClient: '{{ response.UserPoolClient.AllowedOAuthFlowsUserPoolClient }}'
+      AllowedOAuthScopes: '{{ response.UserPoolClient.AllowedOAuthScopes }}'
+      AnalyticsConfiguration: '{{ response.UserPoolClient.AnalyticsConfiguration.RoleArn }}'
+      AuthSessionValidity: '{{ response.UserPoolClient.AuthSessionValidity }}'
+      CallbackURLs: '{{ response.UserPoolClient.CallbackURLs }}'
+      ClientId: '{{ response.UserPoolClient.ClientId }}'
+      ClientName: '{{ response.UserPoolClient.ClientName }}'
+      ClientSecret: '{{ response.UserPoolClient.ClientSecret }}'
+      DefaultRedirectURI: '{{ response.UserPoolClient.DefaultRedirectURI }}'
+      EnablePropagateAdditionalUserContextData: '{{ response.UserPoolClient.EnablePropagateAdditionalUserContextData }}'
+      EnableTokenRevocation: '{{ response.UserPoolClient.EnableTokenRevocation }}'
+      ExplicitAuthFlows: '{{ response.UserPoolClient.ExplicitAuthFlows }}'
+      IdTokenValidity: '{{ response.UserPoolClient.IdTokenValidity }}'
+      LastModifiedDate: '{{ response.UserPoolClient.LastModifiedDate }}'
+      LogoutURLs: '{{ response.UserPoolClient.LogoutURLs }}'
+      PreventUserExistenceErrors: '{{ response.UserPoolClient.PreventUserExistenceErrors }}'
+      ReadAttributes: '{{ response.UserPoolClient.ReadAttributes }}'
+      RefreshTokenRotation: '{{ response.UserPoolClient.RefreshTokenRotation.Feature }}'
+      RefreshTokenValidity: '{{ response.UserPoolClient.RefreshTokenValidity }}'
+      SupportedIdentityProviders: '{{ response.UserPoolClient.SupportedIdentityProviders }}'
+      TokenValidityUnits: '{{ response.UserPoolClient.TokenValidityUnits.IdToken }}'
+      UserPoolId: '{{ response.UserPoolClient.UserPoolId }}'
+      WriteAttributes: '{{ response.UserPoolClient.WriteAttributes }}'
+      ApplicationArn: '{{ response.UserPoolClient.AnalyticsConfiguration.ApplicationArn }}'
+      ApplicationId: '{{ response.UserPoolClient.AnalyticsConfiguration.ApplicationId }}'
+      ExternalId: '{{ response.UserPoolClient.AnalyticsConfiguration.ExternalId }}'
+      RoleArn: '{{ response.UserPoolClient.AnalyticsConfiguration.RoleArn }}'
+      UserDataShared: '{{ response.UserPoolClient.AnalyticsConfiguration.UserDataShared }}'
+      Feature: '{{ response.UserPoolClient.RefreshTokenRotation.Feature }}'
+      RetryGracePeriodSeconds: '{{ response.UserPoolClient.RefreshTokenRotation.RetryGracePeriodSeconds }}'
+      AccessToken: '{{ response.UserPoolClient.TokenValidityUnits.AccessToken }}'
+      IdToken: '{{ response.UserPoolClient.TokenValidityUnits.IdToken }}'
+      RefreshToken: '{{ response.UserPoolClient.TokenValidityUnits.RefreshToken }}'
+- discovery_id: aws.cognito-idp.describe_user_pool_domain
+  calls:
+  - action: describe_user_pool_domain
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.DomainDescription.Status }}'
+      AWSAccountId: '{{ response.DomainDescription.AWSAccountId }}'
+      CloudFrontDistribution: '{{ response.DomainDescription.CloudFrontDistribution }}'
+      CustomDomainConfig: '{{ response.DomainDescription.CustomDomainConfig }}'
+      Domain: '{{ response.DomainDescription.Domain }}'
+      DomainDescription: '{{ response.DomainDescription.DomainDescription }}'
+      ManagedLoginVersion: '{{ response.DomainDescription.ManagedLoginVersion }}'
+      S3Bucket: '{{ response.DomainDescription.S3Bucket }}'
+      UserPoolId: '{{ response.DomainDescription.UserPoolId }}'
+      Version: '{{ response.DomainDescription.Version }}'
+      CertificateArn: '{{ response.DomainDescription.CustomDomainConfig.CertificateArn }}'
+- discovery_id: aws.cognito-idp.get_csv_header
+  calls:
+  - action: get_csv_header
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CSVHeader }}'
+    item:
+      CSVHeader: '{{ item.CSVHeader }}'
+- discovery_id: aws.cognito-idp.get_device
+  calls:
+  - action: get_device
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DeviceAttributes: '{{ response.Device.DeviceAttributes[].Name }}'
+      DeviceCreateDate: '{{ response.Device.DeviceCreateDate }}'
+      DeviceKey: '{{ response.Device.DeviceKey }}'
+      DeviceLastAuthenticatedDate: '{{ response.Device.DeviceLastAuthenticatedDate }}'
+      DeviceLastModifiedDate: '{{ response.Device.DeviceLastModifiedDate }}'
+- discovery_id: aws.cognito-idp.get_group
+  calls:
+  - action: get_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ response.Group.CreationDate }}'
+      RoleArn: '{{ response.Group.RoleArn }}'
+      Description: '{{ response.Group.Description }}'
+      GroupName: '{{ response.Group.GroupName }}'
+      LastModifiedDate: '{{ response.Group.LastModifiedDate }}'
+      Precedence: '{{ response.Group.Precedence }}'
+      UserPoolId: '{{ response.Group.UserPoolId }}'
+- discovery_id: aws.cognito-idp.get_identity_provider_by_identifier
+  calls:
+  - action: get_identity_provider_by_identifier
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ response.IdentityProvider.CreationDate }}'
+      AttributeMapping: '{{ response.IdentityProvider.AttributeMapping }}'
+      IdentityProvider: '{{ response.IdentityProvider.IdentityProvider }}'
+      IdpIdentifiers: '{{ response.IdentityProvider.IdpIdentifiers }}'
+      LastModifiedDate: '{{ response.IdentityProvider.LastModifiedDate }}'
+      ProviderDetails: '{{ response.IdentityProvider.ProviderDetails }}'
+      ProviderName: '{{ response.IdentityProvider.ProviderName }}'
+      ProviderType: '{{ response.IdentityProvider.ProviderType }}'
+      UserPoolId: '{{ response.IdentityProvider.UserPoolId }}'
+- discovery_id: aws.cognito-idp.get_log_delivery_configuration
+  calls:
+  - action: get_log_delivery_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      LogConfigurations: '{{ response.LogDeliveryConfiguration.LogConfigurations[].LogLevel }}'
+      LogDeliveryConfiguration: '{{ response.LogDeliveryConfiguration.LogDeliveryConfiguration }}'
+      UserPoolId: '{{ response.LogDeliveryConfiguration.UserPoolId }}'
+- discovery_id: aws.cognito-idp.get_signing_certificate
+  calls:
+  - action: get_signing_certificate
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Certificate: '{{ response.Certificate }}'
+- discovery_id: aws.cognito-idp.get_tokens_from_refresh_token
+  calls:
+  - action: get_tokens_from_refresh_token
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccessToken: '{{ response.AuthenticationResult.AccessToken }}'
+      ExpiresIn: '{{ response.AuthenticationResult.ExpiresIn }}'
+      IdToken: '{{ response.AuthenticationResult.IdToken }}'
+      NewDeviceMetadata: '{{ response.AuthenticationResult.NewDeviceMetadata.DeviceKey }}'
+      RefreshToken: '{{ response.AuthenticationResult.RefreshToken }}'
+      TokenType: '{{ response.AuthenticationResult.TokenType }}'
+      DeviceGroupKey: '{{ response.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey }}'
+      DeviceKey: '{{ response.AuthenticationResult.NewDeviceMetadata.DeviceKey }}'
+- discovery_id: aws.cognito-idp.get_ui_customization
+  calls:
+  - action: get_ui_customization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationDate: '{{ response.UICustomization.CreationDate }}'
+      CSS: '{{ response.UICustomization.CSS }}'
+      CSSVersion: '{{ response.UICustomization.CSSVersion }}'
+      ClientId: '{{ response.UICustomization.ClientId }}'
+      ImageUrl: '{{ response.UICustomization.ImageUrl }}'
+      LastModifiedDate: '{{ response.UICustomization.LastModifiedDate }}'
+      UICustomization: '{{ response.UICustomization.UICustomization }}'
+      UserPoolId: '{{ response.UICustomization.UserPoolId }}'
+- discovery_id: aws.cognito-idp.get_user
+  calls:
+  - action: get_user
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UserAttributes }}'
+    item:
+      Name: '{{ item.Name }}'
+      PreferredMfaSetting: '{{ item.PreferredMfaSetting }}'
+      UserMFASettingList: '{{ item.UserMFASettingList }}'
+      Value: '{{ item.Value }}'
+      Username: '{{ response.Username }}'
+- discovery_id: aws.cognito-idp.get_user_attribute_verification_code
+  calls:
+  - action: get_user_attribute_verification_code
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AttributeName: '{{ response.CodeDeliveryDetails.AttributeName }}'
+      DeliveryMedium: '{{ response.CodeDeliveryDetails.DeliveryMedium }}'
+      Destination: '{{ response.CodeDeliveryDetails.Destination }}'
+- discovery_id: aws.cognito-idp.get_user_auth_factors
+  calls:
+  - action: get_user_auth_factors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UserMFASettingList }}'
+    item:
+      ConfiguredUserAuthFactors: '{{ item.ConfiguredUserAuthFactors }}'
+      PreferredMfaSetting: '{{ response.PreferredMfaSetting }}'
+      Username: '{{ response.Username }}'
+- discovery_id: aws.cognito-idp.get_user_pool_mfa_config
+  calls:
+  - action: get_user_pool_mfa_config
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      EmailMfaConfiguration: '{{ response.SmsMfaConfiguration.EmailMfaConfiguration }}'
+      SmsAuthenticationMessage: '{{ response.SmsMfaConfiguration.SmsAuthenticationMessage }}'
+      SmsConfiguration: '{{ response.SmsMfaConfiguration.SmsConfiguration.SnsRegion }}'
+      SmsMfaConfiguration: '{{ response.SmsMfaConfiguration.SmsMfaConfiguration }}'
+      SoftwareTokenMfaConfiguration: '{{ response.SmsMfaConfiguration.SoftwareTokenMfaConfiguration }}'
+      WebAuthnConfiguration: '{{ response.SmsMfaConfiguration.WebAuthnConfiguration }}'
+      Message: '{{ response.EmailMfaConfiguration.Message }}'
+      Subject: '{{ response.EmailMfaConfiguration.Subject }}'
+      MfaConfiguration: '{{ response.MfaConfiguration }}'
+      ExternalId: '{{ response.SmsMfaConfiguration.SmsConfiguration.ExternalId }}'
+      SnsCallerArn: '{{ response.SmsMfaConfiguration.SmsConfiguration.SnsCallerArn }}'
+      SnsRegion: '{{ response.SmsMfaConfiguration.SmsConfiguration.SnsRegion }}'
+      Enabled: '{{ response.SoftwareTokenMfaConfiguration.Enabled }}'
+      RelyingPartyId: '{{ response.WebAuthnConfiguration.RelyingPartyId }}'
+      UserVerification: '{{ response.WebAuthnConfiguration.UserVerification }}'
+- discovery_id: aws.cognito-idp.list_devices
+  calls:
+  - action: list_devices
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Devices }}'
+    item:
+      DeviceAttributes: '{{ item.DeviceAttributes }}'
+      DeviceCreateDate: '{{ item.DeviceCreateDate }}'
+      DeviceKey: '{{ item.DeviceKey }}'
+      DeviceLastAuthenticatedDate: '{{ item.DeviceLastAuthenticatedDate }}'
+      DeviceLastModifiedDate: '{{ item.DeviceLastModifiedDate }}'
+      PaginationToken: '{{ response.PaginationToken }}'
+- discovery_id: aws.cognito-idp.list_groups
+  calls:
+  - action: list_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Groups }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      RoleArn: '{{ item.RoleArn }}'
+      Description: '{{ item.Description }}'
+      GroupName: '{{ item.GroupName }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      Precedence: '{{ item.Precedence }}'
+      UserPoolId: '{{ item.UserPoolId }}'
+- discovery_id: aws.cognito-idp.list_identity_providers
+  calls:
+  - action: list_identity_providers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Providers }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      ProviderName: '{{ item.ProviderName }}'
+      ProviderType: '{{ item.ProviderType }}'
+- discovery_id: aws.cognito-idp.list_resource_servers
+  calls:
+  - action: list_resource_servers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceServers }}'
+    item:
+      Name: '{{ item.Name }}'
+      Identifier: '{{ item.Identifier }}'
+      Scopes: '{{ item.Scopes }}'
+      UserPoolId: '{{ item.UserPoolId }}'
+- discovery_id: aws.cognito-idp.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.cognito-idp.list_terms
+  calls:
+  - action: list_terms
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Terms }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      Enforcement: '{{ item.Enforcement }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      TermsId: '{{ item.TermsId }}'
+      TermsName: '{{ item.TermsName }}'
+- discovery_id: aws.cognito-idp.list_user_import_jobs
+  calls:
+  - action: list_user_import_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UserImportJobs }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      Status: '{{ item.Status }}'
+      CloudWatchLogsRoleArn: '{{ item.CloudWatchLogsRoleArn }}'
+      CompletionDate: '{{ item.CompletionDate }}'
+      CompletionMessage: '{{ item.CompletionMessage }}'
+      FailedUsers: '{{ item.FailedUsers }}'
+      ImportedUsers: '{{ item.ImportedUsers }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      PreSignedUrl: '{{ item.PreSignedUrl }}'
+      SkippedUsers: '{{ item.SkippedUsers }}'
+      StartDate: '{{ item.StartDate }}'
+      UserImportJob: '{{ item.UserImportJob }}'
+      UserPoolId: '{{ item.UserPoolId }}'
+      PaginationToken: '{{ response.PaginationToken }}'
+- discovery_id: aws.cognito-idp.list_user_pool_clients
+  calls:
+  - action: list_user_pool_clients
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UserPoolClients }}'
+    item:
+      ClientId: '{{ item.ClientId }}'
+      ClientName: '{{ item.ClientName }}'
+      UserPoolId: '{{ item.UserPoolId }}'
+- discovery_id: aws.cognito-idp.list_user_pools
+  calls:
+  - action: list_user_pools
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UserPools }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      LambdaConfig: '{{ item.LambdaConfig }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+- discovery_id: aws.cognito-idp.list_users
+  calls:
+  - action: list_users
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Users }}'
+    item:
+      Attributes: '{{ item.Attributes }}'
+      Enabled: '{{ item.Enabled }}'
+      MFAOptions: '{{ item.MFAOptions }}'
+      UserAttributes: '{{ item.UserAttributes }}'
+      UserCreateDate: '{{ item.UserCreateDate }}'
+      UserLastModifiedDate: '{{ item.UserLastModifiedDate }}'
+      UserStatus: '{{ item.UserStatus }}'
+      Username: '{{ item.Username }}'
+      PaginationToken: '{{ response.PaginationToken }}'
+- discovery_id: aws.cognito-idp.list_users_in_group
+  calls:
+  - action: list_users_in_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Users }}'
+    item:
+      Attributes: '{{ item.Attributes }}'
+      Enabled: '{{ item.Enabled }}'
+      MFAOptions: '{{ item.MFAOptions }}'
+      UserCreateDate: '{{ item.UserCreateDate }}'
+      UserLastModifiedDate: '{{ item.UserLastModifiedDate }}'
+      UserStatus: '{{ item.UserStatus }}'
+      Username: '{{ item.Username }}'
+- discovery_id: aws.cognito-idp.list_web_authn_credentials
+  calls:
+  - action: list_web_authn_credentials
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Credentials }}'
+    item:
+      AuthenticatorAttachment: '{{ item.AuthenticatorAttachment }}'
+      AuthenticatorTransports: '{{ item.AuthenticatorTransports }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      CredentialId: '{{ item.CredentialId }}'
+      FriendlyCredentialName: '{{ item.FriendlyCredentialName }}'
+      RelyingPartyId: '{{ item.RelyingPartyId }}'

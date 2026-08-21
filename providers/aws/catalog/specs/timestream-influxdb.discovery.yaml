@@ -1,0 +1,196 @@
+version: '1.0'
+provider: aws
+service: timestream-influxdb
+services:
+  client: timestream-influxdb
+  module: boto3.client
+discovery:
+- discovery_id: aws.timestream-influxdb.list_db_clusters
+  calls:
+  - action: list_db_clusters
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      allocatedStorage: '{{ item.allocatedStorage }}'
+      arn: '{{ item.arn }}'
+      dbInstanceType: '{{ item.dbInstanceType }}'
+      dbStorageType: '{{ item.dbStorageType }}'
+      deploymentType: '{{ item.deploymentType }}'
+      endpoint: '{{ item.endpoint }}'
+      engineType: '{{ item.engineType }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      networkType: '{{ item.networkType }}'
+      port: '{{ item.port }}'
+      readerEndpoint: '{{ item.readerEndpoint }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.timestream-influxdb.list_db_instances
+  calls:
+  - action: list_db_instances
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      allocatedStorage: '{{ item.allocatedStorage }}'
+      arn: '{{ item.arn }}'
+      dbInstanceType: '{{ item.dbInstanceType }}'
+      dbStorageType: '{{ item.dbStorageType }}'
+      deploymentType: '{{ item.deploymentType }}'
+      endpoint: '{{ item.endpoint }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      networkType: '{{ item.networkType }}'
+      port: '{{ item.port }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.timestream-influxdb.list_db_parameter_groups
+  calls:
+  - action: list_db_parameter_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      arn: '{{ item.arn }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.timestream-influxdb.get_db_cluster
+  calls:
+  - action: get_db_cluster
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.vpcSubnetIds }}'
+    item:
+      allocatedStorage: '{{ response.allocatedStorage }}'
+      arn: '{{ response.arn }}'
+      dbInstanceType: '{{ response.dbInstanceType }}'
+      dbParameterGroupIdentifier: '{{ response.dbParameterGroupIdentifier }}'
+      dbStorageType: '{{ response.dbStorageType }}'
+      deploymentType: '{{ response.deploymentType }}'
+      endpoint: '{{ response.endpoint }}'
+      failoverMode: '{{ response.failoverMode }}'
+      id: '{{ response.id }}'
+      influxAuthParametersSecretArn: '{{ response.influxAuthParametersSecretArn }}'
+      bucketName: '{{ response.logDeliveryConfiguration.s3Configuration.bucketName }}'
+      enabled: '{{ response.logDeliveryConfiguration.s3Configuration.enabled }}'
+      name: '{{ response.name }}'
+      networkType: '{{ response.networkType }}'
+      port: '{{ response.port }}'
+      publiclyAccessible: '{{ response.publiclyAccessible }}'
+      readerEndpoint: '{{ response.readerEndpoint }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.timestream-influxdb.get_db_instance
+  calls:
+  - action: get_db_instance
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.vpcSubnetIds }}'
+    item:
+      allocatedStorage: '{{ response.allocatedStorage }}'
+      arn: '{{ response.arn }}'
+      availabilityZone: '{{ response.availabilityZone }}'
+      dbClusterId: '{{ response.dbClusterId }}'
+      dbInstanceType: '{{ response.dbInstanceType }}'
+      dbParameterGroupIdentifier: '{{ response.dbParameterGroupIdentifier }}'
+      dbStorageType: '{{ response.dbStorageType }}'
+      deploymentType: '{{ response.deploymentType }}'
+      endpoint: '{{ response.endpoint }}'
+      id: '{{ response.id }}'
+      influxAuthParametersSecretArn: '{{ response.influxAuthParametersSecretArn }}'
+      instanceMode: '{{ response.instanceMode }}'
+      bucketName: '{{ response.logDeliveryConfiguration.s3Configuration.bucketName }}'
+      enabled: '{{ response.logDeliveryConfiguration.s3Configuration.enabled }}'
+      name: '{{ response.name }}'
+      networkType: '{{ response.networkType }}'
+      port: '{{ response.port }}'
+      publiclyAccessible: '{{ response.publiclyAccessible }}'
+      secondaryAvailabilityZone: '{{ response.secondaryAvailabilityZone }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.timestream-influxdb.get_db_parameter_group
+  calls:
+  - action: get_db_parameter_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      InfluxDBv2: '{{ response.parameters.InfluxDBv2 }}'
+      InfluxDBv3Core: '{{ response.parameters.InfluxDBv3Core }}'
+      InfluxDBv3Enterprise: '{{ response.parameters.InfluxDBv3Enterprise }}'
+      arn: '{{ response.arn }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      fluxLogEnabled: '{{ response.parameters.InfluxDBv2.fluxLogEnabled }}'
+      durationType: '{{ response.parameters.InfluxDBv2.httpIdleTimeout.durationType }}'
+      value: '{{ response.parameters.InfluxDBv2.httpIdleTimeout.value }}'
+      influxqlMaxSelectBuckets: '{{ response.parameters.InfluxDBv2.influxqlMaxSelectBuckets }}'
+      influxqlMaxSelectPoint: '{{ response.parameters.InfluxDBv2.influxqlMaxSelectPoint }}'
+      influxqlMaxSelectSeries: '{{ response.parameters.InfluxDBv2.influxqlMaxSelectSeries }}'
+      logLevel: '{{ response.parameters.InfluxDBv2.logLevel }}'
+      metricsDisabled: '{{ response.parameters.InfluxDBv2.metricsDisabled }}'
+      noTasks: '{{ response.parameters.InfluxDBv2.noTasks }}'
+      pprofDisabled: '{{ response.parameters.InfluxDBv2.pprofDisabled }}'
+      queryConcurrency: '{{ response.parameters.InfluxDBv2.queryConcurrency }}'
+      queryInitialMemoryBytes: '{{ response.parameters.InfluxDBv2.queryInitialMemoryBytes }}'
+      queryMaxMemoryBytes: '{{ response.parameters.InfluxDBv2.queryMaxMemoryBytes }}'
+      queryMemoryBytes: '{{ response.parameters.InfluxDBv2.queryMemoryBytes }}'
+      queryQueueSize: '{{ response.parameters.InfluxDBv2.queryQueueSize }}'
+      sessionLength: '{{ response.parameters.InfluxDBv2.sessionLength }}'
+      sessionRenewDisabled: '{{ response.parameters.InfluxDBv2.sessionRenewDisabled }}'
+      storageCacheMaxMemorySize: '{{ response.parameters.InfluxDBv2.storageCacheMaxMemorySize }}'
+      storageCacheSnapshotMemorySize: '{{ response.parameters.InfluxDBv2.storageCacheSnapshotMemorySize }}'
+      storageCompactThroughputBurst: '{{ response.parameters.InfluxDBv2.storageCompactThroughputBurst }}'
+      storageMaxConcurrentCompactions: '{{ response.parameters.InfluxDBv2.storageMaxConcurrentCompactions }}'
+      storageMaxIndexLogFileSize: '{{ response.parameters.InfluxDBv2.storageMaxIndexLogFileSize }}'
+      storageNoValidateFieldSize: '{{ response.parameters.InfluxDBv2.storageNoValidateFieldSize }}'
+      storageSeriesFileMaxConcurrentSnapshotCompactions: '{{ response.parameters.InfluxDBv2.storageSeriesFileMaxConcurrentSnapshotCompactions }}'
+      storageSeriesIdSetCacheSize: '{{ response.parameters.InfluxDBv2.storageSeriesIdSetCacheSize }}'
+      storageWalMaxConcurrentWrites: '{{ response.parameters.InfluxDBv2.storageWalMaxConcurrentWrites }}'
+      tracingType: '{{ response.parameters.InfluxDBv2.tracingType }}'
+      uiDisabled: '{{ response.parameters.InfluxDBv2.uiDisabled }}'
+- discovery_id: aws.timestream-influxdb.list_db_instances_for_cluster
+  calls:
+  - action: list_db_instances_for_cluster
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      allocatedStorage: '{{ item.allocatedStorage }}'
+      arn: '{{ item.arn }}'
+      dbInstanceType: '{{ item.dbInstanceType }}'
+      dbStorageType: '{{ item.dbStorageType }}'
+      deploymentType: '{{ item.deploymentType }}'
+      endpoint: '{{ item.endpoint }}'
+      id: '{{ item.id }}'
+      instanceMode: '{{ item.instanceMode }}'
+      instanceModes: '{{ item.instanceModes }}'
+      name: '{{ item.name }}'
+      networkType: '{{ item.networkType }}'
+      port: '{{ item.port }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.timestream-influxdb.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

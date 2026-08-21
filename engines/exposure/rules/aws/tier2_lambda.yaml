@@ -1,0 +1,42 @@
+# =============================================================================
+# IEDS Tier 2 — AWS Lambda Function URLs
+# Tier 2 = emitted-field condition.
+# Note: lambda.functionurl is also Tier 1 when auth_type=NONE (always public).
+# This Tier 2 rule catches the auth_type field for completeness.
+# =============================================================================
+
+rules:
+
+  # DI emits resource_type=lambda_function_url_config for describe_function_url_configs
+  - rule_id: IEDS-T2-AWS-006
+    tier: 2
+    csp: aws
+    resource_type: lambda_function_url_config
+    origin_type: internet
+    title: "AWS Lambda Function URL has no auth (auth_type=NONE)"
+    description: >
+      Lambda Function URLs with auth_type=NONE are publicly accessible without
+      any authentication. Any caller from the internet can invoke the function.
+    severity: critical
+    required_emitted_fields:
+      - auth_type
+    exposure_conditions:
+      - field: auth_type
+        operator: eq
+        value: NONE
+
+  - rule_id: IEDS-T2-AWS-007
+    tier: 2
+    csp: aws
+    resource_type: lambda_function_url_config
+    origin_type: internet
+    title: "AWS Lambda Function URL is publicly accessible (any auth)"
+    description: >
+      Lambda Function URLs are internet-accessible regardless of auth_type.
+      Even with AWS_IAM auth, the endpoint is reachable from the internet.
+    severity: medium
+    required_emitted_fields:
+      - function_url
+    exposure_conditions:
+      - field: function_url
+        operator: not_null

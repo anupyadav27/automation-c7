@@ -1,0 +1,234 @@
+version: '1.0'
+provider: aws
+service: route53-recovery-readiness
+services:
+  client: route53-recovery-readiness
+  module: boto3.client
+discovery:
+- discovery_id: aws.route53-recovery-readiness.list_cells
+  calls:
+  - action: list_cells
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Cells }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      CellArn: '{{ item.CellArn }}'
+      CellName: '{{ item.CellName }}'
+      Cells: '{{ item.Cells }}'
+      ParentReadinessScopes: '{{ item.ParentReadinessScopes }}'
+      Readiness: '{{ item.Readiness }}'
+- discovery_id: aws.route53-recovery-readiness.list_cross_account_authorizations
+  calls:
+  - action: list_cross_account_authorizations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CrossAccountAuthorizations }}'
+- discovery_id: aws.route53-recovery-readiness.list_readiness_checks
+  calls:
+  - action: list_readiness_checks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ReadinessChecks }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      ReadinessCheckArn: '{{ item.ReadinessCheckArn }}'
+      ReadinessCheckName: '{{ item.ReadinessCheckName }}'
+      ReadinessChecks: '{{ item.ReadinessChecks }}'
+      ResourceSet: '{{ item.ResourceSet }}'
+- discovery_id: aws.route53-recovery-readiness.list_recovery_groups
+  calls:
+  - action: list_recovery_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RecoveryGroups }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      Cells: '{{ item.Cells }}'
+      RecoveryGroupArn: '{{ item.RecoveryGroupArn }}'
+      RecoveryGroupName: '{{ item.RecoveryGroupName }}'
+- discovery_id: aws.route53-recovery-readiness.list_resource_sets
+  calls:
+  - action: list_resource_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceSets }}'
+    item:
+      Tags: '{{ item.Tags }}'
+      ResourceSetArn: '{{ item.ResourceSetArn }}'
+      ResourceSetName: '{{ item.ResourceSetName }}'
+      ResourceSetType: '{{ item.ResourceSetType }}'
+      Resources: '{{ item.Resources }}'
+- discovery_id: aws.route53-recovery-readiness.list_rules
+  calls:
+  - action: list_rules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Rules }}'
+    item:
+      ResourceType: '{{ item.ResourceType }}'
+      RuleDescription: '{{ item.RuleDescription }}'
+      RuleId: '{{ item.RuleId }}'
+      Rules: '{{ item.Rules }}'
+- discovery_id: aws.route53-recovery-readiness.get_architecture_recommendations
+  for_each: aws.route53-recovery-readiness.list_recovery_groups
+  calls:
+  - action: get_architecture_recommendations
+    params:
+      RecoveryGroupName: '{{ item.RecoveryGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Recommendations }}'
+    item:
+      RecommendationText: '{{ item.RecommendationText }}'
+      Recommendations: '{{ item.Recommendations }}'
+      LastAuditTimestamp: '{{ response.LastAuditTimestamp }}'
+- discovery_id: aws.route53-recovery-readiness.get_cell
+  for_each: aws.route53-recovery-readiness.list_cells
+  calls:
+  - action: get_cell
+    params:
+      CellName: '{{ item.CellName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Cells }}'
+    item:
+      CellArn: '{{ response.CellArn }}'
+      CellName: '{{ response.CellName }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.route53-recovery-readiness.get_cell_readiness_summary
+  for_each: aws.route53-recovery-readiness.list_cells
+  calls:
+  - action: get_cell_readiness_summary
+    params:
+      CellName: '{{ item.CellName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ReadinessChecks }}'
+    item:
+      Readiness: '{{ item.Readiness }}'
+      ReadinessCheckName: '{{ item.ReadinessCheckName }}'
+- discovery_id: aws.route53-recovery-readiness.get_readiness_check
+  for_each: aws.route53-recovery-readiness.list_readiness_checks
+  calls:
+  - action: get_readiness_check
+    params:
+      ReadinessCheckName: '{{ item.ReadinessCheckName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'
+      ReadinessCheckArn: '{{ response.ReadinessCheckArn }}'
+      ReadinessCheckName: '{{ response.ReadinessCheckName }}'
+      ResourceSet: '{{ response.ResourceSet }}'
+- discovery_id: aws.route53-recovery-readiness.get_readiness_check_resource_status
+  for_each: aws.route53-recovery-readiness.list_readiness_checks
+  calls:
+  - action: get_readiness_check_resource_status
+    params:
+      ReadinessCheckName: '{{ item.ReadinessCheckName }}'
+      ResourceIdentifier: '{{ item.ResourceIdentifier }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Rules }}'
+    item:
+      LastCheckedTimestamp: '{{ item.LastCheckedTimestamp }}'
+      Messages: '{{ item.Messages }}'
+      Readiness: '{{ item.Readiness }}'
+      RuleId: '{{ item.RuleId }}'
+- discovery_id: aws.route53-recovery-readiness.get_readiness_check_status
+  for_each: aws.route53-recovery-readiness.list_readiness_checks
+  calls:
+  - action: get_readiness_check_status
+    params:
+      ReadinessCheckName: '{{ item.ReadinessCheckName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Messages }}'
+    item:
+      ResourceArn: '{{ item.ResourceArn }}'
+      ComponentId: '{{ item.ComponentId }}'
+      LastCheckedTimestamp: '{{ item.LastCheckedTimestamp }}'
+      Readiness: '{{ item.Readiness }}'
+- discovery_id: aws.route53-recovery-readiness.get_recovery_group
+  for_each: aws.route53-recovery-readiness.list_recovery_groups
+  calls:
+  - action: get_recovery_group
+    params:
+      RecoveryGroupName: '{{ item.RecoveryGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Cells }}'
+    item:
+      RecoveryGroupArn: '{{ response.RecoveryGroupArn }}'
+      RecoveryGroupName: '{{ response.RecoveryGroupName }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.route53-recovery-readiness.get_recovery_group_readiness_summary
+  for_each: aws.route53-recovery-readiness.list_recovery_groups
+  calls:
+  - action: get_recovery_group_readiness_summary
+    params:
+      RecoveryGroupName: '{{ item.RecoveryGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ReadinessChecks }}'
+    item:
+      Readiness: '{{ item.Readiness }}'
+      ReadinessCheckName: '{{ item.ReadinessCheckName }}'
+- discovery_id: aws.route53-recovery-readiness.get_resource_set
+  for_each: aws.route53-recovery-readiness.list_resource_sets
+  calls:
+  - action: get_resource_set
+    params:
+      ResourceSetName: '{{ item.ResourceSetName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Resources }}'
+    item:
+      ResourceArn: '{{ item.ResourceSetArn }}'
+      ComponentId: '{{ item.ComponentId }}'
+      DnsTargetResource: '{{ item.DnsTargetResource }}'
+      ReadinessScopes: '{{ item.ReadinessScopes }}'
+      ResourceSetArn: '{{ response.ResourceSetArn }}'
+      ResourceSetName: '{{ response.ResourceSetName }}'
+      ResourceSetType: '{{ response.ResourceSetType }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.route53-recovery-readiness.list_tags_for_resources
+  calls:
+  - action: list_tags_for_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

@@ -1,0 +1,109 @@
+version: '1.0'
+provider: aws
+service: rum
+services:
+  client: rum
+  module: boto3.client
+discovery:
+- discovery_id: aws.rum.list_app_monitors
+  calls:
+  - action: list_app_monitors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AppMonitorSummaries }}'
+    item:
+      Id: '{{ item.Id }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      AppMonitor: '{{ item.AppMonitor }}'
+      Created: '{{ item.Created }}'
+      CustomEvents: '{{ item.CustomEvents }}'
+      DataStorage: '{{ item.DataStorage }}'
+      DeobfuscationConfiguration: '{{ item.DeobfuscationConfiguration }}'
+      Domain: '{{ item.Domain }}'
+      LastModified: '{{ item.LastModified }}'
+      Platform: '{{ item.Platform }}'
+- discovery_id: aws.rum.get_app_monitor
+  for_each: aws.rum.list_app_monitors
+  calls:
+  - action: get_app_monitor
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.AppMonitor.Id }}'
+      Name: '{{ response.AppMonitor.Name }}'
+      State: '{{ response.AppMonitor.State }}'
+      Status: '{{ response.AppMonitor.State }}'
+      Tags: '{{ response.AppMonitor.Tags }}'
+      AppMonitor: '{{ response.AppMonitor.AppMonitor }}'
+      AppMonitorConfiguration: '{{ response.AppMonitor.AppMonitorConfiguration.EnableXRay }}'
+      Created: '{{ response.AppMonitor.Created }}'
+      CustomEvents: '{{ response.AppMonitor.CustomEvents.Status }}'
+      DataStorage: '{{ response.AppMonitor.DataStorage }}'
+      DeobfuscationConfiguration: '{{ response.AppMonitor.DeobfuscationConfiguration }}'
+      Domain: '{{ response.AppMonitor.Domain }}'
+      DomainList: '{{ response.AppMonitor.Domain }}'
+      Enabled: '{{ response.AppMonitor.Enabled }}'
+      LastModified: '{{ response.AppMonitor.LastModified }}'
+      Platform: '{{ response.AppMonitor.Platform }}'
+      AllowCookies: '{{ response.AppMonitor.AppMonitorConfiguration.AllowCookies }}'
+      EnableXRay: '{{ response.AppMonitor.AppMonitorConfiguration.EnableXRay }}'
+      GuestRoleArn: '{{ response.AppMonitor.AppMonitorConfiguration.GuestRoleArn }}'
+      IdentityPoolId: '{{ response.AppMonitor.AppMonitorConfiguration.IdentityPoolId }}'
+      SessionSampleRate: '{{ response.AppMonitor.AppMonitorConfiguration.SessionSampleRate }}'
+      CwLogEnabled: '{{ response.AppMonitor.DataStorage.CwLog.CwLogEnabled }}'
+      CwLogGroup: '{{ response.AppMonitor.DataStorage.CwLog.CwLogGroup }}'
+      S3Uri: '{{ response.AppMonitor.DeobfuscationConfiguration.JavaScriptSourceMaps.S3Uri }}'
+- discovery_id: aws.rum.get_app_monitor_data
+  for_each: aws.rum.list_app_monitors
+  calls:
+  - action: get_app_monitor_data
+    params:
+      Name: '{{ item.Name }}'
+      TimeRange: '{{ item.TimeRange }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Events }}'
+    item:
+      Events: '{{ item.Events }}'
+- discovery_id: aws.rum.get_resource_policy
+  calls:
+  - action: get_resource_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      PolicyDocument: '{{ response.PolicyDocument }}'
+      PolicyRevisionId: '{{ response.PolicyRevisionId }}'
+- discovery_id: aws.rum.list_rum_metrics_destinations
+  calls:
+  - action: list_rum_metrics_destinations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Destinations }}'
+    item:
+      Destination: '{{ item.Destination }}'
+      DestinationArn: '{{ item.DestinationArn }}'
+      IamRoleArn: '{{ item.IamRoleArn }}'
+- discovery_id: aws.rum.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ResourceArn: '{{ response.ResourceArn }}'
+      Tags: '{{ response.Tags }}'

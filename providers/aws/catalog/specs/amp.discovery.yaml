@@ -1,0 +1,294 @@
+version: '1.0'
+provider: aws
+service: amp
+services:
+  client: amp
+  module: boto3.client
+discovery:
+- discovery_id: aws.amp.get_default_scraper_configuration
+  calls:
+  - action: get_default_scraper_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+      Enabled: '{{ response.Enabled }}'
+      configuration: '{{ response.configuration }}'
+- discovery_id: aws.amp.list_scrapers
+  calls:
+  - action: list_scrapers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.scrapers }}'
+    item:
+      alias: '{{ item.alias }}'
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      destination: '{{ item.destination }}'
+      lastModifiedAt: '{{ item.lastModifiedAt }}'
+      roleArn: '{{ item.roleArn }}'
+      roleConfiguration: '{{ item.roleConfiguration }}'
+      scrapeConfiguration: '{{ item.scrapeConfiguration }}'
+      scraper: '{{ item.scraper }}'
+      scraperId: '{{ item.scraperId }}'
+      source: '{{ item.source }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.amp.list_workspaces
+  calls:
+  - action: list_workspaces
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workspaces }}'
+    item:
+      alias: '{{ item.alias }}'
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      kmsKeyArn: '{{ item.kmsKeyArn }}'
+      status: '{{ item.status }}'
+      tags: '{{ item.tags }}'
+      workspaceId: '{{ item.workspaceId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.amp.describe_alert_manager_definition
+  for_each: aws.amp.list_workspaces
+  calls:
+  - action: describe_alert_manager_definition
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdAt: '{{ response.alertManagerDefinition.createdAt }}'
+      data: '{{ response.alertManagerDefinition.data }}'
+      modifiedAt: '{{ response.alertManagerDefinition.modifiedAt }}'
+      status: '{{ response.alertManagerDefinition.data }}'
+      statusCode: '{{ response.alertManagerDefinition.status.statusCode }}'
+      statusReason: '{{ response.alertManagerDefinition.status.statusReason }}'
+- discovery_id: aws.amp.describe_anomaly_detector
+  for_each: aws.amp.list_workspaces
+  calls:
+  - action: describe_anomaly_detector
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+      anomalyDetectorId: '{{ item.anomalyDetectorId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      alias: '{{ response.anomalyDetector.alias }}'
+      anomalyDetectorId: '{{ response.anomalyDetector.anomalyDetectorId }}'
+      arn: '{{ response.anomalyDetector.arn }}'
+      configuration: '{{ response.anomalyDetector.configuration }}'
+      createdAt: '{{ response.anomalyDetector.createdAt }}'
+      evaluationIntervalInSeconds: '{{ response.anomalyDetector.evaluationIntervalInSeconds }}'
+      labels: '{{ response.anomalyDetector.labels }}'
+      missingDataAction: '{{ response.anomalyDetector.missingDataAction }}'
+      modifiedAt: '{{ response.anomalyDetector.modifiedAt }}'
+      status: '{{ response.anomalyDetector.status }}'
+      tags: '{{ response.anomalyDetector.tags }}'
+- discovery_id: aws.amp.describe_logging_configuration
+  for_each: aws.amp.list_workspaces
+  calls:
+  - action: describe_logging_configuration
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdAt: '{{ response.loggingConfiguration.createdAt }}'
+      logGroupArn: '{{ response.loggingConfiguration.logGroupArn }}'
+      modifiedAt: '{{ response.loggingConfiguration.modifiedAt }}'
+      status: '{{ response.loggingConfiguration.status }}'
+      workspace: '{{ response.loggingConfiguration.workspace }}'
+      statusCode: '{{ response.loggingConfiguration.status.statusCode }}'
+      statusReason: '{{ response.loggingConfiguration.status.statusReason }}'
+- discovery_id: aws.amp.describe_query_logging_configuration
+  for_each: aws.amp.list_workspaces
+  calls:
+  - action: describe_query_logging_configuration
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdAt: '{{ response.queryLoggingConfiguration.createdAt }}'
+      destinations: '{{ response.queryLoggingConfiguration.destinations }}'
+      modifiedAt: '{{ response.queryLoggingConfiguration.modifiedAt }}'
+      status: '{{ response.queryLoggingConfiguration.status.statusCode }}'
+      workspace: '{{ response.queryLoggingConfiguration.workspace }}'
+      statusCode: '{{ response.queryLoggingConfiguration.status.statusCode }}'
+      statusReason: '{{ response.queryLoggingConfiguration.status.statusReason }}'
+- discovery_id: aws.amp.describe_resource_policy
+  calls:
+  - action: describe_resource_policy
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.amp.describe_rule_groups_namespace
+  for_each: aws.amp.list_workspaces
+  calls:
+  - action: describe_rule_groups_namespace
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.ruleGroupsNamespace.arn }}'
+      createdAt: '{{ response.ruleGroupsNamespace.createdAt }}'
+      data: '{{ response.ruleGroupsNamespace.data }}'
+      modifiedAt: '{{ response.ruleGroupsNamespace.modifiedAt }}'
+      name: '{{ response.ruleGroupsNamespace.name }}'
+      status: '{{ response.ruleGroupsNamespace.tags }}'
+      tags: '{{ response.ruleGroupsNamespace.tags }}'
+      statusCode: '{{ response.ruleGroupsNamespace.status.statusCode }}'
+      statusReason: '{{ response.ruleGroupsNamespace.status.statusReason }}'
+- discovery_id: aws.amp.describe_scraper
+  for_each: aws.amp.list_scrapers
+  calls:
+  - action: describe_scraper
+    params:
+      scraperId: '{{ item.scraperId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      alias: '{{ response.scraper.alias }}'
+      arn: '{{ response.scraper.arn }}'
+      createdAt: '{{ response.scraper.createdAt }}'
+      destination: '{{ response.scraper.destination }}'
+      lastModifiedAt: '{{ response.scraper.lastModifiedAt }}'
+      roleArn: '{{ response.scraper.roleArn }}'
+      roleConfiguration: '{{ response.scraper.roleConfiguration }}'
+      scrapeConfiguration: '{{ response.scraper.scrapeConfiguration }}'
+      scraper: '{{ response.scraper.scraperId }}'
+      scraperId: '{{ response.scraper.scraperId }}'
+      source: '{{ response.scraper.source }}'
+      status: '{{ response.scraper.status }}'
+      statusReason: '{{ response.scraper.statusReason }}'
+      tags: '{{ response.scraper.tags }}'
+      workspaceArn: '{{ response.scraper.destination.ampConfiguration.workspaceArn }}'
+      sourceRoleArn: '{{ response.scraper.roleConfiguration.sourceRoleArn }}'
+      targetRoleArn: '{{ response.scraper.roleConfiguration.targetRoleArn }}'
+      configurationBlob: '{{ response.scraper.scrapeConfiguration.configurationBlob }}'
+      clusterArn: '{{ response.scraper.source.eksConfiguration.clusterArn }}'
+      statusCode: '{{ response.scraper.status.statusCode }}'
+- discovery_id: aws.amp.describe_scraper_logging_configuration
+  for_each: aws.amp.list_scrapers
+  calls:
+  - action: describe_scraper_logging_configuration
+    params:
+      scraperId: '{{ item.scraperId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.scraperComponents }}'
+    item:
+      config: '{{ item.config }}'
+      type: '{{ item.type }}'
+- discovery_id: aws.amp.describe_workspace
+  for_each: aws.amp.list_workspaces
+  calls:
+  - action: describe_workspace
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      alias: '{{ response.workspace.alias }}'
+      arn: '{{ response.workspace.arn }}'
+      createdAt: '{{ response.workspace.createdAt }}'
+      kmsKeyArn: '{{ response.workspace.kmsKeyArn }}'
+      prometheusEndpoint: '{{ response.workspace.prometheusEndpoint }}'
+      status: '{{ response.workspace.tags }}'
+      tags: '{{ response.workspace.tags }}'
+      workspaceId: '{{ response.workspace.workspaceId }}'
+      statusCode: '{{ response.workspace.status.statusCode }}'
+- discovery_id: aws.amp.describe_workspace_configuration
+  for_each: aws.amp.list_workspaces
+  calls:
+  - action: describe_workspace_configuration
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      limitsPerLabelSet: '{{ response.workspaceConfiguration.limitsPerLabelSet[].labelSet }}'
+      retentionPeriodInDays: '{{ response.workspaceConfiguration.retentionPeriodInDays }}'
+      status: '{{ response.workspaceConfiguration.status }}'
+      statusCode: '{{ response.workspaceConfiguration.status.statusCode }}'
+      statusReason: '{{ response.workspaceConfiguration.status.statusReason }}'
+- discovery_id: aws.amp.list_anomaly_detectors
+  for_each: aws.amp.list_workspaces
+  calls:
+  - action: list_anomaly_detectors
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.anomalyDetectors }}'
+    item:
+      alias: '{{ item.alias }}'
+      anomalyDetectorId: '{{ item.anomalyDetectorId }}'
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      status: '{{ item.status }}'
+      tags: '{{ item.tags }}'
+- discovery_id: aws.amp.list_rule_groups_namespaces
+  for_each: aws.amp.list_workspaces
+  calls:
+  - action: list_rule_groups_namespaces
+    params:
+      workspaceId: '{{ item.workspaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ruleGroupsNamespaces }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.amp.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

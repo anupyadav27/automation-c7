@@ -1,0 +1,75 @@
+version: '1.0'
+provider: aws
+service: dlm
+services:
+  client: dlm
+  module: boto3.client
+discovery:
+- discovery_id: aws.dlm.get_lifecycle_policies
+  calls:
+  - action: get_lifecycle_policies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Policies }}'
+    item:
+      ExecutionRoleArn: '{{ item.ExecutionRoleArn }}'
+      Policy: '{{ item.Policy }}'
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      DateCreated: '{{ item.DateCreated }}'
+      DateModified: '{{ item.DateModified }}'
+      DefaultPolicy: '{{ item.DefaultPolicy }}'
+      Description: '{{ item.Description }}'
+      Policies: '{{ item.Policies }}'
+      PolicyId: '{{ item.PolicyId }}'
+      PolicyType: '{{ item.PolicyType }}'
+      Statement: '{{ item.Statement }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.dlm.get_lifecycle_policy
+  for_each: aws.dlm.get_lifecycle_policies
+  calls:
+  - action: get_lifecycle_policy
+    params:
+      PolicyId: '{{ item.PolicyId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ExecutionRoleArn: '{{ response.Policy.ExecutionRoleArn }}'
+      Policy: '{{ response.Policy.PolicyId }}'
+      State: '{{ response.Policy.State }}'
+      Tags: '{{ response.Policy.Tags }}'
+      DateCreated: '{{ response.Policy.DateCreated }}'
+      DateModified: '{{ response.Policy.DateModified }}'
+      DefaultPolicy: '{{ response.Policy.DefaultPolicy }}'
+      Description: '{{ response.Policy.Description }}'
+      PolicyArn: '{{ response.Policy.PolicyArn }}'
+      PolicyDetails: '{{ response.Policy.PolicyDetails }}'
+      PolicyId: '{{ response.Policy.PolicyId }}'
+      StatusMessage: '{{ response.Policy.StatusMessage }}'
+      CopyTags: '{{ response.Policy.PolicyDetails.CopyTags }}'
+      CreateInterval: '{{ response.Policy.PolicyDetails.CreateInterval }}'
+      DescriptionRegex: '{{ response.Policy.PolicyDetails.EventSource.Parameters.DescriptionRegex }}'
+      EventType: '{{ response.Policy.PolicyDetails.EventSource.Parameters.EventType }}'
+      Type: '{{ response.Policy.PolicyDetails.EventSource.Type }}'
+      ExcludeBootVolumes: '{{ response.Policy.PolicyDetails.Exclusions.ExcludeBootVolumes }}'
+      ExtendDeletion: '{{ response.Policy.PolicyDetails.ExtendDeletion }}'
+      ExcludeBootVolume: '{{ response.Policy.PolicyDetails.Parameters.ExcludeBootVolume }}'
+      NoReboot: '{{ response.Policy.PolicyDetails.Parameters.NoReboot }}'
+      PolicyLanguage: '{{ response.Policy.PolicyDetails.PolicyLanguage }}'
+      PolicyType: '{{ response.Policy.PolicyDetails.PolicyType }}'
+      ResourceType: '{{ response.Policy.PolicyDetails.ResourceType }}'
+      RetainInterval: '{{ response.Policy.PolicyDetails.RetainInterval }}'
+- discovery_id: aws.dlm.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

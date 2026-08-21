@@ -1,0 +1,86 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: globalaccelerator
+# 4 ops (3 from checks, +1 for inventory)
+version: '1.0'
+provider: aws
+service: globalaccelerator
+discovery:
+  - calls:
+    - action: list_accelerators
+      on_error: continue
+      save_as: response
+    discovery_id: aws.globalaccelerator.list_accelerators
+    emit:
+      as: item
+      item:
+        Accelerator: '{{ item.Accelerator }}'
+        AcceleratorArn: '{{ item.AcceleratorArn }}'
+        AcceleratorAttributes: '{{ item.AcceleratorAttributes }}'
+        AcceleratorPort: '{{ item.AcceleratorPort }}'
+        ClientAffinity: '{{ item.ClientAffinity }}'
+        CreatedTime: '{{ item.CreatedTime }}'
+        DestinationSocketAddress: '{{ item.DestinationSocketAddress }}'
+        DestinationTrafficState: '{{ item.DestinationTrafficState }}'
+        DnsName: '{{ item.DnsName }}'
+        DualStackDnsName: '{{ item.DualStackDnsName }}'
+        Enabled: '{{ item.Enabled }}'
+        Events: '{{ item.Events }}'
+        FlowLogsEnabled: '{{ item.FlowLogsEnabled }}'
+        FlowLogsS3Bucket: '{{ item.FlowLogsS3Bucket }}'
+        FlowLogsS3Prefix: '{{ item.FlowLogsS3Prefix }}'
+        IpAddressType: '{{ item.IpAddressType }}'
+        IpSets: '{{ item.IpSets }}'
+        LastModifiedTime: '{{ item.LastModifiedTime }}'
+        Name: '{{ item.Name }}'
+        PortRanges: '{{ item.PortRanges }}'
+        Protocol: '{{ item.Protocol }}'
+        Protocols: '{{ item.Protocols }}'
+        Status: '{{ item.Status }}'
+      items_for: '{{ response.Accelerators }}'
+  - calls:
+    - action: list_listeners
+      on_error: continue
+      params:
+        AcceleratorArn: '{{ item.AcceleratorArn }}'
+      save_as: response
+    discovery_id: aws.globalaccelerator.list_listeners
+    emit:
+      as: item
+      item:
+        ClientAffinity: '{{ item.ClientAffinity }}'
+        ListenerArn: '{{ item.ListenerArn }}'
+        PortRanges: '{{ item.PortRanges }}'
+        Protocol: '{{ item.Protocol }}'
+      items_for: '{{ response.Listeners }}'
+    for_each: aws.globalaccelerator.list_accelerators
+  - calls:
+    - action: list_cross_account_attachments
+      on_error: continue
+      save_as: response
+    discovery_id: aws.globalaccelerator.list_cross_account_attachments
+    emit:
+      as: item
+      item:
+        AttachmentArn: '{{ item.AttachmentArn }}'
+        CreatedTime: '{{ item.CreatedTime }}'
+        LastModifiedTime: '{{ item.LastModifiedTime }}'
+        Name: '{{ item.Name }}'
+        Principals: '{{ item.Principals }}'
+        Resources: '{{ item.Resources }}'
+      items_for: '{{ response.CrossAccountAttachments }}'
+  - calls:
+    - action: describe_accelerator_attributes
+      on_error: continue
+      params:
+        AcceleratorArn: '{{ item.AcceleratorArn }}'
+      save_as: response
+    discovery_id: aws.globalaccelerator.describe_accelerator_attributes
+    emit:
+      as: item
+      item:
+        AcceleratorAttributes: '{{ response.AcceleratorAttributes.AcceleratorAttributes
+          }}'
+        FlowLogsEnabled: '{{ response.AcceleratorAttributes.FlowLogsEnabled }}'
+        FlowLogsS3Bucket: '{{ response.AcceleratorAttributes.FlowLogsS3Bucket }}'
+        FlowLogsS3Prefix: '{{ response.AcceleratorAttributes.FlowLogsS3Prefix }}'
+    for_each: aws.globalaccelerator.list_accelerators

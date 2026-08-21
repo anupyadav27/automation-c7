@@ -1,0 +1,61 @@
+version: '1.0'
+provider: aws
+service: xray
+discovery:
+- calls:
+  - action: get_encryption_config
+    on_error: continue
+    save_as: response
+  discovery_id: aws.xray.get_encryption_config
+  emit:
+    as: item
+    item:
+      EncryptionConfig: '{{ response.EncryptionConfig.EncryptionConfig }}'
+      KeyId: '{{ response.EncryptionConfig.KeyId }}'
+      Status: '{{ response.EncryptionConfig.Status }}'
+      Type: '{{ response.EncryptionConfig.Type }}'
+- calls:
+  - action: get_sampling_rules
+    on_error: continue
+    save_as: response
+  discovery_id: aws.xray.get_sampling_rules
+  emit:
+    as: item
+    item:
+      CreatedAt: '{{ item.CreatedAt }}'
+      ModifiedAt: '{{ item.ModifiedAt }}'
+      ResourceARN: '{{ item.SamplingRule.ResourceARN }}'
+      RuleARN: '{{ item.SamplingRule.RuleARN }}'
+      RuleName: '{{ item.SamplingRule.RuleName }}'
+      SamplingRuleRecords: '{{ item.SamplingRuleRecords }}'
+      ServiceName: '{{ item.SamplingRule.ServiceName }}'
+    items_for: '{{ response.SamplingRuleRecords }}'
+- calls:
+  - action: get_group
+    on_error: continue
+    save_as: response
+  discovery_id: aws.xray.get_group
+  emit:
+    as: item
+    item:
+      Enabled: '{{ response.Group.Enabled }}'
+      FilterExpression: '{{ response.Group.FilterExpression }}'
+      Group: '{{ response.Group.Group }}'
+      GroupARN: '{{ response.Group.GroupARN }}'
+      GroupName: '{{ response.Group.GroupName }}'
+      InsightsConfiguration: '{{ response.Group.InsightsConfiguration }}'
+- calls:
+  - action: get_sampling_statistic_summaries
+    on_error: continue
+    save_as: response
+  discovery_id: aws.xray.get_sampling_statistic_summaries
+  emit:
+    as: item
+    item:
+      BorrowCount: '{{ item.BorrowCount }}'
+      RequestCount: '{{ item.RequestCount }}'
+      RuleName: '{{ item.RuleName }}'
+      SampledCount: '{{ item.SampledCount }}'
+      SamplingStatisticSummaries: '{{ item.SamplingStatisticSummaries }}'
+      Timestamp: '{{ item.Timestamp }}'
+    items_for: '{{ response.SamplingStatisticSummaries }}'

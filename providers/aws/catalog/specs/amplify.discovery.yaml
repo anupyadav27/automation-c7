@@ -1,0 +1,439 @@
+version: '1.0'
+provider: aws
+service: amplify
+services:
+  client: amplify
+  module: boto3.client
+discovery:
+- discovery_id: aws.amplify.list_apps
+  calls:
+  - action: list_apps
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.apps }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      app: '{{ item.app }}'
+      appArn: '{{ item.appArn }}'
+      appId: '{{ item.appId }}'
+      associatedResources: '{{ item.associatedResources }}'
+      autoBranchCreationConfig: '{{ item.autoBranchCreationConfig }}'
+      autoBranchCreationPatterns: '{{ item.autoBranchCreationPatterns }}'
+      autoSubDomainCreationPatterns: '{{ item.autoSubDomainCreationPatterns }}'
+      autoSubDomainIAMRole: '{{ item.autoSubDomainIAMRole }}'
+      backend: '{{ item.backend }}'
+      backendEnvironment: '{{ item.backendEnvironment }}'
+      basicAuthCredentials: '{{ item.apps[].basicAuthCredentials }}'
+      branch: '{{ item.branch }}'
+      buildSpec: '{{ item.buildSpec }}'
+      cacheConfig: '{{ item.cacheConfig }}'
+      certificate: '{{ item.certificate }}'
+      certificateVerificationDNSRecord: '{{ item.certificateVerificationDNSRecord }}'
+      computeRoleArn: '{{ item.computeRoleArn }}'
+      createTime: '{{ item.createTime }}'
+      customDomains: '{{ item.customDomains }}'
+      customHeaders: '{{ item.customHeaders }}'
+      customRules: '{{ item.customRules }}'
+      defaultDomain: '{{ item.defaultDomain }}'
+      deploymentArtifacts: '{{ item.deploymentArtifacts }}'
+      description: '{{ item.description }}'
+      destinationBranch: '{{ item.destinationBranch }}'
+      displayName: '{{ item.displayName }}'
+      domainAssociation: '{{ item.domainAssociation }}'
+      domainStatus: '{{ item.domainStatus }}'
+      enableAutoBranchCreation: '{{ item.apps[].enableAutoBranchCreation }}'
+      enableAutoBuild: '{{ item.enableAutoBuild }}'
+      enableAutoSubDomain: '{{ item.enableAutoSubDomain }}'
+      enableBasicAuth: '{{ item.enableBasicAuth }}'
+      enableBranchAutoBuild: '{{ item.apps[].enableBranchAutoBuild }}'
+      enableBranchAutoDeletion: '{{ item.apps[].enableBranchAutoDeletion }}'
+      enableNotification: '{{ item.enableNotification }}'
+      enablePerformanceMode: '{{ item.enablePerformanceMode }}'
+      enablePullRequestPreview: '{{ item.enablePullRequestPreview }}'
+      enableSkewProtection: '{{ item.enableSkewProtection }}'
+      environmentVariables: '{{ item.apps[].environmentVariables }}'
+      framework: '{{ item.framework }}'
+      iamServiceRoleArn: '{{ item.iamServiceRoleArn }}'
+      job: '{{ item.job }}'
+      jobConfig: '{{ item.jobConfig }}'
+      name: '{{ item.name }}'
+      platform: '{{ item.platform }}'
+      productionBranch: '{{ item.productionBranch }}'
+      repository: '{{ item.repository }}'
+      repositoryCloneMethod: '{{ item.apps[].repositoryCloneMethod }}'
+      sourceBranch: '{{ item.sourceBranch }}'
+      stackName: '{{ item.stackName }}'
+      stage: '{{ item.stage }}'
+      statusReason: '{{ item.statusReason }}'
+      steps: '{{ item.steps }}'
+      subDomains: '{{ item.subDomains }}'
+      tags: '{{ item.tags }}'
+      thumbnailUrl: '{{ item.thumbnailUrl }}'
+      totalNumberOfJobs: '{{ item.totalNumberOfJobs }}'
+      ttl: '{{ item.ttl }}'
+      updateStatus: '{{ item.updateStatus }}'
+      updateTime: '{{ item.updateTime }}'
+      wafConfiguration: '{{ item.wafConfiguration }}'
+      webhook: '{{ item.webhook }}'
+      webhookCreateTime: '{{ item.webhookCreateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.amplify.get_app
+  for_each: aws.amplify.list_apps
+  calls:
+  - action: get_app
+    params:
+      appId: '{{ item.appId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      app: '{{ response.app.appId }}'
+      appArn: '{{ response.app.appArn }}'
+      appId: '{{ response.app.appId }}'
+      autoBranchCreationConfig: '{{ response.app.autoBranchCreationConfig.stage }}'
+      autoBranchCreationPatterns: '{{ response.app.autoBranchCreationPatterns }}'
+      basicAuthCredentials: '{{ response.app.basicAuthCredentials }}'
+      buildSpec: '{{ response.app.buildSpec }}'
+      cacheConfig: '{{ response.app.cacheConfig.type }}'
+      computeRoleArn: '{{ response.app.computeRoleArn }}'
+      createTime: '{{ response.app.createTime }}'
+      customHeaders: '{{ response.app.customHeaders }}'
+      customRules: '{{ response.app.customRules }}'
+      defaultDomain: '{{ response.app.defaultDomain }}'
+      description: '{{ response.app.description }}'
+      enableAutoBranchCreation: '{{ response.app.enableAutoBranchCreation }}'
+      enableBasicAuth: '{{ response.app.enableBasicAuth }}'
+      enableBranchAutoBuild: '{{ response.app.enableBranchAutoBuild }}'
+      enableBranchAutoDeletion: '{{ response.app.enableBranchAutoDeletion }}'
+      environmentVariables: '{{ response.app.environmentVariables }}'
+      iamServiceRoleArn: '{{ response.app.iamServiceRoleArn }}'
+      jobConfig: '{{ response.app.jobConfig }}'
+      name: '{{ response.app.name }}'
+      platform: '{{ response.app.platform }}'
+      productionBranch: '{{ response.app.productionBranch.status }}'
+      repository: '{{ response.app.repository }}'
+      repositoryCloneMethod: '{{ response.app.repositoryCloneMethod }}'
+      tags: '{{ response.app.tags }}'
+      updateTime: '{{ response.app.updateTime }}'
+      wafConfiguration: '{{ response.app.wafConfiguration }}'
+      webhookCreateTime: '{{ response.app.webhookCreateTime }}'
+      enableAutoBuild: '{{ response.app.autoBranchCreationConfig.enableAutoBuild }}'
+      enablePerformanceMode: '{{ response.app.autoBranchCreationConfig.enablePerformanceMode }}'
+      enablePullRequestPreview: '{{ response.app.autoBranchCreationConfig.enablePullRequestPreview }}'
+      framework: '{{ response.app.autoBranchCreationConfig.framework }}'
+      pullRequestEnvironmentName: '{{ response.app.autoBranchCreationConfig.pullRequestEnvironmentName }}'
+      stage: '{{ response.app.autoBranchCreationConfig.stage }}'
+      type: '{{ response.app.cacheConfig.type }}'
+      buildComputeType: '{{ response.app.jobConfig.buildComputeType }}'
+      branchName: '{{ response.app.productionBranch.branchName }}'
+      lastDeployTime: '{{ response.app.productionBranch.lastDeployTime }}'
+      status: '{{ response.app.productionBranch.status }}'
+      thumbnailUrl: '{{ response.app.productionBranch.thumbnailUrl }}'
+      statusReason: '{{ response.app.wafConfiguration.statusReason }}'
+      wafStatus: '{{ response.app.wafConfiguration.wafStatus }}'
+      webAclArn: '{{ response.app.wafConfiguration.webAclArn }}'
+- discovery_id: aws.amplify.get_artifact_url
+  calls:
+  - action: get_artifact_url
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      artifactId: '{{ response.artifactId }}'
+      artifactUrl: '{{ response.artifactUrl }}'
+- discovery_id: aws.amplify.get_backend_environment
+  for_each: aws.amplify.list_apps
+  calls:
+  - action: get_backend_environment
+    params:
+      appId: '{{ item.appId }}'
+      environmentName: '{{ item.environmentName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      backendEnvironment: '{{ response.backendEnvironment.backendEnvironmentArn }}'
+      backendEnvironmentArn: '{{ response.backendEnvironment.backendEnvironmentArn }}'
+      createTime: '{{ response.backendEnvironment.createTime }}'
+      environmentName: '{{ response.backendEnvironment.environmentName }}'
+      updateTime: '{{ response.backendEnvironment.updateTime }}'
+      deploymentArtifacts: '{{ response.backendEnvironment.deploymentArtifacts }}'
+      stackName: '{{ response.backendEnvironment.stackName }}'
+- discovery_id: aws.amplify.get_branch
+  for_each: aws.amplify.list_apps
+  calls:
+  - action: get_branch
+    params:
+      appId: '{{ item.appId }}'
+      branchName: '{{ item.branchName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      activeJobId: '{{ response.branch.activeJobId }}'
+      backendEnvironmentArn: '{{ response.branch.backendEnvironmentArn }}'
+      basicAuthCredentials: '{{ response.branch.basicAuthCredentials }}'
+      branch: '{{ response.branch.branchArn }}'
+      branchArn: '{{ response.branch.branchArn }}'
+      branchName: '{{ response.branch.branchName }}'
+      buildSpec: '{{ response.branch.buildSpec }}'
+      computeRoleArn: '{{ response.branch.computeRoleArn }}'
+      createTime: '{{ response.branch.createTime }}'
+      description: '{{ response.branch.description }}'
+      enableBasicAuth: '{{ response.branch.enableBasicAuth }}'
+      environmentVariables: '{{ response.branch.environmentVariables }}'
+      pullRequestEnvironmentName: '{{ response.branch.pullRequestEnvironmentName }}'
+      tags: '{{ response.branch.tags }}'
+      updateTime: '{{ response.branch.updateTime }}'
+      stackArn: '{{ response.branch.backend.stackArn }}'
+      destinationBranch: '{{ response.branch.destinationBranch }}'
+      displayName: '{{ response.branch.displayName }}'
+      enableAutoBuild: '{{ response.branch.enableAutoBuild }}'
+      enableNotification: '{{ response.branch.enableNotification }}'
+      enablePerformanceMode: '{{ response.branch.enablePerformanceMode }}'
+      enablePullRequestPreview: '{{ response.branch.enablePullRequestPreview }}'
+      enableSkewProtection: '{{ response.branch.enableSkewProtection }}'
+      framework: '{{ response.branch.framework }}'
+      sourceBranch: '{{ response.branch.sourceBranch }}'
+      stage: '{{ response.branch.stage }}'
+      thumbnailUrl: '{{ response.branch.thumbnailUrl }}'
+      totalNumberOfJobs: '{{ response.branch.totalNumberOfJobs }}'
+      ttl: '{{ response.branch.ttl }}'
+- discovery_id: aws.amplify.get_domain_association
+  for_each: aws.amplify.list_apps
+  calls:
+  - action: get_domain_association
+    params:
+      appId: '{{ item.appId }}'
+      domainName: '{{ item.domainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      domainAssociation: '{{ response.domainAssociation.domainAssociationArn }}'
+      domainAssociationArn: '{{ response.domainAssociation.domainAssociationArn }}'
+      domainName: '{{ response.domainAssociation.domainName }}'
+      autoSubDomainIAMRole: '{{ response.domainAssociation.autoSubDomainIAMRole }}'
+      certificateVerificationDNSRecord: '{{ response.domainAssociation.certificateVerificationDNSRecord }}'
+      customCertificateArn: '{{ response.domainAssociation.certificate.customCertificateArn }}'
+      type: '{{ response.domainAssociation.certificate.type }}'
+      domainStatus: '{{ response.domainAssociation.domainStatus }}'
+      enableAutoSubDomain: '{{ response.domainAssociation.enableAutoSubDomain }}'
+      statusReason: '{{ response.domainAssociation.statusReason }}'
+      updateStatus: '{{ response.domainAssociation.updateStatus }}'
+- discovery_id: aws.amplify.get_job
+  for_each: aws.amplify.list_apps
+  calls:
+  - action: get_job
+    params:
+      appId: '{{ item.appId }}'
+      branchName: '{{ item.branchName }}'
+      jobId: '{{ item.jobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      job: '{{ response.job.job }}'
+      steps: '{{ response.job.steps }}'
+      summary: '{{ response.job.summary }}'
+      commitId: '{{ response.job.summary.commitId }}'
+      commitMessage: '{{ response.job.summary.commitMessage }}'
+      commitTime: '{{ response.job.summary.commitTime }}'
+      endTime: '{{ response.job.summary.endTime }}'
+      jobArn: '{{ response.job.summary.jobArn }}'
+      jobId: '{{ response.job.summary.jobId }}'
+      jobType: '{{ response.job.summary.jobType }}'
+      sourceUrl: '{{ response.job.summary.sourceUrl }}'
+      sourceUrlType: '{{ response.job.summary.sourceUrlType }}'
+      startTime: '{{ response.job.summary.startTime }}'
+      status: '{{ response.job.summary.status }}'
+- discovery_id: aws.amplify.get_webhook
+  calls:
+  - action: get_webhook
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      appId: '{{ response.webhook.appId }}'
+      branchName: '{{ response.webhook.branchName }}'
+      createTime: '{{ response.webhook.createTime }}'
+      description: '{{ response.webhook.description }}'
+      updateTime: '{{ response.webhook.updateTime }}'
+      webhook: '{{ response.webhook.webhookId }}'
+      webhookArn: '{{ response.webhook.webhookArn }}'
+      webhookId: '{{ response.webhook.webhookId }}'
+      webhookUrl: '{{ response.webhook.webhookUrl }}'
+- discovery_id: aws.amplify.list_artifacts
+  for_each: aws.amplify.list_apps
+  calls:
+  - action: list_artifacts
+    params:
+      appId: '{{ item.appId }}'
+      branchName: '{{ item.branchName }}'
+      jobId: '{{ item.jobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.artifacts }}'
+    item:
+      artifactFileName: '{{ item.artifactFileName }}'
+      artifactId: '{{ item.artifactId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.amplify.list_backend_environments
+  for_each: aws.amplify.list_apps
+  calls:
+  - action: list_backend_environments
+    params:
+      appId: '{{ item.appId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.backendEnvironments }}'
+    item:
+      backendEnvironment: '{{ item.backendEnvironment }}'
+      backendEnvironmentArn: '{{ item.backendEnvironmentArn }}'
+      createTime: '{{ item.createTime }}'
+      deploymentArtifacts: '{{ item.deploymentArtifacts }}'
+      environmentName: '{{ item.environmentName }}'
+      stackName: '{{ item.stackName }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.amplify.list_branches
+  for_each: aws.amplify.list_apps
+  calls:
+  - action: list_branches
+    params:
+      appId: '{{ item.appId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.branches }}'
+    item:
+      activeJobId: '{{ item.activeJobId }}'
+      associatedResources: '{{ item.associatedResources }}'
+      backend: '{{ item.backend }}'
+      backendEnvironmentArn: '{{ item.backendEnvironmentArn }}'
+      basicAuthCredentials: '{{ item.basicAuthCredentials }}'
+      branch: '{{ item.branch }}'
+      branchArn: '{{ item.branchArn }}'
+      branchName: '{{ item.branchName }}'
+      buildSpec: '{{ item.buildSpec }}'
+      computeRoleArn: '{{ item.computeRoleArn }}'
+      createTime: '{{ item.createTime }}'
+      customDomains: '{{ item.customDomains }}'
+      description: '{{ item.description }}'
+      destinationBranch: '{{ item.destinationBranch }}'
+      displayName: '{{ item.displayName }}'
+      enableAutoBuild: '{{ item.enableAutoBuild }}'
+      enableBasicAuth: '{{ item.enableBasicAuth }}'
+      enableNotification: '{{ item.enableNotification }}'
+      enablePerformanceMode: '{{ item.enablePerformanceMode }}'
+      enablePullRequestPreview: '{{ item.enablePullRequestPreview }}'
+      enableSkewProtection: '{{ item.enableSkewProtection }}'
+      environmentVariables: '{{ item.environmentVariables }}'
+      framework: '{{ item.framework }}'
+      job: '{{ item.job }}'
+      pullRequestEnvironmentName: '{{ item.pullRequestEnvironmentName }}'
+      sourceBranch: '{{ item.sourceBranch }}'
+      stage: '{{ item.stage }}'
+      steps: '{{ item.steps }}'
+      tags: '{{ item.tags }}'
+      thumbnailUrl: '{{ item.thumbnailUrl }}'
+      totalNumberOfJobs: '{{ item.totalNumberOfJobs }}'
+      ttl: '{{ item.ttl }}'
+      updateTime: '{{ item.updateTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.amplify.list_domain_associations
+  for_each: aws.amplify.list_apps
+  calls:
+  - action: list_domain_associations
+    params:
+      appId: '{{ item.appId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.domainAssociations }}'
+    item:
+      autoSubDomainCreationPatterns: '{{ item.autoSubDomainCreationPatterns }}'
+      autoSubDomainIAMRole: '{{ item.autoSubDomainIAMRole }}'
+      certificate: '{{ item.certificate }}'
+      certificateVerificationDNSRecord: '{{ item.certificateVerificationDNSRecord }}'
+      domainAssociation: '{{ item.domainAssociation }}'
+      domainAssociationArn: '{{ item.domainAssociationArn }}'
+      domainName: '{{ item.domainName }}'
+      domainStatus: '{{ item.domainStatus }}'
+      enableAutoSubDomain: '{{ item.enableAutoSubDomain }}'
+      statusReason: '{{ item.statusReason }}'
+      subDomains: '{{ item.subDomains }}'
+      updateStatus: '{{ item.updateStatus }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.amplify.list_jobs
+  for_each: aws.amplify.list_apps
+  calls:
+  - action: list_jobs
+    params:
+      appId: '{{ item.appId }}'
+      branchName: '{{ item.branchName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.jobSummaries }}'
+    item:
+      commitId: '{{ item.commitId }}'
+      commitMessage: '{{ item.commitMessage }}'
+      commitTime: '{{ item.commitTime }}'
+      endTime: '{{ item.endTime }}'
+      jobArn: '{{ item.jobArn }}'
+      jobId: '{{ item.jobId }}'
+      jobType: '{{ item.jobType }}'
+      sourceUrl: '{{ item.sourceUrl }}'
+      sourceUrlType: '{{ item.sourceUrlType }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.amplify.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.amplify.list_webhooks
+  for_each: aws.amplify.list_apps
+  calls:
+  - action: list_webhooks
+    params:
+      appId: '{{ item.appId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.webhooks }}'
+    item:
+      appId: '{{ item.appId }}'
+      branchName: '{{ item.branchName }}'
+      createTime: '{{ item.createTime }}'
+      description: '{{ item.description }}'
+      updateTime: '{{ item.updateTime }}'
+      webhook: '{{ item.webhook }}'
+      webhookArn: '{{ item.webhookArn }}'
+      webhookId: '{{ item.webhookId }}'
+      webhookUrl: '{{ item.webhookUrl }}'
+      nextToken: '{{ response.nextToken }}'

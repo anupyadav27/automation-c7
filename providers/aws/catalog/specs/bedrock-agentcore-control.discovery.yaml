@@ -1,0 +1,344 @@
+version: '1.0'
+provider: aws
+service: bedrock-agentcore-control
+services:
+  client: bedrock-agentcore-control
+  module: boto3.client
+discovery:
+- discovery_id: aws.bedrock-agentcore-control.get_token_vault
+  calls:
+  - action: get_token_vault
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.kmsConfiguration.Status }}'
+      Enabled: '{{ response.kmsConfiguration.Enabled }}'
+      keyType: '{{ response.kmsConfiguration.keyType }}'
+      kmsConfiguration: '{{ response.kmsConfiguration.kmsConfiguration }}'
+      kmsKeyArn: '{{ response.kmsConfiguration.kmsKeyArn }}'
+      lastModifiedDate: '{{ response.kmsConfiguration.lastModifiedDate }}'
+      tokenVaultId: '{{ response.kmsConfiguration.tokenVaultId }}'
+- discovery_id: aws.bedrock-agentcore-control.list_agent_runtimes
+  calls:
+  - action: list_agent_runtimes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.agentRuntimes }}'
+    item:
+      agentRuntimeArn: '{{ item.agentRuntimeArn }}'
+      agentRuntimeId: '{{ item.agentRuntimeId }}'
+      agentRuntimeName: '{{ item.agentRuntimeName }}'
+      agentRuntimeVersion: '{{ item.agentRuntimeVersion }}'
+      description: '{{ item.description }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      status: '{{ item.status }}'
+- discovery_id: aws.bedrock-agentcore-control.list_api_key_credential_providers
+  calls:
+  - action: list_api_key_credential_providers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.credentialProviders }}'
+    item:
+      createdTime: '{{ item.createdTime }}'
+      credentialProviderArn: '{{ item.credentialProviderArn }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      name: '{{ item.name }}'
+- discovery_id: aws.bedrock-agentcore-control.list_browsers
+  calls:
+  - action: list_browsers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.browserSummaries }}'
+    item:
+      browserArn: '{{ item.browserArn }}'
+      browserId: '{{ item.browserId }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      name: '{{ item.name }}'
+      recording: '{{ item.recording }}'
+      status: '{{ item.status }}'
+- discovery_id: aws.bedrock-agentcore-control.list_code_interpreters
+  calls:
+  - action: list_code_interpreters
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.codeInterpreterSummaries }}'
+    item:
+      codeInterpreterArn: '{{ item.codeInterpreterArn }}'
+      codeInterpreterId: '{{ item.codeInterpreterId }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+- discovery_id: aws.bedrock-agentcore-control.list_gateways
+  calls:
+  - action: list_gateways
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      authorizerType: '{{ item.authorizerType }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      gatewayId: '{{ item.gatewayId }}'
+      name: '{{ item.name }}'
+      protocolType: '{{ item.protocolType }}'
+      status: '{{ item.status }}'
+      updatedAt: '{{ item.updatedAt }}'
+- discovery_id: aws.bedrock-agentcore-control.list_memories
+  calls:
+  - action: list_memories
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.memories }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      id: '{{ item.id }}'
+      status: '{{ item.status }}'
+      updatedAt: '{{ item.updatedAt }}'
+- discovery_id: aws.bedrock-agentcore-control.list_oauth2_credential_providers
+  calls:
+  - action: list_oauth2_credential_providers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.credentialProviders }}'
+    item:
+      createdTime: '{{ item.createdTime }}'
+      credentialProviderArn: '{{ item.credentialProviderArn }}'
+      credentialProviderVendor: '{{ item.credentialProviderVendor }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      name: '{{ item.name }}'
+- discovery_id: aws.bedrock-agentcore-control.list_workload_identities
+  calls:
+  - action: list_workload_identities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workloadIdentities }}'
+    item:
+      name: '{{ item.name }}'
+      workloadIdentityArn: '{{ item.workloadIdentityArn }}'
+- discovery_id: aws.bedrock-agentcore-control.get_agent_runtime
+  for_each: aws.bedrock-agentcore-control.list_agent_runtimes
+  calls:
+  - action: get_agent_runtime
+    params:
+      agentRuntimeId: '{{ item.agentRuntimeId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      networkMode: '{{ response.networkConfiguration.networkMode }}'
+      networkModeConfig: '{{ response.networkConfiguration.networkModeConfig }}'
+- discovery_id: aws.bedrock-agentcore-control.get_agent_runtime_endpoint
+  for_each: aws.bedrock-agentcore-control.list_agent_runtimes
+  calls:
+  - action: get_agent_runtime_endpoint
+    params:
+      agentRuntimeId: '{{ item.agentRuntimeId }}'
+      endpointName: '{{ item.endpointName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      agentRuntimeArn: '{{ response.agentRuntimeArn }}'
+      agentRuntimeEndpointArn: '{{ response.agentRuntimeEndpointArn }}'
+      createdAt: '{{ response.createdAt }}'
+      description: '{{ response.description }}'
+      failureReason: '{{ response.failureReason }}'
+      id: '{{ response.id }}'
+      lastUpdatedAt: '{{ response.lastUpdatedAt }}'
+      liveVersion: '{{ response.liveVersion }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+      targetVersion: '{{ response.targetVersion }}'
+- discovery_id: aws.bedrock-agentcore-control.get_api_key_credential_provider
+  for_each: aws.bedrock-agentcore-control.list_api_key_credential_providers
+  calls:
+  - action: get_api_key_credential_provider
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      secretArn: '{{ response.apiKeySecretArn.secretArn }}'
+- discovery_id: aws.bedrock-agentcore-control.get_browser
+  for_each: aws.bedrock-agentcore-control.list_browsers
+  calls:
+  - action: get_browser
+    params:
+      browserId: '{{ item.browserId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      SecurityGroupIds: '{{ response.networkConfiguration.SecurityGroupIds }}'
+      SubnetIds: '{{ response.networkConfiguration.SubnetIds }}'
+      networkMode: '{{ response.networkConfiguration.networkMode }}'
+      recording: '{{ response.networkConfiguration.recording }}'
+      vpcConfig: '{{ response.networkConfiguration.vpcConfig }}'
+- discovery_id: aws.bedrock-agentcore-control.get_code_interpreter
+  for_each: aws.bedrock-agentcore-control.list_code_interpreters
+  calls:
+  - action: get_code_interpreter
+    params:
+      codeInterpreterId: '{{ item.codeInterpreterId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      networkMode: '{{ response.networkConfiguration.networkMode }}'
+      vpcConfig: '{{ response.networkConfiguration.vpcConfig }}'
+- discovery_id: aws.bedrock-agentcore-control.get_gateway
+  calls:
+  - action: get_gateway
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.statusReasons }}'
+- discovery_id: aws.bedrock-agentcore-control.get_gateway_target
+  calls:
+  - action: get_gateway_target
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.statusReasons }}'
+- discovery_id: aws.bedrock-agentcore-control.get_memory
+  for_each: aws.bedrock-agentcore-control.list_memories
+  calls:
+  - action: get_memory
+    params:
+      memoryId: '{{ item.memoryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.memory.arn }}'
+      createdAt: '{{ response.memory.createdAt }}'
+      description: '{{ response.memory.description }}'
+      encryptionKeyArn: '{{ response.memory.encryptionKeyArn }}'
+      eventExpiryDuration: '{{ response.memory.eventExpiryDuration }}'
+      failureReason: '{{ response.memory.failureReason }}'
+      id: '{{ response.memory.id }}'
+      memoryExecutionRoleArn: '{{ response.memory.memoryExecutionRoleArn }}'
+      name: '{{ response.memory.name }}'
+      status: '{{ response.memory.status }}'
+      strategies: '{{ response.memory.strategies }}'
+      updatedAt: '{{ response.memory.updatedAt }}'
+- discovery_id: aws.bedrock-agentcore-control.get_oauth2_credential_provider
+  for_each: aws.bedrock-agentcore-control.list_api_key_credential_providers
+  calls:
+  - action: get_oauth2_credential_provider
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      secretArn: '{{ response.clientSecretArn.secretArn }}'
+- discovery_id: aws.bedrock-agentcore-control.get_workload_identity
+  for_each: aws.bedrock-agentcore-control.list_api_key_credential_providers
+  calls:
+  - action: get_workload_identity
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.allowedResourceOauth2ReturnUrls }}'
+- discovery_id: aws.bedrock-agentcore-control.list_agent_runtime_endpoints
+  for_each: aws.bedrock-agentcore-control.list_agent_runtimes
+  calls:
+  - action: list_agent_runtime_endpoints
+    params:
+      agentRuntimeId: '{{ item.agentRuntimeId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.runtimeEndpoints }}'
+    item:
+      agentRuntimeArn: '{{ item.agentRuntimeArn }}'
+      agentRuntimeEndpointArn: '{{ item.agentRuntimeEndpointArn }}'
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      liveVersion: '{{ item.liveVersion }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      targetVersion: '{{ item.targetVersion }}'
+- discovery_id: aws.bedrock-agentcore-control.list_agent_runtime_versions
+  for_each: aws.bedrock-agentcore-control.list_agent_runtimes
+  calls:
+  - action: list_agent_runtime_versions
+    params:
+      agentRuntimeId: '{{ item.agentRuntimeId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.agentRuntimes }}'
+    item:
+      agentRuntimeArn: '{{ item.agentRuntimeArn }}'
+      agentRuntimeId: '{{ item.agentRuntimeId }}'
+      agentRuntimeName: '{{ item.agentRuntimeName }}'
+      agentRuntimeVersion: '{{ item.agentRuntimeVersion }}'
+      description: '{{ item.description }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      status: '{{ item.status }}'
+- discovery_id: aws.bedrock-agentcore-control.list_gateway_targets
+  calls:
+  - action: list_gateway_targets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      targetId: '{{ item.targetId }}'
+      updatedAt: '{{ item.updatedAt }}'
+- discovery_id: aws.bedrock-agentcore-control.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

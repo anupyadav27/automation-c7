@@ -1,0 +1,33 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: kinesisfirehose
+# 1 ops (1 from checks, +0 for inventory)
+version: '1.0'
+provider: aws
+service: kinesisfirehose
+discovery:
+  - calls:
+    - action: describe_delivery_stream
+      on_error: continue
+      save_as: response
+    discovery_id: aws.kinesisfirehose.describe_delivery_stream
+    emit:
+      as: item
+      item:
+        CreateTimestamp: '{{ response.CreateTimestamp }}'
+        DeliveryStreamARN: '{{ response.DeliveryStreamARN }}'
+        DeliveryStreamDescription: '{{ response.DeliveryStreamDescription }}'
+        DeliveryStreamEncryptionConfiguration: '{{ response.DeliveryStreamEncryptionConfiguration
+          }}'
+        DeliveryStreamName: '{{ response.DeliveryStreamName }}'
+        DeliveryStreamStatus: '{{ response.DeliveryStreamStatus }}'
+        DeliveryStreamType: '{{ response.DeliveryStreamType }}'
+        DestinationDescription: '{{ response.Destinations }}'
+        Destinations: '{{ response.Destinations }}'
+        Enabled: '{{ response.Enabled }}'
+        ExtendedS3DestinationDescription: '{{ response.Destinations }}'
+        FailureDescription: '{{ response.FailureDescription }}'
+        HasMoreDestinations: '{{ response.HasMoreDestinations }}'
+        LastUpdateTimestamp: '{{ response.LastUpdateTimestamp }}'
+        Source: '{{ response.Source }}'
+        Status: '{{ response.Status }}'
+        VersionId: '{{ response.VersionId }}'

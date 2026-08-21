@@ -1,0 +1,106 @@
+version: '1.0'
+provider: aws
+service: wellarchitected
+discovery:
+- calls:
+  - action: list_workloads
+    on_error: continue
+    save_as: response
+  discovery_id: aws.wellarchitected.list_workloads
+  emit:
+    as: item
+    item:
+      ImprovementStatus: '{{ item.ImprovementStatus }}'
+      Lenses: '{{ item.Lenses }}'
+      Owner: '{{ item.Owner }}'
+      PrioritizedRiskCounts: '{{ item.PrioritizedRiskCounts }}'
+      Profiles: '{{ item.Profiles }}'
+      RiskCounts: '{{ item.RiskCounts }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+      WorkloadArn: '{{ item.WorkloadArn }}'
+      WorkloadId: '{{ item.WorkloadId }}'
+      WorkloadName: '{{ item.WorkloadName }}'
+    items_for: '{{ response.WorkloadSummaries }}'
+- calls:
+  - action: list_share_invitations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.wellarchitected.list_share_invitations
+  emit:
+    as: item
+    item:
+      LensArn: '{{ item.LensArn }}'
+      LensName: '{{ item.LensName }}'
+      PermissionType: '{{ item.PermissionType }}'
+      ProfileArn: '{{ item.ProfileArn }}'
+      ProfileName: '{{ item.ProfileName }}'
+      ShareInvitationId: '{{ item.ShareInvitationId }}'
+      ShareResourceType: '{{ item.ShareResourceType }}'
+      SharedBy: '{{ item.SharedBy }}'
+      SharedWith: '{{ item.SharedWith }}'
+      TemplateArn: '{{ item.TemplateArn }}'
+      TemplateName: '{{ item.TemplateName }}'
+      WorkloadId: '{{ item.WorkloadId }}'
+      WorkloadName: '{{ item.WorkloadName }}'
+    items_for: '{{ response.ShareInvitationSummaries }}'
+- calls:
+  - action: list_profile_notifications
+    on_error: continue
+    save_as: response
+  discovery_id: aws.wellarchitected.list_profile_notifications
+  emit:
+    as: item
+    item:
+      CurrentProfileVersion: '{{ item.CurrentProfileVersion }}'
+      LatestProfileVersion: '{{ item.LatestProfileVersion }}'
+      Profile: '{{ item.Profile }}'
+      ProfileArn: '{{ item.ProfileArn }}'
+      ProfileName: '{{ item.ProfileName }}'
+      Type: '{{ item.Type }}'
+      WorkloadId: '{{ item.WorkloadId }}'
+      WorkloadName: '{{ item.WorkloadName }}'
+    items_for: '{{ response.NotificationSummaries }}'
+- calls:
+  - action: get_workload
+    on_error: continue
+    params:
+      WorkloadId: '{{ item.WorkloadId }}'
+    save_as: response
+  discovery_id: aws.wellarchitected.get_workload
+  emit:
+    as: item
+    item:
+      AccountIds: '{{ response.Workload.AccountIds }}'
+      Applications: '{{ response.Workload.Applications }}'
+      ArchitecturalDesign: '{{ response.Workload.ArchitecturalDesign }}'
+      AwsRegions: '{{ response.Workload.AwsRegions }}'
+      Description: '{{ response.Workload.Description }}'
+      DiscoveryConfig: '{{ response.Workload.DiscoveryConfig }}'
+      Environment: '{{ response.Workload.Environment }}'
+      ImprovementStatus: '{{ response.Workload.ImprovementStatus }}'
+      Industry: '{{ response.Workload.Industry }}'
+      IndustryType: '{{ response.Workload.IndustryType }}'
+      IsReviewOwnerUpdateAcknowledged: '{{ response.Workload.IsReviewOwnerUpdateAcknowledged }}'
+      JiraConfiguration: '{{ response.Workload.JiraConfiguration }}'
+      Lenses: '{{ response.Workload.Lenses }}'
+      NonAwsRegions: '{{ response.Workload.NonAwsRegions }}'
+      Notes: '{{ response.Workload.Notes }}'
+      Owner: '{{ response.Workload.Owner }}'
+      PillarPriorities: '{{ response.Workload.PillarPriorities }}'
+      PrioritizedRiskCounts: '{{ response.Workload.PrioritizedRiskCounts }}'
+      Profiles: '{{ response.Workload.Profiles }}'
+      ReviewOwner: '{{ response.Workload.ReviewOwner }}'
+      ReviewRestrictionDate: '{{ response.Workload.ReviewRestrictionDate }}'
+      RiskCounts: '{{ response.Workload.RiskCounts }}'
+      ShareInvitationId: '{{ response.Workload.ShareInvitationId }}'
+      Tags: '{{ response.Workload.Tags }}'
+      UpdatedAt: '{{ response.Workload.UpdatedAt }}'
+      WorkloadArn: '{{ response.Workload.WorkloadArn }}'
+      WorkloadId: '{{ response.Workload.WorkloadId }}'
+      WorkloadName: '{{ response.Workload.WorkloadName }}'
+      TrustedAdvisorIntegrationStatus: '{{ response.Workload.DiscoveryConfig.TrustedAdvisorIntegrationStatus }}'
+      IssueManagementStatus: '{{ response.Workload.JiraConfiguration.IssueManagementStatus }}'
+      IssueManagementType: '{{ response.Workload.JiraConfiguration.IssueManagementType }}'
+      JiraProjectKey: '{{ response.Workload.JiraConfiguration.JiraProjectKey }}'
+      StatusMessage: '{{ response.Workload.JiraConfiguration.StatusMessage }}'
+  for_each: aws.wellarchitected.list_profile_notifications

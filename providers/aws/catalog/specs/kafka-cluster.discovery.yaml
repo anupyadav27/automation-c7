@@ -1,0 +1,494 @@
+version: '1.0'
+provider: aws
+service: kafka
+services:
+  client: kafka
+  module: boto3.client
+discovery:
+- discovery_id: aws.kafka.get_compatible_kafka_versions
+  calls:
+  - action: get_compatible_kafka_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CompatibleKafkaVersions }}'
+    item:
+      CompatibleKafkaVersions: '{{ item.CompatibleKafkaVersions }}'
+      SourceVersion: '{{ item.SourceVersion }}'
+      TargetVersions: '{{ item.TargetVersions }}'
+- discovery_id: aws.kafka.list_clusters
+  calls:
+  - action: list_clusters
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ClusterInfoList }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      ActiveOperationArn: '{{ item.ActiveOperationArn }}'
+      BrokerNodeGroupInfo: '{{ item.BrokerNodeGroupInfo }}'
+      ClientAuthentication: '{{ item.ClientAuthentication }}'
+      ClusterArn: '{{ item.ClusterArn }}'
+      ClusterInfo: '{{ item.ClusterInfo }}'
+      ClusterName: '{{ item.ClusterName }}'
+      CurrentBrokerSoftwareInfo: '{{ item.CurrentBrokerSoftwareInfo }}'
+      CurrentVersion: '{{ item.CurrentVersion }}'
+      CustomerActionStatus: '{{ item.CustomerActionStatus }}'
+      EncryptionInfo: '{{ item.EncryptionInfo }}'
+      EnhancedMonitoring: '{{ item.EnhancedMonitoring }}'
+      LoggingInfo: '{{ item.LoggingInfo }}'
+      NumberOfBrokerNodes: '{{ item.NumberOfBrokerNodes }}'
+      OpenMonitoring: '{{ item.OpenMonitoring }}'
+      Rebalancing: '{{ item.Rebalancing }}'
+      StateInfo: '{{ item.StateInfo }}'
+      StorageMode: '{{ item.StorageMode }}'
+      ZookeeperConnectString: '{{ item.ZookeeperConnectString }}'
+      ZookeeperConnectStringTls: '{{ item.ZookeeperConnectStringTls }}'
+- discovery_id: aws.kafka.list_clusters_v2
+  calls:
+  - action: list_clusters_v2
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ClusterInfoList }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      ActiveOperationArn: '{{ item.ActiveOperationArn }}'
+      ClusterArn: '{{ item.ClusterArn }}'
+      ClusterName: '{{ item.ClusterName }}'
+      ClusterType: '{{ item.ClusterType }}'
+      CurrentVersion: '{{ item.CurrentVersion }}'
+      Provisioned: '{{ item.Provisioned }}'
+      Serverless: '{{ item.Serverless }}'
+      StateInfo: '{{ item.StateInfo }}'
+- discovery_id: aws.kafka.list_configurations
+  calls:
+  - action: list_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Configurations }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      Description: '{{ item.Description }}'
+      Enabled: '{{ item.Enabled }}'
+      KafkaVersions: '{{ item.KafkaVersions }}'
+      LatestRevision: '{{ item.LatestRevision }}'
+- discovery_id: aws.kafka.list_kafka_versions
+  calls:
+  - action: list_kafka_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.KafkaVersions }}'
+    item:
+      Status: '{{ item.Status }}'
+      Version: '{{ item.Version }}'
+- discovery_id: aws.kafka.list_replicators
+  calls:
+  - action: list_replicators
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Replicators }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      CurrentVersion: '{{ item.CurrentVersion }}'
+      IsReplicatorReference: '{{ item.IsReplicatorReference }}'
+      KafkaClustersSummary: '{{ item.KafkaClustersSummary }}'
+      ReplicationInfoSummaryList: '{{ item.ReplicationInfoSummaryList }}'
+      ReplicatorArn: '{{ item.ReplicatorArn }}'
+      ReplicatorName: '{{ item.ReplicatorName }}'
+      ReplicatorResourceArn: '{{ item.ReplicatorResourceArn }}'
+      ReplicatorState: '{{ item.ReplicatorState }}'
+- discovery_id: aws.kafka.list_vpc_connections
+  calls:
+  - action: list_vpc_connections
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VpcConnections }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      State: '{{ item.State }}'
+      VpcId: '{{ item.VpcId }}'
+      Authentication: '{{ item.Authentication }}'
+      Subnets: '{{ item.Subnets }}'
+      TargetClusterArn: '{{ item.TargetClusterArn }}'
+      VpcConnectionArn: '{{ item.VpcConnectionArn }}'
+- discovery_id: aws.kafka.describe_cluster
+  for_each: aws.kafka.list_clusters
+  calls:
+  - action: describe_cluster
+    params:
+      ClusterArn: '{{ item.ClusterArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ response.ClusterInfo.CreationTime }}'
+      State: '{{ response.ClusterInfo.State }}'
+      Tags: '{{ response.ClusterInfo.Tags }}'
+      ActiveOperationArn: '{{ response.ClusterInfo.ActiveOperationArn }}'
+      BrokerNodeGroupInfo: '{{ response.ClusterInfo.BrokerNodeGroupInfo }}'
+      ClientAuthentication: '{{ response.ClusterInfo.ClientAuthentication }}'
+      ClusterArn: '{{ response.ClusterInfo.ClusterArn }}'
+      ClusterName: '{{ response.ClusterInfo.ClusterName }}'
+      CurrentBrokerSoftwareInfo: '{{ response.ClusterInfo.CurrentBrokerSoftwareInfo
+        }}'
+      CurrentVersion: '{{ response.ClusterInfo.CurrentVersion }}'
+      CustomerActionStatus: '{{ response.ClusterInfo.CustomerActionStatus }}'
+      EncryptionInfo: '{{ response.ClusterInfo.EncryptionInfo }}'
+      EnhancedMonitoring: '{{ response.ClusterInfo.EnhancedMonitoring }}'
+      LoggingInfo: '{{ response.ClusterInfo.LoggingInfo }}'
+      NumberOfBrokerNodes: '{{ response.ClusterInfo.NumberOfBrokerNodes }}'
+      OpenMonitoring: '{{ response.ClusterInfo.OpenMonitoring }}'
+      Rebalancing: '{{ response.ClusterInfo.Rebalancing }}'
+      StateInfo: '{{ response.ClusterInfo.StateInfo }}'
+      StorageMode: '{{ response.ClusterInfo.StorageMode }}'
+      ZookeeperConnectString: '{{ response.ClusterInfo.ZookeeperConnectString }}'
+      ZookeeperConnectStringTls: '{{ response.ClusterInfo.ZookeeperConnectStringTls
+        }}'
+- discovery_id: aws.kafka.describe_cluster_operation
+  calls:
+  - action: describe_cluster_operation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ response.ClusterOperationInfo.CreationTime }}'
+      ClientRequestId: '{{ response.ClusterOperationInfo.ClientRequestId }}'
+      ClusterArn: '{{ response.ClusterOperationInfo.ClusterArn }}'
+      EndTime: '{{ response.ClusterOperationInfo.EndTime }}'
+      ErrorInfo: '{{ response.ClusterOperationInfo.ErrorInfo }}'
+      OperationArn: '{{ response.ClusterOperationInfo.OperationArn }}'
+      OperationState: '{{ response.ClusterOperationInfo.OperationState }}'
+      OperationSteps: '{{ response.ClusterOperationInfo.OperationSteps }}'
+      OperationType: '{{ response.ClusterOperationInfo.OperationType }}'
+      SourceClusterInfo: '{{ response.ClusterOperationInfo.SourceClusterInfo }}'
+      TargetClusterInfo: '{{ response.ClusterOperationInfo.TargetClusterInfo }}'
+      VpcConnectionInfo: '{{ response.ClusterOperationInfo.VpcConnectionInfo }}'
+- discovery_id: aws.kafka.describe_cluster_operation_v2
+  calls:
+  - action: describe_cluster_operation_v2
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ClusterArn: '{{ response.ClusterOperationInfo.ClusterArn }}'
+      ClusterType: '{{ response.ClusterOperationInfo.ClusterType }}'
+      EndTime: '{{ response.ClusterOperationInfo.EndTime }}'
+      ErrorInfo: '{{ response.ClusterOperationInfo.ErrorInfo }}'
+      OperationArn: '{{ response.ClusterOperationInfo.OperationArn }}'
+      OperationState: '{{ response.ClusterOperationInfo.OperationState }}'
+      OperationType: '{{ response.ClusterOperationInfo.OperationType }}'
+      Provisioned: '{{ response.ClusterOperationInfo.Provisioned }}'
+      Serverless: '{{ response.ClusterOperationInfo.Serverless }}'
+      StartTime: '{{ response.ClusterOperationInfo.StartTime }}'
+- discovery_id: aws.kafka.describe_cluster_v2
+  for_each: aws.kafka.list_clusters
+  calls:
+  - action: describe_cluster_v2
+    params:
+      ClusterArn: '{{ item.ClusterArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ response.ClusterInfo.CreationTime }}'
+      State: '{{ response.ClusterInfo.State }}'
+      Tags: '{{ response.ClusterInfo.Tags }}'
+      ActiveOperationArn: '{{ response.ClusterInfo.ActiveOperationArn }}'
+      ClusterArn: '{{ response.ClusterInfo.ClusterArn }}'
+      ClusterName: '{{ response.ClusterInfo.ClusterName }}'
+      ClusterType: '{{ response.ClusterInfo.ClusterType }}'
+      CurrentVersion: '{{ response.ClusterInfo.CurrentVersion }}'
+      Provisioned: '{{ response.ClusterInfo.Provisioned }}'
+      Serverless: '{{ response.ClusterInfo.Serverless }}'
+      StateInfo: '{{ response.ClusterInfo.StateInfo }}'
+- discovery_id: aws.kafka.describe_configuration
+  for_each: aws.kafka.list_configurations
+  calls:
+  - action: describe_configuration
+    params:
+      Arn: '{{ item.Arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.KafkaVersions }}'
+- discovery_id: aws.kafka.describe_configuration_revision
+  for_each: aws.kafka.list_configurations
+  calls:
+  - action: describe_configuration_revision
+    params:
+      Revision: '{{ item.Revision }}'
+      Arn: '{{ item.Arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      CreationTime: '{{ response.CreationTime }}'
+      Description: '{{ response.Description }}'
+      Revision: '{{ response.Revision }}'
+      ServerProperties: '{{ response.ServerProperties }}'
+- discovery_id: aws.kafka.describe_replicator
+  for_each: aws.kafka.list_replicators
+  calls:
+  - action: describe_replicator
+    params:
+      ReplicatorArn: '{{ item.ReplicatorArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.KafkaClusters }}'
+    item:
+      ConsumerGroupReplication: '{{ item.ConsumerGroupReplication }}'
+      SourceKafkaClusterAlias: '{{ item.SourceKafkaClusterAlias }}'
+      TargetCompressionType: '{{ item.TargetCompressionType }}'
+      TargetKafkaClusterAlias: '{{ item.TargetKafkaClusterAlias }}'
+      TopicReplication: '{{ item.TopicReplication }}'
+- discovery_id: aws.kafka.describe_topic
+  for_each: aws.kafka.list_clusters
+  calls:
+  - action: describe_topic
+    params:
+      ClusterArn: '{{ item.ClusterArn }}'
+      TopicName: '{{ item.TopicName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Status }}'
+      Configs: '{{ response.Configs }}'
+      PartitionCount: '{{ response.PartitionCount }}'
+      ReplicationFactor: '{{ response.ReplicationFactor }}'
+      TopicArn: '{{ response.TopicArn }}'
+      TopicName: '{{ response.TopicName }}'
+- discovery_id: aws.kafka.describe_topic_partitions
+  for_each: aws.kafka.list_clusters
+  calls:
+  - action: describe_topic_partitions
+    params:
+      ClusterArn: '{{ item.ClusterArn }}'
+      TopicName: '{{ item.TopicName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Partitions }}'
+    item:
+      Isr: '{{ item.Isr }}'
+      Leader: '{{ item.Leader }}'
+      Partition: '{{ item.Partition }}'
+      Partitions: '{{ item.Partitions }}'
+      Replicas: '{{ item.Replicas }}'
+- discovery_id: aws.kafka.describe_vpc_connection
+  for_each: aws.kafka.list_configurations
+  calls:
+  - action: describe_vpc_connection
+    params:
+      Arn: '{{ item.Arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Subnets }}'
+    item:
+      Subnets: '{{ item.Subnets }}'
+- discovery_id: aws.kafka.get_bootstrap_brokers
+  for_each: aws.kafka.list_clusters
+  calls:
+  - action: get_bootstrap_brokers
+    params:
+      ClusterArn: '{{ item.ClusterArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      BootstrapBrokerString: '{{ response.BootstrapBrokerString }}'
+      BootstrapBrokerStringPublicSaslIam: '{{ response.BootstrapBrokerStringPublicSaslIam
+        }}'
+      BootstrapBrokerStringPublicSaslScram: '{{ response.BootstrapBrokerStringPublicSaslScram
+        }}'
+      BootstrapBrokerStringPublicTls: '{{ response.BootstrapBrokerStringPublicTls
+        }}'
+      BootstrapBrokerStringSaslIam: '{{ response.BootstrapBrokerStringSaslIam }}'
+      BootstrapBrokerStringSaslScram: '{{ response.BootstrapBrokerStringSaslScram
+        }}'
+      BootstrapBrokerStringTls: '{{ response.BootstrapBrokerStringTls }}'
+      BootstrapBrokerStringVpcConnectivitySaslIam: '{{ response.BootstrapBrokerStringVpcConnectivitySaslIam
+        }}'
+      BootstrapBrokerStringVpcConnectivitySaslScram: '{{ response.BootstrapBrokerStringVpcConnectivitySaslScram
+        }}'
+      BootstrapBrokerStringVpcConnectivityTls: '{{ response.BootstrapBrokerStringVpcConnectivityTls
+        }}'
+- discovery_id: aws.kafka.get_cluster_policy
+  for_each: aws.kafka.list_clusters
+  calls:
+  - action: get_cluster_policy
+    params:
+      ClusterArn: '{{ item.ClusterArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      CurrentVersion: '{{ response.CurrentVersion }}'
+      Statement: '{{ response.Statement }}'
+- discovery_id: aws.kafka.list_client_vpc_connections
+  for_each: aws.kafka.list_clusters
+  calls:
+  - action: list_client_vpc_connections
+    params:
+      ClusterArn: '{{ item.ClusterArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ClientVpcConnections }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      State: '{{ item.State }}'
+      Authentication: '{{ item.Authentication }}'
+      Owner: '{{ item.Owner }}'
+      VpcConnectionArn: '{{ item.VpcConnectionArn }}'
+- discovery_id: aws.kafka.list_cluster_operations
+  for_each: aws.kafka.list_clusters
+  calls:
+  - action: list_cluster_operations
+    params:
+      ClusterArn: '{{ item.ClusterArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ClusterOperationInfoList }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      ClientRequestId: '{{ item.ClientRequestId }}'
+      ClusterArn: '{{ item.ClusterArn }}'
+      EndTime: '{{ item.EndTime }}'
+      ErrorInfo: '{{ item.ErrorInfo }}'
+      OperationArn: '{{ item.OperationArn }}'
+      OperationState: '{{ item.OperationState }}'
+      OperationSteps: '{{ item.OperationSteps }}'
+      OperationType: '{{ item.OperationType }}'
+      SourceClusterInfo: '{{ item.SourceClusterInfo }}'
+      TargetClusterInfo: '{{ item.TargetClusterInfo }}'
+      VpcConnectionInfo: '{{ item.VpcConnectionInfo }}'
+- discovery_id: aws.kafka.list_cluster_operations_v2
+  for_each: aws.kafka.list_clusters
+  calls:
+  - action: list_cluster_operations_v2
+    params:
+      ClusterArn: '{{ item.ClusterArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ClusterOperationInfoList }}'
+    item:
+      ClusterArn: '{{ item.ClusterArn }}'
+      ClusterType: '{{ item.ClusterType }}'
+      EndTime: '{{ item.EndTime }}'
+      OperationArn: '{{ item.OperationArn }}'
+      OperationState: '{{ item.OperationState }}'
+      OperationType: '{{ item.OperationType }}'
+      StartTime: '{{ item.StartTime }}'
+- discovery_id: aws.kafka.list_configuration_revisions
+  for_each: aws.kafka.list_configurations
+  calls:
+  - action: list_configuration_revisions
+    params:
+      Arn: '{{ item.Arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Revisions }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      Description: '{{ item.Description }}'
+      Revision: '{{ item.Revision }}'
+- discovery_id: aws.kafka.list_nodes
+  for_each: aws.kafka.list_clusters
+  calls:
+  - action: list_nodes
+    params:
+      ClusterArn: '{{ item.ClusterArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.NodeInfoList }}'
+    item:
+      AddedToClusterTime: '{{ item.AddedToClusterTime }}'
+      BrokerNodeInfo: '{{ item.BrokerNodeInfo }}'
+      ControllerNodeInfo: '{{ item.ControllerNodeInfo }}'
+      InstanceType: '{{ item.InstanceType }}'
+      NodeARN: '{{ item.NodeARN }}'
+      NodeType: '{{ item.NodeType }}'
+      ZookeeperNodeInfo: '{{ item.ZookeeperNodeInfo }}'
+- discovery_id: aws.kafka.list_scram_secrets
+  for_each: aws.kafka.list_clusters
+  calls:
+  - action: list_scram_secrets
+    params:
+      ClusterArn: '{{ item.ClusterArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SecretArnList }}'
+- discovery_id: aws.kafka.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.kafka.list_topics
+  for_each: aws.kafka.list_clusters
+  calls:
+  - action: list_topics
+    params:
+      ClusterArn: '{{ item.ClusterArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Topics }}'
+    item:
+      Configs: '{{ item.Configs }}'
+      OutOfSyncReplicaCount: '{{ item.OutOfSyncReplicaCount }}'
+      PartitionCount: '{{ item.PartitionCount }}'
+      ReplicationFactor: '{{ item.ReplicationFactor }}'
+      TopicArn: '{{ item.TopicArn }}'
+      TopicName: '{{ item.TopicName }}'

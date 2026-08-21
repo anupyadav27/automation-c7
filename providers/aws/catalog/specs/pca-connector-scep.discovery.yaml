@@ -1,0 +1,101 @@
+version: '1.0'
+provider: aws
+service: pca-connector-scep
+services:
+  client: pca-connector-scep
+  module: boto3.client
+discovery:
+- discovery_id: aws.pca-connector-scep.list_connectors
+  calls:
+  - action: list_connectors
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Connectors }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Status: '{{ item.Status }}'
+      CertificateAuthorityArn: '{{ item.CertificateAuthorityArn }}'
+      Connector: '{{ item.Connector }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      Enabled: '{{ item.Enabled }}'
+      Endpoint: '{{ item.Endpoint }}'
+      MobileDeviceManagement: '{{ item.MobileDeviceManagement }}'
+      OpenIdConfiguration: '{{ item.OpenIdConfiguration }}'
+      StatusReason: '{{ item.StatusReason }}'
+      Type: '{{ item.Type }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.pca-connector-scep.get_challenge_metadata
+  calls:
+  - action: get_challenge_metadata
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.ChallengeMetadata.Arn }}'
+      ConnectorArn: '{{ response.ChallengeMetadata.ConnectorArn }}'
+      CreatedAt: '{{ response.ChallengeMetadata.CreatedAt }}'
+      UpdatedAt: '{{ response.ChallengeMetadata.UpdatedAt }}'
+- discovery_id: aws.pca-connector-scep.get_challenge_password
+  calls:
+  - action: get_challenge_password
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Password: '{{ response.Password }}'
+- discovery_id: aws.pca-connector-scep.get_connector
+  for_each: aws.pca-connector-scep.list_connectors
+  calls:
+  - action: get_connector
+    params:
+      ConnectorArn: '{{ item.ConnectorArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Connector.Arn }}'
+      Status: '{{ response.Connector.Status }}'
+      CertificateAuthorityArn: '{{ response.Connector.CertificateAuthorityArn }}'
+      Connector: '{{ response.Connector.Connector }}'
+      CreatedAt: '{{ response.Connector.CreatedAt }}'
+      Endpoint: '{{ response.Connector.Endpoint }}'
+      MobileDeviceManagement: '{{ response.Connector.MobileDeviceManagement }}'
+      OpenIdConfiguration: '{{ response.Connector.OpenIdConfiguration.Issuer }}'
+      StatusReason: '{{ response.Connector.StatusReason }}'
+      Type: '{{ response.Connector.Type }}'
+      UpdatedAt: '{{ response.Connector.UpdatedAt }}'
+      AzureApplicationId: '{{ response.Connector.MobileDeviceManagement.Intune.AzureApplicationId }}'
+      Domain: '{{ response.Connector.MobileDeviceManagement.Intune.Domain }}'
+      Audience: '{{ response.Connector.OpenIdConfiguration.Audience }}'
+      Issuer: '{{ response.Connector.OpenIdConfiguration.Issuer }}'
+      Subject: '{{ response.Connector.OpenIdConfiguration.Subject }}'
+- discovery_id: aws.pca-connector-scep.list_challenge_metadata
+  for_each: aws.pca-connector-scep.list_connectors
+  calls:
+  - action: list_challenge_metadata
+    params:
+      ConnectorArn: '{{ item.ConnectorArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Challenges }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      ConnectorArn: '{{ item.ConnectorArn }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      UpdatedAt: '{{ item.UpdatedAt }}'
+- discovery_id: aws.pca-connector-scep.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

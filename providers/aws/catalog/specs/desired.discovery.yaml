@@ -1,0 +1,52 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: desired (backed by ec2)
+# 1 ops (from checks)
+# Generated: 2026-04-14
+version: '1.0'
+provider: aws
+service: desired
+services:
+  client: ec2
+  module: boto3.client
+discovery:
+  - discovery_id: aws.desired.describe_instances
+    calls:
+    - action: describe_instances
+      save_as: response
+      on_error: continue
+      params:
+        Filters: [{'Name': 'instance-state-name', 'Values': ['running']}]
+    emit:
+      as: item
+      items_for: '{{ response.Reservations[].Instances }}'
+      item:
+        SecurityGroups: '{{ item.SecurityGroups }}'
+        Tags: '{{ item.Tags }}'
+        VpcId: '{{ item.VpcId }}'
+        State: '{{ item.State }}'
+        Architecture: '{{ item.Architecture }}'
+        BlockDeviceMappings: '{{ item.BlockDeviceMappings }}'
+        CapacityReservationGroups: '{{ item.CapacityReservationGroups }}'
+        EbsOptimized: '{{ item.EbsOptimized }}'
+        Groups: '{{ item.Groups }}'
+        IamInstanceProfile: '{{ item.IamInstanceProfile }}'
+        ImageId: '{{ item.ImageId }}'
+        InstanceId: '{{ item.InstanceId }}'
+        InstanceType: '{{ item.InstanceType }}'
+        Instances: '{{ item.Instances }}'
+        KeyName: '{{ item.KeyName }}'
+        LaunchTime: '{{ item.LaunchTime }}'
+        MetadataOptions: '{{ item.MetadataOptions }}'
+        Monitoring: '{{ item.Monitoring }}'
+        NetworkInterfaces: '{{ item.NetworkInterfaces }}'
+        Placement: '{{ item.Placement }}'
+        Platform: '{{ item.Platform }}'
+        PrivateIpAddress: '{{ item.PrivateIpAddress }}'
+        PublicDnsName: '{{ item.PublicDnsName }}'
+        PublicIpAddress: '{{ item.PublicIpAddress }}'
+        RequesterId: '{{ item.RequesterId }}'
+        ReservationId: '{{ item.ReservationId }}'
+        Reservations: '{{ item.Reservations }}'
+        RootDeviceType: '{{ item.RootDeviceType }}'
+        SourceDestCheck: '{{ item.SourceDestCheck }}'
+        SubnetId: '{{ item.SubnetId }}'

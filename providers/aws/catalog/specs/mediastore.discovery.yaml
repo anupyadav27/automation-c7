@@ -1,0 +1,118 @@
+version: '1.0'
+provider: aws
+service: mediastore
+services:
+  client: mediastore
+  module: boto3.client
+discovery:
+- discovery_id: aws.mediastore.describe_container
+  calls:
+  - action: describe_container
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Container.Policy }}'
+      AllowedHeaders: '{{ response.Container.AllowedHeaders }}'
+      AllowedMethods: '{{ response.Container.AllowedMethods }}'
+      AllowedOrigins: '{{ response.Container.AllowedOrigins }}'
+      Container: '{{ response.Container.Container }}'
+      ContainerLevelMetrics: '{{ response.Container.ContainerLevelMetrics }}'
+      CorsPolicy: '{{ response.Container.CorsPolicy }}'
+      ExposeHeaders: '{{ response.Container.ExposeHeaders }}'
+      LifecyclePolicy: '{{ response.Container.LifecyclePolicy }}'
+      MaxAgeSeconds: '{{ response.Container.MaxAgeSeconds }}'
+      MetricPolicy: '{{ response.Container.MetricPolicy }}'
+      ARN: '{{ response.Container.ARN }}'
+      AccessLoggingEnabled: '{{ response.Container.AccessLoggingEnabled }}'
+      CreationTime: '{{ response.Container.CreationTime }}'
+      Endpoint: '{{ response.Container.Endpoint }}'
+      Name: '{{ response.Container.Name }}'
+      Status: '{{ response.Container.Status }}'
+- discovery_id: aws.mediastore.list_containers
+  calls:
+  - action: list_containers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Containers }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      Name: '{{ item.Name }}'
+      Status: '{{ item.Status }}'
+      ARN: '{{ item.ARN }}'
+      AccessLoggingEnabled: '{{ item.AccessLoggingEnabled }}'
+      Container: '{{ item.Container }}'
+      Endpoint: '{{ item.Endpoint }}'
+- discovery_id: aws.mediastore.get_container_policy
+  for_each: aws.mediastore.describe_container
+  calls:
+  - action: get_container_policy
+    params:
+      ContainerName: '{{ item.ContainerName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+- discovery_id: aws.mediastore.get_cors_policy
+  for_each: aws.mediastore.describe_container
+  calls:
+  - action: get_cors_policy
+    params:
+      ContainerName: '{{ item.ContainerName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CorsPolicy }}'
+    item:
+      AllowedHeaders: '{{ item.AllowedHeaders }}'
+      AllowedMethods: '{{ item.AllowedMethods }}'
+      AllowedOrigins: '{{ item.AllowedOrigins }}'
+      CorsPolicy: '{{ item.CorsPolicy }}'
+      ExposeHeaders: '{{ item.ExposeHeaders }}'
+      MaxAgeSeconds: '{{ item.MaxAgeSeconds }}'
+- discovery_id: aws.mediastore.get_lifecycle_policy
+  for_each: aws.mediastore.describe_container
+  calls:
+  - action: get_lifecycle_policy
+    params:
+      ContainerName: '{{ item.ContainerName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Policy: '{{ response.Policy }}'
+      LifecyclePolicy: '{{ response.LifecyclePolicy }}'
+- discovery_id: aws.mediastore.get_metric_policy
+  for_each: aws.mediastore.describe_container
+  calls:
+  - action: get_metric_policy
+    params:
+      ContainerName: '{{ item.ContainerName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ContainerLevelMetrics: '{{ response.MetricPolicy.ContainerLevelMetrics }}'
+      MetricPolicy: '{{ response.MetricPolicy.MetricPolicy }}'
+      MetricPolicyRules: '{{ response.MetricPolicy.MetricPolicyRules }}'
+- discovery_id: aws.mediastore.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

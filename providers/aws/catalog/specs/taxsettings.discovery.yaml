@@ -1,0 +1,129 @@
+version: '1.0'
+provider: aws
+service: taxsettings
+services:
+  client: taxsettings
+  module: boto3.client
+discovery:
+- discovery_id: aws.taxsettings.get_tax_inheritance
+  calls:
+  - action: get_tax_inheritance
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      heritageStatus: '{{ response.heritageStatus }}'
+- discovery_id: aws.taxsettings.get_tax_registration
+  calls:
+  - action: get_tax_registration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      additionalTaxInformation: '{{ response.taxRegistration.additionalTaxInformation }}'
+      certifiedEmailId: '{{ response.taxRegistration.certifiedEmailId }}'
+      legalAddress: '{{ response.taxRegistration.legalAddress.city }}'
+      sector: '{{ response.taxRegistration.sector }}'
+      taxDocumentMetadatas: '{{ response.taxRegistration.taxDocumentMetadatas }}'
+      ccmCode: '{{ response.taxRegistration.additionalTaxInformation.brazilAdditionalInfo.ccmCode }}'
+      legalNatureCode: '{{ response.taxRegistration.additionalTaxInformation.brazilAdditionalInfo.legalNatureCode }}'
+      canadaQuebecSalesTaxNumber: '{{ response.taxRegistration.additionalTaxInformation.canadaAdditionalInfo.canadaQuebecSalesTaxNumber }}'
+      canadaRetailSalesTaxNumber: '{{ response.taxRegistration.additionalTaxInformation.canadaAdditionalInfo.canadaRetailSalesTaxNumber }}'
+      isResellerAccount: '{{ response.taxRegistration.additionalTaxInformation.canadaAdditionalInfo.isResellerAccount }}'
+      provincialSalesTaxId: '{{ response.taxRegistration.additionalTaxInformation.canadaAdditionalInfo.provincialSalesTaxId }}'
+      uniqueIdentificationNumber: '{{ response.taxRegistration.additionalTaxInformation.egyptAdditionalInfo.uniqueIdentificationNumber }}'
+      uniqueIdentificationNumberExpirationDate: '{{ response.taxRegistration.additionalTaxInformation.egyptAdditionalInfo.uniqueIdentificationNumberExpirationDate }}'
+      registryCommercialCode: '{{ response.taxRegistration.additionalTaxInformation.estoniaAdditionalInfo.registryCommercialCode }}'
+      personType: '{{ response.taxRegistration.additionalTaxInformation.georgiaAdditionalInfo.personType }}'
+      contractingAuthorityCode: '{{ response.taxRegistration.additionalTaxInformation.greeceAdditionalInfo.contractingAuthorityCode }}'
+      pan: '{{ response.taxRegistration.additionalTaxInformation.indiaAdditionalInfo.pan }}'
+      decisionNumber: '{{ response.taxRegistration.additionalTaxInformation.indonesiaAdditionalInfo.decisionNumber }}'
+      ppnExceptionDesignationCode: '{{ response.taxRegistration.additionalTaxInformation.indonesiaAdditionalInfo.ppnExceptionDesignationCode }}'
+      taxRegistrationNumberType: '{{ response.taxRegistration.additionalTaxInformation.indonesiaAdditionalInfo.taxRegistrationNumberType }}'
+      customerType: '{{ response.taxRegistration.additionalTaxInformation.israelAdditionalInfo.customerType }}'
+      dealerType: '{{ response.taxRegistration.additionalTaxInformation.israelAdditionalInfo.dealerType }}'
+      cigNumber: '{{ response.taxRegistration.additionalTaxInformation.italyAdditionalInfo.cigNumber }}'
+      cupNumber: '{{ response.taxRegistration.additionalTaxInformation.italyAdditionalInfo.cupNumber }}'
+      sdiAccountId: '{{ response.taxRegistration.additionalTaxInformation.italyAdditionalInfo.sdiAccountId }}'
+      taxCode: '{{ response.taxRegistration.additionalTaxInformation.italyAdditionalInfo.taxCode }}'
+      businessRegistrationNumber: '{{ response.taxRegistration.additionalTaxInformation.malaysiaAdditionalInfo.businessRegistrationNumber }}'
+      taxInformationNumber: '{{ response.taxRegistration.additionalTaxInformation.malaysiaAdditionalInfo.taxInformationNumber }}'
+      individualRegistrationNumber: '{{ response.taxRegistration.additionalTaxInformation.polandAdditionalInfo.individualRegistrationNumber }}'
+      isGroupVatEnabled: '{{ response.taxRegistration.additionalTaxInformation.polandAdditionalInfo.isGroupVatEnabled }}'
+      businessRepresentativeName: '{{ response.taxRegistration.additionalTaxInformation.southKoreaAdditionalInfo.businessRepresentativeName }}'
+      itemOfBusiness: '{{ response.taxRegistration.additionalTaxInformation.southKoreaAdditionalInfo.itemOfBusiness }}'
+      lineOfBusiness: '{{ response.taxRegistration.additionalTaxInformation.southKoreaAdditionalInfo.lineOfBusiness }}'
+      registrationType: '{{ response.taxRegistration.additionalTaxInformation.spainAdditionalInfo.registrationType }}'
+      industries: '{{ response.taxRegistration.additionalTaxInformation.turkeyAdditionalInfo.industries }}'
+      kepEmailId: '{{ response.taxRegistration.additionalTaxInformation.turkeyAdditionalInfo.kepEmailId }}'
+      secondaryTaxId: '{{ response.taxRegistration.additionalTaxInformation.turkeyAdditionalInfo.secondaryTaxId }}'
+      taxOffice: '{{ response.taxRegistration.additionalTaxInformation.turkeyAdditionalInfo.taxOffice }}'
+      ukraineTrnType: '{{ response.taxRegistration.additionalTaxInformation.ukraineAdditionalInfo.ukraineTrnType }}'
+      vatRegistrationNumber: '{{ response.taxRegistration.additionalTaxInformation.uzbekistanAdditionalInfo.vatRegistrationNumber }}'
+      electronicTransactionCodeNumber: '{{ response.taxRegistration.additionalTaxInformation.vietnamAdditionalInfo.electronicTransactionCodeNumber }}'
+      enterpriseIdentificationNumber: '{{ response.taxRegistration.additionalTaxInformation.vietnamAdditionalInfo.enterpriseIdentificationNumber }}'
+      paymentVoucherNumber: '{{ response.taxRegistration.additionalTaxInformation.vietnamAdditionalInfo.paymentVoucherNumber }}'
+      paymentVoucherNumberDate: '{{ response.taxRegistration.additionalTaxInformation.vietnamAdditionalInfo.paymentVoucherNumberDate }}'
+      addressLine1: '{{ response.taxRegistration.legalAddress.addressLine1 }}'
+      addressLine2: '{{ response.taxRegistration.legalAddress.addressLine2 }}'
+      addressLine3: '{{ response.taxRegistration.legalAddress.addressLine3 }}'
+      city: '{{ response.taxRegistration.legalAddress.city }}'
+      countryCode: '{{ response.taxRegistration.legalAddress.countryCode }}'
+      districtOrCounty: '{{ response.taxRegistration.legalAddress.districtOrCounty }}'
+      postalCode: '{{ response.taxRegistration.legalAddress.postalCode }}'
+      stateOrRegion: '{{ response.taxRegistration.legalAddress.stateOrRegion }}'
+      legalName: '{{ response.taxRegistration.legalName }}'
+      registrationId: '{{ response.taxRegistration.registrationId }}'
+      status: '{{ response.taxRegistration.status }}'
+- discovery_id: aws.taxsettings.list_supplemental_tax_registrations
+  calls:
+  - action: list_supplemental_tax_registrations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.taxRegistrations }}'
+    item:
+      address: '{{ item.address }}'
+      authorityId: '{{ item.authorityId }}'
+      legalName: '{{ item.legalName }}'
+      registrationId: '{{ item.registrationId }}'
+      registrationType: '{{ item.registrationType }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.taxsettings.list_tax_exemptions
+  calls:
+  - action: list_tax_exemptions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      taxExemptionDetailsMap: '{{ response.taxExemptionDetailsMap }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.taxsettings.list_tax_registrations
+  calls:
+  - action: list_tax_registrations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.accountDetails }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      accountMetaData: '{{ item.accountMetaData }}'
+      taxInheritanceDetails: '{{ item.taxInheritanceDetails }}'
+      taxRegistration: '{{ item.taxRegistration }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.taxsettings.get_tax_registration_document
+  calls:
+  - action: get_tax_registration_document
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      destinationFilePath: '{{ response.destinationFilePath }}'
+      presignedS3Url: '{{ response.presignedS3Url }}'

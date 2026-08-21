@@ -1,0 +1,185 @@
+version: '1.0'
+provider: aws
+service: networkfirewall
+discovery:
+- calls:
+  - action: describe_rule_group
+    on_error: continue
+    save_as: response
+  discovery_id: aws.networkfirewall.describe_rule_group
+  emit:
+    as: item
+    item:
+      ReferenceSets: '{{ response.ReferenceSets }}'
+      RuleVariables: '{{ response.RuleVariables }}'
+      RulesSource: '{{ response.RulesSource }}'
+      StatefulRuleOptions: '{{ response.StatefulRuleOptions }}'
+      StatelessRuleGroupReferences: '{{ response.RuleGroupResponse.StatelessRuleGroupReferences
+        }}'
+      StatelessRulesAndCustomActions: '{{ response.RuleGroup.RulesSource.StatelessRulesAndCustomActions
+        }}'
+- calls:
+  - action: describe_rule_group_metadata
+    on_error: continue
+    save_as: response
+  discovery_id: aws.networkfirewall.describe_rule_group_metadata
+  emit:
+    as: item
+    item:
+      Capacity: '{{ response.Capacity }}'
+      ListingName: '{{ response.ListingName }}'
+      ProductId: '{{ response.ProductId }}'
+      RuleGroupArn: '{{ response.RuleGroupArn }}'
+      RuleGroupName: '{{ response.RuleGroupName }}'
+      RuleOrder: '{{ response.RuleOrder }}'
+      Type: '{{ response.Type }}'
+- calls:
+  - action: describe_firewall_policy
+    on_error: continue
+    save_as: response
+  discovery_id: aws.networkfirewall.describe_firewall_policy
+  emit:
+    as: item
+    item:
+      ConsumedStatefulRuleCapacity: '{{ response.ConsumedStatefulRuleCapacity }}'
+      ConsumedStatelessRuleCapacity: '{{ response.ConsumedStatelessRuleCapacity }}'
+      Description: '{{ response.Description }}'
+      EncryptionConfiguration: '{{ response.EncryptionConfiguration }}'
+      FirewallPolicyArn: '{{ response.FirewallPolicyArn }}'
+      FirewallPolicyId: '{{ response.FirewallPolicyId }}'
+      FirewallPolicyName: '{{ response.FirewallPolicyName }}'
+      FirewallPolicyResponse: '{{ response.FirewallPolicyResponse }}'
+      FirewallPolicyStatus: '{{ response.FirewallPolicyStatus }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+      NumberOfAssociations: '{{ response.NumberOfAssociations }}'
+      RuleGroups: '{{ response.FirewallPolicy }}'
+      StatefulRuleGroupReferences: '{{ response.FirewallPolicy.StatefulRuleGroupReferences
+        }}'
+      StatelessDefaultActions: '{{ response.FirewallPolicy.StatelessDefaultActions
+        }}'
+      StatelessFragmentDefaultActions: '{{ response.FirewallPolicy.StatelessFragmentDefaultActions
+        }}'
+      StatelessRuleGroupReferences: '{{ response.FirewallPolicy.StatelessRuleGroupReferences
+        }}'
+      Tags: '{{ response.Tags }}'
+- calls:
+  - action: describe_proxy
+    on_error: continue
+    save_as: response
+  discovery_id: aws.networkfirewall.describe_proxy
+  emit:
+    as: item
+    item:
+      CreateTime: '{{ response.CreateTime }}'
+      DeleteTime: '{{ response.DeleteTime }}'
+      FailureCode: '{{ response.FailureCode }}'
+      FailureMessage: '{{ response.FailureMessage }}'
+      ListenerProperties: '{{ response.ListenerProperties }}'
+      NatGatewayId: '{{ response.NatGatewayId }}'
+      PrivateDNSName: '{{ response.PrivateDNSName }}'
+      Proxy: '{{ response.Proxy }}'
+      ProxyArn: '{{ response.ProxyArn }}'
+      ProxyConfigurationArn: '{{ response.ProxyConfigurationArn }}'
+      ProxyConfigurationName: '{{ response.ProxyConfigurationName }}'
+      ProxyModifyState: '{{ response.ProxyModifyState }}'
+      ProxyName: '{{ response.ProxyName }}'
+      ProxyState: '{{ response.ProxyState }}'
+      Tags: '{{ response.Tags }}'
+      TlsInterceptProperties: '{{ response.TlsInterceptProperties }}'
+      UpdateTime: '{{ response.UpdateTime }}'
+      VpcEndpointServiceName: '{{ response.VpcEndpointServiceName }}'
+- calls:
+  - action: describe_logging_configuration
+    on_error: continue
+    save_as: response
+  discovery_id: aws.networkfirewall.describe_logging_configuration
+  emit:
+    as: item
+    item:
+      EnableMonitoringDashboard: '{{ response.EnableMonitoringDashboard }}'
+      LogDestinationConfigs: '{{ response.LogDestinationConfigs }}'
+      LoggingConfiguration: '{{ response.LoggingConfiguration }}'
+- calls:
+  - action: describe_proxy_rule_group
+    on_error: continue
+    save_as: response
+  discovery_id: aws.networkfirewall.describe_proxy_rule_group
+  emit:
+    as: item
+    item:
+      CreateTime: '{{ response.CreateTime }}'
+      DeleteTime: '{{ response.DeleteTime }}'
+      Description: '{{ response.Description }}'
+      ProxyRuleGroup: '{{ response.ProxyRuleGroup }}'
+      ProxyRuleGroupArn: '{{ response.ProxyRuleGroupArn }}'
+      ProxyRuleGroupName: '{{ response.ProxyRuleGroupName }}'
+      Rules: '{{ response.Rules }}'
+      Tags: '{{ response.Tags }}'
+- calls:
+  - action: describe_firewall
+    on_error: continue
+    save_as: response
+  discovery_id: aws.networkfirewall.describe_firewall
+  emit:
+    as: item
+    item:
+      Age: '{{ response.Age }}'
+      AvailabilityZone: '{{ response.AvailabilityZone }}'
+      AvailabilityZoneChangeProtection: '{{ response.AvailabilityZoneChangeProtection
+        }}'
+      AvailabilityZoneMappings: '{{ response.AvailabilityZoneMappings }}'
+      ByteCount: '{{ response.ByteCount }}'
+      DeleteProtection: '{{ response.DeleteProtection }}'
+      Description: '{{ response.Description }}'
+      DestinationAddress: '{{ response.DestinationAddress }}'
+      DestinationPort: '{{ response.DestinationPort }}'
+      EnabledAnalysisTypes: '{{ response.EnabledAnalysisTypes }}'
+      EncryptionConfiguration: '{{ response.EncryptionConfiguration }}'
+      Firewall: '{{ response.Firewall }}'
+      FirewallArn: '{{ response.FirewallArn }}'
+      FirewallId: '{{ response.FirewallId }}'
+      FirewallName: '{{ response.FirewallName }}'
+      FirewallPolicyArn: '{{ response.FirewallPolicyArn }}'
+      FirewallPolicyChangeProtection: '{{ response.FirewallPolicyChangeProtection
+        }}'
+      FlowFilters: '{{ response.FlowFilters }}'
+      FlowOperation: '{{ response.FlowOperation }}'
+      FlowRequestTimestamp: '{{ response.FlowRequestTimestamp }}'
+      MinimumFlowAgeInSeconds: '{{ response.MinimumFlowAgeInSeconds }}'
+      NumberOfAssociations: '{{ response.NumberOfAssociations }}'
+      PacketCount: '{{ response.PacketCount }}'
+      RuleGroups: '{{ response.FirewallStatus.PolicyAndRuleGroupStatus }}'
+      SourceAddress: '{{ response.SourceAddress }}'
+      SourcePort: '{{ response.SourcePort }}'
+      StatusMessage: '{{ response.StatusMessage }}'
+      SubnetChangeProtection: '{{ response.SubnetChangeProtection }}'
+      SubnetMappings: '{{ response.SubnetMappings }}'
+      SyncStates: '{{ response.FirewallStatus.SyncStates }}'
+      Tags: '{{ response.Tags }}'
+      TransitGatewayId: '{{ response.TransitGatewayId }}'
+      TransitGatewayOwnerAccountId: '{{ response.TransitGatewayOwnerAccountId }}'
+      UpdateToken: '{{ response.UpdateToken }}'
+      VpcEndpointId: '{{ response.VpcEndpointId }}'
+      VpcId: '{{ response.VpcId }}'
+- calls:
+  - action: list_firewalls
+    on_error: continue
+    save_as: response
+  discovery_id: aws.networkfirewall.list_firewalls
+  emit:
+    as: item
+    item:
+      FirewallArn: '{{ response.FirewallArn }}'
+      FirewallName: '{{ response.FirewallName }}'
+      TransitGatewayAttachmentId: '{{ response.TransitGatewayAttachmentId }}'
+- calls:
+  - action: list_rule_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.networkfirewall.list_rule_groups
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Name: '{{ response.Name }}'
+      VendorName: '{{ response.VendorName }}'

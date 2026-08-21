@@ -1,0 +1,173 @@
+version: '1.0'
+provider: aws
+service: servicecatalog-appregistry
+services:
+  client: servicecatalog-appregistry
+  module: boto3.client
+discovery:
+- discovery_id: aws.servicecatalog-appregistry.get_configuration
+  calls:
+  - action: get_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.configuration.Status }}'
+      Enabled: '{{ response.configuration.Enabled }}'
+      configuration: '{{ response.configuration.configuration }}'
+      tagQueryConfiguration: '{{ response.configuration.tagQueryConfiguration.tagKey }}'
+      tagKey: '{{ response.configuration.tagQueryConfiguration.tagKey }}'
+- discovery_id: aws.servicecatalog-appregistry.list_applications
+  calls:
+  - action: list_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.applications }}'
+    item:
+      arn: '{{ item.arn }}'
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      integrations: '{{ item.integrations }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.servicecatalog-appregistry.list_attribute_groups
+  calls:
+  - action: list_attribute_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.attributeGroups }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdBy: '{{ item.createdBy }}'
+      creationTime: '{{ item.creationTime }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.servicecatalog-appregistry.get_application
+  for_each: aws.servicecatalog-appregistry.list_applications
+  calls:
+  - action: get_application
+    params:
+      application: '{{ item.application }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      applicationTagResourceGroup: '{{ response.integrations.applicationTagResourceGroup.arn }}'
+      integrations: '{{ response.integrations.integrations }}'
+      resourceGroup: '{{ response.integrations.resourceGroup.arn }}'
+      applicationTag: '{{ response.applicationTag }}'
+      arn: '{{ response.arn }}'
+      associatedResourceCount: '{{ response.associatedResourceCount }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      errorMessage: '{{ response.integrations.applicationTagResourceGroup.errorMessage }}'
+      state: '{{ response.integrations.applicationTagResourceGroup.state }}'
+      lastUpdateTime: '{{ response.lastUpdateTime }}'
+      name: '{{ response.name }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.servicecatalog-appregistry.get_associated_resource
+  for_each: aws.servicecatalog-appregistry.list_applications
+  calls:
+  - action: get_associated_resource
+    params:
+      application: '{{ item.application }}'
+      resourceType: '{{ item.resourceType }}'
+      resource: '{{ item.resource }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.options }}'
+    item:
+      resource: '{{ item.resource }}'
+      applicationTagStatus: '{{ response.applicationTagResult.applicationTagStatus }}'
+      errorMessage: '{{ response.applicationTagResult.errorMessage }}'
+      nextToken: '{{ response.applicationTagResult.nextToken }}'
+      arn: '{{ response.resource.arn }}'
+      associationTime: '{{ response.resource.associationTime }}'
+      state: '{{ response.resource.integrations.resourceGroup.state }}'
+      name: '{{ response.resource.name }}'
+- discovery_id: aws.servicecatalog-appregistry.get_attribute_group
+  calls:
+  - action: get_attribute_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.arn }}'
+      attributes: '{{ response.attributes }}'
+      createdBy: '{{ response.createdBy }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      lastUpdateTime: '{{ response.lastUpdateTime }}'
+      name: '{{ response.name }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.servicecatalog-appregistry.list_associated_attribute_groups
+  calls:
+  - action: list_associated_attribute_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.attributeGroups }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.servicecatalog-appregistry.list_associated_resources
+  for_each: aws.servicecatalog-appregistry.list_applications
+  calls:
+  - action: list_associated_resources
+    params:
+      application: '{{ item.application }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.resources }}'
+    item:
+      arn: '{{ item.arn }}'
+      name: '{{ item.name }}'
+      options: '{{ item.options }}'
+      resource: '{{ item.resource }}'
+      resourceDetails: '{{ item.resourceDetails }}'
+      resourceType: '{{ item.resourceType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.servicecatalog-appregistry.list_attribute_groups_for_application
+  for_each: aws.servicecatalog-appregistry.list_applications
+  calls:
+  - action: list_attribute_groups_for_application
+    params:
+      application: '{{ item.application }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.attributeGroupsDetails }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdBy: '{{ item.createdBy }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.servicecatalog-appregistry.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

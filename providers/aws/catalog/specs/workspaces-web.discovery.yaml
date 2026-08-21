@@ -1,0 +1,457 @@
+version: '1.0'
+provider: aws
+service: workspaces-web
+services:
+  client: workspaces-web
+  module: boto3.client
+discovery:
+- discovery_id: aws.workspaces-web.list_browser_settings
+  calls:
+  - action: list_browser_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.browserSettings }}'
+    item:
+      browserSettings: '{{ item.browserSettings }}'
+      browserSettingsArn: '{{ item.browserSettingsArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.workspaces-web.list_data_protection_settings
+  calls:
+  - action: list_data_protection_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dataProtectionSettings }}'
+    item:
+      creationDate: '{{ item.creationDate }}'
+      dataProtectionSettings: '{{ item.dataProtectionSettings }}'
+      dataProtectionSettingsArn: '{{ item.dataProtectionSettingsArn }}'
+      description: '{{ item.description }}'
+      displayName: '{{ item.displayName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.workspaces-web.list_ip_access_settings
+  calls:
+  - action: list_ip_access_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ipAccessSettings }}'
+    item:
+      creationDate: '{{ item.creationDate }}'
+      description: '{{ item.description }}'
+      displayName: '{{ item.displayName }}'
+      ipAccessSettings: '{{ item.ipAccessSettings }}'
+      ipAccessSettingsArn: '{{ item.ipAccessSettingsArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.workspaces-web.list_network_settings
+  calls:
+  - action: list_network_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.networkSettings }}'
+    item:
+      networkSettings: '{{ item.networkSettings }}'
+      networkSettingsArn: '{{ item.networkSettingsArn }}'
+      vpcId: '{{ item.vpcId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.workspaces-web.list_portals
+  calls:
+  - action: list_portals
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.portals }}'
+    item:
+      authenticationType: '{{ item.authenticationType }}'
+      browserSettingsArn: '{{ item.browserSettingsArn }}'
+      browserType: '{{ item.browserType }}'
+      creationDate: '{{ item.creationDate }}'
+      dataProtectionSettingsArn: '{{ item.dataProtectionSettingsArn }}'
+      displayName: '{{ item.displayName }}'
+      instanceType: '{{ item.instanceType }}'
+      ipAccessSettingsArn: '{{ item.ipAccessSettingsArn }}'
+      maxConcurrentSessions: '{{ item.maxConcurrentSessions }}'
+      networkSettingsArn: '{{ item.networkSettingsArn }}'
+      portal: '{{ item.portal }}'
+      portalArn: '{{ item.portalArn }}'
+      portalEndpoint: '{{ item.portalEndpoint }}'
+      portalStatus: '{{ item.portalStatus }}'
+      rendererType: '{{ item.rendererType }}'
+      sessionLoggerArn: '{{ item.sessionLoggerArn }}'
+      trustStoreArn: '{{ item.trustStoreArn }}'
+      userAccessLoggingSettingsArn: '{{ item.userAccessLoggingSettingsArn }}'
+      userSettingsArn: '{{ item.userSettingsArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.workspaces-web.list_session_loggers
+  calls:
+  - action: list_session_loggers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.sessionLoggers }}'
+    item:
+      Status: '{{ item.Status }}'
+      creationDate: '{{ item.creationDate }}'
+      displayName: '{{ item.displayName }}'
+      logConfiguration: '{{ item.logConfiguration }}'
+      session: '{{ item.session }}'
+      sessionLoggerArn: '{{ item.sessionLoggerArn }}'
+- discovery_id: aws.workspaces-web.list_trust_stores
+  calls:
+  - action: list_trust_stores
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.trustStores }}'
+    item:
+      trustStoreArn: '{{ item.trustStoreArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.workspaces-web.list_user_access_logging_settings
+  calls:
+  - action: list_user_access_logging_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.userAccessLoggingSettings }}'
+    item:
+      kinesisStreamArn: '{{ item.kinesisStreamArn }}'
+      userAccessLoggingSettings: '{{ item.userAccessLoggingSettings }}'
+      userAccessLoggingSettingsArn: '{{ item.userAccessLoggingSettingsArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.workspaces-web.list_user_settings
+  calls:
+  - action: list_user_settings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.userSettings }}'
+    item:
+      cookieSynchronizationConfiguration: '{{ item.cookieSynchronizationConfiguration }}'
+      copyAllowed: '{{ item.copyAllowed }}'
+      deepLinkAllowed: '{{ item.deepLinkAllowed }}'
+      disconnectTimeoutInMinutes: '{{ item.disconnectTimeoutInMinutes }}'
+      downloadAllowed: '{{ item.downloadAllowed }}'
+      idleDisconnectTimeoutInMinutes: '{{ item.idleDisconnectTimeoutInMinutes }}'
+      pasteAllowed: '{{ item.pasteAllowed }}'
+      printAllowed: '{{ item.printAllowed }}'
+      toolbarConfiguration: '{{ item.toolbarConfiguration }}'
+      uploadAllowed: '{{ item.uploadAllowed }}'
+      userSettings: '{{ item.userSettings }}'
+      userSettingsArn: '{{ item.userSettingsArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.workspaces-web.get_browser_settings
+  for_each: aws.workspaces-web.list_browser_settings
+  calls:
+  - action: get_browser_settings
+    params:
+      browserSettingsArn: '{{ item.browserSettingsArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Statement: '{{ response.browserSettings.Statement }}'
+      Version: '{{ response.browserSettings.Version }}'
+      additionalEncryptionContext: '{{ response.browserSettings.additionalEncryptionContext }}'
+      associatedPortalArns: '{{ response.browserSettings.associatedPortalArns }}'
+      browserPolicy: '{{ response.browserSettings.browserPolicy }}'
+      browserSettingsArn: '{{ response.browserSettings.browserSettingsArn }}'
+      customerManagedKey: '{{ response.browserSettings.customerManagedKey }}'
+      webContentFilteringPolicy: '{{ response.browserSettings.webContentFilteringPolicy }}'
+- discovery_id: aws.workspaces-web.get_data_protection_settings
+  for_each: aws.workspaces-web.list_data_protection_settings
+  calls:
+  - action: get_data_protection_settings
+    params:
+      dataProtectionSettingsArn: '{{ item.dataProtectionSettingsArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      additionalEncryptionContext: '{{ response.dataProtectionSettings.additionalEncryptionContext }}'
+      associatedPortalArns: '{{ response.dataProtectionSettings.associatedPortalArns }}'
+      creationDate: '{{ response.dataProtectionSettings.creationDate }}'
+      customerManagedKey: '{{ response.dataProtectionSettings.customerManagedKey }}'
+      dataProtectionSettingsArn: '{{ response.dataProtectionSettings.dataProtectionSettingsArn }}'
+      description: '{{ response.dataProtectionSettings.description }}'
+      displayName: '{{ response.dataProtectionSettings.displayName }}'
+      inlineRedactionConfiguration: '{{ response.dataProtectionSettings.inlineRedactionConfiguration }}'
+      globalConfidenceLevel: '{{ response.dataProtectionSettings.inlineRedactionConfiguration.globalConfidenceLevel }}'
+- discovery_id: aws.workspaces-web.get_identity_provider
+  calls:
+  - action: get_identity_provider
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      identityProviderArn: '{{ response.identityProvider.identityProviderArn }}'
+      identityProviderDetails: '{{ response.identityProvider.identityProviderDetails }}'
+      identityProviderName: '{{ response.identityProvider.identityProviderName }}'
+      identityProviderType: '{{ response.identityProvider.identityProviderType }}'
+- discovery_id: aws.workspaces-web.get_ip_access_settings
+  for_each: aws.workspaces-web.list_ip_access_settings
+  calls:
+  - action: get_ip_access_settings
+    params:
+      ipAccessSettingsArn: '{{ item.ipAccessSettingsArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      additionalEncryptionContext: '{{ response.ipAccessSettings.additionalEncryptionContext }}'
+      associatedPortalArns: '{{ response.ipAccessSettings.associatedPortalArns }}'
+      creationDate: '{{ response.ipAccessSettings.creationDate }}'
+      customerManagedKey: '{{ response.ipAccessSettings.customerManagedKey }}'
+      description: '{{ response.ipAccessSettings.description }}'
+      displayName: '{{ response.ipAccessSettings.displayName }}'
+      ipAccessSettingsArn: '{{ response.ipAccessSettings.ipAccessSettingsArn }}'
+      ipRules: '{{ response.ipAccessSettings.ipRules }}'
+- discovery_id: aws.workspaces-web.get_network_settings
+  for_each: aws.workspaces-web.list_network_settings
+  calls:
+  - action: get_network_settings
+    params:
+      networkSettingsArn: '{{ item.networkSettingsArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      associatedPortalArns: '{{ response.networkSettings.associatedPortalArns }}'
+      networkSettingsArn: '{{ response.networkSettings.networkSettingsArn }}'
+      securityGroupIds: '{{ response.networkSettings.securityGroupIds }}'
+      subnetIds: '{{ response.networkSettings.subnetIds }}'
+      vpcId: '{{ response.networkSettings.vpcId }}'
+- discovery_id: aws.workspaces-web.get_portal
+  for_each: aws.workspaces-web.list_portals
+  calls:
+  - action: get_portal
+    params:
+      portalArn: '{{ item.portalArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      additionalEncryptionContext: '{{ response.portal.additionalEncryptionContext }}'
+      authenticationType: '{{ response.portal.authenticationType }}'
+      browserSettingsArn: '{{ response.portal.browserSettingsArn }}'
+      browserType: '{{ response.portal.browserType }}'
+      creationDate: '{{ response.portal.creationDate }}'
+      customerManagedKey: '{{ response.portal.customerManagedKey }}'
+      dataProtectionSettingsArn: '{{ response.portal.dataProtectionSettingsArn }}'
+      displayName: '{{ response.portal.displayName }}'
+      instanceType: '{{ response.portal.instanceType }}'
+      ipAccessSettingsArn: '{{ response.portal.ipAccessSettingsArn }}'
+      maxConcurrentSessions: '{{ response.portal.maxConcurrentSessions }}'
+      networkSettingsArn: '{{ response.portal.networkSettingsArn }}'
+      portal: '{{ response.portal.portalArn }}'
+      portalArn: '{{ response.portal.portalArn }}'
+      portalEndpoint: '{{ response.portal.portalEndpoint }}'
+      portalStatus: '{{ response.portal.portalStatus }}'
+      rendererType: '{{ response.portal.rendererType }}'
+      sessionLoggerArn: '{{ response.portal.sessionLoggerArn }}'
+      statusReason: '{{ response.portal.statusReason }}'
+      trustStoreArn: '{{ response.portal.trustStoreArn }}'
+      userAccessLoggingSettingsArn: '{{ response.portal.userAccessLoggingSettingsArn }}'
+      userSettingsArn: '{{ response.portal.userSettingsArn }}'
+- discovery_id: aws.workspaces-web.get_portal_service_provider_metadata
+  for_each: aws.workspaces-web.list_portals
+  calls:
+  - action: get_portal_service_provider_metadata
+    params:
+      portalArn: '{{ item.portalArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      portalArn: '{{ response.portalArn }}'
+      serviceProviderSamlMetadata: '{{ response.serviceProviderSamlMetadata }}'
+- discovery_id: aws.workspaces-web.get_session
+  calls:
+  - action: get_session
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      clientIpAddresses: '{{ response.session.clientIpAddresses }}'
+      endTime: '{{ response.session.endTime }}'
+      portalArn: '{{ response.session.portalArn }}'
+      session: '{{ response.session.sessionId }}'
+      sessionId: '{{ response.session.sessionId }}'
+      startTime: '{{ response.session.startTime }}'
+      status: '{{ response.session.status }}'
+      username: '{{ response.session.username }}'
+- discovery_id: aws.workspaces-web.get_session_logger
+  for_each: aws.workspaces-web.list_portals
+  calls:
+  - action: get_session_logger
+    params:
+      sessionLoggerArn: '{{ item.sessionLoggerArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      additionalEncryptionContext: '{{ response.sessionLogger.additionalEncryptionContext }}'
+      associatedPortalArns: '{{ response.sessionLogger.associatedPortalArns }}'
+      creationDate: '{{ response.sessionLogger.creationDate }}'
+      customerManagedKey: '{{ response.sessionLogger.customerManagedKey }}'
+      displayName: '{{ response.sessionLogger.displayName }}'
+      eventFilter: '{{ response.sessionLogger.eventFilter }}'
+      logConfiguration: '{{ response.sessionLogger.logConfiguration }}'
+      sessionLoggerArn: '{{ response.sessionLogger.sessionLoggerArn }}'
+- discovery_id: aws.workspaces-web.get_trust_store
+  for_each: aws.workspaces-web.list_portals
+  calls:
+  - action: get_trust_store
+    params:
+      trustStoreArn: '{{ item.trustStoreArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      associatedPortalArns: '{{ response.trustStore.associatedPortalArns }}'
+      trustStoreArn: '{{ response.trustStore.trustStoreArn }}'
+- discovery_id: aws.workspaces-web.get_trust_store_certificate
+  for_each: aws.workspaces-web.list_portals
+  calls:
+  - action: get_trust_store_certificate
+    params:
+      trustStoreArn: '{{ item.trustStoreArn }}'
+      thumbprint: '{{ item.thumbprint }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      body: '{{ response.certificate.body }}'
+      certificate: '{{ response.certificate.certificate }}'
+      issuer: '{{ response.certificate.issuer }}'
+      notValidAfter: '{{ response.certificate.notValidAfter }}'
+      notValidBefore: '{{ response.certificate.notValidBefore }}'
+      subject: '{{ response.certificate.subject }}'
+      thumbprint: '{{ response.certificate.thumbprint }}'
+      trustStoreArn: '{{ response.trustStoreArn }}'
+- discovery_id: aws.workspaces-web.get_user_access_logging_settings
+  for_each: aws.workspaces-web.list_portals
+  calls:
+  - action: get_user_access_logging_settings
+    params:
+      userAccessLoggingSettingsArn: '{{ item.userAccessLoggingSettingsArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      associatedPortalArns: '{{ response.userAccessLoggingSettings.associatedPortalArns }}'
+      kinesisStreamArn: '{{ response.userAccessLoggingSettings.kinesisStreamArn }}'
+      userAccessLoggingSettingsArn: '{{ response.userAccessLoggingSettings.userAccessLoggingSettingsArn }}'
+- discovery_id: aws.workspaces-web.get_user_settings
+  for_each: aws.workspaces-web.list_portals
+  calls:
+  - action: get_user_settings
+    params:
+      userSettingsArn: '{{ item.userSettingsArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      additionalEncryptionContext: '{{ response.userSettings.additionalEncryptionContext }}'
+      associatedPortalArns: '{{ response.userSettings.associatedPortalArns }}'
+      cookieSynchronizationConfiguration: '{{ response.userSettings.cookieSynchronizationConfiguration }}'
+      copyAllowed: '{{ response.userSettings.copyAllowed }}'
+      customerManagedKey: '{{ response.userSettings.customerManagedKey }}'
+      deepLinkAllowed: '{{ response.userSettings.deepLinkAllowed }}'
+      disconnectTimeoutInMinutes: '{{ response.userSettings.disconnectTimeoutInMinutes }}'
+      downloadAllowed: '{{ response.userSettings.downloadAllowed }}'
+      idleDisconnectTimeoutInMinutes: '{{ response.userSettings.idleDisconnectTimeoutInMinutes }}'
+      pasteAllowed: '{{ response.userSettings.pasteAllowed }}'
+      printAllowed: '{{ response.userSettings.printAllowed }}'
+      toolbarConfiguration: '{{ response.userSettings.toolbarConfiguration.visualMode }}'
+      uploadAllowed: '{{ response.userSettings.uploadAllowed }}'
+      userSettingsArn: '{{ response.userSettings.userSettingsArn }}'
+      maxDisplayResolution: '{{ response.userSettings.toolbarConfiguration.maxDisplayResolution }}'
+      toolbarType: '{{ response.userSettings.toolbarConfiguration.toolbarType }}'
+      visualMode: '{{ response.userSettings.toolbarConfiguration.visualMode }}'
+- discovery_id: aws.workspaces-web.list_identity_providers
+  for_each: aws.workspaces-web.list_portals
+  calls:
+  - action: list_identity_providers
+    params:
+      portalArn: '{{ item.portalArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.identityProviders }}'
+    item:
+      identityProviderArn: '{{ item.identityProviderArn }}'
+      identityProviderName: '{{ item.identityProviderName }}'
+      identityProviderType: '{{ item.identityProviderType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.workspaces-web.list_sessions
+  calls:
+  - action: list_sessions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.sessions }}'
+    item:
+      endTime: '{{ item.endTime }}'
+      portalArn: '{{ item.portalArn }}'
+      sessionId: '{{ item.sessionId }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      username: '{{ item.username }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.workspaces-web.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.workspaces-web.list_trust_store_certificates
+  for_each: aws.workspaces-web.list_portals
+  calls:
+  - action: list_trust_store_certificates
+    params:
+      trustStoreArn: '{{ item.trustStoreArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.certificateList }}'
+    item:
+      certificate: '{{ item.certificate }}'
+      issuer: '{{ item.issuer }}'
+      notValidAfter: '{{ item.notValidAfter }}'
+      notValidBefore: '{{ item.notValidBefore }}'
+      subject: '{{ item.subject }}'
+      thumbprint: '{{ item.thumbprint }}'
+      nextToken: '{{ response.nextToken }}'
+      trustStoreArn: '{{ response.trustStoreArn }}'

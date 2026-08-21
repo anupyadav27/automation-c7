@@ -1,0 +1,469 @@
+version: '1.0'
+provider: aws
+service: es
+services:
+  client: es
+  module: boto3.client
+discovery:
+- discovery_id: aws.es.describe_inbound_cross_cluster_search_connections
+  calls:
+  - action: describe_inbound_cross_cluster_search_connections
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CrossClusterSearchConnections }}'
+    item:
+      ConnectionStatus: '{{ item.ConnectionStatus }}'
+      CrossClusterSearchConnectionId: '{{ item.CrossClusterSearchConnectionId }}'
+      CrossClusterSearchConnections: '{{ item.CrossClusterSearchConnections }}'
+      DestinationDomainInfo: '{{ item.DestinationDomainInfo }}'
+      SourceDomainInfo: '{{ item.SourceDomainInfo }}'
+- discovery_id: aws.es.describe_outbound_cross_cluster_search_connections
+  calls:
+  - action: describe_outbound_cross_cluster_search_connections
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CrossClusterSearchConnections }}'
+    item:
+      ConnectionAlias: '{{ item.ConnectionAlias }}'
+      ConnectionStatus: '{{ item.ConnectionStatus }}'
+      CrossClusterSearchConnectionId: '{{ item.CrossClusterSearchConnectionId }}'
+      DestinationDomainInfo: '{{ item.DestinationDomainInfo }}'
+      SourceDomainInfo: '{{ item.SourceDomainInfo }}'
+- discovery_id: aws.es.describe_reserved_elasticsearch_instance_offerings
+  calls:
+  - action: describe_reserved_elasticsearch_instance_offerings
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ReservedElasticsearchInstanceOfferings }}'
+    item:
+      CurrencyCode: '{{ item.CurrencyCode }}'
+      Duration: '{{ item.Duration }}'
+      ElasticsearchInstanceType: '{{ item.ElasticsearchInstanceType }}'
+      FixedPrice: '{{ item.FixedPrice }}'
+      PaymentOption: '{{ item.PaymentOption }}'
+      RecurringCharges: '{{ item.RecurringCharges }}'
+      ReservedElasticsearchInstanceOfferingId: '{{ item.ReservedElasticsearchInstanceOfferingId }}'
+      ReservedElasticsearchInstanceOfferings: '{{ item.ReservedElasticsearchInstanceOfferings[].Duration }}'
+      UsagePrice: '{{ item.UsagePrice }}'
+- discovery_id: aws.es.describe_reserved_elasticsearch_instances
+  calls:
+  - action: describe_reserved_elasticsearch_instances
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ReservedElasticsearchInstances }}'
+    item:
+      State: '{{ item.State }}'
+      CurrencyCode: '{{ item.CurrencyCode }}'
+      Duration: '{{ item.Duration }}'
+      ElasticsearchInstanceCount: '{{ item.ElasticsearchInstanceCount }}'
+      ElasticsearchInstanceType: '{{ item.ElasticsearchInstanceType }}'
+      FixedPrice: '{{ item.FixedPrice }}'
+      PaymentOption: '{{ item.PaymentOption }}'
+      RecurringCharges: '{{ item.RecurringCharges }}'
+      ReservationName: '{{ item.ReservationName }}'
+      ReservedElasticsearchInstanceId: '{{ item.ReservedElasticsearchInstanceId }}'
+      ReservedElasticsearchInstanceOfferingId: '{{ item.ReservedElasticsearchInstanceOfferingId }}'
+      ReservedElasticsearchInstances: '{{ item.ReservedElasticsearchInstances[].State }}'
+      StartTime: '{{ item.StartTime }}'
+      UsagePrice: '{{ item.UsagePrice }}'
+- discovery_id: aws.es.list_domain_names
+  calls:
+  - action: list_domain_names
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DomainNames }}'
+    item:
+      DomainName: '{{ item.DomainName }}'
+      EngineType: '{{ item.EngineType }}'
+- discovery_id: aws.es.list_elasticsearch_versions
+  calls:
+  - action: list_elasticsearch_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ElasticsearchVersions }}'
+- discovery_id: aws.es.list_vpc_endpoints
+  calls:
+  - action: list_vpc_endpoints
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VpcEndpointSummaryList }}'
+    item:
+      Status: '{{ item.Status }}'
+      DomainArn: '{{ item.DomainArn }}'
+      VpcEndpointId: '{{ item.VpcEndpointId }}'
+      VpcEndpointOwner: '{{ item.VpcEndpointOwner }}'
+- discovery_id: aws.es.describe_domain_auto_tunes
+  for_each: aws.es.list_domain_names
+  calls:
+  - action: describe_domain_auto_tunes
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AutoTunes }}'
+    item:
+      AutoTuneDetails: '{{ item.AutoTuneDetails }}'
+      AutoTuneType: '{{ item.AutoTuneType }}'
+- discovery_id: aws.es.describe_domain_change_progress
+  for_each: aws.es.list_domain_names
+  calls:
+  - action: describe_domain_change_progress
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.ChangeProgressStatus.Status }}'
+      ChangeId: '{{ response.ChangeProgressStatus.ChangeId }}'
+      ChangeProgressStages: '{{ response.ChangeProgressStatus.ChangeProgressStages[].Name }}'
+      CompletedProperties: '{{ response.ChangeProgressStatus.CompletedProperties }}'
+      ConfigChangeStatus: '{{ response.ChangeProgressStatus.ConfigChangeStatus }}'
+      InitiatedBy: '{{ response.ChangeProgressStatus.InitiatedBy }}'
+      LastUpdatedTime: '{{ response.ChangeProgressStatus.LastUpdatedTime }}'
+      PendingProperties: '{{ response.ChangeProgressStatus.PendingProperties }}'
+      StartTime: '{{ response.ChangeProgressStatus.StartTime }}'
+      TotalNumberOfStages: '{{ response.ChangeProgressStatus.TotalNumberOfStages }}'
+- discovery_id: aws.es.describe_elasticsearch_domain
+  for_each: aws.es.list_domain_names
+  calls:
+  - action: describe_elasticsearch_domain
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ARN: '{{ response.DomainStatus.ARN }}'
+      AccessPolicies: '{{ response.DomainStatus.AccessPolicies }}'
+      AdvancedOptions: '{{ response.DomainStatus.AdvancedOptions }}'
+      AdvancedSecurityOptions: '{{ response.DomainStatus.AdvancedSecurityOptions.Enabled }}'
+      AutoTuneOptions: '{{ response.DomainStatus.AutoTuneOptions.State }}'
+      ChangeProgressDetails: '{{ response.DomainStatus.ChangeProgressDetails.Message }}'
+      CognitoOptions: '{{ response.DomainStatus.CognitoOptions.RoleArn }}'
+      Created: '{{ response.DomainStatus.Created }}'
+      Deleted: '{{ response.DomainStatus.Deleted }}'
+      DomainEndpointOptions: '{{ response.DomainStatus.DomainEndpointOptions }}'
+      DomainId: '{{ response.DomainStatus.DomainId }}'
+      DomainName: '{{ response.DomainStatus.DomainName }}'
+      DomainProcessingStatus: '{{ response.DomainStatus.DomainProcessingStatus }}'
+      EBSOptions: '{{ response.DomainStatus.EBSOptions.Iops }}'
+      ElasticsearchClusterConfig: '{{ response.DomainStatus.ElasticsearchClusterConfig.WarmType }}'
+      ElasticsearchVersion: '{{ response.DomainStatus.ElasticsearchVersion }}'
+      EncryptionAtRestOptions: '{{ response.DomainStatus.EncryptionAtRestOptions.Enabled }}'
+      Endpoint: '{{ response.DomainStatus.Endpoint }}'
+      Endpoints: '{{ response.DomainStatus.Endpoints }}'
+      LogPublishingOptions: '{{ response.DomainStatus.LogPublishingOptions }}'
+      ModifyingProperties: '{{ response.DomainStatus.ModifyingProperties[].Name }}'
+      NodeToNodeEncryptionOptions: '{{ response.DomainStatus.NodeToNodeEncryptionOptions.Enabled }}'
+      Processing: '{{ response.DomainStatus.Processing }}'
+      ServiceSoftwareOptions: '{{ response.DomainStatus.ServiceSoftwareOptions.NewVersion }}'
+      SnapshotOptions: '{{ response.DomainStatus.SnapshotOptions }}'
+      UpgradeProcessing: '{{ response.DomainStatus.UpgradeProcessing }}'
+      VPCOptions: '{{ response.DomainStatus.VPCOptions.VPCId }}'
+      AnonymousAuthDisableDate: '{{ response.DomainStatus.AdvancedSecurityOptions.AnonymousAuthDisableDate }}'
+      AnonymousAuthEnabled: '{{ response.DomainStatus.AdvancedSecurityOptions.AnonymousAuthEnabled }}'
+      Enabled: '{{ response.DomainStatus.AdvancedSecurityOptions.Enabled }}'
+      InternalUserDatabaseEnabled: '{{ response.DomainStatus.AdvancedSecurityOptions.InternalUserDatabaseEnabled }}'
+      EntityId: '{{ response.DomainStatus.AdvancedSecurityOptions.SAMLOptions.Idp.EntityId }}'
+      MetadataContent: '{{ response.DomainStatus.AdvancedSecurityOptions.SAMLOptions.Idp.MetadataContent }}'
+      RolesKey: '{{ response.DomainStatus.AdvancedSecurityOptions.SAMLOptions.RolesKey }}'
+      SessionTimeoutMinutes: '{{ response.DomainStatus.AdvancedSecurityOptions.SAMLOptions.SessionTimeoutMinutes }}'
+      SubjectKey: '{{ response.DomainStatus.AdvancedSecurityOptions.SAMLOptions.SubjectKey }}'
+      ErrorMessage: '{{ response.DomainStatus.AutoTuneOptions.ErrorMessage }}'
+      State: '{{ response.DomainStatus.AutoTuneOptions.State }}'
+      ChangeId: '{{ response.DomainStatus.ChangeProgressDetails.ChangeId }}'
+      ConfigChangeStatus: '{{ response.DomainStatus.ChangeProgressDetails.ConfigChangeStatus }}'
+      InitiatedBy: '{{ response.DomainStatus.ChangeProgressDetails.InitiatedBy }}'
+      LastUpdatedTime: '{{ response.DomainStatus.ChangeProgressDetails.LastUpdatedTime }}'
+      Message: '{{ response.DomainStatus.ChangeProgressDetails.Message }}'
+      StartTime: '{{ response.DomainStatus.ChangeProgressDetails.StartTime }}'
+      IdentityPoolId: '{{ response.DomainStatus.CognitoOptions.IdentityPoolId }}'
+      RoleArn: '{{ response.DomainStatus.CognitoOptions.RoleArn }}'
+      UserPoolId: '{{ response.DomainStatus.CognitoOptions.UserPoolId }}'
+      CustomEndpoint: '{{ response.DomainStatus.DomainEndpointOptions.CustomEndpoint }}'
+      CustomEndpointCertificateArn: '{{ response.DomainStatus.DomainEndpointOptions.CustomEndpointCertificateArn }}'
+      CustomEndpointEnabled: '{{ response.DomainStatus.DomainEndpointOptions.CustomEndpointEnabled }}'
+      EnforceHTTPS: '{{ response.DomainStatus.DomainEndpointOptions.EnforceHTTPS }}'
+      TLSSecurityPolicy: '{{ response.DomainStatus.DomainEndpointOptions.TLSSecurityPolicy }}'
+      EBSEnabled: '{{ response.DomainStatus.EBSOptions.EBSEnabled }}'
+      Iops: '{{ response.DomainStatus.EBSOptions.Iops }}'
+      Throughput: '{{ response.DomainStatus.EBSOptions.Throughput }}'
+      VolumeSize: '{{ response.DomainStatus.EBSOptions.VolumeSize }}'
+      VolumeType: '{{ response.DomainStatus.EBSOptions.VolumeType }}'
+      DedicatedMasterCount: '{{ response.DomainStatus.ElasticsearchClusterConfig.DedicatedMasterCount }}'
+      DedicatedMasterEnabled: '{{ response.DomainStatus.ElasticsearchClusterConfig.DedicatedMasterEnabled }}'
+      DedicatedMasterType: '{{ response.DomainStatus.ElasticsearchClusterConfig.DedicatedMasterType }}'
+      InstanceCount: '{{ response.DomainStatus.ElasticsearchClusterConfig.InstanceCount }}'
+      InstanceType: '{{ response.DomainStatus.ElasticsearchClusterConfig.InstanceType }}'
+      WarmCount: '{{ response.DomainStatus.ElasticsearchClusterConfig.WarmCount }}'
+      WarmEnabled: '{{ response.DomainStatus.ElasticsearchClusterConfig.WarmEnabled }}'
+      WarmType: '{{ response.DomainStatus.ElasticsearchClusterConfig.WarmType }}'
+      AvailabilityZoneCount: '{{ response.DomainStatus.ElasticsearchClusterConfig.ZoneAwarenessConfig.AvailabilityZoneCount }}'
+      ZoneAwarenessEnabled: '{{ response.DomainStatus.ElasticsearchClusterConfig.ZoneAwarenessEnabled }}'
+      KmsKeyId: '{{ response.DomainStatus.EncryptionAtRestOptions.KmsKeyId }}'
+      AutomatedUpdateDate: '{{ response.DomainStatus.ServiceSoftwareOptions.AutomatedUpdateDate }}'
+      Cancellable: '{{ response.DomainStatus.ServiceSoftwareOptions.Cancellable }}'
+      CurrentVersion: '{{ response.DomainStatus.ServiceSoftwareOptions.CurrentVersion }}'
+      Description: '{{ response.DomainStatus.ServiceSoftwareOptions.Description }}'
+      NewVersion: '{{ response.DomainStatus.ServiceSoftwareOptions.NewVersion }}'
+      OptionalDeployment: '{{ response.DomainStatus.ServiceSoftwareOptions.OptionalDeployment }}'
+      UpdateAvailable: '{{ response.DomainStatus.ServiceSoftwareOptions.UpdateAvailable }}'
+      UpdateStatus: '{{ response.DomainStatus.ServiceSoftwareOptions.UpdateStatus }}'
+      AutomatedSnapshotStartHour: '{{ response.DomainStatus.SnapshotOptions.AutomatedSnapshotStartHour }}'
+      VPCId: '{{ response.DomainStatus.VPCOptions.VPCId }}'
+- discovery_id: aws.es.describe_elasticsearch_domain_config
+  for_each: aws.es.list_domain_names
+  calls:
+  - action: describe_elasticsearch_domain_config
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccessPolicies: '{{ response.DomainConfig.AccessPolicies.Options }}'
+      AdvancedOptions: '{{ response.DomainConfig.AdvancedOptions.Options }}'
+      AdvancedSecurityOptions: '{{ response.DomainConfig.AdvancedSecurityOptions }}'
+      AutoTuneOptions: '{{ response.DomainConfig.AutoTuneOptions }}'
+      ChangeProgressDetails: '{{ response.DomainConfig.ChangeProgressDetails.Message }}'
+      CognitoOptions: '{{ response.DomainConfig.CognitoOptions }}'
+      DomainEndpointOptions: '{{ response.DomainConfig.DomainEndpointOptions }}'
+      EBSOptions: '{{ response.DomainConfig.EBSOptions }}'
+      ElasticsearchClusterConfig: '{{ response.DomainConfig.ElasticsearchClusterConfig.Status.State }}'
+      ElasticsearchVersion: '{{ response.DomainConfig.ElasticsearchVersion.Options }}'
+      EncryptionAtRestOptions: '{{ response.DomainConfig.EncryptionAtRestOptions }}'
+      LogPublishingOptions: '{{ response.DomainConfig.LogPublishingOptions.Options }}'
+      ModifyingProperties: '{{ response.DomainConfig.ModifyingProperties[].Name }}'
+      NodeToNodeEncryptionOptions: '{{ response.DomainConfig.NodeToNodeEncryptionOptions.Status.State }}'
+      SnapshotOptions: '{{ response.DomainConfig.SnapshotOptions }}'
+      VPCOptions: '{{ response.DomainConfig.VPCOptions }}'
+      Options: '{{ response.DomainConfig.AccessPolicies.Options }}'
+      CreationDate: '{{ response.DomainConfig.AccessPolicies.Status.CreationDate }}'
+      PendingDeletion: '{{ response.DomainConfig.AccessPolicies.Status.PendingDeletion }}'
+      State: '{{ response.DomainConfig.AccessPolicies.Status.State }}'
+      UpdateDate: '{{ response.DomainConfig.AccessPolicies.Status.UpdateDate }}'
+      UpdateVersion: '{{ response.DomainConfig.AccessPolicies.Status.UpdateVersion }}'
+      AnonymousAuthDisableDate: '{{ response.DomainConfig.AdvancedSecurityOptions.Options.AnonymousAuthDisableDate }}'
+      AnonymousAuthEnabled: '{{ response.DomainConfig.AdvancedSecurityOptions.Options.AnonymousAuthEnabled }}'
+      Enabled: '{{ response.DomainConfig.AdvancedSecurityOptions.Options.Enabled }}'
+      InternalUserDatabaseEnabled: '{{ response.DomainConfig.AdvancedSecurityOptions.Options.InternalUserDatabaseEnabled }}'
+      RolesKey: '{{ response.DomainConfig.AdvancedSecurityOptions.Options.SAMLOptions.RolesKey }}'
+      SessionTimeoutMinutes: '{{ response.DomainConfig.AdvancedSecurityOptions.Options.SAMLOptions.SessionTimeoutMinutes }}'
+      SubjectKey: '{{ response.DomainConfig.AdvancedSecurityOptions.Options.SAMLOptions.SubjectKey }}'
+      DesiredState: '{{ response.DomainConfig.AutoTuneOptions.Options.DesiredState }}'
+      RollbackOnDisable: '{{ response.DomainConfig.AutoTuneOptions.Options.RollbackOnDisable }}'
+      ErrorMessage: '{{ response.DomainConfig.AutoTuneOptions.Status.ErrorMessage }}'
+      ChangeId: '{{ response.DomainConfig.ChangeProgressDetails.ChangeId }}'
+      ConfigChangeStatus: '{{ response.DomainConfig.ChangeProgressDetails.ConfigChangeStatus }}'
+      InitiatedBy: '{{ response.DomainConfig.ChangeProgressDetails.InitiatedBy }}'
+      LastUpdatedTime: '{{ response.DomainConfig.ChangeProgressDetails.LastUpdatedTime }}'
+      Message: '{{ response.DomainConfig.ChangeProgressDetails.Message }}'
+      StartTime: '{{ response.DomainConfig.ChangeProgressDetails.StartTime }}'
+      IdentityPoolId: '{{ response.DomainConfig.CognitoOptions.Options.IdentityPoolId }}'
+      RoleArn: '{{ response.DomainConfig.CognitoOptions.Options.RoleArn }}'
+      UserPoolId: '{{ response.DomainConfig.CognitoOptions.Options.UserPoolId }}'
+      CustomEndpoint: '{{ response.DomainConfig.DomainEndpointOptions.Options.CustomEndpoint }}'
+      CustomEndpointCertificateArn: '{{ response.DomainConfig.DomainEndpointOptions.Options.CustomEndpointCertificateArn }}'
+      CustomEndpointEnabled: '{{ response.DomainConfig.DomainEndpointOptions.Options.CustomEndpointEnabled }}'
+      EnforceHTTPS: '{{ response.DomainConfig.DomainEndpointOptions.Options.EnforceHTTPS }}'
+      TLSSecurityPolicy: '{{ response.DomainConfig.DomainEndpointOptions.Options.TLSSecurityPolicy }}'
+      EBSEnabled: '{{ response.DomainConfig.EBSOptions.Options.EBSEnabled }}'
+      Iops: '{{ response.DomainConfig.EBSOptions.Options.Iops }}'
+      Throughput: '{{ response.DomainConfig.EBSOptions.Options.Throughput }}'
+      VolumeSize: '{{ response.DomainConfig.EBSOptions.Options.VolumeSize }}'
+      VolumeType: '{{ response.DomainConfig.EBSOptions.Options.VolumeType }}'
+      DedicatedMasterCount: '{{ response.DomainConfig.ElasticsearchClusterConfig.Options.DedicatedMasterCount }}'
+      DedicatedMasterEnabled: '{{ response.DomainConfig.ElasticsearchClusterConfig.Options.DedicatedMasterEnabled }}'
+      DedicatedMasterType: '{{ response.DomainConfig.ElasticsearchClusterConfig.Options.DedicatedMasterType }}'
+      InstanceCount: '{{ response.DomainConfig.ElasticsearchClusterConfig.Options.InstanceCount }}'
+      InstanceType: '{{ response.DomainConfig.ElasticsearchClusterConfig.Options.InstanceType }}'
+      WarmCount: '{{ response.DomainConfig.ElasticsearchClusterConfig.Options.WarmCount }}'
+      WarmEnabled: '{{ response.DomainConfig.ElasticsearchClusterConfig.Options.WarmEnabled }}'
+      WarmType: '{{ response.DomainConfig.ElasticsearchClusterConfig.Options.WarmType }}'
+      AvailabilityZoneCount: '{{ response.DomainConfig.ElasticsearchClusterConfig.Options.ZoneAwarenessConfig.AvailabilityZoneCount }}'
+      ZoneAwarenessEnabled: '{{ response.DomainConfig.ElasticsearchClusterConfig.Options.ZoneAwarenessEnabled }}'
+      KmsKeyId: '{{ response.DomainConfig.EncryptionAtRestOptions.Options.KmsKeyId }}'
+      AutomatedSnapshotStartHour: '{{ response.DomainConfig.SnapshotOptions.Options.AutomatedSnapshotStartHour }}'
+      VPCId: '{{ response.DomainConfig.VPCOptions.Options.VPCId }}'
+- discovery_id: aws.es.describe_elasticsearch_domains
+  calls:
+  - action: describe_elasticsearch_domains
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DomainStatusList }}'
+    item:
+      ARN: '{{ item.ARN }}'
+      AccessPolicies: '{{ item.AccessPolicies }}'
+      AdvancedOptions: '{{ item.AdvancedOptions }}'
+      AdvancedSecurityOptions: '{{ item.AdvancedSecurityOptions }}'
+      AutoTuneOptions: '{{ item.AutoTuneOptions }}'
+      ChangeProgressDetails: '{{ item.ChangeProgressDetails }}'
+      CognitoOptions: '{{ item.CognitoOptions }}'
+      Created: '{{ item.Created }}'
+      Deleted: '{{ item.Deleted }}'
+      DomainEndpointOptions: '{{ item.DomainEndpointOptions }}'
+      DomainId: '{{ item.DomainId }}'
+      DomainName: '{{ item.DomainName }}'
+      DomainProcessingStatus: '{{ item.DomainProcessingStatus }}'
+      DomainStatusList: '{{ item.DomainStatusList }}'
+      EBSOptions: '{{ item.EBSOptions }}'
+      ElasticsearchClusterConfig: '{{ item.ElasticsearchClusterConfig }}'
+      ElasticsearchVersion: '{{ item.ElasticsearchVersion }}'
+      EncryptionAtRestOptions: '{{ item.EncryptionAtRestOptions }}'
+      Endpoint: '{{ item.Endpoint }}'
+      Endpoints: '{{ item.Endpoints }}'
+      LogPublishingOptions: '{{ item.LogPublishingOptions }}'
+      ModifyingProperties: '{{ item.ModifyingProperties }}'
+      NodeToNodeEncryptionOptions: '{{ item.NodeToNodeEncryptionOptions }}'
+      Processing: '{{ item.Processing }}'
+      ServiceSoftwareOptions: '{{ item.ServiceSoftwareOptions }}'
+      SnapshotOptions: '{{ item.SnapshotOptions }}'
+      UpgradeProcessing: '{{ item.UpgradeProcessing }}'
+      VPCOptions: '{{ item.VPCOptions }}'
+- discovery_id: aws.es.describe_elasticsearch_instance_type_limits
+  calls:
+  - action: describe_elasticsearch_instance_type_limits
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      LimitsByRole: '{{ response.LimitsByRole }}'
+- discovery_id: aws.es.describe_vpc_endpoints
+  calls:
+  - action: describe_vpc_endpoints
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VpcEndpoints }}'
+    item:
+      Status: '{{ item.Status }}'
+      DomainArn: '{{ item.DomainArn }}'
+      Endpoint: '{{ item.Endpoint }}'
+      VpcEndpointId: '{{ item.VpcEndpointId }}'
+      VpcEndpointOwner: '{{ item.VpcEndpointOwner }}'
+      VpcOptions: '{{ item.VpcOptions }}'
+- discovery_id: aws.es.get_upgrade_history
+  for_each: aws.es.list_domain_names
+  calls:
+  - action: get_upgrade_history
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UpgradeHistories }}'
+    item:
+      StartTimestamp: '{{ item.StartTimestamp }}'
+      StepsList: '{{ item.StepsList }}'
+      UpgradeName: '{{ item.UpgradeName }}'
+      UpgradeStatus: '{{ item.UpgradeStatus }}'
+- discovery_id: aws.es.get_upgrade_status
+  for_each: aws.es.list_domain_names
+  calls:
+  - action: get_upgrade_status
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      StepStatus: '{{ response.StepStatus }}'
+      UpgradeName: '{{ response.UpgradeName }}'
+      UpgradeStep: '{{ response.UpgradeStep }}'
+- discovery_id: aws.es.list_elasticsearch_instance_types
+  calls:
+  - action: list_elasticsearch_instance_types
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ElasticsearchInstanceTypes }}'
+- discovery_id: aws.es.list_packages_for_domain
+  for_each: aws.es.list_domain_names
+  calls:
+  - action: list_packages_for_domain
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DomainPackageDetailsList }}'
+    item:
+      DomainName: '{{ item.DomainName }}'
+      DomainPackageStatus: '{{ item.DomainPackageStatus }}'
+      ErrorDetails: '{{ item.ErrorDetails }}'
+      LastUpdated: '{{ item.LastUpdated }}'
+      PackageDetailsList: '{{ item.PackageDetailsList }}'
+      PackageID: '{{ item.PackageID }}'
+      PackageName: '{{ item.PackageName }}'
+      PackageType: '{{ item.PackageType }}'
+      PackageVersion: '{{ item.PackageVersion }}'
+      ReferencePath: '{{ item.ReferencePath }}'
+- discovery_id: aws.es.list_tags
+  calls:
+  - action: list_tags
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TagList }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.es.list_vpc_endpoint_access
+  for_each: aws.es.list_domain_names
+  calls:
+  - action: list_vpc_endpoint_access
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AuthorizedPrincipalList }}'
+    item:
+      Principal: '{{ item.Principal }}'
+      PrincipalType: '{{ item.PrincipalType }}'
+- discovery_id: aws.es.list_vpc_endpoints_for_domain
+  for_each: aws.es.list_domain_names
+  calls:
+  - action: list_vpc_endpoints_for_domain
+    params:
+      DomainName: '{{ item.DomainName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VpcEndpointSummaryList }}'
+    item:
+      Status: '{{ item.Status }}'
+      DomainArn: '{{ item.DomainArn }}'
+      VpcEndpointId: '{{ item.VpcEndpointId }}'
+      VpcEndpointOwner: '{{ item.VpcEndpointOwner }}'

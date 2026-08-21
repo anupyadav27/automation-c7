@@ -1,0 +1,109 @@
+version: '1.0'
+provider: aws
+service: scheduler
+services:
+  client: scheduler
+  module: boto3.client
+discovery:
+- discovery_id: aws.scheduler.list_schedule_groups
+  calls:
+  - action: list_schedule_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ScheduleGroups }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationDate: '{{ item.CreationDate }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      Description: '{{ item.Description }}'
+      LastModificationDate: '{{ item.LastModificationDate }}'
+- discovery_id: aws.scheduler.list_schedules
+  calls:
+  - action: list_schedules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Schedules }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      CreationDate: '{{ item.CreationDate }}'
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      GroupName: '{{ item.GroupName }}'
+      LastModificationDate: '{{ item.LastModificationDate }}'
+      Target: '{{ item.Target }}'
+- discovery_id: aws.scheduler.get_schedule
+  for_each: aws.scheduler.list_schedule_groups
+  calls:
+  - action: get_schedule
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Description: '{{ response.FlexibleTimeWindow.Description }}'
+      MaximumWindowInMinutes: '{{ response.FlexibleTimeWindow.MaximumWindowInMinutes }}'
+      Mode: '{{ response.FlexibleTimeWindow.Mode }}'
+      ActionAfterCompletion: '{{ response.ActionAfterCompletion }}'
+      Arn: '{{ response.Arn }}'
+      CreationDate: '{{ response.CreationDate }}'
+      EndDate: '{{ response.EndDate }}'
+      GroupName: '{{ response.GroupName }}'
+      KmsKeyArn: '{{ response.KmsKeyArn }}'
+      LastModificationDate: '{{ response.LastModificationDate }}'
+      Name: '{{ response.Name }}'
+      ScheduleExpression: '{{ response.ScheduleExpression }}'
+      ScheduleExpressionTimezone: '{{ response.ScheduleExpressionTimezone }}'
+      StartDate: '{{ response.StartDate }}'
+      State: '{{ response.State }}'
+      EnableECSManagedTags: '{{ response.Target.EcsParameters.EnableECSManagedTags }}'
+      EnableExecuteCommand: '{{ response.Target.EcsParameters.EnableExecuteCommand }}'
+      Group: '{{ response.Target.EcsParameters.Group }}'
+      LaunchType: '{{ response.Target.EcsParameters.LaunchType }}'
+      AssignPublicIp: '{{ response.Target.EcsParameters.NetworkConfiguration.awsvpcConfiguration.AssignPublicIp }}'
+      PlatformVersion: '{{ response.Target.EcsParameters.PlatformVersion }}'
+      PropagateTags: '{{ response.Target.EcsParameters.PropagateTags }}'
+      ReferenceId: '{{ response.Target.EcsParameters.ReferenceId }}'
+      TaskCount: '{{ response.Target.EcsParameters.TaskCount }}'
+      TaskDefinitionArn: '{{ response.Target.EcsParameters.TaskDefinitionArn }}'
+      DetailType: '{{ response.Target.EventBridgeParameters.DetailType }}'
+      Source: '{{ response.Target.EventBridgeParameters.Source }}'
+      Input: '{{ response.Target.Input }}'
+      PartitionKey: '{{ response.Target.KinesisParameters.PartitionKey }}'
+      MaximumEventAgeInSeconds: '{{ response.Target.RetryPolicy.MaximumEventAgeInSeconds }}'
+      MaximumRetryAttempts: '{{ response.Target.RetryPolicy.MaximumRetryAttempts }}'
+      RoleArn: '{{ response.Target.RoleArn }}'
+      MessageGroupId: '{{ response.Target.SqsParameters.MessageGroupId }}'
+- discovery_id: aws.scheduler.get_schedule_group
+  for_each: aws.scheduler.list_schedule_groups
+  calls:
+  - action: get_schedule_group
+    params:
+      Name: '{{ item.Name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      CreationDate: '{{ response.CreationDate }}'
+      Name: '{{ response.Name }}'
+      State: '{{ response.State }}'
+      LastModificationDate: '{{ response.LastModificationDate }}'
+- discovery_id: aws.scheduler.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

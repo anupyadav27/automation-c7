@@ -1,0 +1,341 @@
+version: '1.0'
+provider: aws
+service: application-insights
+services:
+  client: application-insights
+  module: boto3.client
+discovery:
+- discovery_id: aws.application-insights.list_applications
+  calls:
+  - action: list_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ApplicationInfoList }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      ApplicationInfo: '{{ item.ApplicationInfo }}'
+      AttachMissingPermission: '{{ item.AttachMissingPermission }}'
+      AutoConfigEnabled: '{{ item.AutoConfigEnabled }}'
+      CWEMonitorEnabled: '{{ item.CWEMonitorEnabled }}'
+      DiscoveryType: '{{ item.DiscoveryType }}'
+      LifeCycle: '{{ item.LifeCycle }}'
+      OpsCenterEnabled: '{{ item.OpsCenterEnabled }}'
+      OpsItemSNSTopicArn: '{{ item.OpsItemSNSTopicArn }}'
+      Remarks: '{{ item.Remarks }}'
+      ResourceGroupName: '{{ item.ResourceGroupName }}'
+      SNSNotificationArn: '{{ item.SNSNotificationArn }}'
+- discovery_id: aws.application-insights.list_configuration_history
+  calls:
+  - action: list_configuration_history
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EventList }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      EventDetail: '{{ item.EventDetail }}'
+      EventResourceName: '{{ item.EventResourceName }}'
+      EventResourceType: '{{ item.EventResourceType }}'
+      EventStatus: '{{ item.EventStatus }}'
+      EventTime: '{{ item.EventTime }}'
+      MonitoredResourceARN: '{{ item.MonitoredResourceARN }}'
+      ResourceGroupName: '{{ item.ResourceGroupName }}'
+- discovery_id: aws.application-insights.list_problems
+  calls:
+  - action: list_problems
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ProblemList }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      Id: '{{ item.Id }}'
+      Status: '{{ item.Status }}'
+      AffectedResource: '{{ item.AffectedResource }}'
+      EndTime: '{{ item.EndTime }}'
+      Feedback: '{{ item.Feedback }}'
+      Insights: '{{ item.Insights }}'
+      LastRecurrenceTime: '{{ item.LastRecurrenceTime }}'
+      Problem: '{{ item.Problem }}'
+      RecurringCount: '{{ item.RecurringCount }}'
+      ResolutionMethod: '{{ item.ResolutionMethod }}'
+      ResourceGroupName: '{{ item.ResourceGroupName }}'
+      SeverityLevel: '{{ item.SeverityLevel }}'
+      ShortName: '{{ item.ShortName }}'
+      StartTime: '{{ item.StartTime }}'
+      Title: '{{ item.Title }}'
+      Visibility: '{{ item.Visibility }}'
+- discovery_id: aws.application-insights.describe_application
+  for_each: aws.application-insights.list_applications
+  calls:
+  - action: describe_application
+    params:
+      ResourceGroupName: '{{ item.ResourceGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccountId: '{{ response.ApplicationInfo.AccountId }}'
+      AttachMissingPermission: '{{ response.ApplicationInfo.AttachMissingPermission }}'
+      AutoConfigEnabled: '{{ response.ApplicationInfo.AutoConfigEnabled }}'
+      CWEMonitorEnabled: '{{ response.ApplicationInfo.CWEMonitorEnabled }}'
+      DiscoveryType: '{{ response.ApplicationInfo.DiscoveryType }}'
+      LifeCycle: '{{ response.ApplicationInfo.LifeCycle }}'
+      OpsCenterEnabled: '{{ response.ApplicationInfo.OpsCenterEnabled }}'
+      OpsItemSNSTopicArn: '{{ response.ApplicationInfo.OpsItemSNSTopicArn }}'
+      Remarks: '{{ response.ApplicationInfo.Remarks }}'
+      ResourceGroupName: '{{ response.ApplicationInfo.ResourceGroupName }}'
+      SNSNotificationArn: '{{ response.ApplicationInfo.SNSNotificationArn }}'
+- discovery_id: aws.application-insights.describe_component
+  calls:
+  - action: describe_component
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResourceList }}'
+    item:
+      ComponentName: '{{ response.ApplicationComponent.ComponentName }}'
+      ComponentRemarks: '{{ response.ApplicationComponent.ComponentRemarks }}'
+      DetectedWorkload: '{{ response.ApplicationComponent.DetectedWorkload }}'
+      Monitor: '{{ response.ApplicationComponent.Monitor }}'
+      OsType: '{{ response.ApplicationComponent.OsType }}'
+      ResourceType: '{{ response.ApplicationComponent.ResourceType }}'
+      Tier: '{{ response.ApplicationComponent.Tier }}'
+- discovery_id: aws.application-insights.describe_component_configuration
+  for_each: aws.application-insights.list_applications
+  calls:
+  - action: describe_component_configuration
+    params:
+      ResourceGroupName: '{{ item.ResourceGroupName }}'
+      ComponentName: '{{ item.ComponentName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ComponentConfiguration: '{{ response.ComponentConfiguration }}'
+      Monitor: '{{ response.Monitor }}'
+      Tier: '{{ response.Tier }}'
+- discovery_id: aws.application-insights.describe_component_configuration_recommendation
+  calls:
+  - action: describe_component_configuration_recommendation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ComponentConfiguration: '{{ response.ComponentConfiguration }}'
+- discovery_id: aws.application-insights.describe_log_pattern
+  for_each: aws.application-insights.list_applications
+  calls:
+  - action: describe_log_pattern
+    params:
+      ResourceGroupName: '{{ item.ResourceGroupName }}'
+      PatternSetName: '{{ item.PatternSetName }}'
+      PatternName: '{{ item.PatternName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Pattern: '{{ response.LogPattern.Pattern }}'
+      PatternName: '{{ response.LogPattern.PatternName }}'
+      PatternSetName: '{{ response.LogPattern.PatternSetName }}'
+      Rank: '{{ response.LogPattern.Rank }}'
+      AccountId: '{{ response.AccountId }}'
+      ResourceGroupName: '{{ response.ResourceGroupName }}'
+- discovery_id: aws.application-insights.describe_observation
+  calls:
+  - action: describe_observation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Id: '{{ response.Observation.Id }}'
+      CloudWatchEventDetailType: '{{ response.Observation.CloudWatchEventDetailType }}'
+      CloudWatchEventId: '{{ response.Observation.CloudWatchEventId }}'
+      CloudWatchEventSource: '{{ response.Observation.CloudWatchEventSource }}'
+      CodeDeployApplication: '{{ response.Observation.CodeDeployApplication }}'
+      CodeDeployDeploymentGroup: '{{ response.Observation.CodeDeployDeploymentGroup }}'
+      CodeDeployDeploymentId: '{{ response.Observation.CodeDeployDeploymentId }}'
+      CodeDeployInstanceGroupId: '{{ response.Observation.CodeDeployInstanceGroupId }}'
+      CodeDeployState: '{{ response.Observation.CodeDeployState }}'
+      EbsCause: '{{ response.Observation.EbsCause }}'
+      EbsEvent: '{{ response.Observation.EbsEvent }}'
+      EbsRequestId: '{{ response.Observation.EbsRequestId }}'
+      EbsResult: '{{ response.Observation.EbsResult }}'
+      Ec2State: '{{ response.Observation.Ec2State }}'
+      EndTime: '{{ response.Observation.EndTime }}'
+      HealthEventArn: '{{ response.Observation.HealthEventArn }}'
+      HealthEventDescription: '{{ response.Observation.HealthEventDescription }}'
+      HealthEventTypeCategory: '{{ response.Observation.HealthEventTypeCategory }}'
+      HealthEventTypeCode: '{{ response.Observation.HealthEventTypeCode }}'
+      HealthService: '{{ response.Observation.HealthService }}'
+      LineTime: '{{ response.Observation.LineTime }}'
+      LogFilter: '{{ response.Observation.LogFilter }}'
+      LogGroup: '{{ response.Observation.LogGroup }}'
+      LogText: '{{ response.Observation.LogText }}'
+      MetricName: '{{ response.Observation.MetricName }}'
+      MetricNamespace: '{{ response.Observation.MetricNamespace }}'
+      Observation: '{{ response.Observation.Observation }}'
+      RdsEventCategories: '{{ response.Observation.RdsEventCategories }}'
+      RdsEventMessage: '{{ response.Observation.RdsEventMessage }}'
+      S3EventName: '{{ response.Observation.S3EventName }}'
+      SourceARN: '{{ response.Observation.SourceARN }}'
+      SourceType: '{{ response.Observation.SourceType }}'
+      StartTime: '{{ response.Observation.StartTime }}'
+      StatesArn: '{{ response.Observation.StatesArn }}'
+      StatesExecutionArn: '{{ response.Observation.StatesExecutionArn }}'
+      StatesInput: '{{ response.Observation.StatesInput }}'
+      StatesStatus: '{{ response.Observation.StatesStatus }}'
+      Unit: '{{ response.Observation.Unit }}'
+      Value: '{{ response.Observation.Value }}'
+      XRayErrorPercent: '{{ response.Observation.XRayErrorPercent }}'
+      XRayFaultPercent: '{{ response.Observation.XRayFaultPercent }}'
+      XRayNodeName: '{{ response.Observation.XRayNodeName }}'
+      XRayNodeType: '{{ response.Observation.XRayNodeType }}'
+      XRayRequestAverageLatency: '{{ response.Observation.XRayRequestAverageLatency }}'
+      XRayRequestCount: '{{ response.Observation.XRayRequestCount }}'
+      XRayThrottlePercent: '{{ response.Observation.XRayThrottlePercent }}'
+- discovery_id: aws.application-insights.describe_problem
+  calls:
+  - action: describe_problem
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccountId: '{{ response.Problem.AccountId }}'
+      Id: '{{ response.Problem.Id }}'
+      Status: '{{ response.Problem.Status }}'
+      AffectedResource: '{{ response.Problem.AffectedResource }}'
+      EndTime: '{{ response.Problem.EndTime }}'
+      Feedback: '{{ response.Problem.Feedback }}'
+      Insights: '{{ response.Problem.Insights }}'
+      LastRecurrenceTime: '{{ response.Problem.LastRecurrenceTime }}'
+      Problem: '{{ response.Problem.Problem }}'
+      RecurringCount: '{{ response.Problem.RecurringCount }}'
+      ResolutionMethod: '{{ response.Problem.ResolutionMethod }}'
+      ResourceGroupName: '{{ response.Problem.ResourceGroupName }}'
+      SeverityLevel: '{{ response.Problem.SeverityLevel }}'
+      ShortName: '{{ response.Problem.ShortName }}'
+      StartTime: '{{ response.Problem.StartTime }}'
+      Title: '{{ response.Problem.Title }}'
+      Visibility: '{{ response.Problem.Visibility }}'
+      SNSNotificationArn: '{{ response.SNSNotificationArn }}'
+- discovery_id: aws.application-insights.describe_problem_observations
+  calls:
+  - action: describe_problem_observations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Observation: '{{ response.RelatedObservations.ObservationList[].Id }}'
+      ObservationList: '{{ response.RelatedObservations.ObservationList[].Id }}'
+- discovery_id: aws.application-insights.describe_workload
+  for_each: aws.application-insights.list_applications
+  calls:
+  - action: describe_workload
+    params:
+      ResourceGroupName: '{{ item.ResourceGroupName }}'
+      ComponentName: '{{ item.ComponentName }}'
+      WorkloadId: '{{ item.WorkloadId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Configuration: '{{ response.WorkloadConfiguration.Configuration }}'
+      Tier: '{{ response.WorkloadConfiguration.Tier }}'
+      WorkloadName: '{{ response.WorkloadConfiguration.WorkloadName }}'
+      WorkloadId: '{{ response.WorkloadId }}'
+      WorkloadRemarks: '{{ response.WorkloadRemarks }}'
+- discovery_id: aws.application-insights.list_components
+  for_each: aws.application-insights.list_applications
+  calls:
+  - action: list_components
+    params:
+      ResourceGroupName: '{{ item.ResourceGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ApplicationComponentList }}'
+    item:
+      ComponentName: '{{ item.ComponentName }}'
+      ComponentRemarks: '{{ item.ComponentRemarks }}'
+      DetectedWorkload: '{{ item.DetectedWorkload }}'
+      Monitor: '{{ item.Monitor }}'
+      OsType: '{{ item.OsType }}'
+      ResourceType: '{{ item.ResourceType }}'
+      Tier: '{{ item.Tier }}'
+- discovery_id: aws.application-insights.list_log_pattern_sets
+  for_each: aws.application-insights.list_applications
+  calls:
+  - action: list_log_pattern_sets
+    params:
+      ResourceGroupName: '{{ item.ResourceGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LogPatternSets }}'
+    item:
+      AccountId: '{{ response.AccountId }}'
+      ResourceGroupName: '{{ response.ResourceGroupName }}'
+- discovery_id: aws.application-insights.list_log_patterns
+  for_each: aws.application-insights.list_applications
+  calls:
+  - action: list_log_patterns
+    params:
+      ResourceGroupName: '{{ item.ResourceGroupName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LogPatterns }}'
+    item:
+      Pattern: '{{ item.Pattern }}'
+      PatternName: '{{ item.PatternName }}'
+      PatternSetName: '{{ item.PatternSetName }}'
+      Rank: '{{ item.Rank }}'
+      AccountId: '{{ response.AccountId }}'
+      ResourceGroupName: '{{ response.ResourceGroupName }}'
+- discovery_id: aws.application-insights.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.application-insights.list_workloads
+  for_each: aws.application-insights.list_applications
+  calls:
+  - action: list_workloads
+    params:
+      ResourceGroupName: '{{ item.ResourceGroupName }}'
+      ComponentName: '{{ item.ComponentName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.WorkloadList }}'
+    item:
+      ComponentName: '{{ item.ComponentName }}'
+      MissingWorkloadConfig: '{{ item.MissingWorkloadConfig }}'
+      Tier: '{{ item.Tier }}'
+      WorkloadId: '{{ item.WorkloadId }}'
+      WorkloadName: '{{ item.WorkloadName }}'
+      WorkloadRemarks: '{{ item.WorkloadRemarks }}'

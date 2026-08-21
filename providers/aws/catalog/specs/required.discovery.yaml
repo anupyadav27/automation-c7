@@ -1,0 +1,25 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: required (backed by resourcegroupstaggingapi)
+# 1 ops (from checks)
+# Generated: 2026-04-14
+version: '1.0'
+provider: aws
+service: required
+services:
+  client: resourcegroupstaggingapi
+  module: boto3.client
+discovery:
+  - discovery_id: aws.required.get_resources
+    calls:
+    - action: get_resources
+      save_as: response
+      on_error: continue
+      params:
+        ResourcesPerPage: 100
+    emit:
+      as: item
+      items_for: '{{ response.ResourceTagMappingList }}'
+      item:
+        Tags: '{{ item.Tags }}'
+        ComplianceDetails: '{{ item.ComplianceDetails }}'
+        ResourceARN: '{{ item.ResourceARN }}'

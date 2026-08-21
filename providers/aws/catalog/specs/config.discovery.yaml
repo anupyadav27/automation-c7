@@ -1,0 +1,246 @@
+version: '1.0'
+provider: aws
+service: config
+discovery:
+- calls:
+  - action: describe_aggregation_authorizations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.config.describe_aggregation_authorizations
+  emit:
+    as: item
+    item:
+      AggregateEvaluationResults: '{{ item.AggregateEvaluationResults }}'
+      AggregationAuthorizationArn: '{{ item.AggregationAuthorizationArn }}'
+      AggregationAuthorizations: '{{ item.AggregationAuthorizations }}'
+      AuthorizedAccountId: '{{ item.AuthorizedAccountId }}'
+      AuthorizedAwsRegion: '{{ item.AuthorizedAwsRegion }}'
+      CreationTime: '{{ item.CreationTime }}'
+    items_for: '{{ response.AggregationAuthorizations }}'
+- calls:
+  - action: describe_configuration_aggregators
+    on_error: continue
+    save_as: response
+  discovery_id: aws.config.describe_configuration_aggregators
+  emit:
+    as: item
+    item:
+      AccountAggregationSources: '{{ item.AccountAggregationSources }}'
+      AggregatorFilters: '{{ item.AggregatorFilters }}'
+      ConfigurationAggregatorArn: '{{ item.ConfigurationAggregatorArn }}'
+      ConfigurationAggregatorName: '{{ item.ConfigurationAggregatorName }}'
+      ConfigurationAggregators: '{{ item.ConfigurationAggregators }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Enabled: '{{ item.Enabled }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      OrganizationAggregationSource: '{{ item.OrganizationAggregationSource }}'
+    items_for: '{{ response.ConfigurationAggregators }}'
+- calls:
+  - action: describe_organization_conformance_packs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.config.describe_organization_conformance_packs
+  emit:
+    as: item
+    item:
+      ConformancePackInputParameters: '{{ item.ConformancePackInputParameters }}'
+      DeliveryS3Bucket: '{{ item.DeliveryS3Bucket }}'
+      DeliveryS3KeyPrefix: '{{ item.DeliveryS3KeyPrefix }}'
+      ExcludedAccounts: '{{ item.ExcludedAccounts }}'
+      LastUpdateTime: '{{ item.LastUpdateTime }}'
+      OrganizationConformancePackArn: '{{ item.OrganizationConformancePackArn }}'
+      OrganizationConformancePackName: '{{ item.OrganizationConformancePackName }}'
+      OrganizationConformancePacks: '{{ item.OrganizationConformancePacks }}'
+    items_for: '{{ response.OrganizationConformancePacks }}'
+- calls:
+  - action: describe_configuration_recorder_status
+    on_error: continue
+    save_as: response
+  discovery_id: aws.config.describe_configuration_recorder_status
+  emit:
+    as: item
+    item:
+      ConfigurationRecordersStatus: '{{ item.ConfigurationRecordersStatus[].arn }}'
+      arn: '{{ item.arn }}'
+      lastErrorCode: '{{ item.lastErrorCode }}'
+      lastErrorMessage: '{{ item.lastErrorMessage }}'
+      lastStartTime: '{{ item.lastStartTime }}'
+      lastStatus: '{{ item.lastStatus }}'
+      lastStatusChangeTime: '{{ item.lastStatusChangeTime }}'
+      lastStopTime: '{{ item.lastStopTime }}'
+      name: '{{ item.name }}'
+      recording: '{{ item.recording }}'
+      servicePrincipal: '{{ item.servicePrincipal }}'
+    items_for: '{{ response.ConfigurationRecordersStatus }}'
+- calls:
+  - action: describe_config_rules
+    on_error: continue
+    save_as: response
+  discovery_id: aws.config.describe_config_rules
+  emit:
+    as: item
+    item:
+      ConfigRuleArn: '{{ item.ConfigRuleArn }}'
+      ConfigRuleId: '{{ item.ConfigRuleId }}'
+      ConfigRuleName: '{{ item.ConfigRuleName }}'
+      ConfigRuleState: '{{ item.ConfigRuleState }}'
+      ConfigRules: '{{ item.ConfigRules }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      Description: '{{ item.Description }}'
+      EvaluationModes: '{{ item.EvaluationModes }}'
+      InputParameters: '{{ item.InputParameters }}'
+      MaximumExecutionFrequency: '{{ item.MaximumExecutionFrequency }}'
+      Scope: '{{ item.Scope }}'
+      Source: '{{ item.Source }}'
+    items_for: '{{ response.ConfigRules }}'
+- calls:
+  - action: describe_configuration_recorders
+    on_error: continue
+    save_as: response
+  discovery_id: aws.config.describe_configuration_recorders
+  emit:
+    as: item
+    item:
+      ConfigurationRecorders: '{{ item.ConfigurationRecorders[].arn }}'
+      arn: '{{ item.arn }}'
+      name: '{{ item.name }}'
+      recordingGroup: '{{ item.recordingGroup }}'
+      recordingMode: '{{ item.recordingMode }}'
+      roleARN: '{{ item.roleARN }}'
+      servicePrincipal: '{{ item.servicePrincipal }}'
+    items_for: '{{ response.ConfigurationRecorders }}'
+- calls:
+  - action: describe_config_rule_evaluation_status
+    on_error: continue
+    save_as: response
+  discovery_id: aws.config.describe_config_rule_evaluation_status
+  emit:
+    as: item
+    item:
+      ConfigRuleArn: '{{ item.ConfigRuleArn }}'
+      ConfigRuleId: '{{ item.ConfigRuleId }}'
+      ConfigRuleName: '{{ item.ConfigRuleName }}'
+      ConfigRulesEvaluationStatus: '{{ item.ConfigRulesEvaluationStatus }}'
+      FirstActivatedTime: '{{ item.FirstActivatedTime }}'
+      FirstEvaluationStarted: '{{ item.FirstEvaluationStarted }}'
+      LastDeactivatedTime: '{{ item.LastDeactivatedTime }}'
+      LastDebugLogDeliveryStatus: '{{ item.LastDebugLogDeliveryStatus }}'
+      LastDebugLogDeliveryStatusReason: '{{ item.LastDebugLogDeliveryStatusReason }}'
+      LastDebugLogDeliveryTime: '{{ item.LastDebugLogDeliveryTime }}'
+      LastErrorCode: '{{ item.LastErrorCode }}'
+      LastErrorMessage: '{{ item.LastErrorMessage }}'
+      LastFailedEvaluationTime: '{{ item.LastFailedEvaluationTime }}'
+      LastFailedInvocationTime: '{{ item.LastFailedInvocationTime }}'
+      LastSuccessfulEvaluationTime: '{{ item.LastSuccessfulEvaluationTime }}'
+      LastSuccessfulInvocationTime: '{{ item.LastSuccessfulInvocationTime }}'
+    items_for: '{{ response.ConfigRulesEvaluationStatus }}'
+- calls:
+  - action: describe_remediation_configurations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.config.describe_remediation_configurations
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      Automatic: '{{ item.Automatic }}'
+      ConfigRuleName: '{{ item.ConfigRuleName }}'
+      CreatedByService: '{{ item.CreatedByService }}'
+      ExecutionControls: '{{ item.ExecutionControls }}'
+      MaximumAutomaticAttempts: '{{ item.MaximumAutomaticAttempts }}'
+      Parameters: '{{ item.Parameters }}'
+      RemediationConfigurations: '{{ item.RemediationConfigurations[].Arn }}'
+      ResourceType: '{{ item.ResourceType }}'
+      RetryAttemptSeconds: '{{ item.RetryAttemptSeconds }}'
+      TargetId: '{{ item.TargetId }}'
+      TargetType: '{{ item.TargetType }}'
+      TargetVersion: '{{ item.TargetVersion }}'
+    items_for: '{{ response.RemediationConfigurations }}'
+- calls:
+  - action: list_stored_queries
+    on_error: continue
+    save_as: response
+  discovery_id: aws.config.list_stored_queries
+  emit:
+    as: item
+    item:
+      Description: '{{ item.Description }}'
+      Expression: '{{ item.Expression }}'
+      QueryArn: '{{ item.QueryArn }}'
+      QueryId: '{{ item.QueryId }}'
+      QueryName: '{{ item.QueryName }}'
+      StoredQuery: '{{ item.StoredQuery }}'
+    items_for: '{{ response.StoredQueryMetadata }}'
+- calls:
+  - action: describe_conformance_packs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.config.describe_conformance_packs
+  emit:
+    as: item
+    item:
+      ConformancePackArn: '{{ item.ConformancePackArn }}'
+      ConformancePackDetails: '{{ item.ConformancePackDetails }}'
+      ConformancePackId: '{{ item.ConformancePackId }}'
+      ConformancePackInputParameters: '{{ item.ConformancePackInputParameters }}'
+      ConformancePackName: '{{ item.ConformancePackName }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      DeliveryS3Bucket: '{{ item.DeliveryS3Bucket }}'
+      DeliveryS3KeyPrefix: '{{ item.DeliveryS3KeyPrefix }}'
+      LastUpdateRequestedTime: '{{ item.LastUpdateRequestedTime }}'
+      TemplateSSMDocumentDetails: '{{ item.TemplateSSMDocumentDetails }}'
+    items_for: '{{ response.ConformancePackDetails }}'
+- calls:
+  - action: describe_conformance_pack_status
+    on_error: continue
+    save_as: response
+  discovery_id: aws.config.describe_conformance_pack_status
+  emit:
+    as: item
+    item:
+      ConformancePackArn: '{{ item.ConformancePackArn }}'
+      ConformancePackId: '{{ item.ConformancePackId }}'
+      ConformancePackName: '{{ item.ConformancePackName }}'
+      ConformancePackState: '{{ item.ConformancePackState }}'
+      ConformancePackStatusDetails: '{{ item.ConformancePackStatusDetails }}'
+      ConformancePackStatusReason: '{{ item.ConformancePackStatusReason }}'
+      LastUpdateCompletedTime: '{{ item.LastUpdateCompletedTime }}'
+      LastUpdateRequestedTime: '{{ item.LastUpdateRequestedTime }}'
+      StackArn: '{{ item.StackArn }}'
+    items_for: '{{ response.ConformancePackStatusDetails }}'
+- calls:
+  - action: describe_delivery_channels
+    on_error: continue
+    save_as: response
+  discovery_id: aws.config.describe_delivery_channels
+  emit:
+    as: item
+    item:
+      DeliveryChannels: '{{ item.DeliveryChannels }}'
+      configSnapshotDeliveryProperties: '{{ item.configSnapshotDeliveryProperties }}'
+      name: '{{ item.name }}'
+      s3BucketName: '{{ item.s3BucketName }}'
+      s3KeyPrefix: '{{ item.s3KeyPrefix }}'
+      s3KmsKeyArn: '{{ item.s3KmsKeyArn }}'
+      snsTopicARN: '{{ item.snsTopicARN }}'
+    items_for: '{{ response.DeliveryChannels }}'
+- calls:
+  - action: describe_organization_config_rules
+    on_error: continue
+    save_as: response
+  discovery_id: aws.config.describe_organization_config_rules
+  emit:
+    as: item
+    item:
+      ExcludedAccounts: '{{ item.ExcludedAccounts }}'
+      LastUpdateTime: '{{ item.LastUpdateTime }}'
+      OrganizationConfigRuleArn: '{{ item.OrganizationConfigRuleArn }}'
+      OrganizationConfigRuleName: '{{ item.OrganizationConfigRuleName }}'
+      OrganizationConfigRules: '{{ item.OrganizationConfigRules }}'
+      OrganizationCustomPolicyRuleMetadata: '{{ item.OrganizationCustomPolicyRuleMetadata }}'
+      OrganizationCustomRuleMetadata: '{{ item.OrganizationCustomRuleMetadata }}'
+      OrganizationManagedRuleMetadata: '{{ item.OrganizationManagedRuleMetadata }}'
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+    items_for: '{{ response.OrganizationConfigRules }}'

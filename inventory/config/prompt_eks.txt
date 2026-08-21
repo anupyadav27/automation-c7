@@ -1,0 +1,155 @@
+Analyze AWS service "eks" and generate relationship definitions for CSPM threat detection.
+
+SERVICE RESOURCE TYPES:
+[
+  "eks.licenses",
+  "eks.policy",
+  "eks.role"
+]
+
+DISCOVERY OPERATIONS (with boto3 actions):
+[
+  {
+    "discovery_id": "aws.eks.list_clusters",
+    "actions": [
+      "list_clusters"
+    ],
+    "for_each": null
+  },
+  {
+    "discovery_id": "aws.eks.describe_cluster",
+    "actions": [
+      "describe_cluster"
+    ],
+    "for_each": "aws.eks.list_clusters"
+  },
+  {
+    "discovery_id": "aws.eks.list_addons",
+    "actions": [
+      "list_addons"
+    ],
+    "for_each": "aws.eks.list_clusters"
+  },
+  {
+    "discovery_id": "aws.eks.describe_addon",
+    "actions": [
+      "describe_addon"
+    ],
+    "for_each": "aws.eks.list_addons"
+  },
+  {
+    "discovery_id": "aws.eks.list_access_entries",
+    "actions": [
+      "list_access_entries"
+    ],
+    "for_each": "aws.eks.list_clusters"
+  },
+  {
+    "discovery_id": "aws.eks.list_nodegroups",
+    "actions": [
+      "list_nodegroups"
+    ],
+    "for_each": "aws.eks.list_clusters"
+  },
+  {
+    "discovery_id": "aws.eks.describe_nodegroup",
+    "actions": [
+      "describe_nodegroup"
+    ],
+    "for_each": "aws.eks.list_nodegroups"
+  },
+  {
+    "discovery_id": "aws.eks.list_fargate_profiles",
+    "actions": [
+      "list_fargate_profiles"
+    ],
+    "for_each": "aws.eks.list_clusters"
+  },
+  {
+    "discovery_id": "aws.eks.describe_fargate_profile",
+    "actions": [
+      "describe_fargate_profile"
+    ],
+    "for_each": "aws.eks.list_fargate_profiles"
+  }
+]
+
+EMITTED FIELDS (available for relationship extraction):
+{}
+
+NOTE: Emit fields are not explicitly defined in discovery YAML. 
+Use your AWS service knowledge to infer likely fields from the boto3 API responses.
+Common response fields from describe_* operations typically include ARNs, IDs, and configuration objects.
+
+
+
+COMMON AWS FIELD PATTERNS FOR RELATIONSHIPS:
+- VPC/Network: VpcId, SubnetIds, SecurityGroupIds, NetworkInterfaceId
+- IAM: RoleArn, Role, PolicyArn, InstanceProfileArn, ServiceRoleArn
+- KMS: KmsKeyId, KMSMasterKeyId, SSEKMSKeyId, EncryptionKey
+- Logging: LogGroupArn, CloudWatchLogsLogGroupArn, S3BucketName
+- Containers: ClusterArn, ServiceArn, TaskDefinitionArn, ContainerInstanceArn
+- Storage: BucketName, DBInstanceArn, TableArn, StreamArn
+- Compute: InstanceId, FunctionArn, QueueArn, TopicArn
+
+
+AVAILABLE RELATION TYPES:
+- contained_by: Resource is contained within another. (network)
+- connected_to: Network connectivity between resources. (network)
+- routes_to: Traffic routing relationship. (network)
+- attached_to: Security or resource attachment. (security)
+- allows_traffic_from: Security rule allowing traffic. (security)
+- uses: Resource uses another resource or identity. (identity)
+- assumes: Principal assumes a role. (identity)
+- member_of: Identity membership in a group. (identity)
+- has_policy: IAM policy attachment. (identity)
+- grants_access_to: Policy grants access to a resource. (identity)
+- controlled_by: Resource controlled/owned by a principal. (identity)
+- encrypted_by: Resource encrypted by key. (data)
+- stores_data_in: Data storage relationship. (data)
+- backs_up_to: Backup relationship. (data)
+- replicates_to: Data replication relationship. (data)
+- logging_enabled_to: Logging destination. (monitoring)
+- monitored_by: Monitoring relationship. (monitoring)
+- triggers: Event triggering relationship. (compute)
+- invokes: Service invocation. (compute)
+- serves_traffic_for: Load balancing relationship. (compute)
+- runs_on: Workload hosting relationship. (compute)
+- scales_with: Auto-scaling relationship. (compute)
+- cached_by: Caching relationship. (compute)
+- exposed_through: External exposure mechanism. (exposure)
+- internet_connected: Resource has internet exposure. (exposure)
+
+EXAMPLES OF RELATIONSHIP DEFINITIONS:
+[
+  {"from_type": "ec2.subnet", "relation_type": "contained_by", "to_type": "ec2.vpc", "source_field": "VpcId", "target_uid_pattern": "arn:aws:ec2:{region}:{account_id}:vpc/{VpcId}"},
+  {"from_type": "lambda.resource", "relation_type": "uses", "to_type": "iam.role", "source_field": "Role", "target_uid_pattern": "{Role}"},
+  {"from_type": "rds.instance", "relation_type": "encrypted_by", "to_type": "kms.key", "source_field": "KmsKeyId", "target_uid_pattern": "arn:aws:kms:{region}:{account_id}:key/{KmsKeyId}"},
+]
+
+TASK:
+1. Analyze the service's discovery operations and AWS service knowledge
+2. Identify relationships this service's resources have to other AWS resources (VPC, IAM, KMS, logging, etc.)
+3. Generate relationship definitions in the exact format shown in examples
+4. Include relationships for all resource types listed above
+5. Use appropriate relation types from the available list
+6. Construct proper target_uid_pattern using {field}, {region}, {account_id} placeholders
+7. For arrays, use source_field_item if needed
+8. Focus on relationships critical for CSPM threat detection (network, security, identity, data)
+
+OUTPUT FORMAT (JSON):
+{
+  "relationships": [
+    {
+      "from_type": "service.resource-type",
+      "relation_type": "relation_type_id",
+      "to_type": "target_service.resource-type",
+      "source_field": "FieldName",
+      "target_uid_pattern": "arn:aws:service:{region}:{account_id}:resource/{FieldName}",
+      "source_field_item": "ItemField"
+    }
+  ],
+  "reasoning": "Brief explanation of relationships found"
+}
+
+Return ONLY valid JSON, no markdown formatting.

@@ -1,0 +1,168 @@
+version: '1.0'
+provider: aws
+service: codeguru-reviewer
+services:
+  client: codeguru-reviewer
+  module: boto3.client
+discovery:
+- discovery_id: aws.codeguru-reviewer.list_repository_associations
+  calls:
+  - action: list_repository_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RepositoryAssociationSummaries }}'
+    item:
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      AssociationArn: '{{ item.AssociationArn }}'
+      AssociationId: '{{ item.AssociationId }}'
+      ConnectionArn: '{{ item.ConnectionArn }}'
+      KMSKeyDetails: '{{ item.KMSKeyDetails }}'
+      LastUpdatedTimeStamp: '{{ item.LastUpdatedTimeStamp }}'
+      Owner: '{{ item.Owner }}'
+      ProviderType: '{{ item.ProviderType }}'
+      RepositoryAssociation: '{{ item.RepositoryAssociation }}'
+      S3RepositoryDetails: '{{ item.S3RepositoryDetails }}'
+- discovery_id: aws.codeguru-reviewer.describe_code_review
+  calls:
+  - action: describe_code_review
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.CodeReview.Name }}'
+      State: '{{ response.CodeReview.State }}'
+      AnalysisTypes: '{{ response.CodeReview.AnalysisTypes }}'
+      AssociationArn: '{{ response.CodeReview.AssociationArn }}'
+      CodeReviewArn: '{{ response.CodeReview.CodeReviewArn }}'
+      ConfigFileState: '{{ response.CodeReview.ConfigFileState }}'
+      CreatedTimeStamp: '{{ response.CodeReview.CreatedTimeStamp }}'
+      LastUpdatedTimeStamp: '{{ response.CodeReview.LastUpdatedTimeStamp }}'
+      Metrics: '{{ response.CodeReview.Metrics }}'
+      Owner: '{{ response.CodeReview.Owner }}'
+      ProviderType: '{{ response.CodeReview.ProviderType }}'
+      PullRequestId: '{{ response.CodeReview.PullRequestId }}'
+      RepositoryName: '{{ response.CodeReview.RepositoryName }}'
+      SourceCodeType: '{{ response.CodeReview.SourceCodeType }}'
+      StateReason: '{{ response.CodeReview.StateReason }}'
+      Type: '{{ response.CodeReview.Type }}'
+      FindingsCount: '{{ response.CodeReview.Metrics.FindingsCount }}'
+      MeteredLinesOfCodeCount: '{{ response.CodeReview.Metrics.MeteredLinesOfCodeCount }}'
+      SuppressedLinesOfCodeCount: '{{ response.CodeReview.Metrics.SuppressedLinesOfCodeCount }}'
+      DestinationBranchName: '{{ response.CodeReview.SourceCodeType.BranchDiff.DestinationBranchName }}'
+      SourceBranchName: '{{ response.CodeReview.SourceCodeType.BranchDiff.SourceBranchName }}'
+      DestinationCommit: '{{ response.CodeReview.SourceCodeType.CommitDiff.DestinationCommit }}'
+      MergeBaseCommit: '{{ response.CodeReview.SourceCodeType.CommitDiff.MergeBaseCommit }}'
+      SourceCommit: '{{ response.CodeReview.SourceCodeType.CommitDiff.SourceCommit }}'
+      BranchName: '{{ response.CodeReview.SourceCodeType.RepositoryHead.BranchName }}'
+      RequestId: '{{ response.CodeReview.SourceCodeType.RequestMetadata.RequestId }}'
+      Requester: '{{ response.CodeReview.SourceCodeType.RequestMetadata.Requester }}'
+      VendorName: '{{ response.CodeReview.SourceCodeType.RequestMetadata.VendorName }}'
+      BucketName: '{{ response.CodeReview.SourceCodeType.S3BucketRepository.Details.BucketName }}'
+- discovery_id: aws.codeguru-reviewer.describe_recommendation_feedback
+  calls:
+  - action: describe_recommendation_feedback
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CodeReviewArn: '{{ response.RecommendationFeedback.CodeReviewArn }}'
+      CreatedTimeStamp: '{{ response.RecommendationFeedback.CreatedTimeStamp }}'
+      LastUpdatedTimeStamp: '{{ response.RecommendationFeedback.LastUpdatedTimeStamp }}'
+      Reactions: '{{ response.RecommendationFeedback.Reactions }}'
+      RecommendationId: '{{ response.RecommendationFeedback.RecommendationId }}'
+      UserId: '{{ response.RecommendationFeedback.UserId }}'
+- discovery_id: aws.codeguru-reviewer.describe_repository_association
+  for_each: aws.codeguru-reviewer.list_repository_associations
+  calls:
+  - action: describe_repository_association
+    params:
+      AssociationArn: '{{ item.AssociationArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.RepositoryAssociation.Name }}'
+      State: '{{ response.RepositoryAssociation.State }}'
+      AssociationArn: '{{ response.RepositoryAssociation.AssociationArn }}'
+      AssociationId: '{{ response.RepositoryAssociation.AssociationId }}'
+      ConnectionArn: '{{ response.RepositoryAssociation.ConnectionArn }}'
+      CreatedTimeStamp: '{{ response.RepositoryAssociation.CreatedTimeStamp }}'
+      KMSKeyDetails: '{{ response.RepositoryAssociation.KMSKeyDetails.KMSKeyId }}'
+      LastUpdatedTimeStamp: '{{ response.RepositoryAssociation.LastUpdatedTimeStamp }}'
+      Owner: '{{ response.RepositoryAssociation.Owner }}'
+      ProviderType: '{{ response.RepositoryAssociation.ProviderType }}'
+      RepositoryAssociation: '{{ response.RepositoryAssociation.RepositoryAssociation }}'
+      S3RepositoryDetails: '{{ response.RepositoryAssociation.S3RepositoryDetails.BucketName }}'
+      StateReason: '{{ response.RepositoryAssociation.StateReason }}'
+      EncryptionOption: '{{ response.RepositoryAssociation.KMSKeyDetails.EncryptionOption }}'
+      KMSKeyId: '{{ response.RepositoryAssociation.KMSKeyDetails.KMSKeyId }}'
+      BucketName: '{{ response.RepositoryAssociation.S3RepositoryDetails.BucketName }}'
+      BuildArtifactsObjectKey: '{{ response.RepositoryAssociation.S3RepositoryDetails.CodeArtifacts.BuildArtifactsObjectKey }}'
+      SourceCodeArtifactsObjectKey: '{{ response.RepositoryAssociation.S3RepositoryDetails.CodeArtifacts.SourceCodeArtifactsObjectKey }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.codeguru-reviewer.list_code_reviews
+  calls:
+  - action: list_code_reviews
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CodeReviewSummaries }}'
+    item:
+      Name: '{{ item.Name }}'
+      State: '{{ item.State }}'
+      CodeReviewArn: '{{ item.CodeReviewArn }}'
+      CreatedTimeStamp: '{{ item.CreatedTimeStamp }}'
+      LastUpdatedTimeStamp: '{{ item.LastUpdatedTimeStamp }}'
+      MetricsSummary: '{{ item.MetricsSummary }}'
+      Owner: '{{ item.Owner }}'
+      ProviderType: '{{ item.ProviderType }}'
+      PullRequestId: '{{ item.PullRequestId }}'
+      RepositoryName: '{{ item.RepositoryName }}'
+      SourceCodeType: '{{ item.SourceCodeType }}'
+      Type: '{{ item.Type }}'
+- discovery_id: aws.codeguru-reviewer.list_recommendation_feedback
+  calls:
+  - action: list_recommendation_feedback
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RecommendationFeedbackSummaries }}'
+    item:
+      Reactions: '{{ item.Reactions }}'
+      RecommendationId: '{{ item.RecommendationId }}'
+      UserId: '{{ item.UserId }}'
+- discovery_id: aws.codeguru-reviewer.list_recommendations
+  calls:
+  - action: list_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RecommendationSummaries }}'
+    item:
+      Description: '{{ item.Description }}'
+      EndLine: '{{ item.EndLine }}'
+      FilePath: '{{ item.FilePath }}'
+      RecommendationCategory: '{{ item.RecommendationCategory }}'
+      RecommendationId: '{{ item.RecommendationId }}'
+      RuleMetadata: '{{ item.RuleMetadata }}'
+      Severity: '{{ item.Severity }}'
+      StartLine: '{{ item.StartLine }}'
+- discovery_id: aws.codeguru-reviewer.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

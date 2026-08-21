@@ -1,0 +1,27 @@
+# ============================================================
+# Discovery YAML — kinesis-video-signaling (AWS)
+# Generated: 2026-02-21T04:56:58Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: kinesis-video-signaling
+services:
+  client: kinesis-video-signaling
+  module: boto3.client
+discovery:
+  # ── Dependent read operations (require identifiers) ──
+  # ── GetIceServerConfig ──
+  - discovery_id: aws.kinesis-video-signaling.get_ice_server_config
+    calls:
+      - action: get_ice_server_config
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.IceServerList }}'
+      item:
+        Password: '{{ item.Password }}'
+        Ttl: '{{ item.Ttl }}'
+        Uris: '{{ item.Uris }}'
+        Username: '{{ item.Username }}'

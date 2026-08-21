@@ -1,0 +1,63 @@
+version: '1.0'
+provider: aws
+service: elb
+discovery:
+- calls:
+  - action: describe_load_balancers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.elb.describe_load_balancers
+  emit:
+    as: item
+    item:
+      AccessLog: '{{ item.AccessLog }}'
+      AvailabilityZones: '{{ item.AvailabilityZones }}'
+      BackendServerDescriptions: '{{ item.BackendServerDescriptions }}'
+      CanonicalHostedZoneId: '{{ item.CanonicalHostedZoneId }}'
+      CreatedTime: '{{ item.CreatedTime }}'
+      CustomerOwnedIpv4Pool: '{{ item.CustomerOwnedIpv4Pool }}'
+      DNSName: '{{ item.DNSName }}'
+      EnablePrefixForIpv6SourceNat: '{{ item.EnablePrefixForIpv6SourceNat }}'
+      EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic: '{{ item.EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic }}'
+      HealthCheck: '{{ item.HealthCheck }}'
+      IpAddressType: '{{ item.IpAddressType }}'
+      IpamPools: '{{ item.IpamPools }}'
+      ListenerDescriptions: '{{ item.ListenerDescriptions }}'
+      LoadBalancerArn: '{{ item.LoadBalancerArn }}'
+      LoadBalancerAttributes: '{{ item.LoadBalancerAttributes }}'
+      LoadBalancerName: '{{ item.LoadBalancerName }}'
+      LoadBalancers: '{{ item.LoadBalancers }}'
+      Policies: '{{ item.Policies }}'
+      Scheme: '{{ item.Scheme }}'
+      SecurityGroups: '{{ item.SecurityGroups }}'
+      SourceSecurityGroup: '{{ item.SourceSecurityGroup }}'
+      State: '{{ item.State }}'
+      Subnets: '{{ item.Subnets }}'
+      Type: '{{ item.Type }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.LoadBalancerDescriptions }}'
+- calls:
+  - action: describe_load_balancer_attributes
+    on_error: continue
+    params:
+      LoadBalancerName: '{{ item.LoadBalancerName }}'
+    save_as: response
+  discovery_id: aws.elb.describe_load_balancer_attributes
+  emit:
+    as: item
+    item:
+      AccessLog: '{{ response.LoadBalancerAttributes.AccessLog.Enabled }}'
+      AdditionalAttributes: '{{ response.LoadBalancerAttributes.AdditionalAttributes[].Key }}'
+      ConnectionDraining: '{{ response.LoadBalancerAttributes.ConnectionDraining.Timeout }}'
+      ConnectionSettings: '{{ response.LoadBalancerAttributes.ConnectionSettings.IdleTimeout }}'
+      CrossZoneLoadBalancing: '{{ response.LoadBalancerAttributes.CrossZoneLoadBalancing.Enabled }}'
+      Key: '{{ response.LoadBalancerAttributes.Key }}'
+      LoadBalancerAttributes: '{{ response.LoadBalancerAttributes.LoadBalancerAttributes }}'
+      Value: '{{ response.LoadBalancerAttributes.Value }}'
+      EmitInterval: '{{ response.LoadBalancerAttributes.AccessLog.EmitInterval }}'
+      Enabled: '{{ response.LoadBalancerAttributes.AccessLog.Enabled }}'
+      S3BucketName: '{{ response.LoadBalancerAttributes.AccessLog.S3BucketName }}'
+      S3BucketPrefix: '{{ response.LoadBalancerAttributes.AccessLog.S3BucketPrefix }}'
+      Timeout: '{{ response.LoadBalancerAttributes.ConnectionDraining.Timeout }}'
+      IdleTimeout: '{{ response.LoadBalancerAttributes.ConnectionSettings.IdleTimeout }}'
+  for_each: aws.elb.describe_load_balancers

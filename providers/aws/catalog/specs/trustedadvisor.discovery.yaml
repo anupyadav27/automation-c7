@@ -1,0 +1,198 @@
+version: '1.0'
+provider: aws
+service: trustedadvisor
+services:
+  client: trustedadvisor
+  module: boto3.client
+discovery:
+- discovery_id: aws.trustedadvisor.list_checks
+  calls:
+  - action: list_checks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.checkSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      awsServices: '{{ item.awsServices }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      metadata: '{{ item.metadata }}'
+      name: '{{ item.name }}'
+      pillars: '{{ item.pillars }}'
+      source: '{{ item.source }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.trustedadvisor.list_organization_recommendations
+  calls:
+  - action: list_organization_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.organizationRecommendationSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      awsServices: '{{ item.awsServices }}'
+      checkArn: '{{ item.checkArn }}'
+      createdAt: '{{ item.createdAt }}'
+      id: '{{ item.id }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      lifecycleStage: '{{ item.lifecycleStage }}'
+      name: '{{ item.name }}'
+      pillarSpecificAggregates: '{{ item.pillarSpecificAggregates }}'
+      pillars: '{{ item.pillars }}'
+      resourcesAggregates: '{{ item.resourcesAggregates }}'
+      source: '{{ item.source }}'
+      status: '{{ item.status }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.trustedadvisor.list_recommendations
+  calls:
+  - action: list_recommendations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recommendationSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      awsServices: '{{ item.awsServices }}'
+      checkArn: '{{ item.checkArn }}'
+      createdAt: '{{ item.createdAt }}'
+      id: '{{ item.id }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      lifecycleStage: '{{ item.lifecycleStage }}'
+      name: '{{ item.name }}'
+      pillarSpecificAggregates: '{{ item.pillarSpecificAggregates }}'
+      pillars: '{{ item.pillars }}'
+      resourcesAggregates: '{{ item.resourcesAggregates }}'
+      source: '{{ item.source }}'
+      status: '{{ item.status }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.trustedadvisor.get_organization_recommendation
+  calls:
+  - action: get_organization_recommendation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.organizationRecommendation.arn }}'
+      awsServices: '{{ response.organizationRecommendation.source }}'
+      checkArn: '{{ response.organizationRecommendation.checkArn }}'
+      createdAt: '{{ response.organizationRecommendation.createdAt }}'
+      createdBy: '{{ response.organizationRecommendation.createdBy }}'
+      description: '{{ response.organizationRecommendation.description }}'
+      id: '{{ response.organizationRecommendation.id }}'
+      lastUpdatedAt: '{{ response.organizationRecommendation.lastUpdatedAt }}'
+      lifecycleStage: '{{ response.organizationRecommendation.lifecycleStage }}'
+      name: '{{ response.organizationRecommendation.name }}'
+      pillarSpecificAggregates: '{{ response.organizationRecommendation.pillarSpecificAggregates }}'
+      pillars: '{{ response.organizationRecommendation.arn }}'
+      resolvedAt: '{{ response.organizationRecommendation.resolvedAt }}'
+      resourcesAggregates: '{{ response.organizationRecommendation.resourcesAggregates.okCount }}'
+      source: '{{ response.organizationRecommendation.source }}'
+      status: '{{ response.organizationRecommendation.status }}'
+      type: '{{ response.organizationRecommendation.type }}'
+      updateReason: '{{ response.organizationRecommendation.updateReason }}'
+      updateReasonCode: '{{ response.organizationRecommendation.updateReasonCode }}'
+      updatedOnBehalfOf: '{{ response.organizationRecommendation.updatedOnBehalfOf }}'
+      updatedOnBehalfOfJobTitle: '{{ response.organizationRecommendation.updatedOnBehalfOfJobTitle }}'
+      estimatedMonthlySavings: '{{ response.organizationRecommendation.pillarSpecificAggregates.costOptimizing.estimatedMonthlySavings }}'
+      estimatedPercentMonthlySavings: '{{ response.organizationRecommendation.pillarSpecificAggregates.costOptimizing.estimatedPercentMonthlySavings }}'
+      errorCount: '{{ response.organizationRecommendation.resourcesAggregates.errorCount }}'
+      okCount: '{{ response.organizationRecommendation.resourcesAggregates.okCount }}'
+      warningCount: '{{ response.organizationRecommendation.resourcesAggregates.warningCount }}'
+- discovery_id: aws.trustedadvisor.get_recommendation
+  calls:
+  - action: get_recommendation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.recommendation.arn }}'
+      awsServices: '{{ response.recommendation.awsServices }}'
+      checkArn: '{{ response.recommendation.checkArn }}'
+      createdAt: '{{ response.recommendation.createdAt }}'
+      createdBy: '{{ response.recommendation.createdBy }}'
+      description: '{{ response.recommendation.description }}'
+      id: '{{ response.recommendation.id }}'
+      lastUpdatedAt: '{{ response.recommendation.lastUpdatedAt }}'
+      lifecycleStage: '{{ response.recommendation.lifecycleStage }}'
+      name: '{{ response.recommendation.name }}'
+      pillarSpecificAggregates: '{{ response.recommendation.pillarSpecificAggregates }}'
+      pillars: '{{ response.recommendation.arn }}'
+      resolvedAt: '{{ response.recommendation.resolvedAt }}'
+      resourcesAggregates: '{{ response.recommendation.resourcesAggregates.okCount }}'
+      source: '{{ response.recommendation.source }}'
+      status: '{{ response.recommendation.status }}'
+      type: '{{ response.recommendation.type }}'
+      updateReason: '{{ response.recommendation.updateReason }}'
+      updateReasonCode: '{{ response.recommendation.updateReasonCode }}'
+      updatedOnBehalfOf: '{{ response.recommendation.updatedOnBehalfOf }}'
+      updatedOnBehalfOfJobTitle: '{{ response.recommendation.updatedOnBehalfOfJobTitle }}'
+      estimatedMonthlySavings: '{{ response.recommendation.pillarSpecificAggregates.costOptimizing.estimatedMonthlySavings }}'
+      estimatedPercentMonthlySavings: '{{ response.recommendation.pillarSpecificAggregates.costOptimizing.estimatedPercentMonthlySavings }}'
+      errorCount: '{{ response.recommendation.resourcesAggregates.errorCount }}'
+      okCount: '{{ response.recommendation.resourcesAggregates.okCount }}'
+      warningCount: '{{ response.recommendation.resourcesAggregates.warningCount }}'
+- discovery_id: aws.trustedadvisor.list_organization_recommendation_accounts
+  calls:
+  - action: list_organization_recommendation_accounts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.accountRecommendationLifecycleSummaries }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      accountRecommendationArn: '{{ item.accountRecommendationArn }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      lifecycleStage: '{{ item.lifecycleStage }}'
+      updateReason: '{{ item.updateReason }}'
+      updateReasonCode: '{{ item.updateReasonCode }}'
+      updatedOnBehalfOf: '{{ item.updatedOnBehalfOf }}'
+      updatedOnBehalfOfJobTitle: '{{ item.updatedOnBehalfOfJobTitle }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.trustedadvisor.list_organization_recommendation_resources
+  calls:
+  - action: list_organization_recommendation_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.organizationRecommendationResourceSummaries }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      arn: '{{ item.arn }}'
+      awsResourceId: '{{ item.awsResourceId }}'
+      exclusionStatus: '{{ item.exclusionStatus }}'
+      id: '{{ item.id }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      metadata: '{{ item.metadata }}'
+      recommendationArn: '{{ item.recommendationArn }}'
+      regionCode: '{{ item.regionCode }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.trustedadvisor.list_recommendation_resources
+  calls:
+  - action: list_recommendation_resources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.recommendationResourceSummaries }}'
+    item:
+      arn: '{{ item.arn }}'
+      awsResourceId: '{{ item.awsResourceId }}'
+      exclusionStatus: '{{ item.exclusionStatus }}'
+      id: '{{ item.id }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      metadata: '{{ item.metadata }}'
+      recommendationArn: '{{ item.recommendationArn }}'
+      regionCode: '{{ item.regionCode }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'

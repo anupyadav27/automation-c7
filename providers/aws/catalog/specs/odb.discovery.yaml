@@ -1,0 +1,769 @@
+version: '1.0'
+provider: aws
+service: odb
+services:
+  client: odb
+  module: boto3.client
+discovery:
+- discovery_id: aws.odb.get_oci_onboarding_status
+  calls:
+  - action: get_oci_onboarding_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      accountSetupCloudFormationUrl: '{{ response.ociIdentityDomain.accountSetupCloudFormationUrl
+        }}'
+      existingTenancyActivationLink: '{{ response.ociIdentityDomain.existingTenancyActivationLink
+        }}'
+      newTenancyActivationLink: '{{ response.ociIdentityDomain.newTenancyActivationLink
+        }}'
+      ociIdentityDomain: '{{ response.ociIdentityDomain.ociIdentityDomain }}'
+      ociIdentityDomainId: '{{ response.ociIdentityDomain.ociIdentityDomainId }}'
+      ociIdentityDomainResourceUrl: '{{ response.ociIdentityDomain.ociIdentityDomainResourceUrl
+        }}'
+      ociIdentityDomainUrl: '{{ response.ociIdentityDomain.ociIdentityDomainUrl }}'
+      status: '{{ response.ociIdentityDomain.status }}'
+      statusReason: '{{ response.ociIdentityDomain.statusReason }}'
+- discovery_id: aws.odb.list_cloud_autonomous_vm_clusters
+  calls:
+  - action: list_cloud_autonomous_vm_clusters
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.cloudAutonomousVmClusters }}'
+    item:
+      autonomousDataStoragePercentage: '{{ item.autonomousDataStoragePercentage }}'
+      autonomousDataStorageSizeInTBs: '{{ item.autonomousDataStorageSizeInTBs }}'
+      availableAutonomousDataStorageSizeInTBs: '{{ item.availableAutonomousDataStorageSizeInTBs
+        }}'
+      availableContainerDatabases: '{{ item.availableContainerDatabases }}'
+      availableCpus: '{{ item.availableCpus }}'
+      cloudAutonomousVmCluster: '{{ item.cloudAutonomousVmCluster }}'
+      cloudAutonomousVmClusterArn: '{{ item.cloudAutonomousVmClusterArn }}'
+      cloudAutonomousVmClusterId: '{{ item.cloudAutonomousVmClusterId }}'
+      cloudExadataInfrastructureId: '{{ item.cloudExadataInfrastructureId }}'
+      computeModel: '{{ item.computeModel }}'
+      cpuCoreCount: '{{ item.cpuCoreCount }}'
+      cpuCoreCountPerNode: '{{ item.cpuCoreCountPerNode }}'
+      cpuPercentage: '{{ item.cpuPercentage }}'
+      createdAt: '{{ item.createdAt }}'
+      dataStorageSizeInGBs: '{{ item.dataStorageSizeInGBs }}'
+      dataStorageSizeInTBs: '{{ item.dataStorageSizeInTBs }}'
+      dbNodeStorageSizeInGBs: '{{ item.dbNodeStorageSizeInGBs }}'
+      dbServers: '{{ item.dbServers }}'
+      description: '{{ item.description }}'
+      displayName: '{{ item.displayName }}'
+      domain: '{{ item.domain }}'
+      exadataStorageInTBsLowestScaledValue: '{{ item.exadataStorageInTBsLowestScaledValue
+        }}'
+      hostname: '{{ item.hostname }}'
+      isMtlsEnabledVmCluster: '{{ item.isMtlsEnabledVmCluster }}'
+      licenseModel: '{{ item.licenseModel }}'
+      maintenanceWindow: '{{ item.maintenanceWindow }}'
+      maxAcdsLowestScaledValue: '{{ item.maxAcdsLowestScaledValue }}'
+      memoryPerOracleComputeUnitInGBs: '{{ item.memoryPerOracleComputeUnitInGBs }}'
+      memorySizeInGBs: '{{ item.memorySizeInGBs }}'
+      nodeCount: '{{ item.nodeCount }}'
+      nonProvisionableAutonomousContainerDatabases: '{{ item.nonProvisionableAutonomousContainerDatabases
+        }}'
+      ociResourceAnchorName: '{{ item.ociResourceAnchorName }}'
+      ociUrl: '{{ item.ociUrl }}'
+      ocid: '{{ item.ocid }}'
+      odbNetworkId: '{{ item.odbNetworkId }}'
+      percentProgress: '{{ item.percentProgress }}'
+      provisionableAutonomousContainerDatabases: '{{ item.provisionableAutonomousContainerDatabases
+        }}'
+      provisionedAutonomousContainerDatabases: '{{ item.provisionedAutonomousContainerDatabases
+        }}'
+      provisionedCpus: '{{ item.provisionedCpus }}'
+      reclaimableCpus: '{{ item.reclaimableCpus }}'
+      reservedCpus: '{{ item.reservedCpus }}'
+      scanListenerPortNonTls: '{{ item.scanListenerPortNonTls }}'
+      scanListenerPortTls: '{{ item.scanListenerPortTls }}'
+      shape: '{{ item.shape }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      timeDatabaseSslCertificateExpires: '{{ item.timeDatabaseSslCertificateExpires
+        }}'
+      timeOrdsCertificateExpires: '{{ item.timeOrdsCertificateExpires }}'
+      timeZone: '{{ item.timeZone }}'
+      totalContainerDatabases: '{{ item.totalContainerDatabases }}'
+- discovery_id: aws.odb.list_cloud_exadata_infrastructures
+  calls:
+  - action: list_cloud_exadata_infrastructures
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.cloudExadataInfrastructures }}'
+    item:
+      activatedStorageCount: '{{ item.activatedStorageCount }}'
+      additionalStorageCount: '{{ item.additionalStorageCount }}'
+      availabilityZone: '{{ item.availabilityZone }}'
+      availabilityZoneId: '{{ item.availabilityZoneId }}'
+      availableStorageSizeInGBs: '{{ item.availableStorageSizeInGBs }}'
+      cloudExadataInfrastructureArn: '{{ item.cloudExadataInfrastructureArn }}'
+      cloudExadataInfrastructureId: '{{ item.cloudExadataInfrastructureId }}'
+      computeCount: '{{ item.computeCount }}'
+      computeModel: '{{ item.computeModel }}'
+      cpuCount: '{{ item.cpuCount }}'
+      createdAt: '{{ item.createdAt }}'
+      customerContactsToSendToOCI: '{{ item.customerContactsToSendToOCI }}'
+      dataStorageSizeInTBs: '{{ item.dataStorageSizeInTBs }}'
+      databaseServerType: '{{ item.databaseServerType }}'
+      dbNodeStorageSizeInGBs: '{{ item.dbNodeStorageSizeInGBs }}'
+      dbServerVersion: '{{ item.dbServerVersion }}'
+      displayName: '{{ item.displayName }}'
+      lastMaintenanceRunId: '{{ item.lastMaintenanceRunId }}'
+      maintenanceWindow: '{{ item.maintenanceWindow }}'
+      maxCpuCount: '{{ item.maxCpuCount }}'
+      maxDataStorageInTBs: '{{ item.maxDataStorageInTBs }}'
+      maxDbNodeStorageSizeInGBs: '{{ item.maxDbNodeStorageSizeInGBs }}'
+      maxMemoryInGBs: '{{ item.maxMemoryInGBs }}'
+      memorySizeInGBs: '{{ item.memorySizeInGBs }}'
+      monthlyDbServerVersion: '{{ item.monthlyDbServerVersion }}'
+      monthlyStorageServerVersion: '{{ item.monthlyStorageServerVersion }}'
+      nextMaintenanceRunId: '{{ item.nextMaintenanceRunId }}'
+      ociResourceAnchorName: '{{ item.ociResourceAnchorName }}'
+      ociUrl: '{{ item.ociUrl }}'
+      ocid: '{{ item.ocid }}'
+      percentProgress: '{{ item.percentProgress }}'
+      shape: '{{ item.shape }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      storageCount: '{{ item.storageCount }}'
+      storageServerType: '{{ item.storageServerType }}'
+      storageServerVersion: '{{ item.storageServerVersion }}'
+      totalStorageSizeInGBs: '{{ item.totalStorageSizeInGBs }}'
+- discovery_id: aws.odb.list_cloud_vm_clusters
+  calls:
+  - action: list_cloud_vm_clusters
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.cloudVmClusters }}'
+    item:
+      cloudExadataInfrastructureId: '{{ item.cloudExadataInfrastructureId }}'
+      cloudVmClusterArn: '{{ item.cloudVmClusterArn }}'
+      cloudVmClusterId: '{{ item.cloudVmClusterId }}'
+      clusterName: '{{ item.clusterName }}'
+      computeModel: '{{ item.computeModel }}'
+      cpuCoreCount: '{{ item.cpuCoreCount }}'
+      createdAt: '{{ item.createdAt }}'
+      dataCollectionOptions: '{{ item.dataCollectionOptions }}'
+      dataStorageSizeInTBs: '{{ item.dataStorageSizeInTBs }}'
+      dbNodeStorageSizeInGBs: '{{ item.dbNodeStorageSizeInGBs }}'
+      dbServers: '{{ item.dbServers }}'
+      diskRedundancy: '{{ item.diskRedundancy }}'
+      displayName: '{{ item.displayName }}'
+      domain: '{{ item.domain }}'
+      giVersion: '{{ item.giVersion }}'
+      hostname: '{{ item.hostname }}'
+      iamRoles: '{{ item.iamRoles }}'
+      iormConfigCache: '{{ item.iormConfigCache }}'
+      isLocalBackupEnabled: '{{ item.isLocalBackupEnabled }}'
+      isSparseDiskgroupEnabled: '{{ item.isSparseDiskgroupEnabled }}'
+      lastUpdateHistoryEntryId: '{{ item.lastUpdateHistoryEntryId }}'
+      licenseModel: '{{ item.licenseModel }}'
+      listenerPort: '{{ item.listenerPort }}'
+      memorySizeInGBs: '{{ item.memorySizeInGBs }}'
+      nodeCount: '{{ item.nodeCount }}'
+      ociResourceAnchorName: '{{ item.ociResourceAnchorName }}'
+      ociUrl: '{{ item.ociUrl }}'
+      ocid: '{{ item.ocid }}'
+      odbNetworkId: '{{ item.odbNetworkId }}'
+      percentProgress: '{{ item.percentProgress }}'
+      scanDnsName: '{{ item.scanDnsName }}'
+      scanDnsRecordId: '{{ item.scanDnsRecordId }}'
+      scanIpIds: '{{ item.scanIpIds }}'
+      shape: '{{ item.shape }}'
+      sshPublicKeys: '{{ item.sshPublicKeys }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      storageSizeInGBs: '{{ item.storageSizeInGBs }}'
+      systemVersion: '{{ item.systemVersion }}'
+      timeZone: '{{ item.timeZone }}'
+      vipIds: '{{ item.vipIds }}'
+- discovery_id: aws.odb.list_db_system_shapes
+  calls:
+  - action: list_db_system_shapes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dbSystemShapes }}'
+    item:
+      areServerTypesSupported: '{{ item.areServerTypesSupported }}'
+      availableCoreCount: '{{ item.availableCoreCount }}'
+      availableCoreCountPerNode: '{{ item.availableCoreCountPerNode }}'
+      availableDataStorageInTBs: '{{ item.availableDataStorageInTBs }}'
+      availableDataStoragePerServerInTBs: '{{ item.availableDataStoragePerServerInTBs
+        }}'
+      availableDbNodePerNodeInGBs: '{{ item.availableDbNodePerNodeInGBs }}'
+      availableDbNodeStorageInGBs: '{{ item.availableDbNodeStorageInGBs }}'
+      availableMemoryInGBs: '{{ item.availableMemoryInGBs }}'
+      availableMemoryPerNodeInGBs: '{{ item.availableMemoryPerNodeInGBs }}'
+      computeModel: '{{ item.computeModel }}'
+      coreCountIncrement: '{{ item.coreCountIncrement }}'
+      maxStorageCount: '{{ item.maxStorageCount }}'
+      maximumNodeCount: '{{ item.maximumNodeCount }}'
+      minCoreCountPerNode: '{{ item.minCoreCountPerNode }}'
+      minDataStorageInTBs: '{{ item.minDataStorageInTBs }}'
+      minDbNodeStoragePerNodeInGBs: '{{ item.minDbNodeStoragePerNodeInGBs }}'
+      minMemoryPerNodeInGBs: '{{ item.minMemoryPerNodeInGBs }}'
+      minStorageCount: '{{ item.minStorageCount }}'
+      minimumCoreCount: '{{ item.minimumCoreCount }}'
+      minimumNodeCount: '{{ item.minimumNodeCount }}'
+      name: '{{ item.name }}'
+      runtimeMinimumCoreCount: '{{ item.runtimeMinimumCoreCount }}'
+      shapeFamily: '{{ item.shapeFamily }}'
+      shapeType: '{{ item.shapeType }}'
+- discovery_id: aws.odb.list_gi_versions
+  calls:
+  - action: list_gi_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.giVersions }}'
+    item:
+      version: '{{ item.version }}'
+- discovery_id: aws.odb.list_odb_networks
+  calls:
+  - action: list_odb_networks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.odbNetworks }}'
+    item:
+      availabilityZone: '{{ item.availabilityZone }}'
+      availabilityZoneId: '{{ item.availabilityZoneId }}'
+      backupSubnetCidr: '{{ item.backupSubnetCidr }}'
+      clientSubnetCidr: '{{ item.clientSubnetCidr }}'
+      createdAt: '{{ item.createdAt }}'
+      customDomainName: '{{ item.customDomainName }}'
+      defaultDnsPrefix: '{{ item.defaultDnsPrefix }}'
+      displayName: '{{ item.displayName }}'
+      managedServices: '{{ item.managedServices }}'
+      ociDnsForwardingConfigs: '{{ item.ociDnsForwardingConfigs }}'
+      ociNetworkAnchorId: '{{ item.ociNetworkAnchorId }}'
+      ociNetworkAnchorUrl: '{{ item.ociNetworkAnchorUrl }}'
+      ociResourceAnchorName: '{{ item.ociResourceAnchorName }}'
+      ociVcnId: '{{ item.ociVcnId }}'
+      ociVcnUrl: '{{ item.ociVcnUrl }}'
+      odbNetworkArn: '{{ item.odbNetworkArn }}'
+      odbNetworkId: '{{ item.odbNetworkId }}'
+      peeredCidrs: '{{ item.peeredCidrs }}'
+      percentProgress: '{{ item.percentProgress }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+- discovery_id: aws.odb.list_odb_peering_connections
+  calls:
+  - action: list_odb_peering_connections
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.odbPeeringConnections }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      displayName: '{{ item.displayName }}'
+      odbNetworkArn: '{{ item.odbNetworkArn }}'
+      odbPeeringConnectionArn: '{{ item.odbPeeringConnectionArn }}'
+      odbPeeringConnectionId: '{{ item.odbPeeringConnectionId }}'
+      odbPeeringConnectionType: '{{ item.odbPeeringConnectionType }}'
+      peerNetworkArn: '{{ item.peerNetworkArn }}'
+      peerNetworkCidrs: '{{ item.peerNetworkCidrs }}'
+      percentProgress: '{{ item.percentProgress }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+- discovery_id: aws.odb.get_cloud_autonomous_vm_cluster
+  for_each: aws.odb.list_cloud_autonomous_vm_clusters
+  calls:
+  - action: get_cloud_autonomous_vm_cluster
+    params:
+      cloudAutonomousVmClusterId: '{{ item.cloudAutonomousVmClusterId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      autonomousDataStoragePercentage: '{{ response.cloudAutonomousVmCluster.autonomousDataStoragePercentage
+        }}'
+      autonomousDataStorageSizeInTBs: '{{ response.cloudAutonomousVmCluster.autonomousDataStorageSizeInTBs
+        }}'
+      availableAutonomousDataStorageSizeInTBs: '{{ response.cloudAutonomousVmCluster.availableAutonomousDataStorageSizeInTBs
+        }}'
+      availableContainerDatabases: '{{ response.cloudAutonomousVmCluster.availableContainerDatabases
+        }}'
+      availableCpus: '{{ response.cloudAutonomousVmCluster.availableCpus }}'
+      cloudAutonomousVmCluster: '{{ response.cloudAutonomousVmCluster.cloudAutonomousVmCluster
+        }}'
+      cloudAutonomousVmClusterArn: '{{ response.cloudAutonomousVmCluster.cloudAutonomousVmClusterArn
+        }}'
+      cloudAutonomousVmClusterId: '{{ response.cloudAutonomousVmCluster.cloudAutonomousVmClusterId
+        }}'
+      cloudExadataInfrastructureId: '{{ response.cloudAutonomousVmCluster.cloudExadataInfrastructureId
+        }}'
+      computeModel: '{{ response.cloudAutonomousVmCluster.computeModel }}'
+      cpuCoreCount: '{{ response.cloudAutonomousVmCluster.cpuCoreCount }}'
+      cpuCoreCountPerNode: '{{ response.cloudAutonomousVmCluster.cpuCoreCountPerNode
+        }}'
+      cpuPercentage: '{{ response.cloudAutonomousVmCluster.cpuPercentage }}'
+      createdAt: '{{ response.cloudAutonomousVmCluster.createdAt }}'
+      dataStorageSizeInGBs: '{{ response.cloudAutonomousVmCluster.dataStorageSizeInGBs
+        }}'
+      dataStorageSizeInTBs: '{{ response.cloudAutonomousVmCluster.dataStorageSizeInTBs
+        }}'
+      dbNodeStorageSizeInGBs: '{{ response.cloudAutonomousVmCluster.dbNodeStorageSizeInGBs
+        }}'
+      dbServers: '{{ response.cloudAutonomousVmCluster.dbServers }}'
+      description: '{{ response.cloudAutonomousVmCluster.description }}'
+      displayName: '{{ response.cloudAutonomousVmCluster.displayName }}'
+      domain: '{{ response.cloudAutonomousVmCluster.domain }}'
+      exadataStorageInTBsLowestScaledValue: '{{ response.cloudAutonomousVmCluster.exadataStorageInTBsLowestScaledValue
+        }}'
+      hostname: '{{ response.cloudAutonomousVmCluster.hostname }}'
+      isMtlsEnabledVmCluster: '{{ response.cloudAutonomousVmCluster.isMtlsEnabledVmCluster
+        }}'
+      licenseModel: '{{ response.cloudAutonomousVmCluster.licenseModel }}'
+      maintenanceWindow: '{{ response.cloudAutonomousVmCluster.maintenanceWindow }}'
+      maxAcdsLowestScaledValue: '{{ response.cloudAutonomousVmCluster.maxAcdsLowestScaledValue
+        }}'
+      memoryPerOracleComputeUnitInGBs: '{{ response.cloudAutonomousVmCluster.memoryPerOracleComputeUnitInGBs
+        }}'
+      memorySizeInGBs: '{{ response.cloudAutonomousVmCluster.memorySizeInGBs }}'
+      nodeCount: '{{ response.cloudAutonomousVmCluster.nodeCount }}'
+      nonProvisionableAutonomousContainerDatabases: '{{ response.cloudAutonomousVmCluster.nonProvisionableAutonomousContainerDatabases
+        }}'
+      ociResourceAnchorName: '{{ response.cloudAutonomousVmCluster.ociResourceAnchorName
+        }}'
+      ociUrl: '{{ response.cloudAutonomousVmCluster.ociUrl }}'
+      ocid: '{{ response.cloudAutonomousVmCluster.ocid }}'
+      odbNetworkId: '{{ response.cloudAutonomousVmCluster.odbNetworkId }}'
+      percentProgress: '{{ response.cloudAutonomousVmCluster.percentProgress }}'
+      provisionableAutonomousContainerDatabases: '{{ response.cloudAutonomousVmCluster.provisionableAutonomousContainerDatabases
+        }}'
+      provisionedAutonomousContainerDatabases: '{{ response.cloudAutonomousVmCluster.provisionedAutonomousContainerDatabases
+        }}'
+      provisionedCpus: '{{ response.cloudAutonomousVmCluster.provisionedCpus }}'
+      reclaimableCpus: '{{ response.cloudAutonomousVmCluster.reclaimableCpus }}'
+      reservedCpus: '{{ response.cloudAutonomousVmCluster.reservedCpus }}'
+      scanListenerPortNonTls: '{{ response.cloudAutonomousVmCluster.scanListenerPortNonTls
+        }}'
+      scanListenerPortTls: '{{ response.cloudAutonomousVmCluster.scanListenerPortTls
+        }}'
+      shape: '{{ response.cloudAutonomousVmCluster.shape }}'
+      status: '{{ response.cloudAutonomousVmCluster.status }}'
+      statusReason: '{{ response.cloudAutonomousVmCluster.statusReason }}'
+      timeDatabaseSslCertificateExpires: '{{ response.cloudAutonomousVmCluster.timeDatabaseSslCertificateExpires
+        }}'
+      timeOrdsCertificateExpires: '{{ response.cloudAutonomousVmCluster.timeOrdsCertificateExpires
+        }}'
+      timeZone: '{{ response.cloudAutonomousVmCluster.timeZone }}'
+      totalContainerDatabases: '{{ response.cloudAutonomousVmCluster.totalContainerDatabases
+        }}'
+- discovery_id: aws.odb.get_cloud_exadata_infrastructure
+  for_each: aws.odb.list_cloud_autonomous_vm_clusters
+  calls:
+  - action: get_cloud_exadata_infrastructure
+    params:
+      cloudExadataInfrastructureId: '{{ item.cloudExadataInfrastructureId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      activatedStorageCount: '{{ response.cloudExadataInfrastructure.activatedStorageCount
+        }}'
+      additionalStorageCount: '{{ response.cloudExadataInfrastructure.additionalStorageCount
+        }}'
+      availabilityZone: '{{ response.cloudExadataInfrastructure.availabilityZone }}'
+      availabilityZoneId: '{{ response.cloudExadataInfrastructure.availabilityZoneId
+        }}'
+      availableStorageSizeInGBs: '{{ response.cloudExadataInfrastructure.availableStorageSizeInGBs
+        }}'
+      cloudExadataInfrastructureArn: '{{ response.cloudExadataInfrastructure.cloudExadataInfrastructureArn
+        }}'
+      cloudExadataInfrastructureId: '{{ response.cloudExadataInfrastructure.cloudExadataInfrastructureId
+        }}'
+      computeCount: '{{ response.cloudExadataInfrastructure.computeCount }}'
+      computeModel: '{{ response.cloudExadataInfrastructure.computeModel }}'
+      cpuCount: '{{ response.cloudExadataInfrastructure.cpuCount }}'
+      createdAt: '{{ response.cloudExadataInfrastructure.createdAt }}'
+      customerContactsToSendToOCI: '{{ response.cloudExadataInfrastructure.customerContactsToSendToOCI
+        }}'
+      dataStorageSizeInTBs: '{{ response.cloudExadataInfrastructure.dataStorageSizeInTBs
+        }}'
+      databaseServerType: '{{ response.cloudExadataInfrastructure.databaseServerType
+        }}'
+      dbNodeStorageSizeInGBs: '{{ response.cloudExadataInfrastructure.dbNodeStorageSizeInGBs
+        }}'
+      dbServerVersion: '{{ response.cloudExadataInfrastructure.dbServerVersion }}'
+      displayName: '{{ response.cloudExadataInfrastructure.displayName }}'
+      lastMaintenanceRunId: '{{ response.cloudExadataInfrastructure.lastMaintenanceRunId
+        }}'
+      maintenanceWindow: '{{ response.cloudExadataInfrastructure.maintenanceWindow
+        }}'
+      maxCpuCount: '{{ response.cloudExadataInfrastructure.maxCpuCount }}'
+      maxDataStorageInTBs: '{{ response.cloudExadataInfrastructure.maxDataStorageInTBs
+        }}'
+      maxDbNodeStorageSizeInGBs: '{{ response.cloudExadataInfrastructure.maxDbNodeStorageSizeInGBs
+        }}'
+      maxMemoryInGBs: '{{ response.cloudExadataInfrastructure.maxMemoryInGBs }}'
+      memorySizeInGBs: '{{ response.cloudExadataInfrastructure.memorySizeInGBs }}'
+      monthlyDbServerVersion: '{{ response.cloudExadataInfrastructure.monthlyDbServerVersion
+        }}'
+      monthlyStorageServerVersion: '{{ response.cloudExadataInfrastructure.monthlyStorageServerVersion
+        }}'
+      nextMaintenanceRunId: '{{ response.cloudExadataInfrastructure.nextMaintenanceRunId
+        }}'
+      ociResourceAnchorName: '{{ response.cloudExadataInfrastructure.ociResourceAnchorName
+        }}'
+      ociUrl: '{{ response.cloudExadataInfrastructure.ociUrl }}'
+      ocid: '{{ response.cloudExadataInfrastructure.ocid }}'
+      percentProgress: '{{ response.cloudExadataInfrastructure.percentProgress }}'
+      shape: '{{ response.cloudExadataInfrastructure.shape }}'
+      status: '{{ response.cloudExadataInfrastructure.status }}'
+      statusReason: '{{ response.cloudExadataInfrastructure.statusReason }}'
+      storageCount: '{{ response.cloudExadataInfrastructure.storageCount }}'
+      storageServerType: '{{ response.cloudExadataInfrastructure.storageServerType
+        }}'
+      storageServerVersion: '{{ response.cloudExadataInfrastructure.storageServerVersion
+        }}'
+      totalStorageSizeInGBs: '{{ response.cloudExadataInfrastructure.totalStorageSizeInGBs
+        }}'
+- discovery_id: aws.odb.get_cloud_exadata_infrastructure_unallocated_resources
+  for_each: aws.odb.list_cloud_autonomous_vm_clusters
+  calls:
+  - action: get_cloud_exadata_infrastructure_unallocated_resources
+    params:
+      cloudExadataInfrastructureId: '{{ item.cloudExadataInfrastructureId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      cloudAutonomousVmClusters: '{{ response.cloudExadataInfrastructureUnallocatedResources.cloudAutonomousVmClusters
+        }}'
+      cloudExadataInfrastructureDisplayName: '{{ response.cloudExadataInfrastructureUnallocatedResources.cloudExadataInfrastructureDisplayName
+        }}'
+      cloudExadataInfrastructureId: '{{ response.cloudExadataInfrastructureUnallocatedResources.cloudExadataInfrastructureId
+        }}'
+      exadataStorageInTBs: '{{ response.cloudExadataInfrastructureUnallocatedResources.exadataStorageInTBs
+        }}'
+      localStorageInGBs: '{{ response.cloudExadataInfrastructureUnallocatedResources.localStorageInGBs
+        }}'
+      memoryInGBs: '{{ response.cloudExadataInfrastructureUnallocatedResources.memoryInGBs
+        }}'
+      ocpus: '{{ response.cloudExadataInfrastructureUnallocatedResources.ocpus }}'
+- discovery_id: aws.odb.get_cloud_vm_cluster
+  for_each: aws.odb.list_cloud_vm_clusters
+  calls:
+  - action: get_cloud_vm_cluster
+    params:
+      cloudVmClusterId: '{{ item.cloudVmClusterId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      cloudExadataInfrastructureId: '{{ response.cloudVmCluster.cloudExadataInfrastructureId
+        }}'
+      cloudVmClusterArn: '{{ response.cloudVmCluster.cloudVmClusterArn }}'
+      cloudVmClusterId: '{{ response.cloudVmCluster.cloudVmClusterId }}'
+      clusterName: '{{ response.cloudVmCluster.clusterName }}'
+      computeModel: '{{ response.cloudVmCluster.computeModel }}'
+      cpuCoreCount: '{{ response.cloudVmCluster.cpuCoreCount }}'
+      createdAt: '{{ response.cloudVmCluster.createdAt }}'
+      dataCollectionOptions: '{{ response.cloudVmCluster.dataCollectionOptions }}'
+      dataStorageSizeInTBs: '{{ response.cloudVmCluster.dataStorageSizeInTBs }}'
+      dbNodeStorageSizeInGBs: '{{ response.cloudVmCluster.dbNodeStorageSizeInGBs }}'
+      dbServers: '{{ response.cloudVmCluster.dbServers }}'
+      diskRedundancy: '{{ response.cloudVmCluster.diskRedundancy }}'
+      displayName: '{{ response.cloudVmCluster.displayName }}'
+      domain: '{{ response.cloudVmCluster.domain }}'
+      giVersion: '{{ response.cloudVmCluster.giVersion }}'
+      hostname: '{{ response.cloudVmCluster.hostname }}'
+      iamRoles: '{{ response.cloudVmCluster.iamRoles }}'
+      iormConfigCache: '{{ response.cloudVmCluster.iormConfigCache }}'
+      isLocalBackupEnabled: '{{ response.cloudVmCluster.isLocalBackupEnabled }}'
+      isSparseDiskgroupEnabled: '{{ response.cloudVmCluster.isSparseDiskgroupEnabled
+        }}'
+      lastUpdateHistoryEntryId: '{{ response.cloudVmCluster.lastUpdateHistoryEntryId
+        }}'
+      licenseModel: '{{ response.cloudVmCluster.licenseModel }}'
+      listenerPort: '{{ response.cloudVmCluster.listenerPort }}'
+      memorySizeInGBs: '{{ response.cloudVmCluster.memorySizeInGBs }}'
+      nodeCount: '{{ response.cloudVmCluster.nodeCount }}'
+      ociResourceAnchorName: '{{ response.cloudVmCluster.ociResourceAnchorName }}'
+      ociUrl: '{{ response.cloudVmCluster.ociUrl }}'
+      ocid: '{{ response.cloudVmCluster.ocid }}'
+      odbNetworkId: '{{ response.cloudVmCluster.odbNetworkId }}'
+      percentProgress: '{{ response.cloudVmCluster.percentProgress }}'
+      scanDnsName: '{{ response.cloudVmCluster.scanDnsName }}'
+      scanDnsRecordId: '{{ response.cloudVmCluster.scanDnsRecordId }}'
+      scanIpIds: '{{ response.cloudVmCluster.scanIpIds }}'
+      shape: '{{ response.cloudVmCluster.shape }}'
+      sshPublicKeys: '{{ response.cloudVmCluster.sshPublicKeys }}'
+      status: '{{ response.cloudVmCluster.status }}'
+      statusReason: '{{ response.cloudVmCluster.statusReason }}'
+      storageSizeInGBs: '{{ response.cloudVmCluster.storageSizeInGBs }}'
+      systemVersion: '{{ response.cloudVmCluster.systemVersion }}'
+      timeZone: '{{ response.cloudVmCluster.timeZone }}'
+      vipIds: '{{ response.cloudVmCluster.vipIds }}'
+- discovery_id: aws.odb.get_db_node
+  for_each: aws.odb.list_cloud_vm_clusters
+  calls:
+  - action: get_db_node
+    params:
+      cloudVmClusterId: '{{ item.cloudVmClusterId }}'
+      dbNodeId: '{{ item.dbNodeId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      additionalDetails: '{{ response.dbNode.additionalDetails }}'
+      backupIpId: '{{ response.dbNode.backupIpId }}'
+      backupVnic2Id: '{{ response.dbNode.backupVnic2Id }}'
+      backupVnicId: '{{ response.dbNode.backupVnicId }}'
+      cpuCoreCount: '{{ response.dbNode.cpuCoreCount }}'
+      createdAt: '{{ response.dbNode.createdAt }}'
+      dbNodeArn: '{{ response.dbNode.dbNodeArn }}'
+      dbNodeId: '{{ response.dbNode.dbNodeId }}'
+      dbNodeStorageSizeInGBs: '{{ response.dbNode.dbNodeStorageSizeInGBs }}'
+      dbServerId: '{{ response.dbNode.dbServerId }}'
+      dbSystemId: '{{ response.dbNode.dbSystemId }}'
+      faultDomain: '{{ response.dbNode.faultDomain }}'
+      floatingIpAddress: '{{ response.dbNode.floatingIpAddress }}'
+      hostIpId: '{{ response.dbNode.hostIpId }}'
+      hostname: '{{ response.dbNode.hostname }}'
+      maintenanceType: '{{ response.dbNode.maintenanceType }}'
+      memorySizeInGBs: '{{ response.dbNode.memorySizeInGBs }}'
+      ociResourceAnchorName: '{{ response.dbNode.ociResourceAnchorName }}'
+      ocid: '{{ response.dbNode.ocid }}'
+      privateIpAddress: '{{ response.dbNode.privateIpAddress }}'
+      softwareStorageSizeInGB: '{{ response.dbNode.softwareStorageSizeInGB }}'
+      status: '{{ response.dbNode.status }}'
+      statusReason: '{{ response.dbNode.statusReason }}'
+      timeMaintenanceWindowEnd: '{{ response.dbNode.timeMaintenanceWindowEnd }}'
+      timeMaintenanceWindowStart: '{{ response.dbNode.timeMaintenanceWindowStart }}'
+      totalCpuCoreCount: '{{ response.dbNode.totalCpuCoreCount }}'
+      vnic2Id: '{{ response.dbNode.vnic2Id }}'
+      vnicId: '{{ response.dbNode.vnicId }}'
+- discovery_id: aws.odb.get_db_server
+  for_each: aws.odb.list_cloud_autonomous_vm_clusters
+  calls:
+  - action: get_db_server
+    params:
+      cloudExadataInfrastructureId: '{{ item.cloudExadataInfrastructureId }}'
+      dbServerId: '{{ item.dbServerId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      autonomousVirtualMachineIds: '{{ response.dbServer.autonomousVirtualMachineIds
+        }}'
+      autonomousVmClusterIds: '{{ response.dbServer.autonomousVmClusterIds }}'
+      computeModel: '{{ response.dbServer.computeModel }}'
+      cpuCoreCount: '{{ response.dbServer.cpuCoreCount }}'
+      createdAt: '{{ response.dbServer.createdAt }}'
+      dbNodeStorageSizeInGBs: '{{ response.dbServer.dbNodeStorageSizeInGBs }}'
+      dbServerId: '{{ response.dbServer.dbServerId }}'
+      dbServerPatchingDetails: '{{ response.dbServer.dbServerPatchingDetails }}'
+      displayName: '{{ response.dbServer.displayName }}'
+      exadataInfrastructureId: '{{ response.dbServer.exadataInfrastructureId }}'
+      maxCpuCount: '{{ response.dbServer.maxCpuCount }}'
+      maxDbNodeStorageInGBs: '{{ response.dbServer.maxDbNodeStorageInGBs }}'
+      maxMemoryInGBs: '{{ response.dbServer.maxMemoryInGBs }}'
+      memorySizeInGBs: '{{ response.dbServer.memorySizeInGBs }}'
+      ociResourceAnchorName: '{{ response.dbServer.ociResourceAnchorName }}'
+      ocid: '{{ response.dbServer.ocid }}'
+      shape: '{{ response.dbServer.shape }}'
+      status: '{{ response.dbServer.status }}'
+      statusReason: '{{ response.dbServer.statusReason }}'
+      vmClusterIds: '{{ response.dbServer.vmClusterIds }}'
+- discovery_id: aws.odb.get_odb_network
+  for_each: aws.odb.list_cloud_autonomous_vm_clusters
+  calls:
+  - action: get_odb_network
+    params:
+      odbNetworkId: '{{ item.odbNetworkId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      availabilityZone: '{{ response.odbNetwork.availabilityZone }}'
+      availabilityZoneId: '{{ response.odbNetwork.availabilityZoneId }}'
+      backupSubnetCidr: '{{ response.odbNetwork.backupSubnetCidr }}'
+      clientSubnetCidr: '{{ response.odbNetwork.clientSubnetCidr }}'
+      createdAt: '{{ response.odbNetwork.createdAt }}'
+      customDomainName: '{{ response.odbNetwork.customDomainName }}'
+      defaultDnsPrefix: '{{ response.odbNetwork.defaultDnsPrefix }}'
+      displayName: '{{ response.odbNetwork.displayName }}'
+      managedServices: '{{ response.odbNetwork.managedServices }}'
+      ociDnsForwardingConfigs: '{{ response.odbNetwork.ociDnsForwardingConfigs }}'
+      ociNetworkAnchorId: '{{ response.odbNetwork.ociNetworkAnchorId }}'
+      ociNetworkAnchorUrl: '{{ response.odbNetwork.ociNetworkAnchorUrl }}'
+      ociResourceAnchorName: '{{ response.odbNetwork.ociResourceAnchorName }}'
+      ociVcnId: '{{ response.odbNetwork.ociVcnId }}'
+      ociVcnUrl: '{{ response.odbNetwork.ociVcnUrl }}'
+      odbNetworkArn: '{{ response.odbNetwork.odbNetworkArn }}'
+      odbNetworkId: '{{ response.odbNetwork.odbNetworkId }}'
+      peeredCidrs: '{{ response.odbNetwork.peeredCidrs }}'
+      percentProgress: '{{ response.odbNetwork.percentProgress }}'
+      status: '{{ response.odbNetwork.status }}'
+      statusReason: '{{ response.odbNetwork.statusReason }}'
+- discovery_id: aws.odb.get_odb_peering_connection
+  for_each: aws.odb.list_odb_peering_connections
+  calls:
+  - action: get_odb_peering_connection
+    params:
+      odbPeeringConnectionId: '{{ item.odbPeeringConnectionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      createdAt: '{{ response.odbPeeringConnection.createdAt }}'
+      displayName: '{{ response.odbPeeringConnection.displayName }}'
+      odbNetworkArn: '{{ response.odbPeeringConnection.odbNetworkArn }}'
+      odbPeeringConnectionArn: '{{ response.odbPeeringConnection.odbPeeringConnectionArn
+        }}'
+      odbPeeringConnectionId: '{{ response.odbPeeringConnection.odbPeeringConnectionId
+        }}'
+      odbPeeringConnectionType: '{{ response.odbPeeringConnection.odbPeeringConnectionType
+        }}'
+      peerNetworkArn: '{{ response.odbPeeringConnection.peerNetworkArn }}'
+      peerNetworkCidrs: '{{ response.odbPeeringConnection.peerNetworkCidrs }}'
+      percentProgress: '{{ response.odbPeeringConnection.percentProgress }}'
+      status: '{{ response.odbPeeringConnection.status }}'
+      statusReason: '{{ response.odbPeeringConnection.statusReason }}'
+- discovery_id: aws.odb.list_autonomous_virtual_machines
+  for_each: aws.odb.list_cloud_autonomous_vm_clusters
+  calls:
+  - action: list_autonomous_virtual_machines
+    params:
+      cloudAutonomousVmClusterId: '{{ item.cloudAutonomousVmClusterId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.autonomousVirtualMachines }}'
+    item:
+      autonomousVirtualMachineId: '{{ item.autonomousVirtualMachineId }}'
+      clientIpAddress: '{{ item.clientIpAddress }}'
+      cloudAutonomousVmClusterId: '{{ item.cloudAutonomousVmClusterId }}'
+      cpuCoreCount: '{{ item.cpuCoreCount }}'
+      dbNodeStorageSizeInGBs: '{{ item.dbNodeStorageSizeInGBs }}'
+      dbServerDisplayName: '{{ item.dbServerDisplayName }}'
+      dbServerId: '{{ item.dbServerId }}'
+      memorySizeInGBs: '{{ item.memorySizeInGBs }}'
+      ociResourceAnchorName: '{{ item.ociResourceAnchorName }}'
+      ocid: '{{ item.ocid }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      vmName: '{{ item.vmName }}'
+- discovery_id: aws.odb.list_db_nodes
+  for_each: aws.odb.list_cloud_vm_clusters
+  calls:
+  - action: list_db_nodes
+    params:
+      cloudVmClusterId: '{{ item.cloudVmClusterId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dbNodes }}'
+    item:
+      additionalDetails: '{{ item.additionalDetails }}'
+      backupIpId: '{{ item.backupIpId }}'
+      backupVnic2Id: '{{ item.backupVnic2Id }}'
+      backupVnicId: '{{ item.backupVnicId }}'
+      cpuCoreCount: '{{ item.cpuCoreCount }}'
+      createdAt: '{{ item.createdAt }}'
+      dbNodeArn: '{{ item.dbNodeArn }}'
+      dbNodeId: '{{ item.dbNodeId }}'
+      dbNodeStorageSizeInGBs: '{{ item.dbNodeStorageSizeInGBs }}'
+      dbServerId: '{{ item.dbServerId }}'
+      dbSystemId: '{{ item.dbSystemId }}'
+      faultDomain: '{{ item.faultDomain }}'
+      hostIpId: '{{ item.hostIpId }}'
+      hostname: '{{ item.hostname }}'
+      maintenanceType: '{{ item.maintenanceType }}'
+      memorySizeInGBs: '{{ item.memorySizeInGBs }}'
+      ociResourceAnchorName: '{{ item.ociResourceAnchorName }}'
+      ocid: '{{ item.ocid }}'
+      softwareStorageSizeInGB: '{{ item.softwareStorageSizeInGB }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      timeMaintenanceWindowEnd: '{{ item.timeMaintenanceWindowEnd }}'
+      timeMaintenanceWindowStart: '{{ item.timeMaintenanceWindowStart }}'
+      totalCpuCoreCount: '{{ item.totalCpuCoreCount }}'
+      vnic2Id: '{{ item.vnic2Id }}'
+      vnicId: '{{ item.vnicId }}'
+- discovery_id: aws.odb.list_db_servers
+  for_each: aws.odb.list_cloud_autonomous_vm_clusters
+  calls:
+  - action: list_db_servers
+    params:
+      cloudExadataInfrastructureId: '{{ item.cloudExadataInfrastructureId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dbServers }}'
+    item:
+      autonomousVirtualMachineIds: '{{ item.autonomousVirtualMachineIds }}'
+      autonomousVmClusterIds: '{{ item.autonomousVmClusterIds }}'
+      computeModel: '{{ item.computeModel }}'
+      cpuCoreCount: '{{ item.cpuCoreCount }}'
+      createdAt: '{{ item.createdAt }}'
+      dbNodeStorageSizeInGBs: '{{ item.dbNodeStorageSizeInGBs }}'
+      dbServerId: '{{ item.dbServerId }}'
+      dbServerPatchingDetails: '{{ item.dbServerPatchingDetails }}'
+      displayName: '{{ item.displayName }}'
+      exadataInfrastructureId: '{{ item.exadataInfrastructureId }}'
+      maxCpuCount: '{{ item.maxCpuCount }}'
+      maxDbNodeStorageInGBs: '{{ item.maxDbNodeStorageInGBs }}'
+      maxMemoryInGBs: '{{ item.maxMemoryInGBs }}'
+      memorySizeInGBs: '{{ item.memorySizeInGBs }}'
+      ociResourceAnchorName: '{{ item.ociResourceAnchorName }}'
+      ocid: '{{ item.ocid }}'
+      shape: '{{ item.shape }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      vmClusterIds: '{{ item.vmClusterIds }}'
+- discovery_id: aws.odb.list_system_versions
+  for_each: aws.odb.list_cloud_autonomous_vm_clusters
+  calls:
+  - action: list_system_versions
+    params:
+      giVersion: '{{ item.giVersion }}'
+      shape: '{{ item.shape }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.systemVersions }}'
+    item:
+      giVersion: '{{ item.giVersion }}'
+      shape: '{{ item.shape }}'
+      systemVersions: '{{ item.systemVersions }}'
+- discovery_id: aws.odb.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

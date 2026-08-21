@@ -1,0 +1,197 @@
+version: '1.0'
+provider: aws
+service: health
+services:
+  client: health
+  module: boto3.client
+discovery:
+- discovery_id: aws.health.describe_affected_entities_for_organization
+  calls:
+  - action: describe_affected_entities_for_organization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.entities }}'
+    item:
+      affectedAccounts: '{{ item.affectedAccounts }}'
+      arn: '{{ item.arn }}'
+      awsAccountId: '{{ item.awsAccountId }}'
+      entities: '{{ item.entities }}'
+      entityArn: '{{ item.entityArn }}'
+      entityMetadata: '{{ item.entityMetadata }}'
+      entityUrl: '{{ item.entityUrl }}'
+      entityValue: '{{ item.entityValue }}'
+      eventArn: '{{ item.eventArn }}'
+      failedSet: '{{ item.failedSet }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      statusCode: '{{ item.statusCode }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.health.describe_entity_aggregates
+  calls:
+  - action: describe_entity_aggregates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.entityAggregates }}'
+    item:
+      count: '{{ item.count }}'
+      entityAggregates: '{{ item.entityAggregates }}'
+      eventArn: '{{ item.eventArn }}'
+      statuses: '{{ item.statuses }}'
+- discovery_id: aws.health.describe_event_types
+  calls:
+  - action: describe_event_types
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.eventTypes }}'
+    item:
+      actionability: '{{ item.actionability }}'
+      category: '{{ item.category }}'
+      code: '{{ item.code }}'
+      eventTypes: '{{ item.eventTypes }}'
+      personas: '{{ item.personas }}'
+      service: '{{ item.service }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.health.describe_events
+  calls:
+  - action: describe_events
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.events }}'
+    item:
+      actionability: '{{ item.actionability }}'
+      availabilityZone: '{{ item.availabilityZone }}'
+      endTime: '{{ item.endTime }}'
+      eventScopeCode: '{{ item.eventScopeCode }}'
+      eventTypeCategory: '{{ item.eventTypeCategory }}'
+      eventTypeCode: '{{ item.eventTypeCode }}'
+      events: '{{ item.events }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      personas: '{{ item.personas }}'
+      region: '{{ item.region }}'
+      service: '{{ item.service }}'
+      startTime: '{{ item.startTime }}'
+      statusCode: '{{ item.statusCode }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.health.describe_events_for_organization
+  calls:
+  - action: describe_events_for_organization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.events }}'
+    item:
+      actionability: '{{ item.actionability }}'
+      arn: '{{ item.arn }}'
+      endTime: '{{ item.endTime }}'
+      eventScopeCode: '{{ item.eventScopeCode }}'
+      eventTypeCategory: '{{ item.eventTypeCategory }}'
+      eventTypeCode: '{{ item.eventTypeCode }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      personas: '{{ item.personas }}'
+      region: '{{ item.region }}'
+      service: '{{ item.service }}'
+      startTime: '{{ item.startTime }}'
+      statusCode: '{{ item.statusCode }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.health.describe_health_service_status_for_organization
+  calls:
+  - action: describe_health_service_status_for_organization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      healthServiceAccessStatusForOrganization: '{{ response.healthServiceAccessStatusForOrganization }}'
+- discovery_id: aws.health.describe_affected_accounts_for_organization
+  for_each: aws.health.describe_events
+  calls:
+  - action: describe_affected_accounts_for_organization
+    params:
+      eventArn: '{{ item.eventArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.affectedAccounts }}'
+    item:
+      affectedAccounts: '{{ item.affectedAccounts }}'
+      eventScopeCode: '{{ response.eventScopeCode }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.health.describe_affected_entities
+  calls:
+  - action: describe_affected_entities
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.entities }}'
+    item:
+      awsAccountId: '{{ item.awsAccountId }}'
+      entityArn: '{{ item.entityArn }}'
+      entityMetadata: '{{ item.entityMetadata }}'
+      entityUrl: '{{ item.entityUrl }}'
+      entityValue: '{{ item.entityValue }}'
+      eventArn: '{{ item.eventArn }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      statusCode: '{{ item.statusCode }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.health.describe_entity_aggregates_for_organization
+  calls:
+  - action: describe_entity_aggregates_for_organization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.organizationEntityAggregates }}'
+    item:
+      accounts: '{{ item.accounts }}'
+      count: '{{ item.count }}'
+      eventArn: '{{ item.eventArn }}'
+      statuses: '{{ item.statuses }}'
+- discovery_id: aws.health.describe_event_aggregates
+  calls:
+  - action: describe_event_aggregates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.eventAggregates }}'
+    item:
+      aggregateValue: '{{ item.aggregateValue }}'
+      count: '{{ item.count }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.health.describe_event_details
+  calls:
+  - action: describe_event_details
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.successfulSet }}'
+    item:
+      event: '{{ item.event }}'
+      eventDescription: '{{ item.eventDescription }}'
+      eventMetadata: '{{ item.eventMetadata }}'
+- discovery_id: aws.health.describe_event_details_for_organization
+  calls:
+  - action: describe_event_details_for_organization
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.successfulSet }}'
+    item:
+      awsAccountId: '{{ item.awsAccountId }}'
+      event: '{{ item.event }}'
+      eventDescription: '{{ item.eventDescription }}'
+      eventMetadata: '{{ item.eventMetadata }}'

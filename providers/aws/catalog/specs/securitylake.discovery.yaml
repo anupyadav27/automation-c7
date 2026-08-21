@@ -1,0 +1,156 @@
+version: '1.0'
+provider: aws
+service: securitylake
+services:
+  client: securitylake
+  module: boto3.client
+discovery:
+- discovery_id: aws.securitylake.get_data_lake_exception_subscription
+  calls:
+  - action: get_data_lake_exception_subscription
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      exceptionTimeToLive: '{{ response.exceptionTimeToLive }}'
+      notificationEndpoint: '{{ response.notificationEndpoint }}'
+      subscriptionProtocol: '{{ response.subscriptionProtocol }}'
+- discovery_id: aws.securitylake.get_data_lake_organization_configuration
+  calls:
+  - action: get_data_lake_organization_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.autoEnableNewAccount }}'
+    item:
+      autoEnableNewAccount: '{{ item.autoEnableNewAccount }}'
+      region: '{{ item.region }}'
+      sources: '{{ item.sources }}'
+- discovery_id: aws.securitylake.get_data_lake_sources
+  calls:
+  - action: get_data_lake_sources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dataLakeSources }}'
+    item:
+      account: '{{ item.account }}'
+      dataLakeSources: '{{ item.dataLakeSources }}'
+      eventClasses: '{{ item.eventClasses }}'
+      sourceName: '{{ item.sourceName }}'
+      sourceStatuses: '{{ item.sourceStatuses }}'
+      dataLakeArn: '{{ response.dataLakeArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.securitylake.list_data_lake_exceptions
+  calls:
+  - action: list_data_lake_exceptions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.exceptions }}'
+    item:
+      exception: '{{ item.exception }}'
+      region: '{{ item.region }}'
+      remediation: '{{ item.remediation }}'
+      timestamp: '{{ item.timestamp }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.securitylake.list_data_lakes
+  calls:
+  - action: list_data_lakes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dataLakes }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      createStatus: '{{ item.createStatus }}'
+      dataLakeArn: '{{ item.dataLakeArn }}'
+      encryptionConfiguration: '{{ item.encryptionConfiguration }}'
+      lifecycleConfiguration: '{{ item.lifecycleConfiguration }}'
+      region: '{{ item.region }}'
+      replicationConfiguration: '{{ item.replicationConfiguration }}'
+      s3BucketArn: '{{ item.s3BucketArn }}'
+      updateStatus: '{{ item.updateStatus }}'
+- discovery_id: aws.securitylake.list_log_sources
+  calls:
+  - action: list_log_sources
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.sources }}'
+    item:
+      account: '{{ item.account }}'
+      region: '{{ item.region }}'
+      sources: '{{ item.sources }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.securitylake.list_subscribers
+  calls:
+  - action: list_subscribers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.subscribers }}'
+    item:
+      accessTypes: '{{ item.accessTypes }}'
+      createdAt: '{{ item.createdAt }}'
+      resourceShareArn: '{{ item.resourceShareArn }}'
+      resourceShareName: '{{ item.resourceShareName }}'
+      roleArn: '{{ item.roleArn }}'
+      s3BucketArn: '{{ item.s3BucketArn }}'
+      sources: '{{ item.sources }}'
+      subscriberArn: '{{ item.subscriberArn }}'
+      subscriberDescription: '{{ item.subscriberDescription }}'
+      subscriberEndpoint: '{{ item.subscriberEndpoint }}'
+      subscriberId: '{{ item.subscriberId }}'
+      subscriberIdentity: '{{ item.subscriberIdentity }}'
+      subscriberName: '{{ item.subscriberName }}'
+      subscriberStatus: '{{ item.subscriberStatus }}'
+      updatedAt: '{{ item.updatedAt }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.securitylake.get_subscriber
+  for_each: aws.securitylake.list_subscribers
+  calls:
+  - action: get_subscriber
+    params:
+      subscriberId: '{{ item.subscriberId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      accessTypes: '{{ response.subscriber.accessTypes }}'
+      createdAt: '{{ response.subscriber.createdAt }}'
+      resourceShareArn: '{{ response.subscriber.resourceShareArn }}'
+      resourceShareName: '{{ response.subscriber.resourceShareName }}'
+      roleArn: '{{ response.subscriber.roleArn }}'
+      s3BucketArn: '{{ response.subscriber.s3BucketArn }}'
+      sources: '{{ response.subscriber.sources }}'
+      subscriberArn: '{{ response.subscriber.subscriberArn }}'
+      subscriberDescription: '{{ response.subscriber.subscriberDescription }}'
+      subscriberEndpoint: '{{ response.subscriber.subscriberEndpoint }}'
+      subscriberId: '{{ response.subscriber.subscriberId }}'
+      subscriberIdentity: '{{ response.subscriber.subscriberId }}'
+      subscriberName: '{{ response.subscriber.subscriberName }}'
+      subscriberStatus: '{{ response.subscriber.subscriberStatus }}'
+      updatedAt: '{{ response.subscriber.updatedAt }}'
+      externalId: '{{ response.subscriber.subscriberIdentity.externalId }}'
+      principal: '{{ response.subscriber.subscriberIdentity.principal }}'
+- discovery_id: aws.securitylake.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'

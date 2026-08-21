@@ -1,0 +1,31 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: eip
+# 1 ops (1 from checks, +0 for inventory)
+version: '1.0'
+provider: aws
+service: eip
+discovery:
+  - calls:
+    - action: describe_addresses
+      on_error: continue
+      save_as: response
+    discovery_id: aws.eip.describe_addresses
+    emit:
+      as: item
+      item:
+        Addresses: '{{ response.Addresses }}'
+        AllocationId: '{{ response.AllocationId }}'
+        AssociatePublicIpAddress: '{{ response.AssociatePublicIpAddress }}'
+        AssociationId: '{{ response.AssociationId }}'
+        CarrierIp: '{{ response.CarrierIp }}'
+        CustomerOwnedIp: '{{ response.CustomerOwnedIp }}'
+        CustomerOwnedIpv4Pool: '{{ response.CustomerOwnedIpv4Pool }}'
+        Domain: '{{ response.Domain }}'
+        InstanceId: '{{ response.InstanceId }}'
+        NetworkBorderGroup: '{{ response.NetworkBorderGroup }}'
+        NetworkInterfaceOwnerId: '{{ response.NetworkInterfaceOwnerId }}'
+        PrivateIpAddress: '{{ response.PrivateIpAddress }}'
+        PublicIp: '{{ response.PublicIp }}'
+        PublicIpv4Pool: '{{ response.PublicIpv4Pool }}'
+        ServiceManaged: '{{ response.ServiceManaged }}'
+        Tags: '{{ response.Tags }}'

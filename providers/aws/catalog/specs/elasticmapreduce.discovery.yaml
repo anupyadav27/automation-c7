@@ -1,0 +1,291 @@
+# ============================================================
+# Discovery YAML — emr (AWS)
+# Generated: 2026-02-21T04:56:58Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: emr
+services:
+  client: emr
+  module: boto3.client
+discovery:
+  # ── DescribeJobFlows ──
+  - discovery_id: aws.emr.describe_job_flows
+    calls:
+      - action: describe_job_flows
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.JobFlows }}'
+  # ── DescribeReleaseLabel ──
+  - discovery_id: aws.emr.describe_release_label
+    calls:
+      - action: describe_release_label
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Applications }}'
+  # ── GetBlockPublicAccessConfiguration ──
+  - discovery_id: aws.emr.get_block_public_access_configuration
+    calls:
+      - action: get_block_public_access_configuration
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        BlockPublicAccessConfiguration: '{{ response.BlockPublicAccessConfiguration }}'
+        BlockPublicAccessConfigurationMetadata: '{{ response.BlockPublicAccessConfigurationMetadata }}'
+  # ── ListClusters ──
+  - discovery_id: aws.emr.list_clusters
+    calls:
+      - action: list_clusters
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Clusters }}'
+  # ── ListNotebookExecutions ──
+  - discovery_id: aws.emr.list_notebook_executions
+    calls:
+      - action: list_notebook_executions
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.NotebookExecutions }}'
+  # ── ListReleaseLabels ──
+  - discovery_id: aws.emr.list_release_labels
+    calls:
+      - action: list_release_labels
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.ReleaseLabels }}'
+  # ── ListSecurityConfigurations ──
+  - discovery_id: aws.emr.list_security_configurations
+    calls:
+      - action: list_security_configurations
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.SecurityConfigurations }}'
+  # ── ListStudioSessionMappings ──
+  - discovery_id: aws.emr.list_studio_session_mappings
+    calls:
+      - action: list_studio_session_mappings
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.SessionMappings }}'
+  # ── ListStudios ──
+  - discovery_id: aws.emr.list_studios
+    calls:
+      - action: list_studios
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Studios }}'
+  # ── Dependent read operations (require identifiers) ──
+  # ── DescribeCluster ──
+  - discovery_id: aws.emr.describe_cluster
+    calls:
+      - action: describe_cluster
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Cluster: '{{ response.Cluster }}'
+  # ── DescribeNotebookExecution ──
+  - discovery_id: aws.emr.describe_notebook_execution
+    for_each: aws.emr.list_notebook_executions
+    calls:
+      - action: describe_notebook_execution
+        params:
+          NotebookExecutionId: '{{ item.NotebookExecutionId }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        NotebookExecution: '{{ response.NotebookExecution }}'
+  # ── DescribePersistentAppUI ──
+  - discovery_id: aws.emr.describe_persistent_app_ui
+    calls:
+      - action: describe_persistent_app_ui
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        PersistentAppUI: '{{ response.PersistentAppUI }}'
+  # ── DescribeSecurityConfiguration ──
+  - discovery_id: aws.emr.describe_security_configuration
+    for_each: aws.emr.describe_job_flows
+    calls:
+      - action: describe_security_configuration
+        params:
+          Name: '{{ item.Name }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Name: '{{ response.Name }}'
+        CreationDateTime: '{{ response.CreationDateTime }}'
+        SecurityConfiguration: '{{ response.SecurityConfiguration }}'
+  # ── DescribeStep ──
+  - discovery_id: aws.emr.describe_step
+    calls:
+      - action: describe_step
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Step: '{{ response.Step }}'
+  # ── DescribeStudio ──
+  - discovery_id: aws.emr.describe_studio
+    for_each: aws.emr.list_studio_session_mappings
+    calls:
+      - action: describe_studio
+        params:
+          StudioId: '{{ item.StudioId }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Studio: '{{ response.Studio }}'
+  # ── GetAutoTerminationPolicy ──
+  - discovery_id: aws.emr.get_auto_termination_policy
+    calls:
+      - action: get_auto_termination_policy
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        AutoTerminationPolicy: '{{ response.AutoTerminationPolicy }}'
+  # ── GetClusterSessionCredentials ──
+  - discovery_id: aws.emr.get_cluster_session_credentials
+    calls:
+      - action: get_cluster_session_credentials
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        Credentials: '{{ response.Credentials }}'
+        ExpiresAt: '{{ response.ExpiresAt }}'
+  # ── GetManagedScalingPolicy ──
+  - discovery_id: aws.emr.get_managed_scaling_policy
+    calls:
+      - action: get_managed_scaling_policy
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ManagedScalingPolicy: '{{ response.ManagedScalingPolicy }}'
+  # ── GetOnClusterAppUIPresignedURL ──
+  - discovery_id: aws.emr.get_on_cluster_app_ui_presigned_url
+    calls:
+      - action: get_on_cluster_app_ui_presigned_url
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        PresignedURL: '{{ response.PresignedURL }}'
+        PresignedURLReady: '{{ response.PresignedURLReady }}'
+  # ── GetPersistentAppUIPresignedURL ──
+  - discovery_id: aws.emr.get_persistent_app_ui_presigned_url
+    calls:
+      - action: get_persistent_app_ui_presigned_url
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        PresignedURL: '{{ response.PresignedURL }}'
+        PresignedURLReady: '{{ response.PresignedURLReady }}'
+  # ── GetStudioSessionMapping ──
+  - discovery_id: aws.emr.get_studio_session_mapping
+    for_each: aws.emr.list_studio_session_mappings
+    calls:
+      - action: get_studio_session_mapping
+        params:
+          StudioId: '{{ item.StudioId }}'
+          IdentityType: '{{ item.IdentityType }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        SessionMapping: '{{ response.SessionMapping }}'
+  # ── ListBootstrapActions ──
+  - discovery_id: aws.emr.list_bootstrap_actions
+    calls:
+      - action: list_bootstrap_actions
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.BootstrapActions }}'
+  # ── ListInstanceFleets ──
+  - discovery_id: aws.emr.list_instance_fleets
+    calls:
+      - action: list_instance_fleets
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.InstanceFleets }}'
+  # ── ListInstanceGroups ──
+  - discovery_id: aws.emr.list_instance_groups
+    calls:
+      - action: list_instance_groups
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.InstanceGroups }}'
+  # ── ListInstances ──
+  - discovery_id: aws.emr.list_instances
+    calls:
+      - action: list_instances
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Instances }}'
+  # ── ListSteps ──
+  - discovery_id: aws.emr.list_steps
+    calls:
+      - action: list_steps
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Steps }}'
+  # ── ListSupportedInstanceTypes ──
+  - discovery_id: aws.emr.list_supported_instance_types
+    for_each: aws.emr.describe_release_label
+    calls:
+      - action: list_supported_instance_types
+        params:
+          ReleaseLabel: '{{ item.ReleaseLabel }}'
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.SupportedInstanceTypes }}'

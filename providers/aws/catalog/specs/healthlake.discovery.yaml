@@ -1,0 +1,178 @@
+version: '1.0'
+provider: aws
+service: healthlake
+services:
+  client: healthlake
+  module: boto3.client
+discovery:
+- discovery_id: aws.healthlake.list_fhir_datastores
+  calls:
+  - action: list_fhir_datastores
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DatastorePropertiesList }}'
+    item:
+      Status: '{{ item.Status }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      DatastoreArn: '{{ item.DatastoreArn }}'
+      DatastoreEndpoint: '{{ item.DatastoreEndpoint }}'
+      DatastoreId: '{{ item.DatastoreId }}'
+      DatastoreName: '{{ item.DatastoreName }}'
+      DatastoreProperties: '{{ item.DatastoreProperties }}'
+      DatastoreStatus: '{{ item.DatastoreStatus }}'
+      DatastoreTypeVersion: '{{ item.DatastoreTypeVersion }}'
+      Enabled: '{{ item.Enabled }}'
+      EndTime: '{{ item.EndTime }}'
+      ErrorCause: '{{ item.ErrorCause }}'
+      ExportJobProperties: '{{ item.ExportJobProperties }}'
+      IdentityProviderConfiguration: '{{ item.IdentityProviderConfiguration }}'
+      ImportJobProperties: '{{ item.ImportJobProperties }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobName: '{{ item.JobName }}'
+      JobOutputDataConfig: '{{ item.JobOutputDataConfig }}'
+      JobProgressReport: '{{ item.JobProgressReport }}'
+      JobStatus: '{{ item.JobStatus }}'
+      Message: '{{ item.Message }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      PreloadDataConfig: '{{ item.PreloadDataConfig }}'
+      SseConfiguration: '{{ item.SseConfiguration }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      ValidationLevel: '{{ item.ValidationLevel }}'
+- discovery_id: aws.healthlake.describe_fhir_datastore
+  for_each: aws.healthlake.list_fhir_datastores
+  calls:
+  - action: describe_fhir_datastore
+    params:
+      DatastoreId: '{{ item.DatastoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreatedAt: '{{ response.DatastoreProperties.CreatedAt }}'
+      DatastoreArn: '{{ response.DatastoreProperties.DatastoreArn }}'
+      DatastoreEndpoint: '{{ response.DatastoreProperties.DatastoreEndpoint }}'
+      DatastoreId: '{{ response.DatastoreProperties.DatastoreId }}'
+      DatastoreName: '{{ response.DatastoreProperties.DatastoreName }}'
+      DatastoreProperties: '{{ response.DatastoreProperties.DatastoreProperties }}'
+      DatastoreStatus: '{{ response.DatastoreProperties.DatastoreStatus }}'
+      DatastoreTypeVersion: '{{ response.DatastoreProperties.DatastoreTypeVersion
+        }}'
+      ErrorCause: '{{ response.DatastoreProperties.ErrorCause }}'
+      IdentityProviderConfiguration: '{{ response.DatastoreProperties.IdentityProviderConfiguration
+        }}'
+      PreloadDataConfig: '{{ response.DatastoreProperties.PreloadDataConfig }}'
+      SseConfiguration: '{{ response.DatastoreProperties.SseConfiguration }}'
+- discovery_id: aws.healthlake.describe_fhir_export_job
+  for_each: aws.healthlake.list_fhir_datastores
+  calls:
+  - action: describe_fhir_export_job
+    params:
+      DatastoreId: '{{ item.DatastoreId }}'
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ response.ExportJobProperties.DataAccessRoleArn }}'
+      DatastoreId: '{{ response.ExportJobProperties.DatastoreId }}'
+      EndTime: '{{ response.ExportJobProperties.EndTime }}'
+      ExportJobProperties: '{{ response.ExportJobProperties.ExportJobProperties }}'
+      JobId: '{{ response.ExportJobProperties.JobId }}'
+      JobName: '{{ response.ExportJobProperties.JobName }}'
+      JobStatus: '{{ response.ExportJobProperties.JobStatus }}'
+      Message: '{{ response.ExportJobProperties.Message }}'
+      OutputDataConfig: '{{ response.ExportJobProperties.OutputDataConfig }}'
+      SubmitTime: '{{ response.ExportJobProperties.SubmitTime }}'
+- discovery_id: aws.healthlake.describe_fhir_import_job
+  for_each: aws.healthlake.list_fhir_datastores
+  calls:
+  - action: describe_fhir_import_job
+    params:
+      DatastoreId: '{{ item.DatastoreId }}'
+      JobId: '{{ item.JobId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ response.ImportJobProperties.DataAccessRoleArn }}'
+      DatastoreId: '{{ response.ImportJobProperties.DatastoreId }}'
+      EndTime: '{{ response.ImportJobProperties.EndTime }}'
+      ImportJobProperties: '{{ response.ImportJobProperties.ImportJobProperties }}'
+      InputDataConfig: '{{ response.ImportJobProperties.InputDataConfig }}'
+      JobId: '{{ response.ImportJobProperties.JobId }}'
+      JobName: '{{ response.ImportJobProperties.JobName }}'
+      JobOutputDataConfig: '{{ response.ImportJobProperties.JobOutputDataConfig }}'
+      JobProgressReport: '{{ response.ImportJobProperties.JobProgressReport }}'
+      JobStatus: '{{ response.ImportJobProperties.JobStatus }}'
+      Message: '{{ response.ImportJobProperties.Message }}'
+      SubmitTime: '{{ response.ImportJobProperties.SubmitTime }}'
+      ValidationLevel: '{{ response.ImportJobProperties.ValidationLevel }}'
+- discovery_id: aws.healthlake.list_fhir_export_jobs
+  for_each: aws.healthlake.list_fhir_datastores
+  calls:
+  - action: list_fhir_export_jobs
+    params:
+      DatastoreId: '{{ item.DatastoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ExportJobPropertiesList }}'
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      DatastoreId: '{{ item.DatastoreId }}'
+      EndTime: '{{ item.EndTime }}'
+      ExportJobProperties: '{{ item.ExportJobProperties }}'
+      ImportJobProperties: '{{ item.ImportJobProperties }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobOutputDataConfig: '{{ item.JobOutputDataConfig }}'
+      JobProgressReport: '{{ item.JobProgressReport }}'
+      JobStatus: '{{ item.JobStatus }}'
+      Message: '{{ item.Message }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      ValidationLevel: '{{ item.ValidationLevel }}'
+- discovery_id: aws.healthlake.list_fhir_import_jobs
+  for_each: aws.healthlake.list_fhir_datastores
+  calls:
+  - action: list_fhir_import_jobs
+    params:
+      DatastoreId: '{{ item.DatastoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ImportJobPropertiesList }}'
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      DatastoreId: '{{ item.DatastoreId }}'
+      EndTime: '{{ item.EndTime }}'
+      ImportJobProperties: '{{ item.ImportJobProperties }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobOutputDataConfig: '{{ item.JobOutputDataConfig }}'
+      JobProgressReport: '{{ item.JobProgressReport }}'
+      JobStatus: '{{ item.JobStatus }}'
+      Message: '{{ item.Message }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      ValidationLevel: '{{ item.ValidationLevel }}'
+- discovery_id: aws.healthlake.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

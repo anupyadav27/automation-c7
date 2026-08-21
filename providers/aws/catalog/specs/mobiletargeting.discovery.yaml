@@ -1,0 +1,543 @@
+# ============================================================
+# Discovery YAML — pinpoint (AWS)
+# Generated: 2026-02-21T04:56:59Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: pinpoint
+services:
+  client: pinpoint
+  module: boto3.client
+discovery:
+  # ── GetApps ──
+  - discovery_id: aws.pinpoint.get_apps
+    calls:
+      - action: get_apps
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ApplicationsResponse: '{{ response.ApplicationsResponse }}'
+  # ── GetRecommenderConfigurations ──
+  - discovery_id: aws.pinpoint.get_recommender_configurations
+    calls:
+      - action: get_recommender_configurations
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ListRecommenderConfigurationsResponse: '{{ response.ListRecommenderConfigurationsResponse }}'
+  # ── ListTemplates ──
+  - discovery_id: aws.pinpoint.list_templates
+    calls:
+      - action: list_templates
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        TemplatesResponse: '{{ response.TemplatesResponse }}'
+  # ── Dependent read operations (require identifiers) ──
+  # ── GetAdmChannel ──
+  - discovery_id: aws.pinpoint.get_adm_channel
+    calls:
+      - action: get_adm_channel
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ADMChannelResponse: '{{ response.ADMChannelResponse }}'
+  # ── GetApnsChannel ──
+  - discovery_id: aws.pinpoint.get_apns_channel
+    calls:
+      - action: get_apns_channel
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        APNSChannelResponse: '{{ response.APNSChannelResponse }}'
+  # ── GetApnsSandboxChannel ──
+  - discovery_id: aws.pinpoint.get_apns_sandbox_channel
+    calls:
+      - action: get_apns_sandbox_channel
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        APNSSandboxChannelResponse: '{{ response.APNSSandboxChannelResponse }}'
+  # ── GetApnsVoipChannel ──
+  - discovery_id: aws.pinpoint.get_apns_voip_channel
+    calls:
+      - action: get_apns_voip_channel
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        APNSVoipChannelResponse: '{{ response.APNSVoipChannelResponse }}'
+  # ── GetApnsVoipSandboxChannel ──
+  - discovery_id: aws.pinpoint.get_apns_voip_sandbox_channel
+    calls:
+      - action: get_apns_voip_sandbox_channel
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        APNSVoipSandboxChannelResponse: '{{ response.APNSVoipSandboxChannelResponse }}'
+  # ── GetApp ──
+  - discovery_id: aws.pinpoint.get_app
+    calls:
+      - action: get_app
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ApplicationResponse: '{{ response.ApplicationResponse }}'
+  # ── GetApplicationDateRangeKpi ──
+  - discovery_id: aws.pinpoint.get_application_date_range_kpi
+    calls:
+      - action: get_application_date_range_kpi
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ApplicationDateRangeKpiResponse: '{{ response.ApplicationDateRangeKpiResponse }}'
+  # ── GetApplicationSettings ──
+  - discovery_id: aws.pinpoint.get_application_settings
+    calls:
+      - action: get_application_settings
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ApplicationSettingsResource: '{{ response.ApplicationSettingsResource }}'
+  # ── GetBaiduChannel ──
+  - discovery_id: aws.pinpoint.get_baidu_channel
+    calls:
+      - action: get_baidu_channel
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        BaiduChannelResponse: '{{ response.BaiduChannelResponse }}'
+  # ── GetCampaign ──
+  - discovery_id: aws.pinpoint.get_campaign
+    calls:
+      - action: get_campaign
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        CampaignResponse: '{{ response.CampaignResponse }}'
+  # ── GetCampaignActivities ──
+  - discovery_id: aws.pinpoint.get_campaign_activities
+    calls:
+      - action: get_campaign_activities
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ActivitiesResponse: '{{ response.ActivitiesResponse }}'
+  # ── GetCampaignDateRangeKpi ──
+  - discovery_id: aws.pinpoint.get_campaign_date_range_kpi
+    calls:
+      - action: get_campaign_date_range_kpi
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        CampaignDateRangeKpiResponse: '{{ response.CampaignDateRangeKpiResponse }}'
+  # ── GetCampaignVersion ──
+  - discovery_id: aws.pinpoint.get_campaign_version
+    calls:
+      - action: get_campaign_version
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        CampaignResponse: '{{ response.CampaignResponse }}'
+  # ── GetCampaignVersions ──
+  - discovery_id: aws.pinpoint.get_campaign_versions
+    calls:
+      - action: get_campaign_versions
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        CampaignsResponse: '{{ response.CampaignsResponse }}'
+  # ── GetCampaigns ──
+  - discovery_id: aws.pinpoint.get_campaigns
+    calls:
+      - action: get_campaigns
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        CampaignsResponse: '{{ response.CampaignsResponse }}'
+  # ── GetChannels ──
+  - discovery_id: aws.pinpoint.get_channels
+    calls:
+      - action: get_channels
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ChannelsResponse: '{{ response.ChannelsResponse }}'
+  # ── GetEmailChannel ──
+  - discovery_id: aws.pinpoint.get_email_channel
+    calls:
+      - action: get_email_channel
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        EmailChannelResponse: '{{ response.EmailChannelResponse }}'
+  # ── GetEmailTemplate ──
+  - discovery_id: aws.pinpoint.get_email_template
+    calls:
+      - action: get_email_template
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        EmailTemplateResponse: '{{ response.EmailTemplateResponse }}'
+  # ── GetEndpoint ──
+  - discovery_id: aws.pinpoint.get_endpoint
+    calls:
+      - action: get_endpoint
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        EndpointResponse: '{{ response.EndpointResponse }}'
+  # ── GetEventStream ──
+  - discovery_id: aws.pinpoint.get_event_stream
+    calls:
+      - action: get_event_stream
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        EventStream: '{{ response.EventStream }}'
+  # ── GetExportJob ──
+  - discovery_id: aws.pinpoint.get_export_job
+    calls:
+      - action: get_export_job
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ExportJobResponse: '{{ response.ExportJobResponse }}'
+  # ── GetExportJobs ──
+  - discovery_id: aws.pinpoint.get_export_jobs
+    calls:
+      - action: get_export_jobs
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ExportJobsResponse: '{{ response.ExportJobsResponse }}'
+  # ── GetGcmChannel ──
+  - discovery_id: aws.pinpoint.get_gcm_channel
+    calls:
+      - action: get_gcm_channel
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        GCMChannelResponse: '{{ response.GCMChannelResponse }}'
+  # ── GetImportJob ──
+  - discovery_id: aws.pinpoint.get_import_job
+    calls:
+      - action: get_import_job
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ImportJobResponse: '{{ response.ImportJobResponse }}'
+  # ── GetImportJobs ──
+  - discovery_id: aws.pinpoint.get_import_jobs
+    calls:
+      - action: get_import_jobs
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ImportJobsResponse: '{{ response.ImportJobsResponse }}'
+  # ── GetInAppMessages ──
+  - discovery_id: aws.pinpoint.get_in_app_messages
+    calls:
+      - action: get_in_app_messages
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        InAppMessagesResponse: '{{ response.InAppMessagesResponse }}'
+  # ── GetInAppTemplate ──
+  - discovery_id: aws.pinpoint.get_in_app_template
+    calls:
+      - action: get_in_app_template
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        InAppTemplateResponse: '{{ response.InAppTemplateResponse }}'
+  # ── GetJourney ──
+  - discovery_id: aws.pinpoint.get_journey
+    calls:
+      - action: get_journey
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        JourneyResponse: '{{ response.JourneyResponse }}'
+  # ── GetJourneyDateRangeKpi ──
+  - discovery_id: aws.pinpoint.get_journey_date_range_kpi
+    calls:
+      - action: get_journey_date_range_kpi
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        JourneyDateRangeKpiResponse: '{{ response.JourneyDateRangeKpiResponse }}'
+  # ── GetJourneyExecutionActivityMetrics ──
+  - discovery_id: aws.pinpoint.get_journey_execution_activity_metrics
+    calls:
+      - action: get_journey_execution_activity_metrics
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        JourneyExecutionActivityMetricsResponse: '{{ response.JourneyExecutionActivityMetricsResponse }}'
+  # ── GetJourneyExecutionMetrics ──
+  - discovery_id: aws.pinpoint.get_journey_execution_metrics
+    calls:
+      - action: get_journey_execution_metrics
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        JourneyExecutionMetricsResponse: '{{ response.JourneyExecutionMetricsResponse }}'
+  # ── GetJourneyRunExecutionActivityMetrics ──
+  - discovery_id: aws.pinpoint.get_journey_run_execution_activity_metrics
+    calls:
+      - action: get_journey_run_execution_activity_metrics
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        JourneyRunExecutionActivityMetricsResponse: '{{ response.JourneyRunExecutionActivityMetricsResponse }}'
+  # ── GetJourneyRunExecutionMetrics ──
+  - discovery_id: aws.pinpoint.get_journey_run_execution_metrics
+    calls:
+      - action: get_journey_run_execution_metrics
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        JourneyRunExecutionMetricsResponse: '{{ response.JourneyRunExecutionMetricsResponse }}'
+  # ── GetJourneyRuns ──
+  - discovery_id: aws.pinpoint.get_journey_runs
+    calls:
+      - action: get_journey_runs
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        JourneyRunsResponse: '{{ response.JourneyRunsResponse }}'
+  # ── GetPushTemplate ──
+  - discovery_id: aws.pinpoint.get_push_template
+    calls:
+      - action: get_push_template
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        PushNotificationTemplateResponse: '{{ response.PushNotificationTemplateResponse }}'
+  # ── GetRecommenderConfiguration ──
+  - discovery_id: aws.pinpoint.get_recommender_configuration
+    calls:
+      - action: get_recommender_configuration
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        RecommenderConfigurationResponse: '{{ response.RecommenderConfigurationResponse }}'
+  # ── GetSegment ──
+  - discovery_id: aws.pinpoint.get_segment
+    calls:
+      - action: get_segment
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        SegmentResponse: '{{ response.SegmentResponse }}'
+  # ── GetSegmentExportJobs ──
+  - discovery_id: aws.pinpoint.get_segment_export_jobs
+    calls:
+      - action: get_segment_export_jobs
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ExportJobsResponse: '{{ response.ExportJobsResponse }}'
+  # ── GetSegmentImportJobs ──
+  - discovery_id: aws.pinpoint.get_segment_import_jobs
+    calls:
+      - action: get_segment_import_jobs
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        ImportJobsResponse: '{{ response.ImportJobsResponse }}'
+  # ── GetSegmentVersion ──
+  - discovery_id: aws.pinpoint.get_segment_version
+    calls:
+      - action: get_segment_version
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        SegmentResponse: '{{ response.SegmentResponse }}'
+  # ── GetSegmentVersions ──
+  - discovery_id: aws.pinpoint.get_segment_versions
+    calls:
+      - action: get_segment_versions
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        SegmentsResponse: '{{ response.SegmentsResponse }}'
+  # ── GetSegments ──
+  - discovery_id: aws.pinpoint.get_segments
+    calls:
+      - action: get_segments
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        SegmentsResponse: '{{ response.SegmentsResponse }}'
+  # ── GetSmsChannel ──
+  - discovery_id: aws.pinpoint.get_sms_channel
+    calls:
+      - action: get_sms_channel
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        SMSChannelResponse: '{{ response.SMSChannelResponse }}'
+  # ── GetSmsTemplate ──
+  - discovery_id: aws.pinpoint.get_sms_template
+    calls:
+      - action: get_sms_template
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        SMSTemplateResponse: '{{ response.SMSTemplateResponse }}'
+  # ── GetUserEndpoints ──
+  - discovery_id: aws.pinpoint.get_user_endpoints
+    calls:
+      - action: get_user_endpoints
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        EndpointsResponse: '{{ response.EndpointsResponse }}'
+  # ── GetVoiceChannel ──
+  - discovery_id: aws.pinpoint.get_voice_channel
+    calls:
+      - action: get_voice_channel
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        VoiceChannelResponse: '{{ response.VoiceChannelResponse }}'
+  # ── GetVoiceTemplate ──
+  - discovery_id: aws.pinpoint.get_voice_template
+    calls:
+      - action: get_voice_template
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        VoiceTemplateResponse: '{{ response.VoiceTemplateResponse }}'
+  # ── ListJourneys ──
+  - discovery_id: aws.pinpoint.list_journeys
+    calls:
+      - action: list_journeys
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        JourneysResponse: '{{ response.JourneysResponse }}'
+  # ── ListTagsForResource ──
+  - discovery_id: aws.pinpoint.list_tags_for_resource
+    calls:
+      - action: list_tags_for_resource
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        TagsModel: '{{ response.TagsModel }}'
+  # ── ListTemplateVersions ──
+  - discovery_id: aws.pinpoint.list_template_versions
+    calls:
+      - action: list_template_versions
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        TemplateVersionsResponse: '{{ response.TemplateVersionsResponse }}'

@@ -1,0 +1,138 @@
+version: '1.0'
+provider: aws
+service: braket
+services:
+  client: braket
+  module: boto3.client
+discovery:
+- discovery_id: aws.braket.search_spending_limits
+  calls:
+  - action: search_spending_limits
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.spendingLimits }}'
+- discovery_id: aws.braket.get_device
+  calls:
+  - action: get_device
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.deviceQueueInfo }}'
+    item:
+      queue: '{{ item.queue }}'
+      queuePriority: '{{ item.queuePriority }}'
+      queueSize: '{{ item.queueSize }}'
+      deviceArn: '{{ response.deviceArn }}'
+      deviceCapabilities: '{{ response.deviceCapabilities }}'
+      deviceName: '{{ response.deviceName }}'
+      deviceStatus: '{{ response.deviceStatus }}'
+      deviceType: '{{ response.deviceType }}'
+      providerName: '{{ response.providerName }}'
+- discovery_id: aws.braket.get_job
+  calls:
+  - action: get_job
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.inputDataConfig }}'
+    item:
+      associations: '{{ item.associations }}'
+      channelName: '{{ item.channelName }}'
+      contentType: '{{ item.contentType }}'
+      dataSource: '{{ item.dataSource }}'
+      uri: '{{ response.algorithmSpecification.containerImage.uri }}'
+      compressionType: '{{ response.algorithmSpecification.scriptModeConfig.compressionType }}'
+      entryPoint: '{{ response.algorithmSpecification.scriptModeConfig.entryPoint }}'
+      s3Uri: '{{ response.algorithmSpecification.scriptModeConfig.s3Uri }}'
+      billableDuration: '{{ response.billableDuration }}'
+      localPath: '{{ response.checkpointConfig.localPath }}'
+      createdAt: '{{ response.createdAt }}'
+      device: '{{ response.deviceConfig.device }}'
+      endedAt: '{{ response.endedAt }}'
+      failureReason: '{{ response.failureReason }}'
+      hyperParameters: '{{ response.hyperParameters }}'
+      instanceCount: '{{ response.instanceConfig.instanceCount }}'
+      instanceType: '{{ response.instanceConfig.instanceType }}'
+      volumeSizeInGb: '{{ response.instanceConfig.volumeSizeInGb }}'
+      jobArn: '{{ response.jobArn }}'
+      jobName: '{{ response.jobName }}'
+      kmsKeyId: '{{ response.outputDataConfig.kmsKeyId }}'
+      s3Path: '{{ response.outputDataConfig.s3Path }}'
+      message: '{{ response.queueInfo.message }}'
+      position: '{{ response.queueInfo.position }}'
+      queue: '{{ response.queueInfo.queue }}'
+      roleArn: '{{ response.roleArn }}'
+      startedAt: '{{ response.startedAt }}'
+      status: '{{ response.status }}'
+      maxRuntimeInSeconds: '{{ response.stoppingCondition.maxRuntimeInSeconds }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.braket.get_quantum_task
+  calls:
+  - action: get_quantum_task
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.associations }}'
+    item:
+      arn: '{{ item.arn }}'
+      type: '{{ item.type }}'
+      createdAt: '{{ response.createdAt }}'
+      deviceArn: '{{ response.deviceArn }}'
+      deviceParameters: '{{ response.deviceParameters }}'
+      endedAt: '{{ response.endedAt }}'
+      failureReason: '{{ response.failureReason }}'
+      jobArn: '{{ response.jobArn }}'
+      outputS3Bucket: '{{ response.outputS3Bucket }}'
+      outputS3Directory: '{{ response.outputS3Directory }}'
+      quantumTaskArn: '{{ response.quantumTaskArn }}'
+      message: '{{ response.queueInfo.message }}'
+      position: '{{ response.queueInfo.position }}'
+      queue: '{{ response.queueInfo.queue }}'
+      queuePriority: '{{ response.queueInfo.queuePriority }}'
+      shots: '{{ response.shots }}'
+      status: '{{ response.status }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.braket.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.braket.search_devices
+  calls:
+  - action: search_devices
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.devices }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.braket.search_jobs
+  calls:
+  - action: search_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.jobs }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.braket.search_quantum_tasks
+  calls:
+  - action: search_quantum_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.quantumTasks }}'
+    item:
+      nextToken: '{{ response.nextToken }}'

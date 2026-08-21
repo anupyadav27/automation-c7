@@ -1,0 +1,208 @@
+version: '1.0'
+provider: aws
+service: verifiedpermissions
+services:
+  client: verifiedpermissions
+  module: boto3.client
+discovery:
+- discovery_id: aws.verifiedpermissions.list_policy_stores
+  calls:
+  - action: list_policy_stores
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.policyStores }}'
+    item:
+      Statement: '{{ item.Statement }}'
+      Version: '{{ item.Version }}'
+      arn: '{{ item.arn }}'
+      createdDate: '{{ item.createdDate }}'
+      description: '{{ item.description }}'
+      lastUpdatedDate: '{{ item.lastUpdatedDate }}'
+      policyStoreId: '{{ item.policyStoreId }}'
+      statement: '{{ item.statement }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.verifiedpermissions.get_identity_source
+  for_each: aws.verifiedpermissions.list_policy_stores
+  calls:
+  - action: get_identity_source
+    params:
+      policyStoreId: '{{ item.policyStoreId }}'
+      identitySourceId: '{{ item.identitySourceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.details.Status }}'
+      Enabled: '{{ response.details.Enabled }}'
+      clientIds: '{{ response.details.clientIds }}'
+      discoveryUrl: '{{ response.details.discoveryUrl }}'
+      openIdIssuer: '{{ response.details.openIdIssuer }}'
+      userPoolArn: '{{ response.details.userPoolArn }}'
+      groupEntityType: '{{ response.configuration.cognitoUserPoolConfiguration.groupConfiguration.groupEntityType }}'
+      issuer: '{{ response.configuration.cognitoUserPoolConfiguration.issuer }}'
+      entityIdPrefix: '{{ response.configuration.openIdConnectConfiguration.entityIdPrefix }}'
+      groupClaim: '{{ response.configuration.openIdConnectConfiguration.groupConfiguration.groupClaim }}'
+      principalIdClaim: '{{ response.configuration.openIdConnectConfiguration.tokenSelection.accessTokenOnly.principalIdClaim }}'
+      createdDate: '{{ response.createdDate }}'
+      identitySourceId: '{{ response.identitySourceId }}'
+      lastUpdatedDate: '{{ response.lastUpdatedDate }}'
+      policyStoreId: '{{ response.policyStoreId }}'
+      principalEntityType: '{{ response.principalEntityType }}'
+- discovery_id: aws.verifiedpermissions.get_policy
+  for_each: aws.verifiedpermissions.list_policy_stores
+  calls:
+  - action: get_policy
+    params:
+      policyStoreId: '{{ item.policyStoreId }}'
+      policyId: '{{ item.policyId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.actions }}'
+    item:
+      actionId: '{{ item.actionId }}'
+      actionType: '{{ item.actionType }}'
+      createdDate: '{{ response.createdDate }}'
+      description: '{{ response.definition.static.description }}'
+      statement: '{{ response.definition.static.statement }}'
+      policyTemplateId: '{{ response.definition.templateLinked.policyTemplateId }}'
+      entityId: '{{ response.definition.templateLinked.principal.entityId }}'
+      entityType: '{{ response.definition.templateLinked.principal.entityType }}'
+      effect: '{{ response.effect }}'
+      lastUpdatedDate: '{{ response.lastUpdatedDate }}'
+      policyId: '{{ response.policyId }}'
+      policyStoreId: '{{ response.policyStoreId }}'
+      policyType: '{{ response.policyType }}'
+- discovery_id: aws.verifiedpermissions.get_policy_store
+  for_each: aws.verifiedpermissions.list_policy_stores
+  calls:
+  - action: get_policy_store
+    params:
+      policyStoreId: '{{ item.policyStoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DestinationArn: '{{ response.validationSettings.DestinationArn }}'
+      Format: '{{ response.validationSettings.Format }}'
+      Level: '{{ response.validationSettings.mode }}'
+      mode: '{{ response.validationSettings.mode }}'
+      arn: '{{ response.arn }}'
+      cedarVersion: '{{ response.cedarVersion }}'
+      createdDate: '{{ response.createdDate }}'
+      deletionProtection: '{{ response.deletionProtection }}'
+      description: '{{ response.description }}'
+      lastUpdatedDate: '{{ response.lastUpdatedDate }}'
+      policyStoreId: '{{ response.policyStoreId }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.verifiedpermissions.get_policy_template
+  for_each: aws.verifiedpermissions.list_policy_stores
+  calls:
+  - action: get_policy_template
+    params:
+      policyStoreId: '{{ item.policyStoreId }}'
+      policyTemplateId: '{{ item.policyTemplateId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      statement: '{{ response.statement }}'
+      createdDate: '{{ response.createdDate }}'
+      description: '{{ response.description }}'
+      lastUpdatedDate: '{{ response.lastUpdatedDate }}'
+      policyStoreId: '{{ response.policyStoreId }}'
+      policyTemplateId: '{{ response.policyTemplateId }}'
+- discovery_id: aws.verifiedpermissions.get_schema
+  for_each: aws.verifiedpermissions.list_policy_stores
+  calls:
+  - action: get_schema
+    params:
+      policyStoreId: '{{ item.policyStoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.namespaces }}'
+    item:
+      namespaces: '{{ item.namespaces }}'
+      schema: '{{ item.schema }}'
+      createdDate: '{{ response.createdDate }}'
+      lastUpdatedDate: '{{ response.lastUpdatedDate }}'
+      policyStoreId: '{{ response.policyStoreId }}'
+- discovery_id: aws.verifiedpermissions.list_identity_sources
+  for_each: aws.verifiedpermissions.list_policy_stores
+  calls:
+  - action: list_identity_sources
+    params:
+      policyStoreId: '{{ item.policyStoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.identitySources }}'
+    item:
+      configuration: '{{ item.configuration }}'
+      createdDate: '{{ item.createdDate }}'
+      details: '{{ item.details }}'
+      identitySourceId: '{{ item.identitySourceId }}'
+      lastUpdatedDate: '{{ item.lastUpdatedDate }}'
+      policyStoreId: '{{ item.policyStoreId }}'
+      principalEntityType: '{{ item.principalEntityType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.verifiedpermissions.list_policies
+  for_each: aws.verifiedpermissions.list_policy_stores
+  calls:
+  - action: list_policies
+    params:
+      policyStoreId: '{{ item.policyStoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.policies }}'
+    item:
+      actions: '{{ item.actions }}'
+      createdDate: '{{ item.createdDate }}'
+      definition: '{{ item.definition }}'
+      effect: '{{ item.effect }}'
+      lastUpdatedDate: '{{ item.lastUpdatedDate }}'
+      policyId: '{{ item.policyId }}'
+      policyStoreId: '{{ item.policyStoreId }}'
+      policyType: '{{ item.policyType }}'
+      principal: '{{ item.principal }}'
+      resource: '{{ item.resource }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.verifiedpermissions.list_policy_templates
+  for_each: aws.verifiedpermissions.list_policy_stores
+  calls:
+  - action: list_policy_templates
+    params:
+      policyStoreId: '{{ item.policyStoreId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.policyTemplates }}'
+    item:
+      createdDate: '{{ item.createdDate }}'
+      description: '{{ item.description }}'
+      lastUpdatedDate: '{{ item.lastUpdatedDate }}'
+      policyStoreId: '{{ item.policyStoreId }}'
+      policyTemplateId: '{{ item.policyTemplateId }}'
+      statement: '{{ item.statement }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.verifiedpermissions.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

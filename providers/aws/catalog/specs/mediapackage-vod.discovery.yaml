@@ -1,0 +1,113 @@
+version: '1.0'
+provider: aws
+service: mediapackage-vod
+services:
+  client: mediapackage-vod
+  module: boto3.client
+discovery:
+- discovery_id: aws.mediapackage-vod.list_assets
+  calls:
+  - action: list_assets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Assets }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      ResourceId: '{{ item.ResourceId }}'
+      Tags: '{{ item.Tags }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      PackagingGroupId: '{{ item.PackagingGroupId }}'
+      SourceArn: '{{ item.SourceArn }}'
+      SourceRoleArn: '{{ item.SourceRoleArn }}'
+- discovery_id: aws.mediapackage-vod.list_packaging_configurations
+  calls:
+  - action: list_packaging_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PackagingConfigurations }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Tags: '{{ item.Tags }}'
+      CmafPackage: '{{ item.CmafPackage }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DashPackage: '{{ item.DashPackage }}'
+      Enabled: '{{ item.Enabled }}'
+      HlsPackage: '{{ item.HlsPackage }}'
+      MssPackage: '{{ item.MssPackage }}'
+      PackagingGroupId: '{{ item.PackagingGroupId }}'
+- discovery_id: aws.mediapackage-vod.list_packaging_groups
+  calls:
+  - action: list_packaging_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PackagingGroups }}'
+    item:
+      Arn: '{{ item.Arn }}'
+      Id: '{{ item.Id }}'
+      Tags: '{{ item.Tags }}'
+      ApproximateAssetCount: '{{ item.ApproximateAssetCount }}'
+      Authorization: '{{ item.Authorization }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DomainName: '{{ item.DomainName }}'
+      EgressAccessLogs: '{{ item.EgressAccessLogs }}'
+- discovery_id: aws.mediapackage-vod.describe_asset
+  for_each: aws.mediapackage-vod.list_assets
+  calls:
+  - action: describe_asset
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EgressEndpoints }}'
+    item:
+      Status: '{{ item.Status }}'
+      PackagingConfigurationId: '{{ item.PackagingConfigurationId }}'
+      Url: '{{ item.Url }}'
+- discovery_id: aws.mediapackage-vod.describe_packaging_configuration
+  for_each: aws.mediapackage-vod.list_assets
+  calls:
+  - action: describe_packaging_configuration
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Encryption: '{{ response.CmafPackage.Encryption }}'
+      HlsManifests: '{{ response.CmafPackage.HlsManifests }}'
+      IncludeEncoderConfigurationInSegments: '{{ response.CmafPackage.IncludeEncoderConfigurationInSegments
+        }}'
+      SegmentDurationSeconds: '{{ response.CmafPackage.SegmentDurationSeconds }}'
+- discovery_id: aws.mediapackage-vod.describe_packaging_group
+  for_each: aws.mediapackage-vod.list_assets
+  calls:
+  - action: describe_packaging_group
+    params:
+      Id: '{{ item.Id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CdnIdentifierSecret: '{{ response.Authorization.CdnIdentifierSecret }}'
+      SecretsRoleArn: '{{ response.Authorization.SecretsRoleArn }}'
+- discovery_id: aws.mediapackage-vod.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

@@ -1,0 +1,326 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: vpc
+# 16 ops (3 from checks, +13 for inventory)
+version: '1.0'
+provider: aws
+service: vpc
+discovery:
+  - calls:
+    - action: describe_network_acls
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_network_acls
+    emit:
+      as: item
+      item:
+        Associations: '{{ response.Associations }}'
+        Entries: '{{ response.Entries }}'
+        IsDefault: '{{ response.IsDefault }}'
+        NetworkAclId: '{{ response.NetworkAclId }}'
+        NetworkAcls: '{{ response.NetworkAcls }}'
+        Tags: '{{ response.Tags }}'
+        VpcId: '{{ response.VpcId }}'
+  - calls:
+    - action: describe_nat_gateways
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_nat_gateways
+    emit:
+      as: item
+      item:
+        AttachedAppliances: '{{ response.AttachedAppliances }}'
+        AutoProvisionZones: '{{ response.AutoProvisionZones }}'
+        AutoScalingIps: '{{ response.AutoScalingIps }}'
+        AvailabilityMode: '{{ response.AvailabilityMode }}'
+        ConnectivityType: '{{ response.ConnectivityType }}'
+        CreateTime: '{{ response.CreateTime }}'
+        DeleteTime: '{{ response.DeleteTime }}'
+        FailureCode: '{{ response.FailureCode }}'
+        FailureMessage: '{{ response.FailureMessage }}'
+        NatGatewayAddresses: '{{ response.NatGatewayAddresses }}'
+        NatGatewayId: '{{ response.NatGatewayId }}'
+        NatGateways: '{{ response.NatGateways }}'
+        ProvisionedBandwidth: '{{ response.ProvisionedBandwidth }}'
+        RouteTableId: '{{ response.RouteTableId }}'
+        State: '{{ response.State }}'
+        Tags: '{{ response.Tags }}'
+        VpcId: '{{ response.VpcId }}'
+  - calls:
+    - action: describe_vpc_peering_connections
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_vpc_peering_connections
+    emit:
+      as: item
+      item:
+        AccepterVpcInfo: '{{ response.AccepterVpcInfo }}'
+        ExpirationTime: '{{ response.ExpirationTime }}'
+        RequesterVpcInfo: '{{ response.RequesterVpcInfo }}'
+        Status: '{{ response.Status }}'
+        Tags: '{{ response.Tags }}'
+        VpcPeeringConnectionId: '{{ response.VpcPeeringConnectionId }}'
+        VpcPeeringConnections: '{{ response.VpcPeeringConnections }}'
+  - calls:
+    - action: describe_security_groups
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_security_groups
+    emit:
+      as: item
+      item:
+        Description: '{{ response.Description }}'
+        GroupId: '{{ response.GroupId }}'
+        GroupName: '{{ response.GroupName }}'
+        IpPermissions: '{{ response.IpPermissions }}'
+        IpPermissionsEgress: '{{ response.IpPermissionsEgress }}'
+        SecurityGroupArn: '{{ response.SecurityGroupArn }}'
+        Tags: '{{ response.Tags }}'
+        VpcId: '{{ response.VpcId }}'
+  - calls:
+    - action: describe_subnets
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_subnets
+    emit:
+      as: item
+      item:
+        AssignIpv6AddressOnCreation: '{{ response.AssignIpv6AddressOnCreation }}'
+        AvailabilityZone: '{{ response.AvailabilityZone }}'
+        AvailabilityZoneId: '{{ response.AvailabilityZoneId }}'
+        AvailableIpAddressCount: '{{ response.AvailableIpAddressCount }}'
+        BlockPublicAccessStates: '{{ response.BlockPublicAccessStates }}'
+        CidrBlock: '{{ response.CidrBlock }}'
+        CustomerOwnedIpv4Pool: '{{ response.CustomerOwnedIpv4Pool }}'
+        DefaultForAz: '{{ response.DefaultForAz }}'
+        EnableDns64: '{{ response.EnableDns64 }}'
+        EnableLniAtDeviceIndex: '{{ response.EnableLniAtDeviceIndex }}'
+        Ipv6CidrBlockAssociationSet: '{{ response.Ipv6CidrBlockAssociationSet }}'
+        Ipv6Native: '{{ response.Ipv6Native }}'
+        MapCustomerOwnedIpOnLaunch: '{{ response.MapCustomerOwnedIpOnLaunch }}'
+        MapPublicIpOnLaunch: '{{ response.MapPublicIpOnLaunch }}'
+        OutpostArn: '{{ response.OutpostArn }}'
+        PrivateDnsNameOptionsOnLaunch: '{{ response.PrivateDnsNameOptionsOnLaunch }}'
+        SubnetArn: '{{ response.SubnetArn }}'
+        Subnets: '{{ response.Subnets }}'
+        Tags: '{{ response.Tags }}'
+        VpcId: '{{ response.VpcId }}'
+  - calls:
+    - action: describe_internet_gateways
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_internet_gateways
+    emit:
+      as: item
+      item:
+        Attachments: '{{ response.Attachments }}'
+        InternetGatewayId: '{{ response.InternetGatewayId }}'
+        InternetGateways: '{{ response.InternetGateways }}'
+        Tags: '{{ response.Tags }}'
+  - calls:
+    - action: describe_vpcs
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_vpcs
+    emit:
+      as: item
+      item:
+        BlockPublicAccessStates: '{{ response.BlockPublicAccessStates }}'
+        CidrBlock: '{{ response.CidrBlock }}'
+        CidrBlockAssociationSet: '{{ response.CidrBlockAssociationSet }}'
+        DhcpOptionsId: '{{ response.DhcpOptionsId }}'
+        EncryptionControl: '{{ response.EncryptionControl }}'
+        InstanceTenancy: '{{ response.InstanceTenancy }}'
+        Ipv6CidrBlockAssociationSet: '{{ response.Ipv6CidrBlockAssociationSet }}'
+        IsDefault: '{{ response.IsDefault }}'
+        Tags: '{{ response.Tags }}'
+        VpcId: '{{ response.VpcId }}'
+  - calls:
+    - action: describe_carrier_gateways
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_carrier_gateways
+    emit:
+      as: item
+      item:
+        CarrierGatewayId: '{{ response.CarrierGatewayId }}'
+        CarrierGateways: '{{ response.CarrierGateways }}'
+        EnableDnsHostnames: '{{ response.EnableDnsHostnames }}'
+        EnableDnsSupport: '{{ response.EnableDnsSupport }}'
+        EnableNetworkAddressUsageMetrics: '{{ response.EnableNetworkAddressUsageMetrics
+          }}'
+        IsExcludable: '{{ response.IsExcludable }}'
+        NonCompliantResources: '{{ response.NonCompliantResources }}'
+        SecurityGroupForVpcs: '{{ response.SecurityGroupForVpcs }}'
+        StaleIpPermissions: '{{ response.StaleIpPermissions }}'
+        StaleIpPermissionsEgress: '{{ response.StaleIpPermissionsEgress }}'
+        StaleSecurityGroupSet: '{{ response.StaleSecurityGroupSet }}'
+        Tags: '{{ response.Tags }}'
+        VpcId: '{{ response.VpcId }}'
+  - calls:
+    - action: describe_vpc_endpoints
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_vpc_endpoints
+    emit:
+      as: item
+      item:
+        CreationTimestamp: '{{ response.CreationTimestamp }}'
+        DnsEntries: '{{ response.DnsEntries }}'
+        DnsOptions: '{{ response.DnsOptions }}'
+        FailureReason: '{{ response.FailureReason }}'
+        Groups: '{{ response.Groups }}'
+        IpAddressType: '{{ response.IpAddressType }}'
+        Ipv4Prefixes: '{{ response.Ipv4Prefixes }}'
+        Ipv6Prefixes: '{{ response.Ipv6Prefixes }}'
+        LastError: '{{ response.LastError }}'
+        NetworkInterfaceIds: '{{ response.NetworkInterfaceIds }}'
+        PolicyDocument: '{{ response.PolicyDocument }}'
+        PrivateDnsEnabled: '{{ response.PrivateDnsEnabled }}'
+        RequesterManaged: '{{ response.RequesterManaged }}'
+        ResourceConfigurationArn: '{{ response.ResourceConfigurationArn }}'
+        RouteTableIds: '{{ response.RouteTableIds }}'
+        ServiceName: '{{ response.ServiceName }}'
+        ServiceNetworkArn: '{{ response.ServiceNetworkArn }}'
+        ServiceRegion: '{{ response.ServiceRegion }}'
+        SubnetIds: '{{ response.SubnetIds }}'
+        Tags: '{{ response.Tags }}'
+        VpcEndpointId: '{{ response.VpcEndpointId }}'
+        VpcEndpointType: '{{ response.VpcEndpointType }}'
+        VpcEndpoints: '{{ response.VpcEndpoints }}'
+        VpcId: '{{ response.VpcId }}'
+  - calls:
+    - action: describe_customer_gateways
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_customer_gateways
+    emit:
+      as: item
+      item:
+        BgpAsn: '{{ response.BgpAsn }}'
+        BgpAsnExtended: '{{ response.BgpAsnExtended }}'
+        CertificateArn: '{{ response.CertificateArn }}'
+        CustomerGatewayId: '{{ response.CustomerGatewayId }}'
+        CustomerGateways: '{{ response.CustomerGateways }}'
+        DeviceName: '{{ response.DeviceName }}'
+        IpAddress: '{{ response.IpAddress }}'
+        State: '{{ response.State }}'
+        Tags: '{{ response.Tags }}'
+        Type: '{{ response.Type }}'
+  - calls:
+    - action: describe_vpc_endpoint_service_configurations
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_vpc_endpoint_service_configurations
+    emit:
+      as: item
+      item:
+        AcceptanceRequired: '{{ response.AcceptanceRequired }}'
+        AvailabilityZoneIds: '{{ response.AvailabilityZoneIds }}'
+        AvailabilityZones: '{{ response.AvailabilityZones }}'
+        BaseEndpointDnsNames: '{{ response.BaseEndpointDnsNames }}'
+        GatewayLoadBalancerArns: '{{ response.GatewayLoadBalancerArns }}'
+        ManagesVpcEndpoints: '{{ response.ManagesVpcEndpoints }}'
+        NetworkLoadBalancerArns: '{{ response.NetworkLoadBalancerArns }}'
+        PayerResponsibility: '{{ response.PayerResponsibility }}'
+        PrivateDnsName: '{{ response.PrivateDnsName }}'
+        PrivateDnsNameConfiguration: '{{ response.PrivateDnsNameConfiguration }}'
+        RemoteAccessEnabled: '{{ response.RemoteAccessEnabled }}'
+        ServiceConfigurations: '{{ response.ServiceConfigurations }}'
+        ServiceId: '{{ response.ServiceId }}'
+        ServiceName: '{{ response.ServiceName }}'
+        ServiceState: '{{ response.ServiceState }}'
+        ServiceType: '{{ response.ServiceType }}'
+        SupportedIpAddressTypes: '{{ response.SupportedIpAddressTypes }}'
+        SupportedRegions: '{{ response.SupportedRegions }}'
+        Tags: '{{ response.Tags }}'
+  - calls:
+    - action: describe_dhcp_options
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_dhcp_options
+    emit:
+      as: item
+      item:
+        DhcpConfigurations: '{{ response.DhcpConfigurations }}'
+        DhcpOptions: '{{ response.DhcpOptions }}'
+        DhcpOptionsId: '{{ response.DhcpOptionsId }}'
+        Tags: '{{ response.Tags }}'
+  - calls:
+    - action: describe_vpn_gateways
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_vpn_gateways
+    emit:
+      as: item
+      item:
+        AmazonSideAsn: '{{ response.AmazonSideAsn }}'
+        AvailabilityZone: '{{ response.AvailabilityZone }}'
+        Tags: '{{ response.Tags }}'
+        VpcAttachments: '{{ response.VpcAttachments }}'
+        VpnGatewayId: '{{ response.VpnGatewayId }}'
+        VpnGateways: '{{ response.VpnGateways }}'
+  - calls:
+    - action: describe_egress_only_internet_gateways
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_egress_only_internet_gateways
+    emit:
+      as: item
+      item:
+        Attachments: '{{ response.Attachments }}'
+        EgressOnlyInternetGatewayId: '{{ response.EgressOnlyInternetGatewayId }}'
+        EgressOnlyInternetGateways: '{{ response.EgressOnlyInternetGateways }}'
+        Tags: '{{ response.Tags }}'
+  - calls:
+    - action: describe_route_tables
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_route_tables
+    emit:
+      as: item
+      item:
+        Associations: '{{ response.Associations }}'
+        PropagatingVgws: '{{ response.PropagatingVgws }}'
+        RouteTableId: '{{ response.RouteTableId }}'
+        RouteTables: '{{ response.RouteTables }}'
+        Routes: '{{ response.Routes }}'
+        Tags: '{{ response.Tags }}'
+        VpcId: '{{ response.VpcId }}'
+  - calls:
+    - action: describe_network_interfaces
+      on_error: continue
+      save_as: response
+    discovery_id: aws.vpc.describe_network_interfaces
+    emit:
+      as: item
+      item:
+        AssociatedSubnets: '{{ response.AssociatedSubnets }}'
+        Association: '{{ response.Association }}'
+        Attachment: '{{ response.Attachment }}'
+        AvailabilityZone: '{{ response.AvailabilityZone }}'
+        AvailabilityZoneId: '{{ response.AvailabilityZoneId }}'
+        ConnectionTrackingConfiguration: '{{ response.ConnectionTrackingConfiguration
+          }}'
+        DenyAllIgwTraffic: '{{ response.DenyAllIgwTraffic }}'
+        Description: '{{ response.Description }}'
+        Groups: '{{ response.Groups }}'
+        InterfaceType: '{{ response.InterfaceType }}'
+        Ipv4Prefixes: '{{ response.Ipv4Prefixes }}'
+        Ipv6Address: '{{ response.Ipv6Address }}'
+        Ipv6Addresses: '{{ response.Ipv6Addresses }}'
+        Ipv6Native: '{{ response.Ipv6Native }}'
+        Ipv6Prefixes: '{{ response.Ipv6Prefixes }}'
+        MacAddress: '{{ response.MacAddress }}'
+        Operator: '{{ response.Operator }}'
+        OutpostArn: '{{ response.OutpostArn }}'
+        PrivateDnsName: '{{ response.PrivateDnsName }}'
+        PrivateIpAddress: '{{ response.PrivateIpAddress }}'
+        PrivateIpAddresses: '{{ response.PrivateIpAddresses }}'
+        PublicDnsName: '{{ response.PublicDnsName }}'
+        PublicIpDnsNameOptions: '{{ response.PublicIpDnsNameOptions }}'
+        RequesterId: '{{ response.RequesterId }}'
+        RequesterManaged: '{{ response.RequesterManaged }}'
+        SourceDestCheck: '{{ response.SourceDestCheck }}'
+        Status: '{{ response.Status }}'
+        TagSet: '{{ response.TagSet }}'
+        VpcId: '{{ response.VpcId }}'

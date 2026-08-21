@@ -1,0 +1,96 @@
+version: '1.0'
+provider: aws
+service: emr
+discovery:
+- calls:
+  - action: get_block_public_access_configuration
+    on_error: continue
+    save_as: response
+  discovery_id: aws.emr.get_block_public_access_configuration
+  emit:
+    as: item
+    item:
+      BlockPublicAccessConfigurationMetadata: '{{ response.BlockPublicAccessConfigurationMetadata.CreatedByArn
+        }}'
+      CreatedByArn: '{{ response.BlockPublicAccessConfigurationMetadata.CreatedByArn
+        }}'
+      CreationDateTime: '{{ response.BlockPublicAccessConfigurationMetadata.CreationDateTime
+        }}'
+      BlockPublicSecurityGroupRules: '{{ response.BlockPublicAccessConfiguration.BlockPublicSecurityGroupRules
+        }}'
+- calls:
+  - action: describe_cluster
+    on_error: continue
+    save_as: response
+  discovery_id: aws.emr.describe_cluster
+  emit:
+    as: item
+    item:
+      AutoScalingRole: '{{ response.Cluster.AutoScalingRole }}'
+      AutoTerminate: '{{ response.Cluster.AutoTerminate }}'
+      ClusterArn: '{{ response.Cluster.ClusterArn }}'
+      CustomAmiId: '{{ response.Cluster.CustomAmiId }}'
+      EbsRootVolumeIops: '{{ response.Cluster.EbsRootVolumeIops }}'
+      EbsRootVolumeSize: '{{ response.Cluster.EbsRootVolumeSize }}'
+      EbsRootVolumeThroughput: '{{ response.Cluster.EbsRootVolumeThroughput }}'
+      Ec2AvailabilityZone: '{{ response.Cluster.Ec2InstanceAttributes.Ec2AvailabilityZone
+        }}'
+      Ec2KeyName: '{{ response.Cluster.Ec2InstanceAttributes.Ec2KeyName }}'
+      Ec2SubnetId: '{{ response.Cluster.Ec2InstanceAttributes.Ec2SubnetId }}'
+      EmrManagedMasterSecurityGroup: '{{ response.Cluster.Ec2InstanceAttributes.EmrManagedMasterSecurityGroup
+        }}'
+      EmrManagedSlaveSecurityGroup: '{{ response.Cluster.Ec2InstanceAttributes.EmrManagedSlaveSecurityGroup
+        }}'
+      IamInstanceProfile: '{{ response.Cluster.Ec2InstanceAttributes.IamInstanceProfile
+        }}'
+      ServiceAccessSecurityGroup: '{{ response.Cluster.Ec2InstanceAttributes.ServiceAccessSecurityGroup
+        }}'
+      Id: '{{ response.Cluster.Id }}'
+      InstanceCollectionType: '{{ response.Cluster.InstanceCollectionType }}'
+      ADDomainJoinPassword: '{{ response.Cluster.KerberosAttributes.ADDomainJoinPassword
+        }}'
+      ADDomainJoinUser: '{{ response.Cluster.KerberosAttributes.ADDomainJoinUser }}'
+      CrossRealmTrustPrincipalPassword: '{{ response.Cluster.KerberosAttributes.CrossRealmTrustPrincipalPassword
+        }}'
+      KdcAdminPassword: '{{ response.Cluster.KerberosAttributes.KdcAdminPassword }}'
+      Realm: '{{ response.Cluster.KerberosAttributes.Realm }}'
+      LogEncryptionKmsKeyId: '{{ response.Cluster.LogEncryptionKmsKeyId }}'
+      LogUri: '{{ response.Cluster.LogUri }}'
+      MasterPublicDnsName: '{{ response.Cluster.MasterPublicDnsName }}'
+      Name: '{{ response.Cluster.Name }}'
+      NormalizedInstanceHours: '{{ response.Cluster.NormalizedInstanceHours }}'
+      OSReleaseLabel: '{{ response.Cluster.OSReleaseLabel }}'
+      OutpostArn: '{{ response.Cluster.OutpostArn }}'
+      ReleaseLabel: '{{ response.Cluster.ReleaseLabel }}'
+      RepoUpgradeOnBoot: '{{ response.Cluster.RepoUpgradeOnBoot }}'
+      RequestedAmiVersion: '{{ response.Cluster.RequestedAmiVersion }}'
+      RunningAmiVersion: '{{ response.Cluster.RunningAmiVersion }}'
+      ScaleDownBehavior: '{{ response.Cluster.ScaleDownBehavior }}'
+      SecurityConfiguration: '{{ response.Cluster.SecurityConfiguration }}'
+      ServiceRole: '{{ response.Cluster.ServiceRole }}'
+      State: '{{ response.Cluster.Status.State }}'
+      Code: '{{ response.Cluster.Status.StateChangeReason.Code }}'
+      Message: '{{ response.Cluster.Status.StateChangeReason.Message }}'
+      CreationDateTime: '{{ response.Cluster.Status.Timeline.CreationDateTime }}'
+      EndDateTime: '{{ response.Cluster.Status.Timeline.EndDateTime }}'
+      ReadyDateTime: '{{ response.Cluster.Status.Timeline.ReadyDateTime }}'
+      StepConcurrencyLevel: '{{ response.Cluster.StepConcurrencyLevel }}'
+      TerminationProtected: '{{ response.Cluster.TerminationProtected }}'
+      UnhealthyNodeReplacement: '{{ response.Cluster.UnhealthyNodeReplacement }}'
+      VisibleToAllUsers: '{{ response.Cluster.VisibleToAllUsers }}'
+- calls:
+  - action: list_clusters
+    on_error: continue
+    save_as: response
+  discovery_id: aws.emr.list_clusters
+  emit:
+    as: item
+    items_for: '{{ response.Clusters }}'
+- calls:
+  - action: list_studio_session_mappings
+    on_error: continue
+    save_as: response
+  discovery_id: aws.emr.list_studio_session_mappings
+  emit:
+    as: item
+    items_for: '{{ response.SessionMappings }}'

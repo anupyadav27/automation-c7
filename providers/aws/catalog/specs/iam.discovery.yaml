@@ -1,0 +1,597 @@
+version: '1.0'
+provider: aws
+service: iam
+discovery:
+- calls:
+  - action: get_user
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.get_user
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.User.Arn }}'
+      CreateDate: '{{ response.User.CreateDate }}'
+      Path: '{{ response.User.Path }}'
+      PermissionsBoundary: '{{ response.User.PermissionsBoundary }}'
+      Tags: '{{ response.User.Tags }}'
+      UserId: '{{ response.User.UserId }}'
+      UserName: '{{ response.User.UserName }}'
+      PasswordLastUsed: '{{ response.User.PasswordLastUsed }}'
+      PermissionsBoundaryArn: '{{ response.User.PermissionsBoundary.PermissionsBoundaryArn }}'
+      PermissionsBoundaryType: '{{ response.User.PermissionsBoundary.PermissionsBoundaryType }}'
+- calls:
+  - action: list_server_certificates
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.list_server_certificates
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      Expiration: '{{ item.Expiration }}'
+      Path: '{{ item.Path }}'
+      ServerCertificateId: '{{ item.ServerCertificateId }}'
+      ServerCertificateName: '{{ item.ServerCertificateName }}'
+      UploadDate: '{{ item.UploadDate }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.ServerCertificateMetadataList }}'
+- calls:
+  - action: list_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.list_groups
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      CreateDate: '{{ item.CreateDate }}'
+      GroupId: '{{ item.GroupId }}'
+      GroupName: '{{ item.GroupName }}'
+      Path: '{{ item.Path }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.Groups }}'
+- calls:
+  - action: list_group_policies
+    on_error: continue
+    params:
+      GroupName: '{{ item.GroupName }}'
+    save_as: response
+  discovery_id: aws.iam.list_group_policies
+  emit:
+    as: policy
+    item:
+      GroupName: '{{ item.GroupName }}'
+      PolicyName: '{{ policy }}'
+      PolicyNames: '{{ response.PolicyNames }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.PolicyNames }}'
+  for_each: aws.iam.list_groups
+- calls:
+  - action: list_open_id_connect_providers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.list_open_id_connect_providers
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      OpenIDConnectProviderArn: '{{ item.Arn }}'
+      Url: '{{ item.Url }}'
+    items_for: '{{ response.OpenIDConnectProviderList }}'
+- calls:
+  - action: get_open_id_connect_provider
+    on_error: continue
+    params:
+      OpenIDConnectProviderArn: '{{ item.Arn }}'
+    save_as: response
+  discovery_id: aws.iam.get_open_id_connect_provider
+  emit:
+    as: item
+    item:
+      ClientIDList: '{{ response.ClientIDList }}'
+      CreateDate: '{{ response.CreateDate }}'
+      Tags: '{{ response.Tags }}'
+      ThumbprintList: '{{ response.ThumbprintList }}'
+      Url: '{{ response.Url }}'
+  for_each: aws.iam.list_open_id_connect_providers
+- calls:
+  - action: list_users
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.list_users
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      CreateDate: '{{ item.CreateDate }}'
+      PasswordLastUsed: '{{ item.PasswordLastUsed }}'
+      Path: '{{ item.Path }}'
+      PermissionsBoundary: '{{ item.PermissionsBoundary }}'
+      Tags: '{{ item.Tags }}'
+      UserId: '{{ item.UserId }}'
+      UserName: '{{ item.UserName }}'
+      Users: '{{ item.Users }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.Users }}'
+- calls:
+  - action: list_user_policies
+    on_error: continue
+    params:
+      UserName: '{{ item.UserName }}'
+    save_as: response
+  discovery_id: aws.iam.list_user_policies
+  emit:
+    as: policy
+    item:
+      PolicyName: '{{ policy }}'
+      PolicyNames: '{{ response.PolicyNames }}'
+      UserName: '{{ item.UserName }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.PolicyNames }}'
+  for_each: aws.iam.list_users
+- calls:
+  - action: list_saml_providers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.list_saml_providers
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      CreateDate: '{{ item.CreateDate }}'
+      PrivateKeyList: '{{ item.PrivateKeyList }}'
+      ValidUntil: '{{ item.ValidUntil }}'
+    items_for: '{{ response.SAMLProviderList }}'
+- calls:
+  - action: get_account_authorization_details
+    on_error: continue
+    save_as: response
+    timeout: 90
+  discovery_id: aws.iam.get_account_authorization_details_policies
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      AttachmentCount: '{{ item.AttachmentCount }}'
+      CreateDate: '{{ item.CreateDate }}'
+      IsAttachable: '{{ item.IsAttachable }}'
+      Path: '{{ item.Path }}'
+      PolicyId: '{{ item.PolicyId }}'
+      PolicyName: '{{ item.PolicyName }}'
+      PolicyVersionList: '{{ item.PolicyVersionList }}'
+      UpdateDate: '{{ item.UpdateDate }}'
+    items_for: '{{ response.Policies }}'
+- calls:
+  - action: get_account_authorization_details
+    on_error: continue
+    save_as: response_auth_detail_roles
+    timeout: 90
+  discovery_id: aws.iam.get_account_authorization_details_roles
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      RoleName: '{{ item.RoleName }}'
+      RoleId: '{{ item.RoleId }}'
+      Path: '{{ item.Path }}'
+      CreateDate: '{{ item.CreateDate }}'
+      Description: '{{ item.Description }}'
+      MaxSessionDuration: '{{ item.MaxSessionDuration }}'
+      AssumeRolePolicyDocument: '{{ item.AssumeRolePolicyDocument }}'
+      AttachedManagedPolicies: '{{ item.AttachedManagedPolicies }}'
+      RolePolicyList: '{{ item.RolePolicyList }}'
+      InstanceProfileList: '{{ item.InstanceProfileList }}'
+      Tags: '{{ item.Tags }}'
+      RoleLastUsed: '{{ item.RoleLastUsed }}'
+      PermissionsBoundary: '{{ item.PermissionsBoundary }}'
+    items_for: '{{ response_auth_detail_roles.RoleDetailList }}'
+- calls:
+  - action: list_signing_certificates
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.list_signing_certificates
+  emit:
+    as: item
+    item:
+      CertificateBody: '{{ item.CertificateBody }}'
+      CertificateId: '{{ item.CertificateId }}'
+      Status: '{{ item.Status }}'
+      UploadDate: '{{ item.UploadDate }}'
+      UserName: '{{ item.UserName }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.Certificates }}'
+- calls:
+  - action: get_policy
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.get_policy
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Policy.Arn }}'
+      AttachmentCount: '{{ response.Policy.AttachmentCount }}'
+      CreateDate: '{{ response.Policy.CreateDate }}'
+      DefaultVersionId: '{{ response.Policy.DefaultVersionId }}'
+      Description: '{{ response.Policy.Description }}'
+      IsAttachable: '{{ response.Policy.IsAttachable }}'
+      Path: '{{ response.Policy.Path }}'
+      PermissionsBoundaryUsageCount: '{{ response.Policy.PermissionsBoundaryUsageCount }}'
+      Policy: '{{ response.Policy.PolicyId }}'
+      PolicyId: '{{ response.Policy.PolicyId }}'
+      PolicyName: '{{ response.Policy.PolicyName }}'
+      Tags: '{{ response.Policy.Tags }}'
+      UpdateDate: '{{ response.Policy.UpdateDate }}'
+- calls:
+  - action: list_mfa_devices
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.list_mfa_devices
+  emit:
+    as: item
+    item:
+      Certifications: '{{ item.Certifications }}'
+      EnableDate: '{{ item.EnableDate }}'
+      MFADevices: '{{ response.MFADevices }}'
+      SerialNumber: '{{ item.SerialNumber }}'
+      UserName: '{{ item.UserName }}'
+    items_for: '{{ response.MFADevices }}'
+- calls:
+  - action: list_policies
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.list_policies
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      AttachmentCount: '{{ item.AttachmentCount }}'
+      CreateDate: '{{ item.CreateDate }}'
+      DefaultVersionId: '{{ item.DefaultVersionId }}'
+      Description: '{{ item.Description }}'
+      Document: '{{ item.Document }}'
+      IsAttachable: '{{ item.IsAttachable }}'
+      IsDefaultVersion: '{{ item.IsDefaultVersion }}'
+      Path: '{{ item.Path }}'
+      PermissionsBoundaryUsageCount: '{{ item.PermissionsBoundaryUsageCount }}'
+      Policy: '{{ item.Policy }}'
+      PolicyId: '{{ item.PolicyId }}'
+      PolicyName: '{{ item.PolicyName }}'
+      PolicyVersion: '{{ item.PolicyVersion }}'
+      Tags: '{{ item.Tags }}'
+      UpdateDate: '{{ item.UpdateDate }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.Policies }}'
+- calls:
+  - action: get_account_authorization_details
+    on_error: continue
+    save_as: response
+    timeout: 90
+  discovery_id: aws.iam.get_account_authorization_details
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      AttachedManagedPolicies: '{{ item.AttachedManagedPolicies }}'
+      CreateDate: '{{ item.CreateDate }}'
+      Fingerprint: '{{ item.Fingerprint }}'
+      Group: '{{ item.Group }}'
+      GroupDetailList: '{{ item.GroupDetailList }}'
+      GroupList: '{{ item.GroupList }}'
+      Path: '{{ item.Path }}'
+      PermissionsBoundary: '{{ item.PermissionsBoundary }}'
+      RoleDetailList: '{{ item.RoleDetailList }}'
+      SSHPublicKey: '{{ item.SSHPublicKey }}'
+      Statement: '{{ item.Statement }}'
+      Tags: '{{ item.Tags }}'
+      UserDetailList: '{{ item.UserDetailList }}'
+      UserId: '{{ item.UserId }}'
+      UserName: '{{ item.UserName }}'
+      UserPolicyList: '{{ item.UserPolicyList }}'
+      Version: '{{ item.Version }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.UserDetailList }}'
+- calls:
+  - action: get_group_policy
+    on_error: continue
+    params:
+      GroupName: '{{ item.GroupName }}'
+      PolicyName: '{{ item.PolicyName }}'
+    save_as: response
+  discovery_id: aws.iam.get_group_policy
+  emit:
+    as: item
+    item:
+      GroupName: '{{ response.GroupName }}'
+      PolicyDocument: '{{ response.PolicyDocument }}'
+      PolicyName: '{{ response.PolicyName }}'
+  for_each: aws.iam.list_group_policies
+- calls:
+  - action: list_instance_profiles
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.list_instance_profiles
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      CreateDate: '{{ item.CreateDate }}'
+      InstanceProfileId: '{{ item.InstanceProfileId }}'
+      InstanceProfileName: '{{ item.InstanceProfileName }}'
+      Path: '{{ item.Path }}'
+      Roles: '{{ item.Roles }}'
+      Tags: '{{ item.Tags }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.InstanceProfiles }}'
+- calls:
+  - action: get_instance_profile
+    on_error: continue
+    params:
+      InstanceProfileName: '{{ item.InstanceProfileName }}'
+    save_as: response
+  discovery_id: aws.iam.get_instance_profile
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.InstanceProfile.Arn }}'
+      CreateDate: '{{ response.InstanceProfile.CreateDate }}'
+      InstanceProfileId: '{{ response.InstanceProfile.InstanceProfileId }}'
+      InstanceProfileName: '{{ response.InstanceProfile.InstanceProfileName }}'
+      Path: '{{ response.InstanceProfile.Path }}'
+      Roles: '{{ response.InstanceProfile.Roles[].Arn }}'
+      Tags: '{{ response.InstanceProfile.Tags[].Key }}'
+  for_each: aws.iam.list_instance_profiles
+- calls:
+  - action: list_attached_role_policies
+    on_error: continue
+    params:
+      RoleName: '{{ item.RoleName }}'
+    save_as: response
+  discovery_id: aws.iam.list_attached_role_policies
+  emit:
+    as: policy
+    item:
+      PolicyArn: '{{ policy.PolicyArn }}'
+      PolicyName: '{{ policy.PolicyName }}'
+      RoleName: '{{ item.RoleName }}'
+      RoleArn: '{{ item.Arn }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.AttachedPolicies }}'
+  for_each: aws.iam.list_roles
+- calls:
+  - action: list_attached_user_policies
+    on_error: continue
+    params:
+      UserName: '{{ item.UserName }}'
+    save_as: response
+  discovery_id: aws.iam.list_attached_user_policies
+  emit:
+    as: item
+    item:
+      PolicyArn: '{{ item.PolicyArn }}'
+      PolicyName: '{{ item.PolicyName }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.AttachedPolicies }}'
+  for_each: aws.iam.list_users
+- calls:
+  - action: get_account_password_policy
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.get_account_password_policy
+  emit:
+    as: item
+    item:
+      AllowUsersToChangePassword: '{{ response.PasswordPolicy.AllowUsersToChangePassword }}'
+      ExpirePasswords: '{{ response.PasswordPolicy.ExpirePasswords }}'
+      HardExpiry: '{{ response.PasswordPolicy.HardExpiry }}'
+      MaxPasswordAge: '{{ response.PasswordPolicy.MaxPasswordAge }}'
+      MinimumPasswordLength: '{{ response.PasswordPolicy.MinimumPasswordLength }}'
+      PasswordPolicy: '{{ response.PasswordPolicy.PasswordPolicy }}'
+      PasswordReusePrevention: '{{ response.PasswordPolicy.PasswordReusePrevention }}'
+      RequireLowercaseCharacters: '{{ response.PasswordPolicy.RequireLowercaseCharacters }}'
+      RequireNumbers: '{{ response.PasswordPolicy.RequireNumbers }}'
+      RequireSymbols: '{{ response.PasswordPolicy.RequireSymbols }}'
+      RequireUppercaseCharacters: '{{ response.PasswordPolicy.RequireUppercaseCharacters }}'
+- calls:
+  - action: get_policy_version
+    on_error: continue
+    params:
+      PolicyArn: '{{ item.Arn }}'
+      VersionId: '{{ item.DefaultVersionId }}'
+    save_as: response
+  discovery_id: aws.iam.get_policy_version
+  emit:
+    as: item
+    item:
+      CreateDate: '{{ response.PolicyVersion.CreateDate }}'
+      Document: '{{ response.PolicyVersion.Document }}'
+      IsDefaultVersion: '{{ response.PolicyVersion.IsDefaultVersion }}'
+      PolicyArn: '{{ item.Arn }}'
+      PolicyDocument: '{{ response.PolicyVersion.Document }}'
+      PolicyName: '{{ item.PolicyName }}'
+      VersionId: '{{ response.PolicyVersion.VersionId }}'
+  for_each: aws.iam.list_policies
+- calls:
+  - action: list_groups_for_user
+    on_error: continue
+    params:
+      UserName: '{{ item.UserName }}'
+    save_as: response
+  discovery_id: aws.iam.list_groups_for_user
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      CreateDate: '{{ item.CreateDate }}'
+      GroupId: '{{ item.GroupId }}'
+      GroupName: '{{ item.GroupName }}'
+      Groups: '{{ response.Groups }}'
+      Path: '{{ item.Path }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.Groups }}'
+  for_each: aws.iam.list_users
+- calls:
+  - action: list_roles
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.list_roles
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      AssumeRolePolicyDocument: '{{ item.Roles[].AssumeRolePolicyDocument }}'
+      CreateDate: '{{ item.CreateDate }}'
+      Description: '{{ item.Description }}'
+      MaxSessionDuration: '{{ item.MaxSessionDuration }}'
+      Path: '{{ item.Path }}'
+      PermissionsBoundary: '{{ item.PermissionsBoundary }}'
+      Role: '{{ item.Role }}'
+      RoleId: '{{ item.RoleId }}'
+      RoleLastUsed: '{{ item.RoleLastUsed }}'
+      RoleName: '{{ item.RoleName }}'
+      Tags: '{{ item.Tags }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.Roles }}'
+- calls:
+  - action: get_role
+    on_error: continue
+    params:
+      RoleName: '{{ item.RoleName }}'
+    save_as: response
+  discovery_id: aws.iam.get_role
+  emit:
+    as: item
+    item:
+      Action: '{{ response.Role.AssumeRolePolicyDocument.Statement.Action }}'
+      Arn: '{{ response.Role.Arn }}'
+      AssumeRolePolicyDocument: '{{ response.Role.AssumeRolePolicyDocument }}'
+      Condition: '{{ response.Role.AssumeRolePolicyDocument.Statement.Condition }}'
+      CreateDate: '{{ response.Role.CreateDate }}'
+      Description: '{{ response.Role.Description }}'
+      Effect: '{{ response.Role.AssumeRolePolicyDocument.Statement.Effect }}'
+      MaxSessionDuration: '{{ response.Role.MaxSessionDuration }}'
+      Path: '{{ response.Role.Path }}'
+      PermissionsBoundary: '{{ response.Role.PermissionsBoundary }}'
+      Principal: '{{ response.Role.AssumeRolePolicyDocument.Statement.Principal }}'
+      RoleId: '{{ response.Role.RoleId }}'
+      RoleLastUsed: '{{ response.Role.RoleLastUsed }}'
+      RoleName: '{{ response.Role.RoleName }}'
+      Tags: '{{ response.Role.Tags }}'
+      PermissionsBoundaryArn: '{{ response.Role.PermissionsBoundary.PermissionsBoundaryArn }}'
+      PermissionsBoundaryType: '{{ response.Role.PermissionsBoundary.PermissionsBoundaryType }}'
+      LastUsedDate: '{{ response.Role.RoleLastUsed.LastUsedDate }}'
+      Region: '{{ response.Role.RoleLastUsed.Region }}'
+  for_each: aws.iam.list_roles
+- calls:
+  - action: get_saml_provider
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.get_saml_provider
+  emit:
+    as: item
+    item:
+      CreateDate: '{{ response.CreateDate }}'
+      SAMLMetadataDocument: '{{ response.SAMLMetadataDocument }}'
+      Tags: '{{ response.Tags }}'
+      ValidUntil: '{{ response.ValidUntil }}'
+- calls:
+  - action: list_instance_profiles_for_role
+    on_error: continue
+    params:
+      RoleName: '{{ item.RoleName }}'
+    save_as: response
+  discovery_id: aws.iam.list_instance_profiles_for_role
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      CreateDate: '{{ item.CreateDate }}'
+      InstanceProfileId: '{{ item.InstanceProfileId }}'
+      InstanceProfileName: '{{ item.InstanceProfileName }}'
+      Path: '{{ item.Path }}'
+      Roles: '{{ item.Roles }}'
+      Tags: '{{ item.Tags }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.InstanceProfiles }}'
+  for_each: aws.iam.list_roles
+- calls:
+  - action: list_policy_versions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.list_policy_versions
+  emit:
+    as: item
+    item:
+      CreateDate: '{{ item.CreateDate }}'
+      Document: '{{ item.Document }}'
+      IsDefaultVersion: '{{ item.IsDefaultVersion }}'
+      VersionId: '{{ item.VersionId }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.Versions }}'
+- calls:
+  - action: list_access_keys
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.list_access_keys
+  emit:
+    as: item
+    item:
+      AccessKeyId: '{{ item.AccessKeyId }}'
+      AccessKeyMetadata: '{{ response.AccessKeyMetadata }}'
+      CreateDate: '{{ item.CreateDate }}'
+      Status: '{{ item.Status }}'
+      UserName: '{{ item.UserName }}'
+      IsTruncated: '{{ response.IsTruncated }}'
+    items_for: '{{ response.AccessKeyMetadata }}'
+- calls:
+  - action: get_account_summary
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.get_account_summary
+  emit:
+    as: item
+    item:
+      SummaryMap: '{{ response.SummaryMap }}'
+- calls:
+  - action: list_delegation_requests
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.list_delegation_requests
+  emit:
+    as: item
+    item:
+      ApproverId: '{{ item.ApproverId }}'
+      CreateDate: '{{ item.CreateDate }}'
+      DelegationRequestId: '{{ item.DelegationRequestId }}'
+      Description: '{{ item.Description }}'
+      Notes: '{{ item.Notes }}'
+      OnlySendByOwner: '{{ item.OnlySendByOwner }}'
+      OwnerAccountId: '{{ item.OwnerAccountId }}'
+      OwnerId: '{{ item.OwnerId }}'
+      PermissionPolicy: '{{ item.PermissionPolicy }}'
+      Permissions: '{{ item.Permissions }}'
+      RedirectUrl: '{{ item.RedirectUrl }}'
+      RejectionReason: '{{ item.RejectionReason }}'
+      RequestMessage: '{{ item.RequestMessage }}'
+      RequestorId: '{{ item.RequestorId }}'
+      RequestorName: '{{ item.RequestorName }}'
+      RolePermissionRestrictionArns: '{{ item.RolePermissionRestrictionArns }}'
+      SessionDuration: '{{ item.SessionDuration }}'
+      State: '{{ item.State }}'
+      UpdatedTime: '{{ item.UpdatedTime }}'
+    items_for: '{{ response.DelegationRequests }}'
+- calls:
+  - action: list_virtual_mfa_devices
+    on_error: continue
+    save_as: response
+  discovery_id: aws.iam.list_virtual_mfa_devices
+  emit:
+    as: item
+    item:
+      Base32StringSeed: '{{ item.Base32StringSeed }}'
+      EnableDate: '{{ item.EnableDate }}'
+      QRCodePNG: '{{ item.QRCodePNG }}'
+      SerialNumber: '{{ item.SerialNumber }}'
+      Tags: '{{ item.Tags }}'
+      User: '{{ item.User }}'
+    items_for: '{{ response.VirtualMFADevices }}'

@@ -1,0 +1,193 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: identitystore, sso-admin
+# 11 ops (11 from checks, +0 for inventory)
+version: '1.0'
+provider: aws
+service: identitycenter
+discovery:
+  - calls:
+    - action: list_instances
+      on_error: continue
+      save_as: response
+    discovery_id: aws.sso-admin.list_instances
+    emit:
+      as: item
+      item:
+        AccessControlAttributes: '{{ item.AccessControlAttributes }}'
+        AccountAssignmentCreationStatus: '{{ item.AccountAssignmentCreationStatus }}'
+        CreatedDate: '{{ item.CreatedDate }}'
+        EncryptionConfigurationDetails: '{{ item.EncryptionConfigurationDetails }}'
+        IdentityStoreId: '{{ item.IdentityStoreId }}'
+        InstanceAccessControlAttributeConfiguration: '{{ item.InstanceAccessControlAttributeConfiguration
+          }}'
+        InstanceArn: '{{ item.InstanceArn }}'
+        Name: '{{ item.Name }}'
+        OwnerAccountId: '{{ item.OwnerAccountId }}'
+        PermissionSetProvisioningStatus: '{{ item.PermissionSetProvisioningStatus }}'
+        Status: '{{ item.Status }}'
+        StatusReason: '{{ item.StatusReason }}'
+      items_for: '{{ response.Instances }}'
+  - calls:
+    - action: list_groups
+      on_error: continue
+      save_as: response
+    discovery_id: aws.identitystore.list_groups
+    emit:
+      as: item
+      item:
+        CreatedAt: '{{ item.CreatedAt }}'
+        CreatedBy: '{{ item.CreatedBy }}'
+        Description: '{{ item.Description }}'
+        DisplayName: '{{ item.DisplayName }}'
+        ExternalIds: '{{ item.ExternalIds }}'
+        GroupId: '{{ item.GroupId }}'
+        IdentityStoreId: '{{ item.IdentityStoreId }}'
+        UpdatedAt: '{{ item.UpdatedAt }}'
+        UpdatedBy: '{{ item.UpdatedBy }}'
+      items_for: '{{ response.Groups }}'
+  - calls:
+    - action: list_users
+      on_error: continue
+      save_as: response
+    discovery_id: aws.identitystore.list_users
+    emit:
+      as: item
+      item:
+        Addresses: '{{ item.Addresses }}'
+        Birthdate: '{{ item.Birthdate }}'
+        CreatedAt: '{{ item.CreatedAt }}'
+        CreatedBy: '{{ item.CreatedBy }}'
+        DisplayName: '{{ item.DisplayName }}'
+        Emails: '{{ item.Emails }}'
+        ExternalIds: '{{ item.ExternalIds }}'
+        IdentityStoreId: '{{ item.IdentityStoreId }}'
+        Locale: '{{ item.Locale }}'
+        Name: '{{ item.Name }}'
+        NickName: '{{ item.NickName }}'
+        PhoneNumbers: '{{ item.PhoneNumbers }}'
+        Photos: '{{ item.Photos }}'
+        PreferredLanguage: '{{ item.PreferredLanguage }}'
+        ProfileUrl: '{{ item.ProfileUrl }}'
+        Timezone: '{{ item.Timezone }}'
+        Title: '{{ item.Title }}'
+        UpdatedAt: '{{ item.UpdatedAt }}'
+        UpdatedBy: '{{ item.UpdatedBy }}'
+        UserId: '{{ item.UserId }}'
+        UserName: '{{ item.UserName }}'
+        UserStatus: '{{ item.UserStatus }}'
+        UserType: '{{ item.UserType }}'
+        Website: '{{ item.Website }}'
+      items_for: '{{ response.Users }}'
+  - calls:
+    - action: list_managed_policies_in_permission_set
+      on_error: continue
+      params:
+        InstanceArn: '{{ item.InstanceArn }}'
+        PermissionSetArn: '{{ item.PermissionSetArn }}'
+      save_as: response
+    discovery_id: aws.sso-admin.list_managed_policies_in_permission_set
+    emit:
+      as: item
+      item:
+        Arn: '{{ item.Arn }}'
+        Name: '{{ item.Name }}'
+      items_for: '{{ response.AttachedManagedPolicies }}'
+    for_each: aws.sso-admin.list_instances
+  - calls:
+    - action: list_trusted_token_issuers
+      on_error: continue
+      params:
+        InstanceArn: '{{ item.InstanceArn }}'
+      save_as: response
+    discovery_id: aws.sso-admin.list_trusted_token_issuers
+    emit:
+      as: item
+      item:
+        Name: '{{ item.Name }}'
+        TrustedTokenIssuerArn: '{{ item.TrustedTokenIssuerArn }}'
+        TrustedTokenIssuerType: '{{ item.TrustedTokenIssuerType }}'
+      items_for: '{{ response.TrustedTokenIssuers }}'
+    for_each: aws.sso-admin.list_instances
+  - calls:
+    - action: get_inline_policy_for_permission_set
+      on_error: continue
+      save_as: response
+    discovery_id: aws.sso-admin.get_inline_policy_for_permission_set
+    emit:
+      as: item
+      item:
+        Statement: '{{ response.Statement }}'
+        Version: '{{ response.Version }}'
+  - calls:
+    - action: list_permission_sets_provisioned_to_account
+      on_error: continue
+      save_as: response
+    discovery_id: aws.sso-admin.list_permission_sets_provisioned_to_account
+    emit:
+      as: item
+      item:
+        PermissionSetArn: '{{ item }}'
+      items_for: '{{ response.PermissionSets }}'
+  - calls:
+    - action: list_customer_managed_policy_references_in_permission_set
+      on_error: continue
+      params:
+        InstanceArn: '{{ item.InstanceArn }}'
+        PermissionSetArn: '{{ item.PermissionSetArn }}'
+      save_as: response
+    discovery_id: aws.sso-admin.list_customer_managed_policy_references_in_permission_set
+    emit:
+      as: item
+      item:
+        Name: '{{ item.Name }}'
+        Path: '{{ item.Path }}'
+      items_for: '{{ response.CustomerManagedPolicyReferences }}'
+    for_each: aws.sso-admin.list_instances
+  - calls:
+    - action: describe_permission_set
+      on_error: continue
+      params:
+        InstanceArn: '{{ item.InstanceArn }}'
+        PermissionSetArn: '{{ item.PermissionSetArn }}'
+      save_as: response
+    discovery_id: aws.sso-admin.describe_permission_set
+    emit:
+      as: item
+      item:
+        CreatedDate: '{{ response.PermissionSet.CreatedDate }}'
+        Description: '{{ response.PermissionSet.Description }}'
+        Name: '{{ response.PermissionSet.Name }}'
+        PermissionSetArn: '{{ response.PermissionSet.PermissionSetArn }}'
+        RelayState: '{{ response.PermissionSet.RelayState }}'
+        SessionDuration: '{{ response.PermissionSet.SessionDuration }}'
+    for_each: aws.sso-admin.list_instances
+  - calls:
+    - action: get_permissions_boundary_for_permission_set
+      on_error: continue
+      params:
+        InstanceArn: '{{ item.InstanceArn }}'
+        PermissionSetArn: '{{ item.PermissionSetArn }}'
+      save_as: response
+    discovery_id: aws.sso-admin.get_permissions_boundary_for_permission_set
+    emit:
+      as: item
+      item:
+        CustomerManagedPolicyReference: '{{ response.PermissionsBoundary.CustomerManagedPolicyReference
+          }}'
+        ManagedPolicyArn: '{{ response.PermissionsBoundary.ManagedPolicyArn }}'
+    for_each: aws.sso-admin.list_instances
+  - calls:
+    - action: describe_instance_access_control_attribute_configuration
+      on_error: continue
+      params:
+        InstanceArn: '{{ item.InstanceArn }}'
+      save_as: response
+    discovery_id: aws.sso-admin.describe_instance_access_control_attribute_configuration
+    emit:
+      as: item
+      item:
+        AccessControlAttributes: '{{ response.InstanceAccessControlAttributeConfiguration.AccessControlAttributes
+          }}'
+        InstanceAccessControlAttributeConfiguration: '{{ response.InstanceAccessControlAttributeConfiguration.InstanceAccessControlAttributeConfiguration
+          }}'
+    for_each: aws.sso-admin.list_instances

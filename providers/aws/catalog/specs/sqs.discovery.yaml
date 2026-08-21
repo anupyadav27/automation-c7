@@ -1,0 +1,25 @@
+version: '1.0'
+provider: aws
+service: sqs
+discovery:
+- calls:
+  - action: get_queue_attributes
+    on_error: continue
+    save_as: response
+    params:
+      QueueUrl: '{{ item.QueueUrl }}'
+      AttributeNames:
+      - All
+  discovery_id: aws.sqs.get_queue_attributes
+  emit:
+    as: item
+    item:
+      KmsMasterKeyId: '{{ response.Attributes.KmsMasterKeyId }}'
+      MaximumMessageSize: '{{ response.Attributes.MaximumMessageSize }}'
+      Policy: '{{ response.Attributes.Policy }}'
+      QueueArn: '{{ response.Attributes.QueueArn }}'
+      RedrivePolicy: '{{ response.Attributes.RedrivePolicy }}'
+      SqsManagedSseEnabled: '{{ response.Attributes.SqsManagedSseEnabled }}'
+      VisibilityTimeout: '{{ response.Attributes.VisibilityTimeout }}'
+  for_each: aws.sqs.list_queues
+  resource_type: sqs_queue_attribute

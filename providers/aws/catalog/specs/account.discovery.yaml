@@ -1,0 +1,41 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: account
+# 2 ops (2 from checks, +0 for inventory)
+version: '1.0'
+provider: aws
+service: account
+discovery:
+  - calls:
+    - action: get_alternate_contact
+      on_error: continue
+      save_as: response
+    discovery_id: aws.account.get_alternate_contact
+    emit:
+      as: item
+      item:
+        AlternateContactType: '{{ response.AlternateContact.AlternateContactType }}'
+        EmailAddress: '{{ response.AlternateContact.EmailAddress }}'
+        Name: '{{ response.AlternateContact.Name }}'
+        PhoneNumber: '{{ response.AlternateContact.PhoneNumber }}'
+        Title: '{{ response.AlternateContact.Title }}'
+  - calls:
+    - action: get_contact_information
+      on_error: continue
+      save_as: response
+    discovery_id: aws.account.get_contact_information
+    emit:
+      as: item
+      item:
+        AddressLine1: '{{ response.ContactInformation.AddressLine1 }}'
+        AddressLine2: '{{ response.ContactInformation.AddressLine2 }}'
+        AddressLine3: '{{ response.ContactInformation.AddressLine3 }}'
+        City: '{{ response.ContactInformation.City }}'
+        CompanyName: '{{ response.ContactInformation.CompanyName }}'
+        ContactInformation: '{{ response.ContactInformation.ContactInformation }}'
+        CountryCode: '{{ response.ContactInformation.CountryCode }}'
+        DistrictOrCounty: '{{ response.ContactInformation.DistrictOrCounty }}'
+        FullName: '{{ response.ContactInformation.FullName }}'
+        PhoneNumber: '{{ response.ContactInformation.PhoneNumber }}'
+        PostalCode: '{{ response.ContactInformation.PostalCode }}'
+        StateOrRegion: '{{ response.ContactInformation.StateOrRegion }}'
+        WebsiteUrl: '{{ response.ContactInformation.WebsiteUrl }}'

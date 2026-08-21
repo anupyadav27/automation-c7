@@ -1,0 +1,121 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: macie
+# 5 ops (1 from checks, +4 for inventory)
+version: '1.0'
+provider: aws
+service: macie
+discovery:
+  - calls:
+    - action: list_findings
+      on_error: continue
+      save_as: response
+    discovery_id: aws.macie.list_findings
+    emit:
+      as: item
+      item:
+        archived: '{{ response.archived }}'
+        classificationDetails: '{{ response.classificationDetails }}'
+        findings: '{{ response.findings }}'
+        partition: '{{ response.partition }}'
+        policyDetails: '{{ response.policyDetails }}'
+        resourcesAffected: '{{ response.resourcesAffected }}'
+        sample: '{{ response.sample }}'
+        schemaVersion: '{{ response.schemaVersion }}'
+        severity: '{{ response.severity }}'
+        title: '{{ response.title }}'
+  - calls:
+    - action: describe_buckets
+      on_error: continue
+      save_as: response
+    discovery_id: aws.macie.describe_buckets
+    emit:
+      as: item
+      item:
+        accountId: '{{ response.accountId }}'
+        allowsUnencryptedObjectUploads: '{{ response.allowsUnencryptedObjectUploads
+          }}'
+        automatedDiscoveryMonitoringStatus: '{{ response.automatedDiscoveryMonitoringStatus
+          }}'
+        bucketArn: '{{ response.bucketArn }}'
+        bucketCreatedAt: '{{ response.bucketCreatedAt }}'
+        bucketName: '{{ response.bucketName }}'
+        buckets: '{{ response.buckets }}'
+        classifiableObjectCount: '{{ response.classifiableObjectCount }}'
+        classifiableSizeInBytes: '{{ response.classifiableSizeInBytes }}'
+        errorCode: '{{ response.errorCode }}'
+        errorMessage: '{{ response.errorMessage }}'
+        jobDetails: '{{ response.jobDetails }}'
+        lastAutomatedDiscoveryTime: '{{ response.lastAutomatedDiscoveryTime }}'
+        lastUpdated: '{{ response.lastUpdated }}'
+        objectCount: '{{ response.objectCount }}'
+        objectCountByEncryptionType: '{{ response.objectCountByEncryptionType }}'
+        publicAccess: '{{ response.publicAccess }}'
+        region: '{{ response.region }}'
+        replicationDetails: '{{ response.replicationDetails }}'
+        sensitivityScore: '{{ response.sensitivityScore }}'
+        serverSideEncryption: '{{ response.serverSideEncryption }}'
+        sharedAccess: '{{ response.sharedAccess }}'
+        sizeInBytes: '{{ response.sizeInBytes }}'
+        sizeInBytesCompressed: '{{ response.sizeInBytesCompressed }}'
+        tags: '{{ response.tags }}'
+        unclassifiableObjectCount: '{{ response.unclassifiableObjectCount }}'
+        unclassifiableObjectSizeInBytes: '{{ response.unclassifiableObjectSizeInBytes
+          }}'
+        versioning: '{{ response.versioning }}'
+  - calls:
+    - action: list_allow_lists
+      on_error: continue
+      save_as: response
+    discovery_id: aws.macie.list_allow_lists
+    emit:
+      as: item
+      item:
+        arn: '{{ response.arn }}'
+        createdAt: '{{ response.createdAt }}'
+        criteria: '{{ response.criteria }}'
+        description: '{{ response.description }}'
+        id: '{{ response.id }}'
+        name: '{{ response.name }}'
+        updatedAt: '{{ response.updatedAt }}'
+  - calls:
+    - action: list_classification_jobs
+      on_error: continue
+      save_as: response
+    discovery_id: aws.macie.list_classification_jobs
+    emit:
+      as: item
+      item:
+        allowListIds: '{{ response.allowListIds }}'
+        bucketCriteria: '{{ response.bucketCriteria }}'
+        bucketDefinitions: '{{ response.bucketDefinitions }}'
+        clientToken: '{{ response.clientToken }}'
+        createdAt: '{{ response.createdAt }}'
+        customDataIdentifierIds: '{{ response.customDataIdentifierIds }}'
+        initialRun: '{{ response.initialRun }}'
+        jobArn: '{{ response.jobArn }}'
+        jobId: '{{ response.jobId }}'
+        jobStatus: '{{ response.jobStatus }}'
+        jobType: '{{ response.jobType }}'
+        lastRunErrorStatus: '{{ response.lastRunErrorStatus }}'
+        lastRunTime: '{{ response.lastRunTime }}'
+        managedDataIdentifierSelector: '{{ response.managedDataIdentifierSelector }}'
+        name: '{{ response.name }}'
+        s3JobDefinition: '{{ response.s3JobDefinition }}'
+        samplingPercentage: '{{ response.samplingPercentage }}'
+        scheduleFrequency: '{{ response.scheduleFrequency }}'
+        statistics: '{{ response.statistics }}'
+        userPausedDetails: '{{ response.userPausedDetails }}'
+  - calls:
+    - action: list_findings_filters
+      on_error: continue
+      save_as: response
+    discovery_id: aws.macie.list_findings_filters
+    emit:
+      as: item
+      item:
+        action: '{{ response.action }}'
+        arn: '{{ response.arn }}'
+        id: '{{ response.id }}'
+        name: '{{ response.name }}'
+        position: '{{ response.position }}'
+        tags: '{{ response.tags }}'

@@ -1,0 +1,372 @@
+version: '1.0'
+provider: aws
+service: appmesh
+services:
+  client: appmesh
+  module: boto3.client
+discovery:
+- discovery_id: aws.appmesh.list_meshes
+  calls:
+  - action: list_meshes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.meshes }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      gatewayRoute: '{{ item.gatewayRoute }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      mesh: '{{ item.mesh }}'
+      meshName: '{{ item.meshName }}'
+      meshOwner: '{{ item.meshOwner }}'
+      metadata: '{{ item.metadata }}'
+      resourceOwner: '{{ item.resourceOwner }}'
+      spec: '{{ item.spec }}'
+      status: '{{ item.status }}'
+      version: '{{ item.version }}'
+      virtualGateway: '{{ item.virtualGateway }}'
+      virtualNode: '{{ item.virtualNode }}'
+      virtualRouter: '{{ item.virtualRouter }}'
+      virtualService: '{{ item.virtualService }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.appmesh.describe_gateway_route
+  for_each: aws.appmesh.list_meshes
+  calls:
+  - action: describe_gateway_route
+    params:
+      gatewayRouteName: '{{ item.gatewayRouteName }}'
+      meshName: '{{ item.meshName }}'
+      virtualGatewayName: '{{ item.virtualGatewayName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      gatewayRoute: '{{ response.gatewayRoute.gatewayRouteName }}'
+      gatewayRouteName: '{{ response.gatewayRoute.gatewayRouteName }}'
+      meshName: '{{ response.gatewayRoute.meshName }}'
+      metadata: '{{ response.gatewayRoute.metadata.uid }}'
+      spec: '{{ response.gatewayRoute.spec }}'
+      status: '{{ response.gatewayRoute.status }}'
+      virtualGatewayName: '{{ response.gatewayRoute.virtualGatewayName }}'
+      arn: '{{ response.gatewayRoute.metadata.arn }}'
+      createdAt: '{{ response.gatewayRoute.metadata.createdAt }}'
+      lastUpdatedAt: '{{ response.gatewayRoute.metadata.lastUpdatedAt }}'
+      meshOwner: '{{ response.gatewayRoute.metadata.meshOwner }}'
+      resourceOwner: '{{ response.gatewayRoute.metadata.resourceOwner }}'
+      uid: '{{ response.gatewayRoute.metadata.uid }}'
+      version: '{{ response.gatewayRoute.metadata.version }}'
+      port: '{{ response.gatewayRoute.spec.grpcRoute.match.port }}'
+      serviceName: '{{ response.gatewayRoute.spec.grpcRoute.match.serviceName }}'
+      method: '{{ response.gatewayRoute.spec.http2Route.match.method }}'
+      prefix: '{{ response.gatewayRoute.spec.http2Route.match.prefix }}'
+      priority: '{{ response.gatewayRoute.spec.priority }}'
+- discovery_id: aws.appmesh.describe_mesh
+  for_each: aws.appmesh.list_meshes
+  calls:
+  - action: describe_mesh
+    params:
+      meshName: '{{ item.meshName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      meshName: '{{ response.mesh.meshName }}'
+      metadata: '{{ response.mesh.metadata.uid }}'
+      spec: '{{ response.mesh.spec }}'
+      status: '{{ response.mesh.status }}'
+      arn: '{{ response.mesh.metadata.arn }}'
+      createdAt: '{{ response.mesh.metadata.createdAt }}'
+      lastUpdatedAt: '{{ response.mesh.metadata.lastUpdatedAt }}'
+      meshOwner: '{{ response.mesh.metadata.meshOwner }}'
+      resourceOwner: '{{ response.mesh.metadata.resourceOwner }}'
+      uid: '{{ response.mesh.metadata.uid }}'
+      version: '{{ response.mesh.metadata.version }}'
+      type: '{{ response.mesh.spec.egressFilter.type }}'
+      ipPreference: '{{ response.mesh.spec.serviceDiscovery.ipPreference }}'
+- discovery_id: aws.appmesh.describe_route
+  for_each: aws.appmesh.list_meshes
+  calls:
+  - action: describe_route
+    params:
+      meshName: '{{ item.meshName }}'
+      routeName: '{{ item.routeName }}'
+      virtualRouterName: '{{ item.virtualRouterName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      meshName: '{{ response.route.meshName }}'
+      metadata: '{{ response.route.metadata.uid }}'
+      routeName: '{{ response.route.routeName }}'
+      spec: '{{ response.route.spec }}'
+      status: '{{ response.route.status }}'
+      virtualRouterName: '{{ response.route.virtualRouterName }}'
+      arn: '{{ response.route.metadata.arn }}'
+      createdAt: '{{ response.route.metadata.createdAt }}'
+      lastUpdatedAt: '{{ response.route.metadata.lastUpdatedAt }}'
+      meshOwner: '{{ response.route.metadata.meshOwner }}'
+      resourceOwner: '{{ response.route.metadata.resourceOwner }}'
+      uid: '{{ response.route.metadata.uid }}'
+      version: '{{ response.route.metadata.version }}'
+      methodName: '{{ response.route.spec.grpcRoute.match.methodName }}'
+      port: '{{ response.route.spec.grpcRoute.match.port }}'
+      serviceName: '{{ response.route.spec.grpcRoute.match.serviceName }}'
+      maxRetries: '{{ response.route.spec.grpcRoute.retryPolicy.maxRetries }}'
+      method: '{{ response.route.spec.http2Route.match.method }}'
+      prefix: '{{ response.route.spec.http2Route.match.prefix }}'
+      scheme: '{{ response.route.spec.http2Route.match.scheme }}'
+      priority: '{{ response.route.spec.priority }}'
+- discovery_id: aws.appmesh.describe_virtual_gateway
+  for_each: aws.appmesh.list_meshes
+  calls:
+  - action: describe_virtual_gateway
+    params:
+      meshName: '{{ item.meshName }}'
+      virtualGatewayName: '{{ item.virtualGatewayName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      meshName: '{{ response.virtualGateway.meshName }}'
+      metadata: '{{ response.virtualGateway.metadata.uid }}'
+      spec: '{{ response.virtualGateway.spec }}'
+      status: '{{ response.virtualGateway.status.status }}'
+      virtualGateway: '{{ response.virtualGateway.virtualGatewayName }}'
+      virtualGatewayName: '{{ response.virtualGateway.virtualGatewayName }}'
+      arn: '{{ response.virtualGateway.metadata.arn }}'
+      createdAt: '{{ response.virtualGateway.metadata.createdAt }}'
+      lastUpdatedAt: '{{ response.virtualGateway.metadata.lastUpdatedAt }}'
+      meshOwner: '{{ response.virtualGateway.metadata.meshOwner }}'
+      resourceOwner: '{{ response.virtualGateway.metadata.resourceOwner }}'
+      uid: '{{ response.virtualGateway.metadata.uid }}'
+      version: '{{ response.virtualGateway.metadata.version }}'
+- discovery_id: aws.appmesh.describe_virtual_node
+  for_each: aws.appmesh.list_meshes
+  calls:
+  - action: describe_virtual_node
+    params:
+      meshName: '{{ item.meshName }}'
+      virtualNodeName: '{{ item.virtualNodeName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      meshName: '{{ response.virtualNode.meshName }}'
+      metadata: '{{ response.virtualNode.metadata.uid }}'
+      spec: '{{ response.virtualNode.spec }}'
+      status: '{{ response.virtualNode.status }}'
+      virtualNode: '{{ response.virtualNode.virtualNodeName }}'
+      virtualNodeName: '{{ response.virtualNode.virtualNodeName }}'
+      arn: '{{ response.virtualNode.metadata.arn }}'
+      createdAt: '{{ response.virtualNode.metadata.createdAt }}'
+      lastUpdatedAt: '{{ response.virtualNode.metadata.lastUpdatedAt }}'
+      meshOwner: '{{ response.virtualNode.metadata.meshOwner }}'
+      resourceOwner: '{{ response.virtualNode.metadata.resourceOwner }}'
+      uid: '{{ response.virtualNode.metadata.uid }}'
+      version: '{{ response.virtualNode.metadata.version }}'
+      ipPreference: '{{ response.virtualNode.spec.serviceDiscovery.awsCloudMap.ipPreference }}'
+      namespaceName: '{{ response.virtualNode.spec.serviceDiscovery.awsCloudMap.namespaceName }}'
+      serviceName: '{{ response.virtualNode.spec.serviceDiscovery.awsCloudMap.serviceName }}'
+      hostname: '{{ response.virtualNode.spec.serviceDiscovery.dns.hostname }}'
+      responseType: '{{ response.virtualNode.spec.serviceDiscovery.dns.responseType }}'
+- discovery_id: aws.appmesh.describe_virtual_router
+  for_each: aws.appmesh.list_meshes
+  calls:
+  - action: describe_virtual_router
+    params:
+      meshName: '{{ item.meshName }}'
+      virtualRouterName: '{{ item.virtualRouterName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      meshName: '{{ response.virtualRouter.meshName }}'
+      metadata: '{{ response.virtualRouter.metadata.uid }}'
+      spec: '{{ response.virtualRouter.spec }}'
+      status: '{{ response.virtualRouter.status.status }}'
+      virtualRouter: '{{ response.virtualRouter.virtualRouterName }}'
+      virtualRouterName: '{{ response.virtualRouter.virtualRouterName }}'
+      arn: '{{ response.virtualRouter.metadata.arn }}'
+      createdAt: '{{ response.virtualRouter.metadata.createdAt }}'
+      lastUpdatedAt: '{{ response.virtualRouter.metadata.lastUpdatedAt }}'
+      meshOwner: '{{ response.virtualRouter.metadata.meshOwner }}'
+      resourceOwner: '{{ response.virtualRouter.metadata.resourceOwner }}'
+      uid: '{{ response.virtualRouter.metadata.uid }}'
+      version: '{{ response.virtualRouter.metadata.version }}'
+- discovery_id: aws.appmesh.describe_virtual_service
+  for_each: aws.appmesh.list_meshes
+  calls:
+  - action: describe_virtual_service
+    params:
+      meshName: '{{ item.meshName }}'
+      virtualServiceName: '{{ item.virtualServiceName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      meshName: '{{ response.virtualService.meshName }}'
+      metadata: '{{ response.virtualService.metadata.uid }}'
+      spec: '{{ response.virtualService.spec }}'
+      status: '{{ response.virtualService.status.status }}'
+      virtualService: '{{ response.virtualService.virtualServiceName }}'
+      virtualServiceName: '{{ response.virtualService.virtualServiceName }}'
+      arn: '{{ response.virtualService.metadata.arn }}'
+      createdAt: '{{ response.virtualService.metadata.createdAt }}'
+      lastUpdatedAt: '{{ response.virtualService.metadata.lastUpdatedAt }}'
+      meshOwner: '{{ response.virtualService.metadata.meshOwner }}'
+      resourceOwner: '{{ response.virtualService.metadata.resourceOwner }}'
+      uid: '{{ response.virtualService.metadata.uid }}'
+      version: '{{ response.virtualService.metadata.version }}'
+      virtualNodeName: '{{ response.virtualService.spec.provider.virtualNode.virtualNodeName }}'
+      virtualRouterName: '{{ response.virtualService.spec.provider.virtualRouter.virtualRouterName }}'
+- discovery_id: aws.appmesh.list_gateway_routes
+  for_each: aws.appmesh.list_meshes
+  calls:
+  - action: list_gateway_routes
+    params:
+      meshName: '{{ item.meshName }}'
+      virtualGatewayName: '{{ item.virtualGatewayName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.gatewayRoutes }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      gatewayRouteName: '{{ item.gatewayRouteName }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      meshName: '{{ item.meshName }}'
+      meshOwner: '{{ item.meshOwner }}'
+      resourceOwner: '{{ item.resourceOwner }}'
+      version: '{{ item.version }}'
+      virtualGatewayName: '{{ item.virtualGatewayName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.appmesh.list_routes
+  for_each: aws.appmesh.list_meshes
+  calls:
+  - action: list_routes
+    params:
+      meshName: '{{ item.meshName }}'
+      virtualRouterName: '{{ item.virtualRouterName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.routes }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      meshName: '{{ item.meshName }}'
+      meshOwner: '{{ item.meshOwner }}'
+      resourceOwner: '{{ item.resourceOwner }}'
+      routeName: '{{ item.routeName }}'
+      version: '{{ item.version }}'
+      virtualRouterName: '{{ item.virtualRouterName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.appmesh.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.appmesh.list_virtual_gateways
+  for_each: aws.appmesh.list_meshes
+  calls:
+  - action: list_virtual_gateways
+    params:
+      meshName: '{{ item.meshName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.virtualGateways }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      meshName: '{{ item.meshName }}'
+      meshOwner: '{{ item.meshOwner }}'
+      resourceOwner: '{{ item.resourceOwner }}'
+      version: '{{ item.version }}'
+      virtualGatewayName: '{{ item.virtualGatewayName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.appmesh.list_virtual_nodes
+  for_each: aws.appmesh.list_meshes
+  calls:
+  - action: list_virtual_nodes
+    params:
+      meshName: '{{ item.meshName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.virtualNodes }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      meshName: '{{ item.meshName }}'
+      meshOwner: '{{ item.meshOwner }}'
+      resourceOwner: '{{ item.resourceOwner }}'
+      version: '{{ item.version }}'
+      virtualNodeName: '{{ item.virtualNodeName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.appmesh.list_virtual_routers
+  for_each: aws.appmesh.list_meshes
+  calls:
+  - action: list_virtual_routers
+    params:
+      meshName: '{{ item.meshName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.virtualRouters }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      meshName: '{{ item.meshName }}'
+      meshOwner: '{{ item.meshOwner }}'
+      resourceOwner: '{{ item.resourceOwner }}'
+      version: '{{ item.version }}'
+      virtualRouterName: '{{ item.virtualRouterName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.appmesh.list_virtual_services
+  for_each: aws.appmesh.list_meshes
+  calls:
+  - action: list_virtual_services
+    params:
+      meshName: '{{ item.meshName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.virtualServices }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      lastUpdatedAt: '{{ item.lastUpdatedAt }}'
+      meshName: '{{ item.meshName }}'
+      meshOwner: '{{ item.meshOwner }}'
+      resourceOwner: '{{ item.resourceOwner }}'
+      version: '{{ item.version }}'
+      virtualServiceName: '{{ item.virtualServiceName }}'
+      nextToken: '{{ response.nextToken }}'

@@ -1,0 +1,62 @@
+version: '1.0'
+provider: aws
+service: geo-places
+services:
+  client: geo-places
+  module: boto3.client
+discovery:
+- discovery_id: aws.geo-places.search_text
+  calls:
+  - action: search_text
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResultItems }}'
+    item:
+      PricingBucket: '{{ response.PricingBucket }}'
+- discovery_id: aws.geo-places.get_place
+  calls:
+  - action: get_place
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PostalCodeDetails }}'
+    item:
+      PostalAuthority: '{{ item.PostalAuthority }}'
+      PostalCode: '{{ item.PostalCode }}'
+      PostalCodeType: '{{ item.PostalCodeType }}'
+      UspsZip: '{{ item.UspsZip }}'
+      UspsZipPlus4: '{{ item.UspsZipPlus4 }}'
+      AddressNumberCorrected: '{{ response.AddressNumberCorrected }}'
+      AddressNumber: '{{ response.Address.AddressNumber }}'
+      Block: '{{ response.Address.Block }}'
+      Building: '{{ response.Address.Building }}'
+      Code2: '{{ response.Address.Country.Code2 }}'
+      Code3: '{{ response.Address.Country.Code3 }}'
+      Name: '{{ response.Address.Country.Name }}'
+      District: '{{ response.Address.District }}'
+      Label: '{{ response.Address.Label }}'
+      Locality: '{{ response.Address.Locality }}'
+      Code: '{{ response.Address.Region.Code }}'
+      Street: '{{ response.Address.Street }}'
+      SubBlock: '{{ response.Address.SubBlock }}'
+      SubDistrict: '{{ response.Address.SubDistrict }}'
+      PlaceId: '{{ response.PlaceId }}'
+      PlaceType: '{{ response.PlaceType }}'
+      PoliticalView: '{{ response.PoliticalView }}'
+      PricingBucket: '{{ response.PricingBucket }}'
+      Offset: '{{ response.TimeZone.Offset }}'
+      OffsetSeconds: '{{ response.TimeZone.OffsetSeconds }}'
+      Title: '{{ response.Title }}'
+- discovery_id: aws.geo-places.search_nearby
+  calls:
+  - action: search_nearby
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ResultItems }}'
+    item:
+      PricingBucket: '{{ response.PricingBucket }}'

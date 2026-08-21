@@ -1,0 +1,441 @@
+version: '1.0'
+provider: aws
+service: m2
+services:
+  client: m2
+  module: boto3.client
+discovery:
+- discovery_id: aws.m2.get_signed_bluinsights_url
+  calls:
+  - action: get_signed_bluinsights_url
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      signedBiUrl: '{{ response.signedBiUrl }}'
+- discovery_id: aws.m2.list_applications
+  calls:
+  - action: list_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.applications }}'
+    item:
+      applicationArn: '{{ item.applicationArn }}'
+      applicationId: '{{ item.applicationId }}'
+      applicationVersion: '{{ item.applicationVersion }}'
+      creationTime: '{{ item.creationTime }}'
+      deploymentStatus: '{{ item.deploymentStatus }}'
+      description: '{{ item.description }}'
+      engineType: '{{ item.engineType }}'
+      environmentId: '{{ item.environmentId }}'
+      lastStartTime: '{{ item.lastStartTime }}'
+      name: '{{ item.name }}'
+      roleArn: '{{ item.roleArn }}'
+      status: '{{ item.status }}'
+      versionStatus: '{{ item.versionStatus }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.m2.list_engine_versions
+  calls:
+  - action: list_engine_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.engineVersions }}'
+    item:
+      engineType: '{{ item.engineType }}'
+      engineVersion: '{{ item.engineVersion }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.m2.list_environments
+  calls:
+  - action: list_environments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.environments }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      engineType: '{{ item.engineType }}'
+      engineVersion: '{{ item.engineVersion }}'
+      environmentArn: '{{ item.environmentArn }}'
+      environmentId: '{{ item.environmentId }}'
+      instanceType: '{{ item.instanceType }}'
+      name: '{{ item.name }}'
+      networkType: '{{ item.networkType }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.m2.get_application
+  for_each: aws.m2.list_applications
+  calls:
+  - action: get_application
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.listenerArns }}'
+    item:
+      applicationArn: '{{ response.applicationArn }}'
+      applicationId: '{{ response.applicationId }}'
+      creationTime: '{{ response.creationTime }}'
+      applicationVersion: '{{ response.deployedVersion.applicationVersion }}'
+      status: '{{ response.deployedVersion.status }}'
+      statusReason: '{{ response.deployedVersion.statusReason }}'
+      description: '{{ response.description }}'
+      engineType: '{{ response.engineType }}'
+      environmentId: '{{ response.environmentId }}'
+      kmsKeyId: '{{ response.kmsKeyId }}'
+      lastStartTime: '{{ response.lastStartTime }}'
+      loadBalancerDnsName: '{{ response.loadBalancerDnsName }}'
+      name: '{{ response.name }}'
+      roleArn: '{{ response.roleArn }}'
+      tags: '{{ response.tags }}'
+- discovery_id: aws.m2.get_application_version
+  for_each: aws.m2.list_applications
+  calls:
+  - action: get_application_version
+    params:
+      applicationId: '{{ item.applicationId }}'
+      applicationVersion: '{{ item.applicationVersion }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      applicationVersion: '{{ response.applicationVersion }}'
+      creationTime: '{{ response.creationTime }}'
+      definitionContent: '{{ response.definitionContent }}'
+      description: '{{ response.description }}'
+      name: '{{ response.name }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+- discovery_id: aws.m2.get_batch_job_execution
+  for_each: aws.m2.list_applications
+  calls:
+  - action: get_batch_job_execution
+    params:
+      applicationId: '{{ item.applicationId }}'
+      executionId: '{{ item.executionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      fileBatchJobIdentifier: '{{ response.batchJobIdentifier.fileBatchJobIdentifier.fileName }}'
+      restartBatchJobIdentifier: '{{ response.batchJobIdentifier.restartBatchJobIdentifier.executionId }}'
+      s3BatchJobIdentifier: '{{ response.batchJobIdentifier.s3BatchJobIdentifier.bucket }}'
+      scriptBatchJobIdentifier: '{{ response.batchJobIdentifier.scriptBatchJobIdentifier.scriptName }}'
+      applicationId: '{{ response.applicationId }}'
+      fileName: '{{ response.batchJobIdentifier.fileBatchJobIdentifier.fileName }}'
+      folderPath: '{{ response.batchJobIdentifier.fileBatchJobIdentifier.folderPath }}'
+      executionId: '{{ response.batchJobIdentifier.restartBatchJobIdentifier.executionId }}'
+      fromProcStep: '{{ response.batchJobIdentifier.restartBatchJobIdentifier.jobStepRestartMarker.fromProcStep }}'
+      fromStep: '{{ response.batchJobIdentifier.restartBatchJobIdentifier.jobStepRestartMarker.fromStep }}'
+      skip: '{{ response.batchJobIdentifier.restartBatchJobIdentifier.jobStepRestartMarker.skip }}'
+      stepCheckpoint: '{{ response.batchJobIdentifier.restartBatchJobIdentifier.jobStepRestartMarker.stepCheckpoint }}'
+      toProcStep: '{{ response.batchJobIdentifier.restartBatchJobIdentifier.jobStepRestartMarker.toProcStep }}'
+      toStep: '{{ response.batchJobIdentifier.restartBatchJobIdentifier.jobStepRestartMarker.toStep }}'
+      bucket: '{{ response.batchJobIdentifier.s3BatchJobIdentifier.bucket }}'
+      scriptName: '{{ response.batchJobIdentifier.s3BatchJobIdentifier.identifier.scriptName }}'
+      keyPrefix: '{{ response.batchJobIdentifier.s3BatchJobIdentifier.keyPrefix }}'
+      endTime: '{{ response.endTime }}'
+      jobId: '{{ response.jobId }}'
+      jobName: '{{ response.jobName }}'
+      jobType: '{{ response.jobType }}'
+      jobUser: '{{ response.jobUser }}'
+      returnCode: '{{ response.returnCode }}'
+      startTime: '{{ response.startTime }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+- discovery_id: aws.m2.get_data_set_details
+  for_each: aws.m2.list_applications
+  calls:
+  - action: get_data_set_details
+    params:
+      applicationId: '{{ item.applicationId }}'
+      dataSetName: '{{ item.dataSetName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      blocksize: '{{ response.blocksize }}'
+      gdg: '{{ response.gdg }}'
+      location: '{{ response.location }}'
+      po: '{{ response.po }}'
+      ps: '{{ response.ps }}'
+      vsam: '{{ response.vsam }}'
+      creationTime: '{{ response.creationTime }}'
+      dataSetName: '{{ response.dataSetName }}'
+      limit: '{{ response.dataSetOrg.gdg.limit }}'
+      rollDisposition: '{{ response.dataSetOrg.gdg.rollDisposition }}'
+      encoding: '{{ response.dataSetOrg.po.encoding }}'
+      format: '{{ response.dataSetOrg.po.format }}'
+      cacheAtStartup: '{{ response.dataSetOrg.vsam.cacheAtStartup }}'
+      compressed: '{{ response.dataSetOrg.vsam.compressed }}'
+      length: '{{ response.dataSetOrg.vsam.primaryKey.length }}'
+      name: '{{ response.dataSetOrg.vsam.primaryKey.name }}'
+      offset: '{{ response.dataSetOrg.vsam.primaryKey.offset }}'
+      recordFormat: '{{ response.dataSetOrg.vsam.recordFormat }}'
+      fileSize: '{{ response.fileSize }}'
+      lastReferencedTime: '{{ response.lastReferencedTime }}'
+      lastUpdatedTime: '{{ response.lastUpdatedTime }}'
+      recordLength: '{{ response.recordLength }}'
+- discovery_id: aws.m2.get_data_set_export_task
+  for_each: aws.m2.list_applications
+  calls:
+  - action: get_data_set_export_task
+    params:
+      applicationId: '{{ item.applicationId }}'
+      taskId: '{{ item.taskId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      failed: '{{ response.summary.failed }}'
+      inProgress: '{{ response.summary.inProgress }}'
+      pending: '{{ response.summary.pending }}'
+      succeeded: '{{ response.summary.succeeded }}'
+      total: '{{ response.summary.total }}'
+      kmsKeyArn: '{{ response.kmsKeyArn }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+      taskId: '{{ response.taskId }}'
+- discovery_id: aws.m2.get_data_set_import_task
+  for_each: aws.m2.list_applications
+  calls:
+  - action: get_data_set_import_task
+    params:
+      applicationId: '{{ item.applicationId }}'
+      taskId: '{{ item.taskId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      failed: '{{ response.summary.failed }}'
+      inProgress: '{{ response.summary.inProgress }}'
+      pending: '{{ response.summary.pending }}'
+      succeeded: '{{ response.summary.succeeded }}'
+      total: '{{ response.summary.total }}'
+      status: '{{ response.status }}'
+      taskId: '{{ response.taskId }}'
+- discovery_id: aws.m2.get_deployment
+  for_each: aws.m2.list_applications
+  calls:
+  - action: get_deployment
+    params:
+      applicationId: '{{ item.applicationId }}'
+      deploymentId: '{{ item.deploymentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      applicationId: '{{ response.applicationId }}'
+      applicationVersion: '{{ response.applicationVersion }}'
+      creationTime: '{{ response.creationTime }}'
+      deploymentId: '{{ response.deploymentId }}'
+      environmentId: '{{ response.environmentId }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+- discovery_id: aws.m2.get_environment
+  for_each: aws.m2.list_applications
+  calls:
+  - action: get_environment
+    params:
+      environmentId: '{{ item.environmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.securityGroupIds }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      actualCapacity: '{{ response.actualCapacity }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      engineType: '{{ response.engineType }}'
+      engineVersion: '{{ response.engineVersion }}'
+      environmentArn: '{{ response.environmentArn }}'
+      environmentId: '{{ response.environmentId }}'
+      desiredCapacity: '{{ response.highAvailabilityConfig.desiredCapacity }}'
+      instanceType: '{{ response.instanceType }}'
+      kmsKeyId: '{{ response.kmsKeyId }}'
+      loadBalancerArn: '{{ response.loadBalancerArn }}'
+      name: '{{ response.name }}'
+      networkType: '{{ response.networkType }}'
+      endTime: '{{ response.pendingMaintenance.schedule.endTime }}'
+      startTime: '{{ response.pendingMaintenance.schedule.startTime }}'
+      preferredMaintenanceWindow: '{{ response.preferredMaintenanceWindow }}'
+      publiclyAccessible: '{{ response.publiclyAccessible }}'
+      status: '{{ response.status }}'
+      statusReason: '{{ response.statusReason }}'
+      tags: '{{ response.tags }}'
+      vpcId: '{{ response.vpcId }}'
+- discovery_id: aws.m2.list_application_versions
+  for_each: aws.m2.list_applications
+  calls:
+  - action: list_application_versions
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.applicationVersions }}'
+    item:
+      applicationVersion: '{{ item.applicationVersion }}'
+      creationTime: '{{ item.creationTime }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.m2.list_batch_job_definitions
+  for_each: aws.m2.list_applications
+  calls:
+  - action: list_batch_job_definitions
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.batchJobDefinitions }}'
+    item:
+      fileBatchJobDefinition: '{{ item.fileBatchJobDefinition }}'
+      scriptBatchJobDefinition: '{{ item.scriptBatchJobDefinition }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.m2.list_batch_job_executions
+  for_each: aws.m2.list_applications
+  calls:
+  - action: list_batch_job_executions
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.batchJobExecutions }}'
+    item:
+      applicationId: '{{ item.applicationId }}'
+      batchJobIdentifier: '{{ item.batchJobIdentifier }}'
+      endTime: '{{ item.endTime }}'
+      executionId: '{{ item.executionId }}'
+      jobId: '{{ item.jobId }}'
+      jobName: '{{ item.jobName }}'
+      jobType: '{{ item.jobType }}'
+      returnCode: '{{ item.returnCode }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.m2.list_batch_job_restart_points
+  for_each: aws.m2.list_applications
+  calls:
+  - action: list_batch_job_restart_points
+    params:
+      applicationId: '{{ item.applicationId }}'
+      executionId: '{{ item.executionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.batchJobSteps }}'
+    item:
+      procStepName: '{{ item.procStepName }}'
+      procStepNumber: '{{ item.procStepNumber }}'
+      stepCheckpoint: '{{ item.stepCheckpoint }}'
+      stepCheckpointStatus: '{{ item.stepCheckpointStatus }}'
+      stepCheckpointTime: '{{ item.stepCheckpointTime }}'
+      stepCondCode: '{{ item.stepCondCode }}'
+      stepName: '{{ item.stepName }}'
+      stepNumber: '{{ item.stepNumber }}'
+      stepRestartable: '{{ item.stepRestartable }}'
+- discovery_id: aws.m2.list_data_set_export_history
+  for_each: aws.m2.list_applications
+  calls:
+  - action: list_data_set_export_history
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dataSetExportTasks }}'
+    item:
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      summary: '{{ item.summary }}'
+      taskId: '{{ item.taskId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.m2.list_data_set_import_history
+  for_each: aws.m2.list_applications
+  calls:
+  - action: list_data_set_import_history
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dataSetImportTasks }}'
+    item:
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      summary: '{{ item.summary }}'
+      taskId: '{{ item.taskId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.m2.list_data_sets
+  for_each: aws.m2.list_applications
+  calls:
+  - action: list_data_sets
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.dataSets }}'
+    item:
+      creationTime: '{{ item.creationTime }}'
+      dataSetName: '{{ item.dataSetName }}'
+      dataSetOrg: '{{ item.dataSetOrg }}'
+      format: '{{ item.format }}'
+      lastReferencedTime: '{{ item.lastReferencedTime }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.m2.list_deployments
+  for_each: aws.m2.list_applications
+  calls:
+  - action: list_deployments
+    params:
+      applicationId: '{{ item.applicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.deployments }}'
+    item:
+      applicationId: '{{ item.applicationId }}'
+      applicationVersion: '{{ item.applicationVersion }}'
+      creationTime: '{{ item.creationTime }}'
+      deploymentId: '{{ item.deploymentId }}'
+      environmentId: '{{ item.environmentId }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.m2.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

@@ -1,0 +1,111 @@
+version: '1.0'
+provider: aws
+service: ds-data
+services:
+  client: ds-data
+  module: boto3.client
+discovery:
+- discovery_id: aws.ds-data.describe_group
+  calls:
+  - action: describe_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DirectoryId: '{{ response.DirectoryId }}'
+      DistinguishedName: '{{ response.DistinguishedName }}'
+      GroupScope: '{{ response.GroupScope }}'
+      GroupType: '{{ response.GroupType }}'
+      OtherAttributes: '{{ response.OtherAttributes }}'
+      Realm: '{{ response.Realm }}'
+      SAMAccountName: '{{ response.SAMAccountName }}'
+      SID: '{{ response.SID }}'
+- discovery_id: aws.ds-data.describe_user
+  calls:
+  - action: describe_user
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      DirectoryId: '{{ response.DirectoryId }}'
+      DistinguishedName: '{{ response.DistinguishedName }}'
+      EmailAddress: '{{ response.EmailAddress }}'
+      Enabled: '{{ response.Enabled }}'
+      GivenName: '{{ response.GivenName }}'
+      OtherAttributes: '{{ response.OtherAttributes }}'
+      Realm: '{{ response.Realm }}'
+      SAMAccountName: '{{ response.SAMAccountName }}'
+      SID: '{{ response.SID }}'
+      Surname: '{{ response.Surname }}'
+      UserPrincipalName: '{{ response.UserPrincipalName }}'
+- discovery_id: aws.ds-data.list_group_members
+  calls:
+  - action: list_group_members
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Members }}'
+    item:
+      MemberType: '{{ item.MemberType }}'
+      DirectoryId: '{{ response.DirectoryId }}'
+      MemberRealm: '{{ response.MemberRealm }}'
+      Realm: '{{ response.Realm }}'
+- discovery_id: aws.ds-data.list_groups
+  calls:
+  - action: list_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Groups }}'
+    item:
+      DirectoryId: '{{ response.DirectoryId }}'
+      Realm: '{{ response.Realm }}'
+- discovery_id: aws.ds-data.list_groups_for_member
+  calls:
+  - action: list_groups_for_member
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Groups }}'
+    item:
+      DirectoryId: '{{ response.DirectoryId }}'
+      MemberRealm: '{{ response.MemberRealm }}'
+      Realm: '{{ response.Realm }}'
+- discovery_id: aws.ds-data.list_users
+  calls:
+  - action: list_users
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Users }}'
+    item:
+      DirectoryId: '{{ response.DirectoryId }}'
+      Realm: '{{ response.Realm }}'
+- discovery_id: aws.ds-data.search_groups
+  calls:
+  - action: search_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Groups }}'
+    item:
+      DirectoryId: '{{ response.DirectoryId }}'
+      Realm: '{{ response.Realm }}'
+- discovery_id: aws.ds-data.search_users
+  calls:
+  - action: search_users
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Users }}'
+    item:
+      DirectoryId: '{{ response.DirectoryId }}'
+      Realm: '{{ response.Realm }}'

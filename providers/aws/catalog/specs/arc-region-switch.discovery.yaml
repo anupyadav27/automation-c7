@@ -1,0 +1,251 @@
+version: '1.0'
+provider: aws
+service: arc-region-switch
+services:
+  client: arc-region-switch
+  module: boto3.client
+discovery:
+- discovery_id: aws.arc-region-switch.list_plans
+  calls:
+  - action: list_plans
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.plans }}'
+    item:
+      activePlanExecution: '{{ item.activePlanExecution }}'
+      actualRecoveryTime: '{{ item.actualRecoveryTime }}'
+      arn: '{{ item.arn }}'
+      associatedAlarms: '{{ item.associatedAlarms }}'
+      comment: '{{ item.comment }}'
+      description: '{{ item.description }}'
+      endTime: '{{ item.endTime }}'
+      error: '{{ item.error }}'
+      evaluationState: '{{ item.evaluationState }}'
+      eventId: '{{ item.eventId }}'
+      executionAction: '{{ item.executionAction }}'
+      executionBlockType: '{{ item.executionBlockType }}'
+      executionRegion: '{{ item.executionRegion }}'
+      executionRole: '{{ item.executionRole }}'
+      executionState: '{{ item.executionState }}'
+      lastEvaluatedVersion: '{{ item.lastEvaluatedVersion }}'
+      lastEvaluationTime: '{{ item.lastEvaluationTime }}'
+      mode: '{{ item.mode }}'
+      name: '{{ item.name }}'
+      owner: '{{ item.owner }}'
+      plan: '{{ item.plan }}'
+      previousEventId: '{{ item.previousEventId }}'
+      primaryRegion: '{{ item.primaryRegion }}'
+      recoveryApproach: '{{ item.recoveryApproach }}'
+      recoveryTimeObjectiveMinutes: '{{ item.recoveryTimeObjectiveMinutes }}'
+      regions: '{{ item.regions }}'
+      resources: '{{ item.resources }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      stepMode: '{{ item.stepMode }}'
+      stepStates: '{{ item.stepStates }}'
+      timestamp: '{{ item.timestamp }}'
+      triggers: '{{ item.triggers }}'
+      type: '{{ item.type }}'
+      updatedAt: '{{ item.updatedAt }}'
+      version: '{{ item.version }}'
+      workflow: '{{ item.workflow }}'
+      workflows: '{{ item.workflows }}'
+- discovery_id: aws.arc-region-switch.list_plans_in_region
+  calls:
+  - action: list_plans_in_region
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.plans }}'
+    item:
+      activePlanExecution: '{{ item.activePlanExecution }}'
+      arn: '{{ item.arn }}'
+      description: '{{ item.description }}'
+      executionRole: '{{ item.executionRole }}'
+      name: '{{ item.name }}'
+      owner: '{{ item.owner }}'
+      primaryRegion: '{{ item.primaryRegion }}'
+      recoveryApproach: '{{ item.recoveryApproach }}'
+      recoveryTimeObjectiveMinutes: '{{ item.recoveryTimeObjectiveMinutes }}'
+      regions: '{{ item.regions }}'
+      updatedAt: '{{ item.updatedAt }}'
+      version: '{{ item.version }}'
+- discovery_id: aws.arc-region-switch.get_plan
+  for_each: aws.arc-region-switch.list_plans
+  calls:
+  - action: get_plan
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.plan.arn }}'
+      associatedAlarms: '{{ response.plan.associatedAlarms }}'
+      description: '{{ response.plan.description }}'
+      executionRole: '{{ response.plan.executionRole }}'
+      name: '{{ response.plan.name }}'
+      owner: '{{ response.plan.owner }}'
+      primaryRegion: '{{ response.plan.primaryRegion }}'
+      recoveryApproach: '{{ response.plan.recoveryApproach }}'
+      recoveryTimeObjectiveMinutes: '{{ response.plan.recoveryTimeObjectiveMinutes
+        }}'
+      regions: '{{ response.plan.regions }}'
+      triggers: '{{ response.plan.triggers }}'
+      updatedAt: '{{ response.plan.updatedAt }}'
+      version: '{{ response.plan.version }}'
+      workflows: '{{ response.plan.workflows }}'
+- discovery_id: aws.arc-region-switch.get_plan_evaluation_status
+  for_each: aws.arc-region-switch.list_plans
+  calls:
+  - action: get_plan_evaluation_status
+    params:
+      planArn: '{{ item.planArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.warnings }}'
+    item:
+      evaluationState: '{{ item.evaluationState }}'
+      lastEvaluatedVersion: '{{ item.lastEvaluatedVersion }}'
+      lastEvaluationTime: '{{ item.lastEvaluationTime }}'
+      resourceArn: '{{ item.resourceArn }}'
+      stepName: '{{ item.stepName }}'
+      version: '{{ item.version }}'
+      warningMessage: '{{ item.warningMessage }}'
+      warningStatus: '{{ item.warningStatus }}'
+      warningUpdatedTime: '{{ item.warningUpdatedTime }}'
+      warnings: '{{ item.warnings }}'
+      workflow: '{{ item.workflow }}'
+- discovery_id: aws.arc-region-switch.get_plan_execution
+  for_each: aws.arc-region-switch.list_plans
+  calls:
+  - action: get_plan_execution
+    params:
+      planArn: '{{ item.planArn }}'
+      executionId: '{{ item.executionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.stepStates }}'
+    item:
+      endTime: '{{ item.endTime }}'
+      name: '{{ item.name }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      stepMode: '{{ item.stepMode }}'
+      stepStates: '{{ item.stepStates }}'
+- discovery_id: aws.arc-region-switch.get_plan_in_region
+  for_each: aws.arc-region-switch.list_plans
+  calls:
+  - action: get_plan_in_region
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.plan.arn }}'
+      associatedAlarms: '{{ response.plan.associatedAlarms }}'
+      description: '{{ response.plan.description }}'
+      executionRole: '{{ response.plan.executionRole }}'
+      name: '{{ response.plan.name }}'
+      owner: '{{ response.plan.owner }}'
+      primaryRegion: '{{ response.plan.primaryRegion }}'
+      recoveryApproach: '{{ response.plan.recoveryApproach }}'
+      recoveryTimeObjectiveMinutes: '{{ response.plan.recoveryTimeObjectiveMinutes
+        }}'
+      regions: '{{ response.plan.regions }}'
+      triggers: '{{ response.plan.triggers }}'
+      updatedAt: '{{ response.plan.updatedAt }}'
+      version: '{{ response.plan.version }}'
+      workflows: '{{ response.plan.workflows }}'
+- discovery_id: aws.arc-region-switch.list_plan_execution_events
+  for_each: aws.arc-region-switch.list_plans
+  calls:
+  - action: list_plan_execution_events
+    params:
+      planArn: '{{ item.planArn }}'
+      executionId: '{{ item.executionId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      description: '{{ item.description }}'
+      error: '{{ item.error }}'
+      eventId: '{{ item.eventId }}'
+      executionBlockType: '{{ item.executionBlockType }}'
+      previousEventId: '{{ item.previousEventId }}'
+      resources: '{{ item.resources }}'
+      stepName: '{{ item.stepName }}'
+      stepStates: '{{ item.stepStates }}'
+      timestamp: '{{ item.timestamp }}'
+      type: '{{ item.type }}'
+- discovery_id: aws.arc-region-switch.list_plan_executions
+  for_each: aws.arc-region-switch.list_plans
+  calls:
+  - action: list_plan_executions
+    params:
+      planArn: '{{ item.planArn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      actualRecoveryTime: '{{ item.actualRecoveryTime }}'
+      comment: '{{ item.comment }}'
+      endTime: '{{ item.endTime }}'
+      error: '{{ item.error }}'
+      eventId: '{{ item.eventId }}'
+      executionAction: '{{ item.executionAction }}'
+      executionBlockType: '{{ item.executionBlockType }}'
+      executionId: '{{ item.executionId }}'
+      executionRegion: '{{ item.executionRegion }}'
+      executionState: '{{ item.executionState }}'
+      mode: '{{ item.mode }}'
+      planArn: '{{ item.planArn }}'
+      previousEventId: '{{ item.previousEventId }}'
+      resources: '{{ item.resources }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      stepMode: '{{ item.stepMode }}'
+      stepStates: '{{ item.stepStates }}'
+      timestamp: '{{ item.timestamp }}'
+      type: '{{ item.type }}'
+      updatedAt: '{{ item.updatedAt }}'
+      version: '{{ item.version }}'
+- discovery_id: aws.arc-region-switch.list_route53_health_checks
+  for_each: aws.arc-region-switch.list_plans
+  calls:
+  - action: list_route53_health_checks
+    params:
+      arn: '{{ item.arn }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.healthChecks }}'
+    item:
+      healthCheckId: '{{ item.healthCheckId }}'
+      hostedZoneId: '{{ item.hostedZoneId }}'
+      recordName: '{{ item.recordName }}'
+      region: '{{ item.region }}'
+- discovery_id: aws.arc-region-switch.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      resourceTags: '{{ response.resourceTags }}'

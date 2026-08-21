@@ -1,0 +1,222 @@
+version: '1.0'
+provider: aws
+service: security-ir
+services:
+  client: security-ir
+  module: boto3.client
+discovery:
+- discovery_id: aws.security-ir.list_cases
+  calls:
+  - action: list_cases
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      action: '{{ item.action }}'
+      actionType: '{{ item.actionType }}'
+      actualIncidentStartDate: '{{ item.actualIncidentStartDate }}'
+      attachmentPresignedUrl: '{{ item.attachmentPresignedUrl }}'
+      body: '{{ item.body }}'
+      caseArn: '{{ item.caseArn }}'
+      caseAttachments: '{{ item.caseAttachments }}'
+      caseId: '{{ item.caseId }}'
+      caseMetadata: '{{ item.caseMetadata }}'
+      caseStatus: '{{ item.caseStatus }}'
+      closedDate: '{{ item.closedDate }}'
+      closureCode: '{{ item.closureCode }}'
+      content: '{{ item.content }}'
+      createdDate: '{{ item.createdDate }}'
+      creator: '{{ item.creator }}'
+      description: '{{ item.description }}'
+      engagementType: '{{ item.engagementType }}'
+      eventTimestamp: '{{ item.eventTimestamp }}'
+      feedback: '{{ item.feedback }}'
+      impactedAccounts: '{{ item.impactedAccounts }}'
+      impactedAwsRegions: '{{ item.impactedAwsRegions }}'
+      impactedServices: '{{ item.impactedServices }}'
+      investigationId: '{{ item.investigationId }}'
+      lastUpdated: '{{ item.lastUpdated }}'
+      lastUpdatedBy: '{{ item.lastUpdatedBy }}'
+      lastUpdatedDate: '{{ item.lastUpdatedDate }}'
+      message: '{{ item.message }}'
+      pendingAction: '{{ item.pendingAction }}'
+      principal: '{{ item.principal }}'
+      reportedIncidentStartDate: '{{ item.reportedIncidentStartDate }}'
+      resolverType: '{{ item.resolverType }}'
+      status: '{{ item.status }}'
+      threatActorIpAddresses: '{{ item.threatActorIpAddresses }}'
+      title: '{{ item.title }}'
+      watchers: '{{ item.watchers }}'
+      nextToken: '{{ response.nextToken }}'
+      total: '{{ response.total }}'
+- discovery_id: aws.security-ir.list_memberships
+  calls:
+  - action: list_memberships
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      accountId: '{{ item.accountId }}'
+      membershipArn: '{{ item.membershipArn }}'
+      membershipId: '{{ item.membershipId }}'
+      membershipStatus: '{{ item.membershipStatus }}'
+      region: '{{ item.region }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.security-ir.get_case
+  for_each: aws.security-ir.list_cases
+  calls:
+  - action: get_case
+    params:
+      caseId: '{{ item.caseId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.impactedAwsRegions }}'
+    item:
+      actualIncidentStartDate: '{{ item.actualIncidentStartDate }}'
+      caseAttachments: '{{ item.caseAttachments }}'
+      caseMetadata: '{{ item.caseMetadata }}'
+      closureCode: '{{ item.closureCode }}'
+      description: '{{ item.description }}'
+      impactedAccounts: '{{ item.impactedAccounts }}'
+      impactedAwsRegions: '{{ item.impactedAwsRegions }}'
+      impactedServices: '{{ item.impactedServices }}'
+      region: '{{ item.region }}'
+      reportedIncidentStartDate: '{{ item.reportedIncidentStartDate }}'
+      threatActorIpAddresses: '{{ item.threatActorIpAddresses }}'
+      watchers: '{{ item.watchers }}'
+      caseArn: '{{ response.caseArn }}'
+      caseStatus: '{{ response.caseStatus }}'
+      closedDate: '{{ response.closedDate }}'
+      createdDate: '{{ response.createdDate }}'
+      engagementType: '{{ response.engagementType }}'
+      lastUpdatedDate: '{{ response.lastUpdatedDate }}'
+      pendingAction: '{{ response.pendingAction }}'
+      resolverType: '{{ response.resolverType }}'
+      title: '{{ response.title }}'
+- discovery_id: aws.security-ir.get_case_attachment_download_url
+  for_each: aws.security-ir.list_cases
+  calls:
+  - action: get_case_attachment_download_url
+    params:
+      caseId: '{{ item.caseId }}'
+      attachmentId: '{{ item.attachmentId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      attachmentPresignedUrl: '{{ response.attachmentPresignedUrl }}'
+- discovery_id: aws.security-ir.get_case_attachment_upload_url
+  for_each: aws.security-ir.list_cases
+  calls:
+  - action: get_case_attachment_upload_url
+    params:
+      caseId: '{{ item.caseId }}'
+      fileName: '{{ item.fileName }}'
+      contentLength: '{{ item.contentLength }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      attachmentPresignedUrl: '{{ response.attachmentPresignedUrl }}'
+- discovery_id: aws.security-ir.get_membership
+  for_each: aws.security-ir.list_memberships
+  calls:
+  - action: get_membership
+    params:
+      membershipId: '{{ item.membershipId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.incidentResponseTeam }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      communicationPreferences: '{{ item.communicationPreferences }}'
+      email: '{{ item.email }}'
+      jobTitle: '{{ item.jobTitle }}'
+      name: '{{ item.name }}'
+      accountId: '{{ response.accountId }}'
+      customerType: '{{ response.customerType }}'
+      membershipActivationTimestamp: '{{ response.membershipActivationTimestamp }}'
+      membershipArn: '{{ response.membershipArn }}'
+      membershipDeactivationTimestamp: '{{ response.membershipDeactivationTimestamp }}'
+      membershipId: '{{ response.membershipId }}'
+      membershipName: '{{ response.membershipName }}'
+      membershipStatus: '{{ response.membershipStatus }}'
+      numberOfAccountsCovered: '{{ response.numberOfAccountsCovered }}'
+      region: '{{ response.region }}'
+- discovery_id: aws.security-ir.list_case_edits
+  for_each: aws.security-ir.list_cases
+  calls:
+  - action: list_case_edits
+    params:
+      caseId: '{{ item.caseId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      action: '{{ item.action }}'
+      eventTimestamp: '{{ item.eventTimestamp }}'
+      message: '{{ item.message }}'
+      principal: '{{ item.principal }}'
+      nextToken: '{{ response.nextToken }}'
+      total: '{{ response.total }}'
+- discovery_id: aws.security-ir.list_comments
+  for_each: aws.security-ir.list_cases
+  calls:
+  - action: list_comments
+    params:
+      caseId: '{{ item.caseId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.items }}'
+    item:
+      body: '{{ item.body }}'
+      commentId: '{{ item.commentId }}'
+      createdDate: '{{ item.createdDate }}'
+      creator: '{{ item.creator }}'
+      lastUpdatedBy: '{{ item.lastUpdatedBy }}'
+      lastUpdatedDate: '{{ item.lastUpdatedDate }}'
+      nextToken: '{{ response.nextToken }}'
+      total: '{{ response.total }}'
+- discovery_id: aws.security-ir.list_investigations
+  for_each: aws.security-ir.list_cases
+  calls:
+  - action: list_investigations
+    params:
+      caseId: '{{ item.caseId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.investigationActions }}'
+    item:
+      actionType: '{{ item.actionType }}'
+      content: '{{ item.content }}'
+      feedback: '{{ item.feedback }}'
+      investigationId: '{{ item.investigationId }}'
+      lastUpdated: '{{ item.lastUpdated }}'
+      status: '{{ item.status }}'
+      title: '{{ item.title }}'
+- discovery_id: aws.security-ir.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

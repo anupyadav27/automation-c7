@@ -1,0 +1,486 @@
+version: '1.0'
+provider: aws
+service: location
+services:
+  client: location
+  module: boto3.client
+discovery:
+- discovery_id: aws.location.list_geofence_collections
+  calls:
+  - action: list_geofence_collections
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Entries }}'
+    item:
+      CreateTime: '{{ item.CreateTime }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      Circle: '{{ item.Circle }}'
+      CollectionArn: '{{ item.CollectionArn }}'
+      CollectionName: '{{ item.CollectionName }}'
+      Description: '{{ item.Description }}'
+      Geobuf: '{{ item.Geobuf }}'
+      GeofenceCount: '{{ item.GeofenceCount }}'
+      GeofenceProperties: '{{ item.GeofenceProperties }}'
+      MultiPolygon: '{{ item.MultiPolygon }}'
+      Polygon: '{{ item.Polygon }}'
+      PricingPlan: '{{ item.PricingPlan }}'
+      PricingPlanDataSource: '{{ item.PricingPlanDataSource }}'
+      UpdateTime: '{{ item.UpdateTime }}'
+- discovery_id: aws.location.list_keys
+  calls:
+  - action: list_keys
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Entries }}'
+    item:
+      CreateTime: '{{ item.CreateTime }}'
+      Description: '{{ item.Description }}'
+      ExpireTime: '{{ item.ExpireTime }}'
+      KeyName: '{{ item.KeyName }}'
+      Restrictions: '{{ item.Restrictions }}'
+      UpdateTime: '{{ item.UpdateTime }}'
+- discovery_id: aws.location.list_maps
+  calls:
+  - action: list_maps
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Entries }}'
+    item:
+      CreateTime: '{{ item.CreateTime }}'
+      Configuration: '{{ item.Configuration }}'
+      DataSource: '{{ item.DataSource }}'
+      Description: '{{ item.Description }}'
+      MapName: '{{ item.MapName }}'
+      PricingPlan: '{{ item.PricingPlan }}'
+      UpdateTime: '{{ item.UpdateTime }}'
+- discovery_id: aws.location.list_place_indexes
+  calls:
+  - action: list_place_indexes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Entries }}'
+    item:
+      CreateTime: '{{ item.CreateTime }}'
+      DataSource: '{{ item.DataSource }}'
+      Description: '{{ item.Description }}'
+      IndexName: '{{ item.IndexName }}'
+      PricingPlan: '{{ item.PricingPlan }}'
+      UpdateTime: '{{ item.UpdateTime }}'
+- discovery_id: aws.location.list_route_calculators
+  calls:
+  - action: list_route_calculators
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Entries }}'
+    item:
+      CreateTime: '{{ item.CreateTime }}'
+      CalculatorName: '{{ item.CalculatorName }}'
+      DataSource: '{{ item.DataSource }}'
+      Description: '{{ item.Description }}'
+      PricingPlan: '{{ item.PricingPlan }}'
+      UpdateTime: '{{ item.UpdateTime }}'
+- discovery_id: aws.location.list_trackers
+  calls:
+  - action: list_trackers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Entries }}'
+    item:
+      CreateTime: '{{ item.CreateTime }}'
+      Description: '{{ item.Description }}'
+      PricingPlan: '{{ item.PricingPlan }}'
+      PricingPlanDataSource: '{{ item.PricingPlanDataSource }}'
+      TrackerName: '{{ item.TrackerName }}'
+      UpdateTime: '{{ item.UpdateTime }}'
+- discovery_id: aws.location.describe_geofence_collection
+  for_each: aws.location.list_geofence_collections
+  calls:
+  - action: describe_geofence_collection
+    params:
+      CollectionName: '{{ item.CollectionName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      KmsKeyId: '{{ response.KmsKeyId }}'
+      Tags: '{{ response.Tags }}'
+      CollectionArn: '{{ response.CollectionArn }}'
+      GeofenceCount: '{{ response.GeofenceCount }}'
+      CollectionName: '{{ response.CollectionName }}'
+      CreateTime: '{{ response.CreateTime }}'
+      Description: '{{ response.Description }}'
+      PricingPlan: '{{ response.PricingPlan }}'
+      PricingPlanDataSource: '{{ response.PricingPlanDataSource }}'
+      UpdateTime: '{{ response.UpdateTime }}'
+- discovery_id: aws.location.describe_key
+  for_each: aws.location.list_keys
+  calls:
+  - action: describe_key
+    params:
+      KeyName: '{{ item.KeyName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AllowActions: '{{ response.Restrictions.AllowActions }}'
+      AllowAndroidApps: '{{ response.Restrictions.AllowAndroidApps }}'
+      AllowAppleApps: '{{ response.Restrictions.AllowAppleApps }}'
+      AllowReferers: '{{ response.Restrictions.AllowReferers }}'
+      AllowResources: '{{ response.Restrictions.AllowResources }}'
+      CreateTime: '{{ response.CreateTime }}'
+      Description: '{{ response.Description }}'
+      ExpireTime: '{{ response.ExpireTime }}'
+      Key: '{{ response.Key }}'
+      KeyArn: '{{ response.KeyArn }}'
+      KeyName: '{{ response.KeyName }}'
+      Tags: '{{ response.Tags }}'
+      UpdateTime: '{{ response.UpdateTime }}'
+- discovery_id: aws.location.describe_map
+  for_each: aws.location.list_maps
+  calls:
+  - action: describe_map
+    params:
+      MapName: '{{ item.MapName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Configuration: '{{ response.Configuration.Configuration }}'
+      CustomLayers: '{{ response.Configuration.CustomLayers }}'
+      Enabled: '{{ response.Configuration.Enabled }}'
+      PoliticalView: '{{ response.Configuration.PoliticalView }}'
+      Style: '{{ response.Configuration.Style }}'
+      CreateTime: '{{ response.CreateTime }}'
+      DataSource: '{{ response.DataSource }}'
+      Description: '{{ response.Description }}'
+      MapArn: '{{ response.MapArn }}'
+      MapName: '{{ response.MapName }}'
+      PricingPlan: '{{ response.PricingPlan }}'
+      Tags: '{{ response.Tags }}'
+      UpdateTime: '{{ response.UpdateTime }}'
+- discovery_id: aws.location.describe_place_index
+  for_each: aws.location.list_place_indexes
+  calls:
+  - action: describe_place_index
+    params:
+      IndexName: '{{ item.IndexName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      IntendedUse: '{{ response.DataSourceConfiguration.IntendedUse }}'
+      CreateTime: '{{ response.CreateTime }}'
+      DataSource: '{{ response.DataSource }}'
+      Description: '{{ response.Description }}'
+      IndexArn: '{{ response.IndexArn }}'
+      IndexName: '{{ response.IndexName }}'
+      PricingPlan: '{{ response.PricingPlan }}'
+      Tags: '{{ response.Tags }}'
+      UpdateTime: '{{ response.UpdateTime }}'
+- discovery_id: aws.location.describe_route_calculator
+  for_each: aws.location.list_route_calculators
+  calls:
+  - action: describe_route_calculator
+    params:
+      CalculatorName: '{{ item.CalculatorName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreateTime: '{{ response.CreateTime }}'
+      Tags: '{{ response.Tags }}'
+      CalculatorArn: '{{ response.CalculatorArn }}'
+      CalculatorName: '{{ response.CalculatorName }}'
+      DataSource: '{{ response.DataSource }}'
+      Description: '{{ response.Description }}'
+      PricingPlan: '{{ response.PricingPlan }}'
+      UpdateTime: '{{ response.UpdateTime }}'
+- discovery_id: aws.location.describe_tracker
+  for_each: aws.location.list_trackers
+  calls:
+  - action: describe_tracker
+    params:
+      TrackerName: '{{ item.TrackerName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      CreateTime: '{{ response.CreateTime }}'
+      KmsKeyId: '{{ response.KmsKeyId }}'
+      Tags: '{{ response.Tags }}'
+      Description: '{{ response.Description }}'
+      EventBridgeEnabled: '{{ response.EventBridgeEnabled }}'
+      KmsKeyEnableGeospatialQueries: '{{ response.KmsKeyEnableGeospatialQueries }}'
+      PositionFiltering: '{{ response.PositionFiltering }}'
+      PricingPlan: '{{ response.PricingPlan }}'
+      PricingPlanDataSource: '{{ response.PricingPlanDataSource }}'
+      TrackerArn: '{{ response.TrackerArn }}'
+      TrackerName: '{{ response.TrackerName }}'
+      UpdateTime: '{{ response.UpdateTime }}'
+- discovery_id: aws.location.get_device_position
+  for_each: aws.location.list_trackers
+  calls:
+  - action: get_device_position
+    params:
+      TrackerName: '{{ item.TrackerName }}'
+      DeviceId: '{{ item.DeviceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Position }}'
+    item:
+      Horizontal: '{{ response.Accuracy.Horizontal }}'
+      DeviceId: '{{ response.DeviceId }}'
+      PositionProperties: '{{ response.PositionProperties }}'
+      ReceivedTime: '{{ response.ReceivedTime }}'
+      SampleTime: '{{ response.SampleTime }}'
+- discovery_id: aws.location.get_device_position_history
+  for_each: aws.location.list_trackers
+  calls:
+  - action: get_device_position_history
+    params:
+      TrackerName: '{{ item.TrackerName }}'
+      DeviceId: '{{ item.DeviceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DevicePositions }}'
+    item:
+      Accuracy: '{{ item.Accuracy }}'
+      DeviceId: '{{ item.DeviceId }}'
+      Position: '{{ item.Position }}'
+      PositionProperties: '{{ item.PositionProperties }}'
+      ReceivedTime: '{{ item.ReceivedTime }}'
+      SampleTime: '{{ item.SampleTime }}'
+- discovery_id: aws.location.get_geofence
+  for_each: aws.location.list_geofence_collections
+  calls:
+  - action: get_geofence
+    params:
+      CollectionName: '{{ item.CollectionName }}'
+      GeofenceId: '{{ item.GeofenceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Circle: '{{ response.Geometry.Circle }}'
+      Geobuf: '{{ response.Geometry.Geobuf }}'
+      MultiPolygon: '{{ response.Geometry.MultiPolygon }}'
+      Polygon: '{{ response.Geometry.Polygon }}'
+      CreateTime: '{{ response.CreateTime }}'
+      GeofenceId: '{{ response.GeofenceId }}'
+      GeofenceProperties: '{{ response.GeofenceProperties }}'
+      Radius: '{{ response.Geometry.Circle.Radius }}'
+      Status: '{{ response.Status }}'
+      UpdateTime: '{{ response.UpdateTime }}'
+- discovery_id: aws.location.get_map_glyphs
+  for_each: aws.location.list_maps
+  calls:
+  - action: get_map_glyphs
+    params:
+      MapName: '{{ item.MapName }}'
+      FontStack: '{{ item.FontStack }}'
+      FontUnicodeRange: '{{ item.FontUnicodeRange }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Blob: '{{ response.Blob }}'
+      CacheControl: '{{ response.CacheControl }}'
+      ContentType: '{{ response.ContentType }}'
+- discovery_id: aws.location.get_map_sprites
+  for_each: aws.location.list_maps
+  calls:
+  - action: get_map_sprites
+    params:
+      MapName: '{{ item.MapName }}'
+      FileName: '{{ item.FileName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Blob: '{{ response.Blob }}'
+      CacheControl: '{{ response.CacheControl }}'
+      ContentType: '{{ response.ContentType }}'
+- discovery_id: aws.location.get_map_style_descriptor
+  for_each: aws.location.list_maps
+  calls:
+  - action: get_map_style_descriptor
+    params:
+      MapName: '{{ item.MapName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Blob: '{{ response.Blob }}'
+      CacheControl: '{{ response.CacheControl }}'
+      ContentType: '{{ response.ContentType }}'
+- discovery_id: aws.location.get_map_tile
+  for_each: aws.location.list_maps
+  calls:
+  - action: get_map_tile
+    params:
+      MapName: '{{ item.MapName }}'
+      Z: '{{ item.Z }}'
+      X: '{{ item.X }}'
+      Y: '{{ item.Y }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Blob: '{{ response.Blob }}'
+      CacheControl: '{{ response.CacheControl }}'
+      ContentType: '{{ response.ContentType }}'
+- discovery_id: aws.location.get_place
+  for_each: aws.location.list_place_indexes
+  calls:
+  - action: get_place
+    params:
+      IndexName: '{{ item.IndexName }}'
+      PlaceId: '{{ item.PlaceId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Region: '{{ response.Place.Region }}'
+      AddressNumber: '{{ response.Place.AddressNumber }}'
+      Country: '{{ response.Place.Country }}'
+      Geometry: '{{ response.Place.Geometry }}'
+      Interpolated: '{{ response.Place.Interpolated }}'
+      Label: '{{ response.Place.Label }}'
+      Municipality: '{{ response.Place.Municipality }}'
+      Neighborhood: '{{ response.Place.Neighborhood }}'
+      PostalCode: '{{ response.Place.PostalCode }}'
+      Street: '{{ response.Place.Street }}'
+      SubMunicipality: '{{ response.Place.SubMunicipality }}'
+      SubRegion: '{{ response.Place.SubRegion }}'
+      TimeZone: '{{ response.Place.TimeZone }}'
+      UnitNumber: '{{ response.Place.UnitNumber }}'
+      UnitType: '{{ response.Place.UnitType }}'
+      Name: '{{ response.Place.TimeZone.Name }}'
+      Offset: '{{ response.Place.TimeZone.Offset }}'
+- discovery_id: aws.location.list_device_positions
+  for_each: aws.location.list_trackers
+  calls:
+  - action: list_device_positions
+    params:
+      TrackerName: '{{ item.TrackerName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Entries }}'
+    item:
+      Accuracy: '{{ item.Accuracy }}'
+      DeviceId: '{{ item.DeviceId }}'
+      Position: '{{ item.Position }}'
+      PositionProperties: '{{ item.PositionProperties }}'
+      SampleTime: '{{ item.SampleTime }}'
+- discovery_id: aws.location.list_geofences
+  for_each: aws.location.list_geofence_collections
+  calls:
+  - action: list_geofences
+    params:
+      CollectionName: '{{ item.CollectionName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Entries }}'
+    item:
+      CreateTime: '{{ item.CreateTime }}'
+      Status: '{{ item.Status }}'
+      Circle: '{{ item.Circle }}'
+      Geobuf: '{{ item.Geobuf }}'
+      GeofenceId: '{{ item.GeofenceId }}'
+      GeofenceProperties: '{{ item.GeofenceProperties }}'
+      Geometry: '{{ item.Geometry }}'
+      MultiPolygon: '{{ item.MultiPolygon }}'
+      Polygon: '{{ item.Polygon }}'
+      UpdateTime: '{{ item.UpdateTime }}'
+- discovery_id: aws.location.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.location.list_tracker_consumers
+  for_each: aws.location.list_trackers
+  calls:
+  - action: list_tracker_consumers
+    params:
+      TrackerName: '{{ item.TrackerName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ConsumerArns }}'
+- discovery_id: aws.location.search_place_index_for_position
+  calls:
+  - action: search_place_index_for_position
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Results }}'
+    item:
+      DataSource: '{{ response.Summary.DataSource }}'
+      Language: '{{ response.Summary.Language }}'
+      MaxResults: '{{ response.Summary.MaxResults }}'
+- discovery_id: aws.location.search_place_index_for_suggestions
+  calls:
+  - action: search_place_index_for_suggestions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Results }}'
+    item:
+      DataSource: '{{ response.Summary.DataSource }}'
+      Language: '{{ response.Summary.Language }}'
+      MaxResults: '{{ response.Summary.MaxResults }}'
+      Text: '{{ response.Summary.Text }}'
+- discovery_id: aws.location.search_place_index_for_text
+  calls:
+  - action: search_place_index_for_text
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Results }}'
+    item:
+      DataSource: '{{ response.Summary.DataSource }}'
+      Language: '{{ response.Summary.Language }}'
+      MaxResults: '{{ response.Summary.MaxResults }}'
+      Text: '{{ response.Summary.Text }}'

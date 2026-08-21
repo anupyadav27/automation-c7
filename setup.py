@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="automation-c7",
+    name="cloud-estate",
     version="0.1.0",
     description="FinOps & Security as Policy engine",
     packages=find_packages(),

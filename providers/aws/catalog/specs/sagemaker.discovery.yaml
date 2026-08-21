@@ -1,0 +1,333 @@
+# Security-focused SageMaker discovery — trimmed from 65 → 17 calls.
+# Removed: edge, A2I, MLflow, lineage, compilation, monitoring, geospatial sub-services.
+# Kept: notebook instances, Studio domains, endpoints, training jobs, models, feature groups, model packages, workforces.
+# Auto-generated backup: /Users/apple/Desktop/threat-engine/catalog/discovery_generator_data/aws/sagemaker/step6_sagemaker.discovery.yaml.backup_pre_trim
+version: '1.0'
+provider: aws
+service: sagemaker
+discovery:
+- calls:
+  - action: list_training_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.sagemaker.list_training_jobs
+  emit:
+    as: item
+    item:
+      BillableTimeInSeconds: '{{ item.BillableTimeInSeconds }}'
+      CreationTime: '{{ item.CreationTime }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      SecondaryStatus: '{{ item.SecondaryStatus }}'
+      TrainingEndTime: '{{ item.TrainingEndTime }}'
+      TrainingJobArn: '{{ item.TrainingJobArn }}'
+      TrainingJobName: '{{ item.TrainingJobName }}'
+      TrainingJobStatus: '{{ item.TrainingJobStatus }}'
+      TrainingPlanArn: '{{ item.TrainingPlanArn }}'
+      TrainingTimeInSeconds: '{{ item.TrainingTimeInSeconds }}'
+      TuningJobArn: '{{ item.TuningJobArn }}'
+      WarmPoolStatus: '{{ item.WarmPoolStatus }}'
+    items_for: '{{ response.TrainingJobSummaries }}'
+- calls:
+  - action: describe_training_job
+    on_error: continue
+    params:
+      TrainingJobName: '{{ item.TrainingJobName }}'
+    save_as: response
+  discovery_id: aws.sagemaker.describe_training_job
+  emit:
+    as: item
+    item:
+      BillableTimeInSeconds: '{{ item.BillableTimeInSeconds }}'
+      HyperParameters: '{{ item.HyperParameters }}'
+      MetricName: '{{ item.MetricName }}'
+      ModelArtifacts: '{{ item.ModelArtifacts }}'
+      Timestamp: '{{ item.Timestamp }}'
+      TrainingTimeInSeconds: '{{ item.TrainingTimeInSeconds }}'
+      TuningJobArn: '{{ item.TuningJobArn }}'
+      Value: '{{ item.Value }}'
+    items_for: '{{ response.InputDataConfig }}'
+  for_each: aws.sagemaker.list_training_jobs
+- calls:
+  - action: list_models
+    on_error: continue
+    save_as: response
+  discovery_id: aws.sagemaker.list_models
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      ModelArn: '{{ item.ModelArn }}'
+      ModelName: '{{ item.ModelName }}'
+    items_for: '{{ response.Models }}'
+- calls:
+  - action: list_endpoints
+    on_error: continue
+    save_as: response
+  discovery_id: aws.sagemaker.list_endpoints
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      EndpointArn: '{{ item.EndpointArn }}'
+      EndpointName: '{{ item.EndpointName }}'
+      EndpointStatus: '{{ item.EndpointStatus }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+    items_for: '{{ response.Endpoints }}'
+- calls:
+  - action: describe_model
+    on_error: continue
+    params:
+      ModelName: '{{ item.ModelName }}'
+    save_as: response
+  discovery_id: aws.sagemaker.describe_model
+  emit:
+    as: item
+    item:
+      AdditionalModelDataSources: '{{ item.AdditionalModelDataSources }}'
+      ContainerHostname: '{{ item.ContainerHostname }}'
+      DeploymentRecommendation: '{{ item.DeploymentRecommendation }}'
+      Environment: '{{ item.Environment }}'
+      ExecutionRoleArn: '{{ item.ExecutionRoleArn }}'
+      Image: '{{ item.Image }}'
+      ImageConfig: '{{ item.ImageConfig }}'
+      InferenceExecutionConfig: '{{ item.InferenceExecutionConfig }}'
+      InferenceSpecificationName: '{{ item.InferenceSpecificationName }}'
+      Mode: '{{ item.Mode }}'
+      ModelDataSource: '{{ item.ModelDataSource }}'
+      ModelDataUrl: '{{ item.ModelDataUrl }}'
+      ModelPackageName: '{{ item.ModelPackageName }}'
+      MultiModelConfig: '{{ item.MultiModelConfig }}'
+      PrimaryContainer: '{{ item.PrimaryContainer }}'
+      VpcConfig: '{{ response.VpcConfig }}'
+    items_for: '{{ response.Containers }}'
+  for_each: aws.sagemaker.list_edge_packaging_jobs
+- calls:
+  - action: list_model_packages
+    on_error: continue
+    save_as: response
+  discovery_id: aws.sagemaker.list_model_packages
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      ModelApprovalStatus: '{{ item.ModelApprovalStatus }}'
+      ModelLifeCycle: '{{ item.ModelLifeCycle }}'
+      ModelPackageArn: '{{ item.ModelPackageArn }}'
+      ModelPackageDescription: '{{ item.ModelPackageDescription }}'
+      ModelPackageGroupName: '{{ item.ModelPackageGroupName }}'
+      ModelPackageName: '{{ item.ModelPackageName }}'
+      ModelPackageStatus: '{{ item.ModelPackageStatus }}'
+      ModelPackageVersion: '{{ item.ModelPackageVersion }}'
+    items_for: '{{ response.ModelPackageSummaryList }}'
+- calls:
+  - action: describe_model_package
+    on_error: continue
+    params:
+      ModelPackageName: '{{ item.ModelPackageName }}'
+    save_as: response
+  discovery_id: aws.sagemaker.describe_model_package
+  emit:
+    as: item
+    item:
+      Containers: '{{ item.Containers }}'
+      Description: '{{ item.Description }}'
+      ModelPackageStatusDetails: '{{ item.ModelPackageStatusDetails }}'
+      Name: '{{ item.Name }}'
+      SourceAlgorithmSpecification: '{{ item.SourceAlgorithmSpecification }}'
+      SupportedContentTypes: '{{ item.SupportedContentTypes }}'
+      SupportedRealtimeInferenceInstanceTypes: '{{ item.SupportedRealtimeInferenceInstanceTypes
+        }}'
+      SupportedResponseMIMETypes: '{{ item.SupportedResponseMIMETypes }}'
+      SupportedTransformInstanceTypes: '{{ item.SupportedTransformInstanceTypes }}'
+    items_for: '{{ response.AdditionalInferenceSpecifications }}'
+  for_each: aws.sagemaker.list_model_packages
+- calls:
+  - action: list_domains
+    on_error: continue
+    save_as: response
+  discovery_id: aws.sagemaker.list_domains
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      DomainArn: '{{ item.DomainArn }}'
+      DomainId: '{{ item.DomainId }}'
+      DomainName: '{{ item.DomainName }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      Status: '{{ item.Status }}'
+      Url: '{{ item.Url }}'
+    items_for: '{{ response.Domains }}'
+- calls:
+  - action: list_model_package_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.sagemaker.list_model_package_groups
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      ModelPackageGroupArn: '{{ item.ModelPackageGroupArn }}'
+      ModelPackageGroupDescription: '{{ item.ModelPackageGroupDescription }}'
+      ModelPackageGroupName: '{{ item.ModelPackageGroupName }}'
+      ModelPackageGroupStatus: '{{ item.ModelPackageGroupStatus }}'
+      ModelPackageStatusDetails: '{{ item.ModelPackageStatusDetails }}'
+      SourceAlgorithmSpecification: '{{ item.SourceAlgorithmSpecification }}'
+    items_for: '{{ response.ModelPackageGroupSummaryList }}'
+- calls:
+  - action: list_apps
+    on_error: continue
+    save_as: response
+  discovery_id: aws.sagemaker.list_apps
+  emit:
+    as: item
+    item:
+      AppName: '{{ item.AppName }}'
+      AppType: '{{ item.AppType }}'
+      CreationTime: '{{ item.CreationTime }}'
+      DomainId: '{{ item.DomainId }}'
+      ResourceSpec: '{{ item.ResourceSpec }}'
+      SpaceName: '{{ item.SpaceName }}'
+      Status: '{{ item.Status }}'
+      UserProfileName: '{{ item.UserProfileName }}'
+    items_for: '{{ response.Apps }}'
+- calls:
+  - action: list_feature_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.sagemaker.list_feature_groups
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      FeatureGroupArn: '{{ item.FeatureGroupArn }}'
+      FeatureGroupName: '{{ item.FeatureGroupName }}'
+      FeatureGroupStatus: '{{ item.FeatureGroupStatus }}'
+      OfflineStoreStatus: '{{ item.OfflineStoreStatus }}'
+    items_for: '{{ response.FeatureGroupSummaries }}'
+- calls:
+  - action: list_notebook_instances
+    on_error: continue
+    save_as: response
+  discovery_id: aws.sagemaker.list_notebook_instances
+  emit:
+    as: item
+    item:
+      AdditionalCodeRepositories: '{{ item.AdditionalCodeRepositories }}'
+      CreationTime: '{{ item.CreationTime }}'
+      DefaultCodeRepository: '{{ item.DefaultCodeRepository }}'
+      InstanceType: '{{ item.InstanceType }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      NotebookInstanceArn: '{{ item.NotebookInstanceArn }}'
+      NotebookInstanceLifecycleConfigName: '{{ item.NotebookInstanceLifecycleConfigName
+        }}'
+      NotebookInstanceName: '{{ item.NotebookInstanceName }}'
+      NotebookInstanceStatus: '{{ item.NotebookInstanceStatus }}'
+      Url: '{{ item.Url }}'
+    items_for: '{{ response.NotebookInstances }}'
+- calls:
+  - action: describe_notebook_instance
+    on_error: continue
+    params:
+      NotebookInstanceName: '{{ item.NotebookInstanceName }}'
+    save_as: response
+  discovery_id: aws.sagemaker.describe_notebook_instance
+  emit:
+    as: item
+    item:
+      DirectInternetAccess: '{{ response.DirectInternetAccess }}'
+      InstanceType: '{{ response.InstanceType }}'
+      KmsKeyId: '{{ response.KmsKeyId }}'
+      NotebookInstanceName: '{{ response.NotebookInstanceName }}'
+      NotebookInstanceStatus: '{{ response.NotebookInstanceStatus }}'
+      RoleArn: '{{ response.RoleArn }}'
+      SecurityGroups: '{{ response.SecurityGroups }}'
+      SubnetId: '{{ response.SubnetId }}'
+  for_each: aws.sagemaker.list_notebook_instances
+- calls:
+  - action: list_endpoint_configs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.sagemaker.list_endpoint_configs
+  emit:
+    as: item
+    item:
+      BillableTimeInSeconds: '{{ item.BillableTimeInSeconds }}'
+      CreationTime: '{{ item.CreationTime }}'
+      EndpointConfigArn: '{{ item.EndpointConfigArn }}'
+      EndpointConfigName: '{{ item.EndpointConfigName }}'
+      TrainingTimeInSeconds: '{{ item.TrainingTimeInSeconds }}'
+    items_for: '{{ response.EndpointConfigs }}'
+- calls:
+  - action: describe_endpoint_config
+    on_error: continue
+    params:
+      EndpointConfigName: '{{ item.EndpointConfigName }}'
+    save_as: response
+  discovery_id: aws.sagemaker.describe_endpoint_config
+  emit:
+    as: item
+    item:
+      AcceleratorType: '{{ item.AcceleratorType }}'
+      BillableTimeInSeconds: '{{ item.BillableTimeInSeconds }}'
+      CapacityReservationConfig: '{{ item.CapacityReservationConfig }}'
+      ContainerStartupHealthCheckTimeoutInSeconds: '{{ item.ContainerStartupHealthCheckTimeoutInSeconds
+        }}'
+      CoreDumpConfig: '{{ item.CoreDumpConfig }}'
+      DataCaptureConfig: '{{ item.DataCaptureConfig }}'
+      EnableSSMAccess: '{{ item.EnableSSMAccess }}'
+      InferenceAmiVersion: '{{ item.InferenceAmiVersion }}'
+      InitialInstanceCount: '{{ item.InitialInstanceCount }}'
+      InitialVariantWeight: '{{ item.InitialVariantWeight }}'
+      InstanceType: '{{ item.InstanceType }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      ManagedInstanceScaling: '{{ item.ManagedInstanceScaling }}'
+      ModelDataDownloadTimeoutInSeconds: '{{ item.ModelDataDownloadTimeoutInSeconds
+        }}'
+      ModelName: '{{ item.ModelName }}'
+      RoutingConfig: '{{ item.RoutingConfig }}'
+      ServerlessConfig: '{{ item.ServerlessConfig }}'
+      TrainingTimeInSeconds: '{{ item.TrainingTimeInSeconds }}'
+      VariantName: '{{ item.VariantName }}'
+      VolumeSizeInGB: '{{ item.VolumeSizeInGB }}'
+    items_for: '{{ response.ProductionVariants }}'
+  for_each: aws.sagemaker.list_endpoint_configs
+- calls:
+  - action: list_notebook_instance_lifecycle_configs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.sagemaker.list_notebook_instance_lifecycle_configs
+  emit:
+    as: item
+    item:
+      BuiltInLifecycleConfigArn: '{{ item.BuiltInLifecycleConfigArn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      NotebookInstanceLifecycleConfigArn: '{{ item.NotebookInstanceLifecycleConfigArn
+        }}'
+      NotebookInstanceLifecycleConfigName: '{{ item.NotebookInstanceLifecycleConfigName
+        }}'
+    items_for: '{{ response.NotebookInstanceLifecycleConfigs }}'
+- calls:
+  - action: list_workforces
+    on_error: continue
+    save_as: response
+  discovery_id: aws.sagemaker.list_workforces
+  emit:
+    as: item
+    item:
+      CognitoConfig: '{{ item.CognitoConfig }}'
+      CreateDate: '{{ item.CreateDate }}'
+      FailureReason: '{{ item.FailureReason }}'
+      IpAddressType: '{{ item.IpAddressType }}'
+      LastUpdatedDate: '{{ item.LastUpdatedDate }}'
+      OidcConfig: '{{ item.OidcConfig }}'
+      SecurityGroupIds: '{{ item.SecurityGroupIds }}'
+      SourceIpConfig: '{{ item.SourceIpConfig }}'
+      Status: '{{ item.Status }}'
+      SubDomain: '{{ item.SubDomain }}'
+      SubnetIds: '{{ item.SubnetIds }}'
+      Workforce: '{{ item.Workforce }}'
+      WorkforceArn: '{{ item.WorkforceArn }}'
+      WorkforceName: '{{ item.WorkforceName }}'
+      WorkforceVpcConfig: '{{ item.WorkforceVpcConfig }}'
+    items_for: '{{ response.Workforces }}'

@@ -1,0 +1,1978 @@
+version: '1.0'
+provider: aws
+service: ec2
+discovery:
+- calls:
+  - action: describe_service_link_virtual_interfaces
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_service_link_virtual_interfaces
+  emit:
+    as: item
+    item:
+      ConfigurationState: '{{ item.ConfigurationState }}'
+      LocalAddress: '{{ item.LocalAddress }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      OutpostId: '{{ item.OutpostId }}'
+      OutpostLagId: '{{ item.OutpostLagId }}'
+      PeerAddress: '{{ item.PeerAddress }}'
+      PeerBgpAsn: '{{ item.PeerBgpAsn }}'
+      ServiceLinkVirtualInterfaceArn: '{{ item.ServiceLinkVirtualInterfaceArn }}'
+      ServiceLinkVirtualInterfaceId: '{{ item.ServiceLinkVirtualInterfaceId }}'
+      ServiceLinkVirtualInterfaces: '{{ item.ServiceLinkVirtualInterfaces }}'
+      Tags: '{{ item.Tags }}'
+      Vlan: '{{ item.Vlan }}'
+    items_for: '{{ response.ServiceLinkVirtualInterfaces }}'
+  resource_type: ec2_service_link_virtual_interface
+- calls:
+  - action: describe_iam_instance_profile_associations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_iam_instance_profile_associations
+  emit:
+    as: item
+    item:
+      AssociationId: '{{ item.AssociationId }}'
+      IamInstanceProfile: '{{ item.IamInstanceProfile }}'
+      IamInstanceProfileAssociations: '{{ item.IamInstanceProfileAssociations }}'
+      InstanceId: '{{ item.InstanceId }}'
+      Timestamp: '{{ item.Timestamp }}'
+    items_for: '{{ response.IamInstanceProfileAssociations }}'
+  resource_type: ec2_iam_instance_profile_association
+- calls:
+  - action: describe_outpost_lags
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_outpost_lags
+  emit:
+    as: item
+    item:
+      LocalGatewayVirtualInterfaceIds: '{{ item.LocalGatewayVirtualInterfaceIds }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      OutpostLagId: '{{ item.OutpostLagId }}'
+      OutpostLags: '{{ item.OutpostLags }}'
+      ServiceLinkVirtualInterfaceIds: '{{ item.ServiceLinkVirtualInterfaceIds }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.OutpostLags }}'
+  resource_type: ec2_outpost_lag
+- calls:
+  - action: describe_public_ipv4_pools
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_public_ipv4_pools
+  emit:
+    as: item
+    item:
+      Description: '{{ item.Description }}'
+      NetworkBorderGroup: '{{ item.NetworkBorderGroup }}'
+      PoolAddressRanges: '{{ item.PoolAddressRanges }}'
+      PoolId: '{{ item.PoolId }}'
+      PublicIpv4Pools: '{{ item.PublicIpv4Pools }}'
+      Tags: '{{ item.Tags }}'
+      TotalAddressCount: '{{ item.TotalAddressCount }}'
+      TotalAvailableAddressCount: '{{ item.TotalAvailableAddressCount }}'
+    items_for: '{{ response.PublicIpv4Pools }}'
+  resource_type: ec2_public_ipv4_pool
+- calls:
+  - action: describe_subnets
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_subnets
+  emit:
+    as: item
+    item:
+      AssignIpv6AddressOnCreation: '{{ item.AssignIpv6AddressOnCreation }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      AvailableIpAddressCount: '{{ item.AvailableIpAddressCount }}'
+      BlockPublicAccessStates: '{{ item.BlockPublicAccessStates }}'
+      CidrBlock: '{{ item.CidrBlock }}'
+      CustomerOwnedIpv4Pool: '{{ item.CustomerOwnedIpv4Pool }}'
+      DefaultForAz: '{{ item.DefaultForAz }}'
+      EnableDns64: '{{ item.EnableDns64 }}'
+      EnableLniAtDeviceIndex: '{{ item.EnableLniAtDeviceIndex }}'
+      Ipv6CidrBlockAssociationSet: '{{ item.Ipv6CidrBlockAssociationSet }}'
+      Ipv6Native: '{{ item.Ipv6Native }}'
+      MapCustomerOwnedIpOnLaunch: '{{ item.MapCustomerOwnedIpOnLaunch }}'
+      MapPublicIpOnLaunch: '{{ item.MapPublicIpOnLaunch }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      PrivateDnsNameOptionsOnLaunch: '{{ item.PrivateDnsNameOptionsOnLaunch }}'
+      SubnetArn: '{{ item.SubnetArn }}'
+      Subnets: '{{ item.Subnets }}'
+      Tags: '{{ item.Tags }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.Subnets }}'
+  resource_type: ec2_subnet
+- calls:
+  - action: describe_vpn_connections
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_vpn_connections
+  emit:
+    as: item
+    item:
+      Category: '{{ item.Category }}'
+      CoreNetworkArn: '{{ item.CoreNetworkArn }}'
+      CoreNetworkAttachmentArn: '{{ item.CoreNetworkAttachmentArn }}'
+      CustomerGatewayConfiguration: '{{ item.CustomerGatewayConfiguration }}'
+      CustomerGatewayId: '{{ item.CustomerGatewayId }}'
+      GatewayAssociationState: '{{ item.GatewayAssociationState }}'
+      Options: '{{ item.Options }}'
+      PreSharedKeyArn: '{{ item.PreSharedKeyArn }}'
+      Routes: '{{ item.Routes }}'
+      Tags: '{{ item.Tags }}'
+      TransitGatewayId: '{{ item.TransitGatewayId }}'
+      VgwTelemetry: '{{ item.VgwTelemetry }}'
+      VpnConcentratorId: '{{ item.VpnConcentratorId }}'
+      VpnConnectionId: '{{ item.VpnConnectionId }}'
+      VpnConnections: '{{ item.VpnConnections }}'
+      VpnGatewayId: '{{ item.VpnGatewayId }}'
+    items_for: '{{ response.VpnConnections }}'
+  resource_type: ec2_vpn_connection
+- calls:
+  - action: list_volumes_in_recycle_bin
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.list_volumes_in_recycle_bin
+  emit:
+    as: item
+    item:
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      CreateTime: '{{ item.CreateTime }}'
+      Iops: '{{ item.Iops }}'
+      Operator: '{{ item.Operator }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      RecycleBinEnterTime: '{{ item.RecycleBinEnterTime }}'
+      RecycleBinExitTime: '{{ item.RecycleBinExitTime }}'
+      Size: '{{ item.Size }}'
+      SnapshotId: '{{ item.SnapshotId }}'
+      SourceVolumeId: '{{ item.SourceVolumeId }}'
+      State: '{{ item.State }}'
+      Throughput: '{{ item.Throughput }}'
+      VolumeId: '{{ item.VolumeId }}'
+      VolumeType: '{{ item.VolumeType }}'
+      Volumes: '{{ item.Volumes }}'
+    items_for: '{{ response.Volumes }}'
+  resource_type: ec2_volumes_in_recycle_bin
+- calls:
+  - action: describe_security_group_vpc_associations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_security_group_vpc_associations
+  emit:
+    as: item
+    item:
+      GroupId: '{{ item.GroupId }}'
+      GroupOwnerId: '{{ item.GroupOwnerId }}'
+      SecurityGroupVpcAssociations: '{{ item.SecurityGroupVpcAssociations }}'
+      StateReason: '{{ item.StateReason }}'
+      VpcId: '{{ item.VpcId }}'
+      VpcOwnerId: '{{ item.VpcOwnerId }}'
+    items_for: '{{ response.SecurityGroupVpcAssociations }}'
+  resource_type: ec2_security_group_vpc_association
+- calls:
+  - action: describe_security_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_security_groups
+  emit:
+    as: item
+    item:
+      Description: '{{ item.Description }}'
+      GroupId: '{{ item.GroupId }}'
+      GroupName: '{{ item.GroupName }}'
+      IpPermissions: '{{ item.IpPermissions }}'
+      IpPermissionsEgress: '{{ item.IpPermissionsEgress }}'
+      SecurityGroupArn: '{{ item.SecurityGroupArn }}'
+      Tags: '{{ item.Tags }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.SecurityGroups }}'
+  resource_type: ec2_security_group
+- calls:
+  - action: describe_capacity_reservation_fleets
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_capacity_reservation_fleets
+  emit:
+    as: item
+    item:
+      AllocationStrategy: '{{ item.AllocationStrategy }}'
+      CapacityReservationFleetArn: '{{ item.CapacityReservationFleetArn }}'
+      CapacityReservationFleetId: '{{ item.CapacityReservationFleetId }}'
+      CapacityReservationFleets: '{{ item.CapacityReservationFleets }}'
+      CreateTime: '{{ item.CreateTime }}'
+      EndDate: '{{ item.EndDate }}'
+      InstanceMatchCriteria: '{{ item.InstanceMatchCriteria }}'
+      InstanceTypeSpecifications: '{{ item.InstanceTypeSpecifications }}'
+      Tags: '{{ item.Tags }}'
+      Tenancy: '{{ item.Tenancy }}'
+      TotalFulfilledCapacity: '{{ item.TotalFulfilledCapacity }}'
+      TotalTargetCapacity: '{{ item.TotalTargetCapacity }}'
+    items_for: '{{ response.CapacityReservationFleets }}'
+  resource_type: ec2_capacity_reservation_fleet
+- calls:
+  - action: describe_ipam_scopes
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_ipam_scopes
+  emit:
+    as: item
+    item:
+      Description: '{{ item.Description }}'
+      ExternalAuthorityConfiguration: '{{ item.ExternalAuthorityConfiguration }}'
+      IpamArn: '{{ item.IpamArn }}'
+      IpamRegion: '{{ item.IpamRegion }}'
+      IpamScopeArn: '{{ item.IpamScopeArn }}'
+      IpamScopeId: '{{ item.IpamScopeId }}'
+      IpamScopeType: '{{ item.IpamScopeType }}'
+      IpamScopes: '{{ item.IpamScopes }}'
+      IsDefault: '{{ item.IsDefault }}'
+      PoolCount: '{{ item.PoolCount }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.IpamScopes }}'
+  resource_type: ec2_ipam_scope
+- calls:
+  - action: describe_security_group_rules
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_security_group_rules
+  emit:
+    as: item
+    item:
+      CidrIpv4: '{{ item.CidrIpv4 }}'
+      CidrIpv6: '{{ item.CidrIpv6 }}'
+      Description: '{{ item.Description }}'
+      FromPort: '{{ item.FromPort }}'
+      GroupId: '{{ item.GroupId }}'
+      GroupOwnerId: '{{ item.GroupOwnerId }}'
+      IpProtocol: '{{ item.IpProtocol }}'
+      IsEgress: '{{ item.IsEgress }}'
+      ReferencedGroupInfo: '{{ item.ReferencedGroupInfo }}'
+      SecurityGroupRuleArn: '{{ item.SecurityGroupRuleArn }}'
+      SecurityGroupRuleId: '{{ item.SecurityGroupRuleId }}'
+      SecurityGroupRules: '{{ item.SecurityGroupRules }}'
+      Tags: '{{ item.Tags }}'
+      ToPort: '{{ item.ToPort }}'
+    items_for: '{{ response.SecurityGroupRules }}'
+  resource_type: ec2_security_group_rule
+- calls:
+  - action: get_enabled_ipam_policy
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.get_enabled_ipam_policy
+  emit:
+    as: item
+    item:
+      IpamPolicyEnabled: '{{ item.IpamPolicyEnabled }}'
+    items_for: '{{ response.IpamPolicyEnabled }}'
+  resource_type: ec2_enabled_ipam_policy
+- calls:
+  - action: describe_images
+    on_error: continue
+    params:
+      Owners:
+      - self
+    save_as: response
+  discovery_id: aws.ec2.describe_images
+  emit:
+    as: item
+    item:
+      Architecture: '{{ item.Architecture }}'
+      BlockDeviceMappings: '{{ item.BlockDeviceMappings }}'
+      BootMode: '{{ item.BootMode }}'
+      CreationDate: '{{ item.CreationDate }}'
+      DeprecationTime: '{{ item.DeprecationTime }}'
+      DeregistrationProtection: '{{ item.DeregistrationProtection }}'
+      Description: '{{ item.Description }}'
+      EnaSupport: '{{ item.EnaSupport }}'
+      FreeTierEligible: '{{ item.FreeTierEligible }}'
+      Hypervisor: '{{ item.Hypervisor }}'
+      ImageAllowed: '{{ item.ImageAllowed }}'
+      ImageId: '{{ item.ImageId }}'
+      ImageLocation: '{{ item.ImageLocation }}'
+      ImageOwnerAlias: '{{ item.ImageOwnerAlias }}'
+      ImageType: '{{ item.ImageType }}'
+      ImdsSupport: '{{ item.ImdsSupport }}'
+      KernelId: '{{ item.KernelId }}'
+      LastLaunchedTime: '{{ item.LastLaunchedTime }}'
+      Name: '{{ item.Name }}'
+      Platform: '{{ item.Platform }}'
+      PlatformDetails: '{{ item.PlatformDetails }}'
+      ProductCodes: '{{ item.ProductCodes }}'
+      Public: '{{ item.Public }}'
+      RamdiskId: '{{ item.RamdiskId }}'
+      RootDeviceName: '{{ item.RootDeviceName }}'
+      RootDeviceType: '{{ item.RootDeviceType }}'
+      SourceImageId: '{{ item.SourceImageId }}'
+      SourceImageRegion: '{{ item.SourceImageRegion }}'
+      SourceInstanceId: '{{ item.SourceInstanceId }}'
+      SriovNetSupport: '{{ item.SriovNetSupport }}'
+      StateReason: '{{ item.StateReason }}'
+      Tags: '{{ item.Tags }}'
+      TpmSupport: '{{ item.TpmSupport }}'
+      UsageOperation: '{{ item.UsageOperation }}'
+      VirtualizationType: '{{ item.VirtualizationType }}'
+    items_for: '{{ response.Images }}'
+  resource_type: ec2_image
+- calls:
+  - action: describe_vpc_block_public_access_exclusions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_vpc_block_public_access_exclusions
+  emit:
+    as: item
+    item:
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      DeletionTimestamp: '{{ item.DeletionTimestamp }}'
+      ExclusionId: '{{ item.ExclusionId }}'
+      InternetGatewayExclusionMode: '{{ item.InternetGatewayExclusionMode }}'
+      LastUpdateTimestamp: '{{ item.LastUpdateTimestamp }}'
+      Reason: '{{ item.Reason }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      Tags: '{{ item.Tags }}'
+      VpcBlockPublicAccessExclusions: '{{ item.VpcBlockPublicAccessExclusions }}'
+    items_for: '{{ response.VpcBlockPublicAccessExclusions }}'
+  resource_type: ec2_vpc_block_public_access_exclusion
+- calls:
+  - action: describe_addresses
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_addresses
+  emit:
+    as: item
+    item:
+      Addresses: '{{ item.Addresses }}'
+      AllocationId: '{{ item.AllocationId }}'
+      AssociationId: '{{ item.AssociationId }}'
+      CarrierIp: '{{ item.CarrierIp }}'
+      CustomerOwnedIp: '{{ item.CustomerOwnedIp }}'
+      CustomerOwnedIpv4Pool: '{{ item.CustomerOwnedIpv4Pool }}'
+      Domain: '{{ item.Domain }}'
+      InstanceId: '{{ item.InstanceId }}'
+      NetworkBorderGroup: '{{ item.NetworkBorderGroup }}'
+      NetworkInterfaceOwnerId: '{{ item.NetworkInterfaceOwnerId }}'
+      PrivateIpAddress: '{{ item.PrivateIpAddress }}'
+      PublicIp: '{{ item.PublicIp }}'
+      PublicIpv4Pool: '{{ item.PublicIpv4Pool }}'
+      ServiceManaged: '{{ item.ServiceManaged }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.Addresses }}'
+  resource_type: ec2_address
+- calls:
+  - action: describe_ipams
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_ipams
+  emit:
+    as: item
+    item:
+      DefaultResourceDiscoveryAssociationId: '{{ item.DefaultResourceDiscoveryAssociationId }}'
+      DefaultResourceDiscoveryId: '{{ item.DefaultResourceDiscoveryId }}'
+      Description: '{{ item.Description }}'
+      EnablePrivateGua: '{{ item.EnablePrivateGua }}'
+      IpamArn: '{{ item.IpamArn }}'
+      IpamId: '{{ item.IpamId }}'
+      IpamRegion: '{{ item.IpamRegion }}'
+      Ipams: '{{ item.Ipams }}'
+      MeteredAccount: '{{ item.MeteredAccount }}'
+      OperatingRegions: '{{ item.OperatingRegions }}'
+      PrivateDefaultScopeId: '{{ item.PrivateDefaultScopeId }}'
+      PublicDefaultScopeId: '{{ item.PublicDefaultScopeId }}'
+      ResourceDiscoveryAssociationCount: '{{ item.ResourceDiscoveryAssociationCount }}'
+      ScopeCount: '{{ item.ScopeCount }}'
+      StateMessage: '{{ item.StateMessage }}'
+      Tags: '{{ item.Tags }}'
+      Tier: '{{ item.Tier }}'
+    items_for: '{{ response.Ipams }}'
+  resource_type: ec2_ipam
+- calls:
+  - action: describe_flow_logs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_flow_logs
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      DeliverCrossAccountRole: '{{ item.DeliverCrossAccountRole }}'
+      DeliverLogsErrorMessage: '{{ item.DeliverLogsErrorMessage }}'
+      DeliverLogsPermissionArn: '{{ item.DeliverLogsPermissionArn }}'
+      DeliverLogsStatus: '{{ item.DeliverLogsStatus }}'
+      DestinationOptions: '{{ item.DestinationOptions }}'
+      FlowLogId: '{{ item.FlowLogId }}'
+      FlowLogStatus: '{{ item.FlowLogStatus }}'
+      FlowLogs: '{{ item.FlowLogs }}'
+      LogDestination: '{{ item.LogDestination }}'
+      LogDestinationType: '{{ item.LogDestinationType }}'
+      LogFormat: '{{ item.LogFormat }}'
+      LogGroupName: '{{ item.LogGroupName }}'
+      MaxAggregationInterval: '{{ item.MaxAggregationInterval }}'
+      ResourceId: '{{ item.ResourceId }}'
+      Tags: '{{ item.Tags }}'
+      TrafficType: '{{ item.TrafficType }}'
+    items_for: '{{ response.FlowLogs }}'
+  resource_type: ec2_flow_log
+- calls:
+  - action: describe_customer_gateways
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_customer_gateways
+  emit:
+    as: item
+    item:
+      BgpAsn: '{{ item.BgpAsn }}'
+      BgpAsnExtended: '{{ item.BgpAsnExtended }}'
+      CertificateArn: '{{ item.CertificateArn }}'
+      CustomerGatewayId: '{{ item.CustomerGatewayId }}'
+      CustomerGateways: '{{ item.CustomerGateways }}'
+      DeviceName: '{{ item.DeviceName }}'
+      IpAddress: '{{ item.IpAddress }}'
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.CustomerGateways }}'
+  resource_type: ec2_customer_gateway
+- calls:
+  - action: describe_capacity_reservations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_capacity_reservations
+  emit:
+    as: item
+    item:
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      AvailableInstanceCount: '{{ item.AvailableInstanceCount }}'
+      CapacityAllocations: '{{ item.CapacityAllocations }}'
+      CapacityBlockId: '{{ item.CapacityBlockId }}'
+      CapacityReservationArn: '{{ item.CapacityReservationArn }}'
+      CapacityReservationFleetId: '{{ item.CapacityReservationFleetId }}'
+      CapacityReservationId: '{{ item.CapacityReservationId }}'
+      CommitmentInfo: '{{ item.CommitmentInfo }}'
+      CreateDate: '{{ item.CreateDate }}'
+      DeliveryPreference: '{{ item.DeliveryPreference }}'
+      EbsOptimized: '{{ item.EbsOptimized }}'
+      EndDate: '{{ item.EndDate }}'
+      EndDateType: '{{ item.EndDateType }}'
+      EphemeralStorage: '{{ item.EphemeralStorage }}'
+      InstanceMatchCriteria: '{{ item.InstanceMatchCriteria }}'
+      InstancePlatform: '{{ item.InstancePlatform }}'
+      InstanceType: '{{ item.InstanceType }}'
+      Interruptible: '{{ item.Interruptible }}'
+      InterruptibleCapacityAllocation: '{{ item.InterruptibleCapacityAllocation }}'
+      InterruptionInfo: '{{ item.InterruptionInfo }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      PlacementGroupArn: '{{ item.PlacementGroupArn }}'
+      ReservationType: '{{ item.ReservationType }}'
+      StartDate: '{{ item.StartDate }}'
+      Tags: '{{ item.Tags }}'
+      Tenancy: '{{ item.Tenancy }}'
+      TotalInstanceCount: '{{ item.TotalInstanceCount }}'
+      UnusedReservationBillingOwnerId: '{{ item.UnusedReservationBillingOwnerId }}'
+    items_for: '{{ response.CapacityReservations }}'
+  resource_type: ec2_capacity_reservation
+- calls:
+  - action: describe_ipv6_pools
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_ipv6_pools
+  emit:
+    as: item
+    item:
+      Description: '{{ item.Description }}'
+      Ipv6Pools: '{{ item.Ipv6Pools }}'
+      PoolCidrBlocks: '{{ item.PoolCidrBlocks }}'
+      PoolId: '{{ item.PoolId }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.Ipv6Pools }}'
+  resource_type: ec2_ipv6_pool
+- calls:
+  - action: describe_instances
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_instances
+  emit:
+    as: item
+    item:
+      Architecture: '{{ item.Architecture }}'
+      BlockDeviceMappings: '{{ item.BlockDeviceMappings }}'
+      EbsOptimized: '{{ item.EbsOptimized }}'
+      IamInstanceProfile: '{{ item.IamInstanceProfile }}'
+      ImageId: '{{ item.ImageId }}'
+      InstanceId: '{{ item.InstanceId }}'
+      InstanceType: '{{ item.InstanceType }}'
+      KeyName: '{{ item.KeyName }}'
+      LaunchTime: '{{ item.LaunchTime }}'
+      MetadataOptions: '{{ item.MetadataOptions }}'
+      Monitoring: '{{ item.Monitoring }}'
+      NetworkInterfaces: '{{ item.NetworkInterfaces }}'
+      Placement: '{{ item.Placement }}'
+      Platform: '{{ item.Platform }}'
+      PrivateIpAddress: '{{ item.PrivateIpAddress }}'
+      PublicDnsName: '{{ item.PublicDnsName }}'
+      PublicIpAddress: '{{ item.PublicIpAddress }}'
+      Reservations: '{{ item.Reservations }}'
+      RootDeviceType: '{{ item.RootDeviceType }}'
+      SecurityGroups: '{{ item.SecurityGroups }}'
+      SourceDestCheck: '{{ item.SourceDestCheck }}'
+      State: '{{ item.State }}'
+      SubnetId: '{{ item.SubnetId }}'
+      Tags: '{{ item.Tags }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.Reservations[].Instances }}'
+  resource_type: ec2_instance
+- calls:
+  - action: describe_transit_gateway_multicast_domains
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_transit_gateway_multicast_domains
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      Options: '{{ item.Options }}'
+      Tags: '{{ item.Tags }}'
+      TransitGatewayId: '{{ item.TransitGatewayId }}'
+      TransitGatewayMulticastDomainArn: '{{ item.TransitGatewayMulticastDomainArn }}'
+      TransitGatewayMulticastDomainId: '{{ item.TransitGatewayMulticastDomainId }}'
+      TransitGatewayMulticastDomains: '{{ item.TransitGatewayMulticastDomains }}'
+    items_for: '{{ response.TransitGatewayMulticastDomains }}'
+  resource_type: ec2_transit_gateway_multicast_domain
+- calls:
+  - action: describe_instance_image_metadata
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_instance_image_metadata
+  emit:
+    as: item
+    item:
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      ImageMetadata: '{{ item.ImageMetadata }}'
+      InstanceId: '{{ item.InstanceId }}'
+      InstanceImageMetadata: '{{ item.InstanceImageMetadata }}'
+      InstanceType: '{{ item.InstanceType }}'
+      LaunchTime: '{{ item.LaunchTime }}'
+      Operator: '{{ item.Operator }}'
+      Tags: '{{ item.Tags }}'
+      ZoneId: '{{ item.ZoneId }}'
+    items_for: '{{ response.InstanceImageMetadata }}'
+  resource_type: ec2_instance
+- calls:
+  - action: describe_network_insights_paths
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_network_insights_paths
+  emit:
+    as: item
+    item:
+      CreatedDate: '{{ item.CreatedDate }}'
+      Destination: '{{ item.Destination }}'
+      DestinationArn: '{{ item.DestinationArn }}'
+      DestinationIp: '{{ item.DestinationIp }}'
+      DestinationPort: '{{ item.DestinationPort }}'
+      FilterAtDestination: '{{ item.FilterAtDestination }}'
+      FilterAtSource: '{{ item.FilterAtSource }}'
+      NetworkInsightsPathArn: '{{ item.NetworkInsightsPathArn }}'
+      NetworkInsightsPathId: '{{ item.NetworkInsightsPathId }}'
+      NetworkInsightsPaths: '{{ item.NetworkInsightsPaths }}'
+      Protocol: '{{ item.Protocol }}'
+      Source: '{{ item.Source }}'
+      SourceArn: '{{ item.SourceArn }}'
+      SourceIp: '{{ item.SourceIp }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.NetworkInsightsPaths }}'
+  resource_type: ec2_network_insights_path
+- calls:
+  - action: describe_traffic_mirror_targets
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_traffic_mirror_targets
+  emit:
+    as: item
+    item:
+      Description: '{{ item.Description }}'
+      GatewayLoadBalancerEndpointId: '{{ item.GatewayLoadBalancerEndpointId }}'
+      NetworkLoadBalancerArn: '{{ item.NetworkLoadBalancerArn }}'
+      Tags: '{{ item.Tags }}'
+      TrafficMirrorTargetId: '{{ item.TrafficMirrorTargetId }}'
+      TrafficMirrorTargets: '{{ item.TrafficMirrorTargets }}'
+    items_for: '{{ response.TrafficMirrorTargets }}'
+  resource_type: ec2_traffic_mirror_target
+- calls:
+  - action: describe_vpc_block_public_access_options
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_vpc_block_public_access_options
+  emit:
+    as: item
+    item:
+      AwsAccountId: '{{ item.AwsAccountId }}'
+      AwsRegion: '{{ item.AwsRegion }}'
+      ExclusionsAllowed: '{{ item.ExclusionsAllowed }}'
+      InternetGatewayBlockMode: '{{ item.InternetGatewayBlockMode }}'
+      LastUpdateTimestamp: '{{ item.LastUpdateTimestamp }}'
+      ManagedBy: '{{ item.ManagedBy }}'
+      Reason: '{{ item.Reason }}'
+      VpcBlockPublicAccessOptions: '{{ item.VpcBlockPublicAccessOptions }}'
+    items_for: '{{ response.NetworkInterfacePermissions }}'
+  resource_type: ec2_vpc_block_public_access_option
+- calls:
+  - action: describe_placement_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_placement_groups
+  emit:
+    as: item
+    item:
+      GroupArn: '{{ item.GroupArn }}'
+      GroupId: '{{ item.GroupId }}'
+      GroupName: '{{ item.GroupName }}'
+      PartitionCount: '{{ item.PartitionCount }}'
+      PlacementGroups: '{{ item.PlacementGroups }}'
+      SpreadLevel: '{{ item.SpreadLevel }}'
+      Strategy: '{{ item.Strategy }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.PlacementGroups }}'
+  resource_type: ec2_placement_group
+- calls:
+  - action: describe_ipam_policies
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_ipam_policies
+  emit:
+    as: item
+    item:
+      IpamId: '{{ item.IpamId }}'
+      IpamPolicies: '{{ item.IpamPolicies }}'
+      IpamPolicyArn: '{{ item.IpamPolicyArn }}'
+      IpamPolicyId: '{{ item.IpamPolicyId }}'
+      IpamPolicyRegion: '{{ item.IpamPolicyRegion }}'
+      StateMessage: '{{ item.StateMessage }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.IpamPolicies }}'
+  resource_type: ec2_ipam_policy
+- calls:
+  - action: describe_coip_pools
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_coip_pools
+  emit:
+    as: item
+    item:
+      AssociatedResource: '{{ item.AssociatedResource }}'
+      CoIp: '{{ item.CoIp }}'
+      CoipAddressUsages: '{{ item.CoipAddressUsages }}'
+      CoipPools: '{{ item.CoipPools }}'
+      IpamPoolCidrs: '{{ item.IpamPoolCidrs }}'
+      Ipv6Cidr: '{{ item.Ipv6Cidr }}'
+      Ipv6CidrAssociations: '{{ item.Ipv6CidrAssociations }}'
+      PoolArn: '{{ item.PoolArn }}'
+      PoolCidrs: '{{ item.PoolCidrs }}'
+      PoolId: '{{ item.PoolId }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.CoipPools }}'
+  resource_type: ec2_coip_pool
+- calls:
+  - action: describe_hosts
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_hosts
+  emit:
+    as: item
+    item:
+      AllocationTime: '{{ item.AllocationTime }}'
+      AllowsMultipleInstanceTypes: '{{ item.AllowsMultipleInstanceTypes }}'
+      AssetId: '{{ item.AssetId }}'
+      AutoPlacement: '{{ item.AutoPlacement }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      AvailableCapacity: '{{ item.AvailableCapacity }}'
+      ClientToken: '{{ item.ClientToken }}'
+      HostId: '{{ item.HostId }}'
+      HostMaintenance: '{{ item.HostMaintenance }}'
+      HostProperties: '{{ item.HostProperties }}'
+      HostRecovery: '{{ item.HostRecovery }}'
+      HostReservationId: '{{ item.HostReservationId }}'
+      Hosts: '{{ item.Hosts }}'
+      Instances: '{{ item.Instances }}'
+      MemberOfServiceLinkedResourceGroup: '{{ item.MemberOfServiceLinkedResourceGroup }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      ReleaseTime: '{{ item.ReleaseTime }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.Hosts }}'
+  resource_type: ec2_host
+- calls:
+  - action: describe_launch_templates
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_launch_templates
+  emit:
+    as: item
+    item:
+      CreateTime: '{{ item.CreateTime }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      DefaultVersionNumber: '{{ item.DefaultVersionNumber }}'
+      LatestVersionNumber: '{{ item.LatestVersionNumber }}'
+      LaunchTemplateId: '{{ item.LaunchTemplateId }}'
+      LaunchTemplateName: '{{ item.LaunchTemplateName }}'
+      LaunchTemplates: '{{ item.LaunchTemplates }}'
+      Operator: '{{ item.Operator }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.LaunchTemplates }}'
+  resource_type: ec2_launch_template
+- calls:
+  - action: describe_vpc_endpoint_associations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_vpc_endpoint_associations
+  emit:
+    as: item
+    item:
+      AssociatedResourceAccessibility: '{{ item.AssociatedResourceAccessibility }}'
+      AssociatedResourceArn: '{{ item.AssociatedResourceArn }}'
+      DnsEntry: '{{ item.DnsEntry }}'
+      FailureCode: '{{ item.FailureCode }}'
+      FailureReason: '{{ item.FailureReason }}'
+      Id: '{{ item.Id }}'
+      PrivateDnsEntry: '{{ item.PrivateDnsEntry }}'
+      ResourceConfigurationGroupArn: '{{ item.ResourceConfigurationGroupArn }}'
+      ServiceNetworkArn: '{{ item.ServiceNetworkArn }}'
+      ServiceNetworkName: '{{ item.ServiceNetworkName }}'
+      Tags: '{{ item.Tags }}'
+      VpcEndpointAssociations: '{{ item.VpcEndpointAssociations }}'
+      VpcEndpointId: '{{ item.VpcEndpointId }}'
+    items_for: '{{ response.VpcEndpointAssociations }}'
+  resource_type: ec2_vpc_endpoint_association
+- calls:
+  - action: describe_ipam_prefix_list_resolvers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_ipam_prefix_list_resolvers
+  emit:
+    as: item
+    item:
+      AddressFamily: '{{ item.AddressFamily }}'
+      Description: '{{ item.Description }}'
+      IpamArn: '{{ item.IpamArn }}'
+      IpamPrefixListResolverArn: '{{ item.IpamPrefixListResolverArn }}'
+      IpamPrefixListResolverId: '{{ item.IpamPrefixListResolverId }}'
+      IpamPrefixListResolvers: '{{ item.IpamPrefixListResolvers }}'
+      IpamRegion: '{{ item.IpamRegion }}'
+      LastVersionCreationStatus: '{{ item.LastVersionCreationStatus }}'
+      LastVersionCreationStatusMessage: '{{ item.LastVersionCreationStatusMessage }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.IpamPrefixListResolvers }}'
+  resource_type: ec2_ipam_prefix_list_resolver
+- calls:
+  - action: list_snapshots_in_recycle_bin
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.list_snapshots_in_recycle_bin
+  emit:
+    as: item
+    item:
+      Description: '{{ item.Description }}'
+      RecycleBinEnterTime: '{{ item.RecycleBinEnterTime }}'
+      RecycleBinExitTime: '{{ item.RecycleBinExitTime }}'
+      SnapshotId: '{{ item.SnapshotId }}'
+      Snapshots: '{{ item.Snapshots }}'
+      VolumeId: '{{ item.VolumeId }}'
+    items_for: '{{ response.Snapshots }}'
+  resource_type: ec2_snapshots_in_recycle_bin
+- calls:
+  - action: describe_carrier_gateways
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_carrier_gateways
+  emit:
+    as: item
+    item:
+      CarrierGatewayId: '{{ item.CarrierGatewayId }}'
+      CarrierGateways: '{{ item.CarrierGateways }}'
+      EnableDnsHostnames: '{{ item.EnableDnsHostnames }}'
+      EnableDnsSupport: '{{ item.EnableDnsSupport }}'
+      EnableNetworkAddressUsageMetrics: '{{ item.EnableNetworkAddressUsageMetrics }}'
+      IsExcludable: '{{ item.IsExcludable }}'
+      NonCompliantResources: '{{ item.NonCompliantResources }}'
+      SecurityGroupForVpcs: '{{ item.SecurityGroupForVpcs }}'
+      StaleIpPermissions: '{{ item.StaleIpPermissions }}'
+      StaleIpPermissionsEgress: '{{ item.StaleIpPermissionsEgress }}'
+      StaleSecurityGroupSet: '{{ item.StaleSecurityGroupSet }}'
+      Tags: '{{ item.Tags }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.CarrierGateways }}'
+  resource_type: ec2_carrier_gateway
+- calls:
+  - action: describe_launch_template_versions
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_launch_template_versions
+  emit:
+    as: item
+    item:
+      CreateTime: '{{ item.CreateTime }}'
+      CreatedBy: '{{ item.CreatedBy }}'
+      DefaultVersion: '{{ item.DefaultVersion }}'
+      LaunchTemplateData: '{{ item.LaunchTemplateData }}'
+      LaunchTemplateId: '{{ item.LaunchTemplateId }}'
+      LaunchTemplateName: '{{ item.LaunchTemplateName }}'
+      LaunchTemplateVersions: '{{ item.LaunchTemplateVersions }}'
+      Operator: '{{ item.Operator }}'
+      VersionDescription: '{{ item.VersionDescription }}'
+      VersionNumber: '{{ item.VersionNumber }}'
+    items_for: '{{ response.LaunchTemplateVersions }}'
+  resource_type: ec2_launch_template_version
+- calls:
+  - action: describe_network_insights_access_scope_analyses
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_network_insights_access_scope_analyses
+  emit:
+    as: item
+    item:
+      AnalyzedEniCount: '{{ item.AnalyzedEniCount }}'
+      EndDate: '{{ item.EndDate }}'
+      FindingsFound: '{{ item.FindingsFound }}'
+      NetworkInsightsAccessScopeAnalyses: '{{ item.NetworkInsightsAccessScopeAnalyses }}'
+      NetworkInsightsAccessScopeAnalysisArn: '{{ item.NetworkInsightsAccessScopeAnalysisArn }}'
+      NetworkInsightsAccessScopeAnalysisId: '{{ item.NetworkInsightsAccessScopeAnalysisId }}'
+      NetworkInsightsAccessScopeId: '{{ item.NetworkInsightsAccessScopeId }}'
+      StartDate: '{{ item.StartDate }}'
+      Status: '{{ item.Status }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      Tags: '{{ item.Tags }}'
+      WarningMessage: '{{ item.WarningMessage }}'
+    items_for: '{{ response.NetworkInsightsAccessScopeAnalyses }}'
+  resource_type: ec2_network_insights_access_scope_analys
+- calls:
+  - action: describe_ipam_pools
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_ipam_pools
+  emit:
+    as: item
+    item:
+      AddressFamily: '{{ item.AddressFamily }}'
+      AllocationDefaultNetmaskLength: '{{ item.AllocationDefaultNetmaskLength }}'
+      AllocationMaxNetmaskLength: '{{ item.AllocationMaxNetmaskLength }}'
+      AllocationMinNetmaskLength: '{{ item.AllocationMinNetmaskLength }}'
+      AllocationResourceTags: '{{ item.AllocationResourceTags }}'
+      AutoImport: '{{ item.AutoImport }}'
+      AwsService: '{{ item.AwsService }}'
+      Description: '{{ item.Description }}'
+      IpamArn: '{{ item.IpamArn }}'
+      IpamPoolArn: '{{ item.IpamPoolArn }}'
+      IpamPoolId: '{{ item.IpamPoolId }}'
+      IpamPools: '{{ item.IpamPools }}'
+      IpamRegion: '{{ item.IpamRegion }}'
+      IpamScopeArn: '{{ item.IpamScopeArn }}'
+      IpamScopeType: '{{ item.IpamScopeType }}'
+      Locale: '{{ item.Locale }}'
+      PoolDepth: '{{ item.PoolDepth }}'
+      PublicIpSource: '{{ item.PublicIpSource }}'
+      PubliclyAdvertisable: '{{ item.PubliclyAdvertisable }}'
+      SourceIpamPoolId: '{{ item.SourceIpamPoolId }}'
+      SourceResource: '{{ item.SourceResource }}'
+      StateMessage: '{{ item.StateMessage }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.IpamPools }}'
+  resource_type: ec2_ipam_pool
+- calls:
+  - action: describe_verified_access_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_verified_access_groups
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      DeletionTime: '{{ item.DeletionTime }}'
+      Description: '{{ item.Description }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      Owner: '{{ item.Owner }}'
+      SseSpecification: '{{ item.SseSpecification }}'
+      Tags: '{{ item.Tags }}'
+      VerifiedAccessGroupArn: '{{ item.VerifiedAccessGroupArn }}'
+      VerifiedAccessGroupId: '{{ item.VerifiedAccessGroupId }}'
+      VerifiedAccessGroups: '{{ item.VerifiedAccessGroups }}'
+      VerifiedAccessInstanceId: '{{ item.VerifiedAccessInstanceId }}'
+    items_for: '{{ response.VerifiedAccessGroups }}'
+  resource_type: ec2_verified_access_group
+- calls:
+  - action: describe_snapshots
+    on_error: continue
+    params:
+      OwnerIds:
+      - self
+    save_as: response
+  discovery_id: aws.ec2.describe_snapshots
+  emit:
+    as: item
+    item:
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      CompletionDurationMinutes: '{{ item.CompletionDurationMinutes }}'
+      CompletionTime: '{{ item.CompletionTime }}'
+      DataEncryptionKeyId: '{{ item.DataEncryptionKeyId }}'
+      Description: '{{ item.Description }}'
+      Encrypted: '{{ item.Encrypted }}'
+      FullSnapshotSizeInBytes: '{{ item.FullSnapshotSizeInBytes }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      OwnerAlias: '{{ item.OwnerAlias }}'
+      Progress: '{{ item.Progress }}'
+      RestoreExpiryTime: '{{ item.RestoreExpiryTime }}'
+      SnapshotId: '{{ item.SnapshotId }}'
+      Snapshots: '{{ item.Snapshots }}'
+      SseType: '{{ item.SseType }}'
+      StartTime: '{{ item.StartTime }}'
+      StateMessage: '{{ item.StateMessage }}'
+      StorageTier: '{{ item.StorageTier }}'
+      Tags: '{{ item.Tags }}'
+      TransferType: '{{ item.TransferType }}'
+      VolumeId: '{{ item.VolumeId }}'
+      VolumeSize: '{{ item.VolumeSize }}'
+    items_for: '{{ response.Snapshots }}'
+  resource_type: ec2_snapshot
+- calls:
+  - action: describe_route_tables
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_route_tables
+  emit:
+    as: item
+    item:
+      Associations: '{{ item.Associations }}'
+      PropagatingVgws: '{{ item.PropagatingVgws }}'
+      RouteTableId: '{{ item.RouteTableId }}'
+      RouteTables: '{{ item.RouteTables }}'
+      Routes: '{{ item.Routes }}'
+      Tags: '{{ item.Tags }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.RouteTables }}'
+  resource_type: ec2_route_table
+- calls:
+  - action: describe_import_image_tasks
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_import_image_tasks
+  emit:
+    as: item
+    item:
+      Architecture: '{{ item.Architecture }}'
+      BootMode: '{{ item.BootMode }}'
+      Description: '{{ item.Description }}'
+      Encrypted: '{{ item.Encrypted }}'
+      Hypervisor: '{{ item.Hypervisor }}'
+      ImageId: '{{ item.ImageId }}'
+      ImportImageTasks: '{{ item.ImportImageTasks }}'
+      ImportTaskId: '{{ item.ImportTaskId }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      LicenseSpecifications: '{{ item.LicenseSpecifications }}'
+      LicenseType: '{{ item.LicenseType }}'
+      Platform: '{{ item.Platform }}'
+      Progress: '{{ item.Progress }}'
+      SnapshotDetails: '{{ item.SnapshotDetails }}'
+      Status: '{{ item.Status }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      Tags: '{{ item.Tags }}'
+      UsageOperation: '{{ item.UsageOperation }}'
+    items_for: '{{ response.ImportImageTasks }}'
+  resource_type: ec2_import_image_task
+- calls:
+  - action: get_launch_template_data
+    on_error: continue
+    params:
+      InstanceId: '{{ item.InstanceId }}'
+    save_as: response
+  discovery_id: aws.ec2.get_launch_template_data
+  emit:
+    as: item
+    item:
+      BlockDeviceMappings: '{{ item.BlockDeviceMappings }}'
+      CapacityReservationSpecification: '{{ item.CapacityReservationSpecification }}'
+      CpuOptions: '{{ item.CpuOptions }}'
+      CreditSpecification: '{{ item.CreditSpecification }}'
+      DisableApiStop: '{{ item.DisableApiStop }}'
+      DisableApiTermination: '{{ item.DisableApiTermination }}'
+      EbsOptimized: '{{ item.EbsOptimized }}'
+      ElasticGpuSpecifications: '{{ item.ElasticGpuSpecifications }}'
+      ElasticInferenceAccelerators: '{{ item.ElasticInferenceAccelerators }}'
+      EnclaveOptions: '{{ item.EnclaveOptions }}'
+      HibernationOptions: '{{ item.HibernationOptions }}'
+      IamInstanceProfile: '{{ item.IamInstanceProfile }}'
+      ImageId: '{{ item.ImageId }}'
+      InstanceInitiatedShutdownBehavior: '{{ item.InstanceInitiatedShutdownBehavior }}'
+      InstanceMarketOptions: '{{ item.InstanceMarketOptions }}'
+      InstanceRequirements: '{{ item.InstanceRequirements }}'
+      InstanceType: '{{ item.InstanceType }}'
+      KernelId: '{{ item.KernelId }}'
+      KeyName: '{{ item.KeyName }}'
+      LicenseSpecifications: '{{ item.LicenseSpecifications }}'
+      MaintenanceOptions: '{{ item.MaintenanceOptions }}'
+      MetadataOptions: '{{ item.MetadataOptions }}'
+      Monitoring: '{{ item.Monitoring }}'
+      NetworkInterfaces: '{{ item.NetworkInterfaces }}'
+      NetworkPerformanceOptions: '{{ item.NetworkPerformanceOptions }}'
+      Operator: '{{ item.Operator }}'
+      Placement: '{{ item.Placement }}'
+      PrivateDnsNameOptions: '{{ item.PrivateDnsNameOptions }}'
+      RamDiskId: '{{ item.RamDiskId }}'
+      SecurityGroupIds: '{{ item.SecurityGroupIds }}'
+      SecurityGroups: '{{ item.SecurityGroups }}'
+      TagSpecifications: '{{ item.TagSpecifications }}'
+      UserData: '{{ item.UserData }}'
+    items_for: '{{ response.Images }}'
+  for_each: aws.ec2.describe_addresses
+  resource_type: ec2_launch_template_data
+- calls:
+  - action: describe_volume_status
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_volume_status
+  emit:
+    as: item
+    item:
+      Actions: '{{ item.Actions }}'
+      AttachmentStatuses: '{{ item.AttachmentStatuses }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      Events: '{{ item.Events }}'
+      InitializationStatusDetails: '{{ item.InitializationStatusDetails }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      VolumeId: '{{ item.VolumeId }}'
+      VolumeStatus: '{{ item.VolumeStatus }}'
+      VolumeStatuses: '{{ item.VolumeStatuses }}'
+    items_for: '{{ response.VolumeStatuses }}'
+  resource_type: ec2_volume
+- calls:
+  - action: describe_transit_gateways
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_transit_gateways
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      Description: '{{ item.Description }}'
+      Options: '{{ item.Options }}'
+      Tags: '{{ item.Tags }}'
+      TransitGatewayArn: '{{ item.TransitGatewayArn }}'
+      TransitGatewayId: '{{ item.TransitGatewayId }}'
+      TransitGateways: '{{ item.TransitGateways }}'
+    items_for: '{{ response.TransitGateways }}'
+  resource_type: ec2_transit_gateway
+- calls:
+  - action: describe_local_gateway_route_table_vpc_associations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_local_gateway_route_table_vpc_associations
+  emit:
+    as: item
+    item:
+      LocalGatewayId: '{{ item.LocalGatewayId }}'
+      LocalGatewayRouteTableVpcAssociationId: '{{ item.LocalGatewayRouteTableVpcAssociationId }}'
+      LocalGatewayRouteTableVpcAssociations: '{{ item.LocalGatewayRouteTableVpcAssociations }}'
+      Tags: '{{ item.Tags }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.LocalGatewayRouteTableVpcAssociations }}'
+  resource_type: ec2_local_gateway_route_table_vpc_association
+- calls:
+  - action: describe_local_gateway_route_tables
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_local_gateway_route_tables
+  emit:
+    as: item
+    item:
+      LocalGatewayId: '{{ item.LocalGatewayId }}'
+      LocalGatewayRouteTables: '{{ item.LocalGatewayRouteTables }}'
+      Mode: '{{ item.Mode }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      StateReason: '{{ item.StateReason }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.LocalGatewayRouteTables }}'
+  resource_type: ec2_local_gateway_route_table
+- calls:
+  - action: describe_vpc_endpoint_connections
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_vpc_endpoint_connections
+  emit:
+    as: item
+    item:
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      DnsEntries: '{{ item.DnsEntries }}'
+      GatewayLoadBalancerArns: '{{ item.GatewayLoadBalancerArns }}'
+      IpAddressType: '{{ item.IpAddressType }}'
+      NetworkLoadBalancerArns: '{{ item.NetworkLoadBalancerArns }}'
+      ServiceId: '{{ item.ServiceId }}'
+      Tags: '{{ item.Tags }}'
+      VpcEndpointConnectionId: '{{ item.VpcEndpointConnectionId }}'
+      VpcEndpointConnections: '{{ item.VpcEndpointConnections }}'
+      VpcEndpointId: '{{ item.VpcEndpointId }}'
+      VpcEndpointOwner: '{{ item.VpcEndpointOwner }}'
+      VpcEndpointRegion: '{{ item.VpcEndpointRegion }}'
+      VpcEndpointState: '{{ item.VpcEndpointState }}'
+    items_for: '{{ response.VpcEndpointConnections }}'
+  resource_type: ec2_vpc_endpoint_connection
+- calls:
+  - action: describe_ipam_resource_discovery_associations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_ipam_resource_discovery_associations
+  emit:
+    as: item
+    item:
+      IpamArn: '{{ item.IpamArn }}'
+      IpamId: '{{ item.IpamId }}'
+      IpamRegion: '{{ item.IpamRegion }}'
+      IpamResourceDiscoveryAssociationArn: '{{ item.IpamResourceDiscoveryAssociationArn }}'
+      IpamResourceDiscoveryAssociationId: '{{ item.IpamResourceDiscoveryAssociationId }}'
+      IpamResourceDiscoveryAssociations: '{{ item.IpamResourceDiscoveryAssociations }}'
+      IpamResourceDiscoveryId: '{{ item.IpamResourceDiscoveryId }}'
+      IsDefault: '{{ item.IsDefault }}'
+      ResourceDiscoveryStatus: '{{ item.ResourceDiscoveryStatus }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.IpamResourceDiscoveryAssociations }}'
+  resource_type: ec2_ipam_resource_discovery_association
+- calls:
+  - action: list_images_in_recycle_bin
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.list_images_in_recycle_bin
+  emit:
+    as: item
+    item:
+      Description: '{{ item.Description }}'
+      ImageId: '{{ item.ImageId }}'
+      Images: '{{ item.Images }}'
+      Name: '{{ item.Name }}'
+      RecycleBinEnterTime: '{{ item.RecycleBinEnterTime }}'
+      RecycleBinExitTime: '{{ item.RecycleBinExitTime }}'
+    items_for: '{{ response.Images }}'
+  resource_type: ec2_images_in_recycle_bin
+- calls:
+  - action: describe_instance_connect_endpoints
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_instance_connect_endpoints
+  emit:
+    as: item
+    item:
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      CreatedAt: '{{ item.CreatedAt }}'
+      DnsName: '{{ item.DnsName }}'
+      FipsDnsName: '{{ item.FipsDnsName }}'
+      InstanceConnectEndpointArn: '{{ item.InstanceConnectEndpointArn }}'
+      InstanceConnectEndpointId: '{{ item.InstanceConnectEndpointId }}'
+      InstanceConnectEndpoints: '{{ item.InstanceConnectEndpoints }}'
+      IpAddressType: '{{ item.IpAddressType }}'
+      NetworkInterfaceIds: '{{ item.NetworkInterfaceIds }}'
+      PreserveClientIp: '{{ item.PreserveClientIp }}'
+      PublicDnsNames: '{{ item.PublicDnsNames }}'
+      SecurityGroupIds: '{{ item.SecurityGroupIds }}'
+      StateMessage: '{{ item.StateMessage }}'
+      Tags: '{{ item.Tags }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.InstanceConnectEndpoints }}'
+  resource_type: ec2_instance_connect_endpoint
+- calls:
+  - action: describe_network_acls
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_network_acls
+  emit:
+    as: item
+    item:
+      Associations: '{{ item.Associations }}'
+      Entries: '{{ item.Entries }}'
+      IsDefault: '{{ item.IsDefault }}'
+      NetworkAclId: '{{ item.NetworkAclId }}'
+      NetworkAcls: '{{ item.NetworkAcls }}'
+      Tags: '{{ item.Tags }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.NetworkAcls }}'
+  resource_type: ec2_network_acl
+- calls:
+  - action: describe_verified_access_instances
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_verified_access_instances
+  emit:
+    as: item
+    item:
+      CidrEndpointsCustomSubDomain: '{{ item.CidrEndpointsCustomSubDomain }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Description: '{{ item.Description }}'
+      FipsEnabled: '{{ item.FipsEnabled }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      Tags: '{{ item.Tags }}'
+      VerifiedAccessInstanceId: '{{ item.VerifiedAccessInstanceId }}'
+      VerifiedAccessInstances: '{{ item.VerifiedAccessInstances }}'
+      VerifiedAccessTrustProviders: '{{ item.VerifiedAccessTrustProviders }}'
+    items_for: '{{ response.VerifiedAccessInstances }}'
+  resource_type: ec2_verified_access_instance
+- calls:
+  - action: describe_ipam_external_resource_verification_tokens
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_ipam_external_resource_verification_tokens
+  emit:
+    as: item
+    item:
+      IpamArn: '{{ item.IpamArn }}'
+      IpamExternalResourceVerificationTokenArn: '{{ item.IpamExternalResourceVerificationTokenArn }}'
+      IpamExternalResourceVerificationTokenId: '{{ item.IpamExternalResourceVerificationTokenId }}'
+      IpamExternalResourceVerificationTokens: '{{ item.IpamExternalResourceVerificationTokens }}'
+      IpamId: '{{ item.IpamId }}'
+      IpamRegion: '{{ item.IpamRegion }}'
+      NotAfter: '{{ item.NotAfter }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      TokenName: '{{ item.TokenName }}'
+      TokenValue: '{{ item.TokenValue }}'
+    items_for: '{{ response.IpamExternalResourceVerificationTokens }}'
+  resource_type: ec2_ipam_external_resource_verification_token
+- calls:
+  - action: describe_spot_instance_requests
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_spot_instance_requests
+  emit:
+    as: item
+    item:
+      ActualBlockHourlyPrice: '{{ item.ActualBlockHourlyPrice }}'
+      AvailabilityZoneGroup: '{{ item.AvailabilityZoneGroup }}'
+      BlockDurationMinutes: '{{ item.BlockDurationMinutes }}'
+      CreateTime: '{{ item.CreateTime }}'
+      Fault: '{{ item.Fault }}'
+      InstanceId: '{{ item.InstanceId }}'
+      InstanceInterruptionBehavior: '{{ item.InstanceInterruptionBehavior }}'
+      LaunchGroup: '{{ item.LaunchGroup }}'
+      LaunchSpecification: '{{ item.LaunchSpecification }}'
+      LaunchedAvailabilityZone: '{{ item.LaunchedAvailabilityZone }}'
+      LaunchedAvailabilityZoneId: '{{ item.LaunchedAvailabilityZoneId }}'
+      ProductDescription: '{{ item.ProductDescription }}'
+      SpotInstanceRequestId: '{{ item.SpotInstanceRequestId }}'
+      SpotInstanceRequests: '{{ item.SpotInstanceRequests }}'
+      SpotPrice: '{{ item.SpotPrice }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      ValidFrom: '{{ item.ValidFrom }}'
+      ValidUntil: '{{ item.ValidUntil }}'
+    items_for: '{{ response.SpotInstanceRequests }}'
+  resource_type: ec2_spot_instance_request
+- calls:
+  - action: describe_ipam_prefix_list_resolver_targets
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_ipam_prefix_list_resolver_targets
+  emit:
+    as: item
+    item:
+      DesiredVersion: '{{ item.DesiredVersion }}'
+      IpamPrefixListResolverId: '{{ item.IpamPrefixListResolverId }}'
+      IpamPrefixListResolverTargetArn: '{{ item.IpamPrefixListResolverTargetArn }}'
+      IpamPrefixListResolverTargetId: '{{ item.IpamPrefixListResolverTargetId }}'
+      IpamPrefixListResolverTargets: '{{ item.IpamPrefixListResolverTargets }}'
+      LastSyncedVersion: '{{ item.LastSyncedVersion }}'
+      PrefixListRegion: '{{ item.PrefixListRegion }}'
+      StateMessage: '{{ item.StateMessage }}'
+      Tags: '{{ item.Tags }}'
+      TrackLatestVersion: '{{ item.TrackLatestVersion }}'
+    items_for: '{{ response.IpamPrefixListResolverTargets }}'
+  resource_type: ec2_ipam_prefix_list_resolver_target
+- calls:
+  - action: describe_reserved_instances
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_reserved_instances
+  emit:
+    as: item
+    item:
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      CurrencyCode: '{{ item.CurrencyCode }}'
+      Duration: '{{ item.Duration }}'
+      End: '{{ item.End }}'
+      FixedPrice: '{{ item.FixedPrice }}'
+      InstanceCount: '{{ item.InstanceCount }}'
+      InstanceTenancy: '{{ item.InstanceTenancy }}'
+      InstanceType: '{{ item.InstanceType }}'
+      OfferingClass: '{{ item.OfferingClass }}'
+      OfferingType: '{{ item.OfferingType }}'
+      ProductDescription: '{{ item.ProductDescription }}'
+      RecurringCharges: '{{ item.RecurringCharges }}'
+      ReservedInstances: '{{ item.ReservedInstances }}'
+      ReservedInstancesId: '{{ item.ReservedInstancesId }}'
+      Scope: '{{ item.Scope }}'
+      Start: '{{ item.Start }}'
+      State: '{{ item.State }}'
+      Tags: '{{ item.Tags }}'
+      UsagePrice: '{{ item.UsagePrice }}'
+    items_for: '{{ response.ReservedInstances }}'
+  resource_type: ec2_reserved_instance
+- calls:
+  - action: describe_volumes
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_volumes
+  emit:
+    as: item
+    item:
+      Attachments: '{{ item.Attachments }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      CreateTime: '{{ item.CreateTime }}'
+      Encrypted: '{{ item.Encrypted }}'
+      FastRestored: '{{ item.FastRestored }}'
+      KmsKeyId: '{{ item.KmsKeyId }}'
+      MultiAttachEnabled: '{{ item.MultiAttachEnabled }}'
+      Operator: '{{ item.Operator }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      SnapshotId: '{{ item.SnapshotId }}'
+      SourceVolumeId: '{{ item.SourceVolumeId }}'
+      SseType: '{{ item.SseType }}'
+      Tags: '{{ item.Tags }}'
+      VolumeId: '{{ item.VolumeId }}'
+      VolumeInitializationRate: '{{ item.VolumeInitializationRate }}'
+    items_for: '{{ response.Volumes }}'
+  resource_type: ec2_volume
+- calls:
+  - action: describe_vpc_endpoints
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_vpc_endpoints
+  emit:
+    as: item
+    item:
+      CreationTimestamp: '{{ item.CreationTimestamp }}'
+      DnsEntries: '{{ item.DnsEntries }}'
+      DnsOptions: '{{ item.DnsOptions }}'
+      FailureReason: '{{ item.FailureReason }}'
+      Groups: '{{ item.Groups }}'
+      IpAddressType: '{{ item.IpAddressType }}'
+      Ipv4Prefixes: '{{ item.Ipv4Prefixes }}'
+      Ipv6Prefixes: '{{ item.Ipv6Prefixes }}'
+      LastError: '{{ item.LastError }}'
+      NetworkInterfaceIds: '{{ item.NetworkInterfaceIds }}'
+      PolicyDocument: '{{ item.PolicyDocument }}'
+      PrivateDnsEnabled: '{{ item.PrivateDnsEnabled }}'
+      RequesterManaged: '{{ item.RequesterManaged }}'
+      ResourceConfigurationArn: '{{ item.ResourceConfigurationArn }}'
+      RouteTableIds: '{{ item.RouteTableIds }}'
+      ServiceName: '{{ item.ServiceName }}'
+      ServiceNetworkArn: '{{ item.ServiceNetworkArn }}'
+      ServiceRegion: '{{ item.ServiceRegion }}'
+      SubnetIds: '{{ item.SubnetIds }}'
+      Tags: '{{ item.Tags }}'
+      VpcEndpointId: '{{ item.VpcEndpointId }}'
+      VpcEndpointType: '{{ item.VpcEndpointType }}'
+      VpcEndpoints: '{{ item.VpcEndpoints }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.VpcEndpoints }}'
+  resource_type: ec2_vpc_endpoint
+- calls:
+  - action: describe_managed_prefix_lists
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_managed_prefix_lists
+  emit:
+    as: item
+    item:
+      AddressFamily: '{{ item.AddressFamily }}'
+      IpamPrefixListResolverSyncEnabled: '{{ item.IpamPrefixListResolverSyncEnabled }}'
+      IpamPrefixListResolverTargetId: '{{ item.IpamPrefixListResolverTargetId }}'
+      MaxEntries: '{{ item.MaxEntries }}'
+      PrefixListArn: '{{ item.PrefixListArn }}'
+      PrefixListName: '{{ item.PrefixListName }}'
+      PrefixLists: '{{ item.PrefixLists }}'
+      StateMessage: '{{ item.StateMessage }}'
+      Tags: '{{ item.Tags }}'
+      Version: '{{ item.Version }}'
+    items_for: '{{ response.PrefixLists }}'
+  resource_type: ec2_managed_prefix_list
+- calls:
+  - action: describe_local_gateway_virtual_interfaces
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_local_gateway_virtual_interfaces
+  emit:
+    as: item
+    item:
+      ConfigurationState: '{{ item.ConfigurationState }}'
+      LocalAddress: '{{ item.LocalAddress }}'
+      LocalBgpAsn: '{{ item.LocalBgpAsn }}'
+      LocalGatewayId: '{{ item.LocalGatewayId }}'
+      LocalGatewayVirtualInterfaceArn: '{{ item.LocalGatewayVirtualInterfaceArn }}'
+      LocalGatewayVirtualInterfaceId: '{{ item.LocalGatewayVirtualInterfaceId }}'
+      LocalGatewayVirtualInterfaces: '{{ item.LocalGatewayVirtualInterfaces }}'
+      OutpostLagId: '{{ item.OutpostLagId }}'
+      PeerAddress: '{{ item.PeerAddress }}'
+      PeerBgpAsn: '{{ item.PeerBgpAsn }}'
+      PeerBgpAsnExtended: '{{ item.PeerBgpAsnExtended }}'
+      Tags: '{{ item.Tags }}'
+      Vlan: '{{ item.Vlan }}'
+    items_for: '{{ response.LocalGatewayVirtualInterfaces }}'
+  resource_type: ec2_local_gateway_virtual_interface
+- calls:
+  - action: describe_address_transfers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_address_transfers
+  emit:
+    as: item
+    item:
+      AddressTransferStatus: '{{ item.AddressTransferStatus }}'
+      AddressTransfers: '{{ item.AddressTransfers }}'
+      AllocationId: '{{ item.AllocationId }}'
+      PublicIp: '{{ item.PublicIp }}'
+      TransferAccountId: '{{ item.TransferAccountId }}'
+      TransferOfferAcceptedTimestamp: '{{ item.TransferOfferAcceptedTimestamp }}'
+      TransferOfferExpirationTimestamp: '{{ item.TransferOfferExpirationTimestamp }}'
+    items_for: '{{ response.AddressTransfers }}'
+  resource_type: ec2_address_transfer
+- calls:
+  - action: get_active_vpn_tunnel_status
+    on_error: continue
+    params:
+      VpnConnectionId: '{{ item.VpnConnectionId }}'
+      VpnTunnelOutsideIpAddress: '{{ item.VpnTunnelOutsideIpAddress }}'
+    save_as: response
+  discovery_id: aws.ec2.get_active_vpn_tunnel_status
+  emit:
+    as: item
+    item:
+      IkeVersion: '{{ item.IkeVersion }}'
+      Phase1DHGroup: '{{ item.Phase1DHGroup }}'
+      Phase1EncryptionAlgorithm: '{{ item.Phase1EncryptionAlgorithm }}'
+      Phase1IntegrityAlgorithm: '{{ item.Phase1IntegrityAlgorithm }}'
+      Phase2DHGroup: '{{ item.Phase2DHGroup }}'
+      Phase2EncryptionAlgorithm: '{{ item.Phase2EncryptionAlgorithm }}'
+      Phase2IntegrityAlgorithm: '{{ item.Phase2IntegrityAlgorithm }}'
+      ProvisioningStatus: '{{ item.ProvisioningStatus }}'
+      ProvisioningStatusReason: '{{ item.ProvisioningStatusReason }}'
+    items_for: '{{ response.ActiveVpnTunnelStatus }}'
+  for_each: aws.ec2.describe_vpn_connections
+  resource_type: ec2_active_vpn_tunnel_status
+- calls:
+  - action: describe_vpc_endpoint_service_configurations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_vpc_endpoint_service_configurations
+  emit:
+    as: item
+    item:
+      AcceptanceRequired: '{{ item.AcceptanceRequired }}'
+      AvailabilityZoneIds: '{{ item.AvailabilityZoneIds }}'
+      AvailabilityZones: '{{ item.AvailabilityZones }}'
+      BaseEndpointDnsNames: '{{ item.BaseEndpointDnsNames }}'
+      GatewayLoadBalancerArns: '{{ item.GatewayLoadBalancerArns }}'
+      ManagesVpcEndpoints: '{{ item.ManagesVpcEndpoints }}'
+      NetworkLoadBalancerArns: '{{ item.NetworkLoadBalancerArns }}'
+      PayerResponsibility: '{{ item.PayerResponsibility }}'
+      PrivateDnsName: '{{ item.PrivateDnsName }}'
+      PrivateDnsNameConfiguration: '{{ item.PrivateDnsNameConfiguration }}'
+      RemoteAccessEnabled: '{{ item.RemoteAccessEnabled }}'
+      ServiceConfigurations: '{{ item.ServiceConfigurations }}'
+      ServiceId: '{{ item.ServiceId }}'
+      ServiceName: '{{ item.ServiceName }}'
+      ServiceState: '{{ item.ServiceState }}'
+      ServiceType: '{{ item.ServiceType }}'
+      SupportedIpAddressTypes: '{{ item.SupportedIpAddressTypes }}'
+      SupportedRegions: '{{ item.SupportedRegions }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.ServiceConfigurations }}'
+  resource_type: ec2_vpc_endpoint_service_configuration
+- calls:
+  - action: describe_network_interfaces
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_network_interfaces
+  emit:
+    as: item
+    item:
+      AssociatedSubnets: '{{ item.AssociatedSubnets }}'
+      Association: '{{ item.Association }}'
+      Attachment: '{{ item.Attachment }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      ConnectionTrackingConfiguration: '{{ item.ConnectionTrackingConfiguration }}'
+      DenyAllIgwTraffic: '{{ item.DenyAllIgwTraffic }}'
+      Description: '{{ item.Description }}'
+      Groups: '{{ item.Groups }}'
+      InterfaceType: '{{ item.InterfaceType }}'
+      Ipv4Prefixes: '{{ item.Ipv4Prefixes }}'
+      Ipv6Address: '{{ item.Ipv6Address }}'
+      Ipv6Addresses: '{{ item.Ipv6Addresses }}'
+      Ipv6Native: '{{ item.Ipv6Native }}'
+      Ipv6Prefixes: '{{ item.Ipv6Prefixes }}'
+      MacAddress: '{{ item.MacAddress }}'
+      Operator: '{{ item.Operator }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      PrivateDnsName: '{{ item.PrivateDnsName }}'
+      PrivateIpAddress: '{{ item.PrivateIpAddress }}'
+      PrivateIpAddresses: '{{ item.PrivateIpAddresses }}'
+      PublicDnsName: '{{ item.PublicDnsName }}'
+      PublicIpDnsNameOptions: '{{ item.PublicIpDnsNameOptions }}'
+      RequesterId: '{{ item.RequesterId }}'
+      RequesterManaged: '{{ item.RequesterManaged }}'
+      SourceDestCheck: '{{ item.SourceDestCheck }}'
+      Status: '{{ item.Status }}'
+      TagSet: '{{ item.TagSet }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.NetworkInterfaces }}'
+  resource_type: ec2_network_interface
+- calls:
+  - action: describe_local_gateways
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_local_gateways
+  emit:
+    as: item
+    item:
+      LocalGatewayId: '{{ item.LocalGatewayId }}'
+      LocalGateways: '{{ item.LocalGateways }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.LocalGateways }}'
+  resource_type: ec2_local_gateway
+- calls:
+  - action: describe_network_insights_analyses
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_network_insights_analyses
+  emit:
+    as: item
+    item:
+      AdditionalAccounts: '{{ item.AdditionalAccounts }}'
+      AlternatePathHints: '{{ item.AlternatePathHints }}'
+      Explanations: '{{ item.Explanations }}'
+      FilterInArns: '{{ item.FilterInArns }}'
+      FilterOutArns: '{{ item.FilterOutArns }}'
+      ForwardPathComponents: '{{ item.ForwardPathComponents }}'
+      NetworkInsightsAnalyses: '{{ item.NetworkInsightsAnalyses }}'
+      NetworkInsightsAnalysisArn: '{{ item.NetworkInsightsAnalysisArn }}'
+      NetworkInsightsAnalysisId: '{{ item.NetworkInsightsAnalysisId }}'
+      NetworkInsightsPathId: '{{ item.NetworkInsightsPathId }}'
+      NetworkPathFound: '{{ item.NetworkPathFound }}'
+      ReturnPathComponents: '{{ item.ReturnPathComponents }}'
+      StartDate: '{{ item.StartDate }}'
+      Status: '{{ item.Status }}'
+      StatusMessage: '{{ item.StatusMessage }}'
+      SuggestedAccounts: '{{ item.SuggestedAccounts }}'
+      Tags: '{{ item.Tags }}'
+      WarningMessage: '{{ item.WarningMessage }}'
+    items_for: '{{ response.NetworkInsightsAnalyses }}'
+  resource_type: ec2_network_insights_analys
+- calls:
+  - action: describe_ipam_resource_discoveries
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_ipam_resource_discoveries
+  emit:
+    as: item
+    item:
+      Description: '{{ item.Description }}'
+      IpamResourceDiscoveries: '{{ item.IpamResourceDiscoveries }}'
+      IpamResourceDiscoveryArn: '{{ item.IpamResourceDiscoveryArn }}'
+      IpamResourceDiscoveryId: '{{ item.IpamResourceDiscoveryId }}'
+      IpamResourceDiscoveryRegion: '{{ item.IpamResourceDiscoveryRegion }}'
+      IsDefault: '{{ item.IsDefault }}'
+      OperatingRegions: '{{ item.OperatingRegions }}'
+      OrganizationalUnitExclusions: '{{ item.OrganizationalUnitExclusions }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.IpamResourceDiscoveries }}'
+  resource_type: ec2_ipam_resource_discovery
+- calls:
+  - action: describe_vpc_endpoint_connection_notifications
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_vpc_endpoint_connection_notifications
+  emit:
+    as: item
+    item:
+      AllowedPrincipals: '{{ item.AllowedPrincipals }}'
+      ConnectionEvents: '{{ item.ConnectionEvents }}'
+      ConnectionNotificationArn: '{{ item.ConnectionNotificationArn }}'
+      ConnectionNotificationId: '{{ item.ConnectionNotificationId }}'
+      ConnectionNotificationSet: '{{ item.ConnectionNotificationSet }}'
+      ConnectionNotificationState: '{{ item.ConnectionNotificationState }}'
+      ConnectionNotificationType: '{{ item.ConnectionNotificationType }}'
+      Principal: '{{ item.Principal }}'
+      PrincipalType: '{{ item.PrincipalType }}'
+      ServiceId: '{{ item.ServiceId }}'
+      ServicePermissionId: '{{ item.ServicePermissionId }}'
+      ServiceRegion: '{{ item.ServiceRegion }}'
+      VpcEndpointId: '{{ item.VpcEndpointId }}'
+    items_for: '{{ response.ConnectionNotificationSet }}'
+  resource_type: ec2_vpc_endpoint_connection_notification
+- calls:
+  - action: get_ebs_encryption_by_default
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.get_ebs_encryption_by_default
+  emit:
+    as: item
+    item:
+      EbsEncryptionByDefault: '{{ item.EbsEncryptionByDefault }}'
+    items_for: '{{ response.EbsEncryptionByDefault }}'
+  resource_type: ec2_ebs_encryption_by_default
+- calls:
+  - action: describe_prefix_lists
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_prefix_lists
+  emit:
+    as: item
+    item:
+      Cidrs: '{{ item.Cidrs }}'
+      PrefixListName: '{{ item.PrefixListName }}'
+    items_for: '{{ response.PrefixLists }}'
+  resource_type: ec2_prefix_list
+- calls:
+  - action: describe_instance_status
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_instance_status
+  emit:
+    as: item
+    item:
+      AttachedEbsStatus: '{{ item.AttachedEbsStatus }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      Events: '{{ item.Events }}'
+      InstanceId: '{{ item.InstanceId }}'
+      InstanceState: '{{ item.InstanceState }}'
+      InstanceStatus: '{{ item.InstanceStatus }}'
+      InstanceStatuses: '{{ item.InstanceStatuses }}'
+      Operator: '{{ item.Operator }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      SystemStatus: '{{ item.SystemStatus }}'
+    items_for: '{{ response.InstanceStatuses }}'
+  resource_type: ec2_instance
+- calls:
+  - action: describe_local_gateway_virtual_interface_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_local_gateway_virtual_interface_groups
+  emit:
+    as: item
+    item:
+      ConfigurationState: '{{ item.ConfigurationState }}'
+      LocalBgpAsn: '{{ item.LocalBgpAsn }}'
+      LocalBgpAsnExtended: '{{ item.LocalBgpAsnExtended }}'
+      LocalGatewayId: '{{ item.LocalGatewayId }}'
+      LocalGatewayVirtualInterfaceGroupArn: '{{ item.LocalGatewayVirtualInterfaceGroupArn }}'
+      LocalGatewayVirtualInterfaceGroups: '{{ item.LocalGatewayVirtualInterfaceGroups }}'
+      LocalGatewayVirtualInterfaceIds: '{{ item.LocalGatewayVirtualInterfaceIds }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.LocalGatewayVirtualInterfaceGroups }}'
+  resource_type: ec2_local_gateway_virtual_interface_group
+- calls:
+  - action: get_serial_console_access_status
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.get_serial_console_access_status
+  emit:
+    as: item
+    item:
+      SerialConsoleAccessEnabled: '{{ item.SerialConsoleAccessEnabled }}'
+    items_for: '{{ response.SerialConsoleAccessEnabled }}'
+  resource_type: ec2_serial_console_access_status
+- calls:
+  - action: describe_egress_only_internet_gateways
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_egress_only_internet_gateways
+  emit:
+    as: item
+    item:
+      Attachments: '{{ item.Attachments }}'
+      EgressOnlyInternetGatewayId: '{{ item.EgressOnlyInternetGatewayId }}'
+      EgressOnlyInternetGateways: '{{ item.EgressOnlyInternetGateways }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.EgressOnlyInternetGateways }}'
+  resource_type: ec2_egress_only_internet_gateway
+- calls:
+  - action: describe_client_vpn_endpoints
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_client_vpn_endpoints
+  emit:
+    as: item
+    item:
+      AssociatedRoles: '{{ item.AssociatedRoles }}'
+      AssociatedTargetNetworks: '{{ item.AssociatedTargetNetworks }}'
+      AuthenticationOptions: '{{ item.AuthenticationOptions }}'
+      CertificateS3BucketName: '{{ item.CertificateS3BucketName }}'
+      CertificateS3ObjectKey: '{{ item.CertificateS3ObjectKey }}'
+      ClientCidrBlock: '{{ item.ClientCidrBlock }}'
+      ClientConnectOptions: '{{ item.ClientConnectOptions }}'
+      ClientLoginBannerOptions: '{{ item.ClientLoginBannerOptions }}'
+      ClientRouteEnforcementOptions: '{{ item.ClientRouteEnforcementOptions }}'
+      ClientVpnEndpointId: '{{ item.ClientVpnEndpointId }}'
+      ClientVpnEndpoints: '{{ item.ClientVpnEndpoints }}'
+      ClientVpnTargetNetworks: '{{ item.ClientVpnTargetNetworks }}'
+      ConnectionLogOptions: '{{ item.ConnectionLogOptions }}'
+      CreationTime: '{{ item.CreationTime }}'
+      DeletionTime: '{{ item.DeletionTime }}'
+      Description: '{{ item.Description }}'
+      DisconnectOnSessionTimeout: '{{ item.DisconnectOnSessionTimeout }}'
+      DnsName: '{{ item.DnsName }}'
+      DnsServers: '{{ item.DnsServers }}'
+      EndpointIpAddressType: '{{ item.EndpointIpAddressType }}'
+      SecurityGroupIds: '{{ item.SecurityGroupIds }}'
+      SelfServicePortalUrl: '{{ item.SelfServicePortalUrl }}'
+      ServerCertificateArn: '{{ item.ServerCertificateArn }}'
+      SessionTimeoutHours: '{{ item.SessionTimeoutHours }}'
+      SplitTunnel: '{{ item.SplitTunnel }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      TrafficIpAddressType: '{{ item.TrafficIpAddressType }}'
+      TransportProtocol: '{{ item.TransportProtocol }}'
+      VpcId: '{{ item.VpcId }}'
+      VpnPort: '{{ item.VpnPort }}'
+      VpnProtocol: '{{ item.VpnProtocol }}'
+    items_for: '{{ response.ClientVpnEndpoints }}'
+  resource_type: ec2_client_vpn_endpoint
+- calls:
+  - action: describe_verified_access_endpoints
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_verified_access_endpoints
+  emit:
+    as: item
+    item:
+      ApplicationDomain: '{{ item.ApplicationDomain }}'
+      AttachmentType: '{{ item.AttachmentType }}'
+      CidrOptions: '{{ item.CidrOptions }}'
+      CreationTime: '{{ item.CreationTime }}'
+      DeletionTime: '{{ item.DeletionTime }}'
+      Description: '{{ item.Description }}'
+      DeviceValidationDomain: '{{ item.DeviceValidationDomain }}'
+      DomainCertificateArn: '{{ item.DomainCertificateArn }}'
+      EndpointDomain: '{{ item.EndpointDomain }}'
+      EndpointType: '{{ item.EndpointType }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      LoadBalancerOptions: '{{ item.LoadBalancerOptions }}'
+      NetworkInterfaceOptions: '{{ item.NetworkInterfaceOptions }}'
+      RdsOptions: '{{ item.RdsOptions }}'
+      SecurityGroupIds: '{{ item.SecurityGroupIds }}'
+      SseSpecification: '{{ item.SseSpecification }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      VerifiedAccessEndpointId: '{{ item.VerifiedAccessEndpointId }}'
+      VerifiedAccessEndpoints: '{{ item.VerifiedAccessEndpoints }}'
+      VerifiedAccessGroupId: '{{ item.VerifiedAccessGroupId }}'
+      VerifiedAccessInstanceId: '{{ item.VerifiedAccessInstanceId }}'
+    items_for: '{{ response.VerifiedAccessEndpoints }}'
+  resource_type: ec2_verified_access_endpoint
+- calls:
+  - action: describe_network_insights_access_scopes
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_network_insights_access_scopes
+  emit:
+    as: item
+    item:
+      CreatedDate: '{{ item.CreatedDate }}'
+      NetworkInsightsAccessScopeArn: '{{ item.NetworkInsightsAccessScopeArn }}'
+      NetworkInsightsAccessScopeId: '{{ item.NetworkInsightsAccessScopeId }}'
+      NetworkInsightsAccessScopes: '{{ item.NetworkInsightsAccessScopes }}'
+      Tags: '{{ item.Tags }}'
+      UpdatedDate: '{{ item.UpdatedDate }}'
+    items_for: '{{ response.NetworkInsightsAccessScopes }}'
+  resource_type: ec2_network_insights_access_scope
+- calls:
+  - action: describe_classic_link_instances
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_classic_link_instances
+  emit:
+    as: item
+    item:
+      Groups: '{{ item.Groups }}'
+      InstanceId: '{{ item.InstanceId }}'
+      Tags: '{{ item.Tags }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.Instances }}'
+  resource_type: ec2_classic_link_instance
+- calls:
+  - action: describe_key_pairs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_key_pairs
+  emit:
+    as: item
+    item:
+      CreateTime: '{{ item.CreateTime }}'
+      KeyFingerprint: '{{ item.KeyFingerprint }}'
+      KeyName: '{{ item.KeyName }}'
+      KeyPairId: '{{ item.KeyPairId }}'
+      KeyPairs: '{{ item.KeyPairs }}'
+      KeyType: '{{ item.KeyType }}'
+      PublicKey: '{{ item.PublicKey }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.KeyPairs }}'
+  resource_type: ec2_key_pair
+- calls:
+  - action: describe_principal_id_format
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_principal_id_format
+  emit:
+    as: item
+    item:
+      Arn: '{{ item.Arn }}'
+      Principals: '{{ item.Principals }}'
+      Statuses: '{{ item.Statuses }}'
+    items_for: '{{ response.Principals }}'
+  resource_type: ec2_principal_id_format
+- calls:
+  - action: describe_vpcs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_vpcs
+  emit:
+    as: item
+    item:
+      BlockPublicAccessStates: '{{ item.BlockPublicAccessStates }}'
+      CidrBlock: '{{ item.CidrBlock }}'
+      CidrBlockAssociationSet: '{{ item.CidrBlockAssociationSet }}'
+      DhcpOptionsId: '{{ item.DhcpOptionsId }}'
+      EncryptionControl: '{{ item.EncryptionControl }}'
+      InstanceTenancy: '{{ item.InstanceTenancy }}'
+      Ipv6CidrBlockAssociationSet: '{{ item.Ipv6CidrBlockAssociationSet }}'
+      IsDefault: '{{ item.IsDefault }}'
+      OwnerId: '{{ item.OwnerId }}'
+      Tags: '{{ item.Tags }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.Vpcs }}'
+  resource_type: ec2_vpc
+- calls:
+  - action: describe_internet_gateways
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_internet_gateways
+  emit:
+    as: item
+    item:
+      Attachments: '{{ item.Attachments }}'
+      InternetGatewayId: '{{ item.InternetGatewayId }}'
+      InternetGateways: '{{ item.InternetGateways }}'
+      OwnerId: '{{ item.OwnerId }}'
+      Tags: '{{ item.Tags }}'
+    items_for: '{{ response.InternetGateways }}'
+  resource_type: ec2_internet_gateway
+- calls:
+  - action: describe_nat_gateways
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_nat_gateways
+  emit:
+    as: item
+    item:
+      AttachedAppliances: '{{ item.AttachedAppliances }}'
+      AutoProvisionZones: '{{ item.AutoProvisionZones }}'
+      AutoScalingIps: '{{ item.AutoScalingIps }}'
+      AvailabilityMode: '{{ item.AvailabilityMode }}'
+      ConnectivityType: '{{ item.ConnectivityType }}'
+      CreateTime: '{{ item.CreateTime }}'
+      DeleteTime: '{{ item.DeleteTime }}'
+      FailureCode: '{{ item.FailureCode }}'
+      FailureMessage: '{{ item.FailureMessage }}'
+      NatGatewayAddresses: '{{ item.NatGatewayAddresses }}'
+      NatGatewayId: '{{ item.NatGatewayId }}'
+      NatGateways: '{{ item.NatGateways }}'
+      ProvisionedBandwidth: '{{ item.ProvisionedBandwidth }}'
+      RouteTableId: '{{ item.RouteTableId }}'
+      State: '{{ item.State }}'
+      SubnetId: '{{ item.SubnetId }}'
+      Tags: '{{ item.Tags }}'
+      VpcId: '{{ item.VpcId }}'
+    items_for: '{{ response.NatGateways }}'
+  resource_type: ec2_nat_gateway
+- calls:
+  - action: describe_vpc_peering_connections
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_vpc_peering_connections
+  emit:
+    as: item
+    item:
+      AccepterVpcInfo: '{{ item.AccepterVpcInfo }}'
+      ExpirationTime: '{{ item.ExpirationTime }}'
+      RequesterVpcInfo: '{{ item.RequesterVpcInfo }}'
+      Status: '{{ item.Status }}'
+      Tags: '{{ item.Tags }}'
+      VpcPeeringConnectionId: '{{ item.VpcPeeringConnectionId }}'
+      VpcPeeringConnections: '{{ item.VpcPeeringConnections }}'
+    items_for: '{{ response.VpcPeeringConnections }}'
+  resource_type: ec2_vpc_peering_connection
+- calls:
+  - action: describe_transit_gateway_attachments
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_transit_gateway_attachments
+  emit:
+    as: item
+    item:
+      Association: '{{ item.Association }}'
+      CreationTime: '{{ item.CreationTime }}'
+      Tags: '{{ item.Tags }}'
+      TransitGatewayId: '{{ item.TransitGatewayId }}'
+      TransitGatewayOwnerId: '{{ item.TransitGatewayOwnerId }}'
+    items_for: '{{ response.TransitGatewayAttachments }}'
+  resource_type: ec2_transit_gateway_attachment
+- calls:
+  - action: describe_transit_gateway_route_tables
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_transit_gateway_route_tables
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      DefaultAssociationRouteTable: '{{ item.DefaultAssociationRouteTable }}'
+      DefaultPropagationRouteTable: '{{ item.DefaultPropagationRouteTable }}'
+      Tags: '{{ item.Tags }}'
+      TransitGatewayId: '{{ item.TransitGatewayId }}'
+      TransitGatewayRouteTableId: '{{ item.TransitGatewayRouteTableId }}'
+      TransitGatewayRouteTables: '{{ item.TransitGatewayRouteTables }}'
+    items_for: '{{ response.TransitGatewayRouteTables }}'
+  resource_type: ec2_transit_gateway_route_table
+- calls:
+  - action: describe_transit_gateway_vpc_attachments
+    on_error: continue
+    save_as: response
+  discovery_id: aws.ec2.describe_transit_gateway_vpc_attachments
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      Options: '{{ item.Options }}'
+      SubnetIds: '{{ item.SubnetIds }}'
+      Tags: '{{ item.Tags }}'
+      TransitGatewayId: '{{ item.TransitGatewayId }}'
+      TransitGatewayVpcAttachments: '{{ item.TransitGatewayVpcAttachments }}'
+      VpcId: '{{ item.VpcId }}'
+      VpcOwnerId: '{{ item.VpcOwnerId }}'
+    items_for: '{{ response.TransitGatewayVpcAttachments }}'
+  resource_type: ec2_transit_gateway_vpc_attachment
+- calls:
+  - action: describe_snapshot_attribute
+    on_error: continue
+    params:
+      SnapshotId: '{{ item.SnapshotId }}'
+      Attribute: createVolumePermission
+    save_as: response
+  discovery_id: aws.ec2.describe_snapshot_attribute
+  resource_type: ec2_snapshot
+  emit:
+    as: item
+    item:
+      CreateVolumePermissions: '{{ response.CreateVolumePermissions }}'
+      SnapshotId: '{{ response.SnapshotId }}'
+  for_each: aws.ec2.describe_snapshots

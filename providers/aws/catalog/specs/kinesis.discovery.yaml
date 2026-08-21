@@ -1,0 +1,78 @@
+version: '1.0'
+provider: aws
+service: kinesis
+discovery:
+- calls:
+  - action: describe_stream
+    on_error: continue
+    save_as: response
+  discovery_id: aws.kinesis.describe_stream
+  emit:
+    as: item
+    item:
+      EncryptionType: '{{ response.StreamDescription.EncryptionType }}'
+      EnhancedMonitoring: '{{ response.StreamDescription.EnhancedMonitoring }}'
+      HasMoreShards: '{{ response.StreamDescription.HasMoreShards }}'
+      KeyId: '{{ response.StreamDescription.KeyId }}'
+      RetentionPeriodHours: '{{ response.StreamDescription.RetentionPeriodHours }}'
+      Shards: '{{ response.StreamDescription.HasMoreShards }}'
+      StreamARN: '{{ response.StreamDescription.StreamARN }}'
+      StreamCreationTimestamp: '{{ response.StreamDescription.StreamCreationTimestamp }}'
+      StreamDescription: '{{ response.StreamDescription.StreamDescription }}'
+      StreamModeDetails: '{{ response.StreamDescription.StreamModeDetails.StreamMode }}'
+      StreamName: '{{ response.StreamDescription.StreamName }}'
+      StreamStatus: '{{ response.StreamDescription.StreamStatus }}'
+      StreamMode: '{{ response.StreamDescription.StreamModeDetails.StreamMode }}'
+- calls:
+  - action: list_stream_consumers
+    on_error: continue
+    params:
+      StreamARN: '{{ item.StreamARN }}'
+    save_as: response
+  discovery_id: aws.kinesis.list_stream_consumers
+  emit:
+    as: item
+    item:
+      ConsumerARN: '{{ item.ConsumerARN }}'
+      ConsumerCreationTimestamp: '{{ item.ConsumerCreationTimestamp }}'
+      ConsumerName: '{{ item.ConsumerName }}'
+      ConsumerStatus: '{{ item.ConsumerStatus }}'
+    items_for: '{{ response.Consumers }}'
+  for_each: aws.kinesis.describe_stream
+- calls:
+  - action: describe_stream_consumer
+    on_error: continue
+    save_as: response
+  discovery_id: aws.kinesis.describe_stream_consumer
+  emit:
+    as: item
+    item:
+      ConsumerARN: '{{ response.ConsumerDescription.ConsumerARN }}'
+      ConsumerCreationTimestamp: '{{ response.ConsumerDescription.ConsumerCreationTimestamp }}'
+      ConsumerDescription: '{{ response.ConsumerDescription.ConsumerDescription }}'
+      ConsumerName: '{{ response.ConsumerDescription.ConsumerName }}'
+      ConsumerStatus: '{{ response.ConsumerDescription.ConsumerStatus }}'
+      StreamARN: '{{ response.ConsumerDescription.StreamARN }}'
+- calls:
+  - action: describe_stream_summary
+    on_error: continue
+    save_as: response
+  discovery_id: aws.kinesis.describe_stream_summary
+  emit:
+    as: item
+    item:
+      ConsumerCount: '{{ response.StreamDescriptionSummary.ConsumerCount }}'
+      EncryptionType: '{{ response.StreamDescriptionSummary.EncryptionType }}'
+      EnhancedMonitoring: '{{ response.StreamDescriptionSummary.EnhancedMonitoring }}'
+      KeyId: '{{ response.StreamDescriptionSummary.KeyId }}'
+      MaxRecordSizeInKiB: '{{ response.StreamDescriptionSummary.MaxRecordSizeInKiB }}'
+      OpenShardCount: '{{ response.StreamDescriptionSummary.OpenShardCount }}'
+      RetentionPeriodHours: '{{ response.StreamDescriptionSummary.RetentionPeriodHours }}'
+      StreamARN: '{{ response.StreamDescriptionSummary.StreamARN }}'
+      StreamCreationTimestamp: '{{ response.StreamDescriptionSummary.StreamCreationTimestamp }}'
+      StreamDescriptionSummary: '{{ response.StreamDescriptionSummary.StreamDescriptionSummary }}'
+      StreamModeDetails: '{{ response.StreamDescriptionSummary.StreamModeDetails.StreamMode }}'
+      StreamName: '{{ response.StreamDescriptionSummary.StreamName }}'
+      StreamStatus: '{{ response.StreamDescriptionSummary.StreamStatus }}'
+      WarmThroughput: '{{ response.StreamDescriptionSummary.WarmThroughput }}'
+      StreamMode: '{{ response.StreamDescriptionSummary.StreamModeDetails.StreamMode }}'

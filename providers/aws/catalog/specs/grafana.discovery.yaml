@@ -1,0 +1,159 @@
+version: '1.0'
+provider: aws
+service: grafana
+services:
+  client: grafana
+  module: boto3.client
+discovery:
+- discovery_id: aws.grafana.list_versions
+  calls:
+  - action: list_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.grafanaVersions }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.grafana.list_workspaces
+  calls:
+  - action: list_workspaces
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workspaces }}'
+    item:
+      authentication: '{{ item.authentication }}'
+      created: '{{ item.created }}'
+      description: '{{ item.description }}'
+      endpoint: '{{ item.endpoint }}'
+      grafanaToken: '{{ item.grafanaToken }}'
+      grafanaVersion: '{{ item.grafanaVersion }}'
+      id: '{{ item.id }}'
+      licenseType: '{{ item.licenseType }}'
+      modified: '{{ item.modified }}'
+      name: '{{ item.name }}'
+      notificationDestinations: '{{ item.notificationDestinations }}'
+      status: '{{ item.status }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.grafana.describe_workspace
+  calls:
+  - action: describe_workspace
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      accountAccessType: '{{ response.workspace.accountAccessType }}'
+      authentication: '{{ response.workspace.authentication }}'
+      created: '{{ response.workspace.created }}'
+      dataSources: '{{ response.workspace.dataSources }}'
+      description: '{{ response.workspace.description }}'
+      endpoint: '{{ response.workspace.endpoint }}'
+      freeTrialConsumed: '{{ response.workspace.freeTrialConsumed }}'
+      freeTrialExpiration: '{{ response.workspace.freeTrialExpiration }}'
+      grafanaToken: '{{ response.workspace.grafanaToken }}'
+      grafanaVersion: '{{ response.workspace.grafanaVersion }}'
+      id: '{{ response.workspace.id }}'
+      licenseExpiration: '{{ response.workspace.licenseExpiration }}'
+      licenseType: '{{ response.workspace.licenseType }}'
+      modified: '{{ response.workspace.modified }}'
+      name: '{{ response.workspace.name }}'
+      networkAccessControl: '{{ response.workspace.networkAccessControl }}'
+      notificationDestinations: '{{ response.workspace.notificationDestinations }}'
+      organizationRoleName: '{{ response.workspace.organizationRoleName }}'
+      organizationalUnits: '{{ response.workspace.organizationalUnits }}'
+      permissionType: '{{ response.workspace.permissionType }}'
+      stackSetName: '{{ response.workspace.stackSetName }}'
+      status: '{{ response.workspace.status }}'
+      tags: '{{ response.workspace.tags }}'
+      vpcConfiguration: '{{ response.workspace.vpcConfiguration }}'
+      workspaceRoleArn: '{{ response.workspace.workspaceRoleArn }}'
+      samlConfigurationStatus: '{{ response.workspace.authentication.samlConfigurationStatus }}'
+- discovery_id: aws.grafana.describe_workspace_authentication
+  calls:
+  - action: describe_workspace_authentication
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      awsSso: '{{ response.authentication.awsSso }}'
+      providers: '{{ response.authentication.providers }}'
+      saml: '{{ response.authentication.saml }}'
+      ssoClientId: '{{ response.authentication.awsSso.ssoClientId }}'
+      email: '{{ response.authentication.saml.configuration.assertionAttributes.email }}'
+      groups: '{{ response.authentication.saml.configuration.assertionAttributes.groups }}'
+      login: '{{ response.authentication.saml.configuration.assertionAttributes.login }}'
+      name: '{{ response.authentication.saml.configuration.assertionAttributes.name }}'
+      org: '{{ response.authentication.saml.configuration.assertionAttributes.org }}'
+      role: '{{ response.authentication.saml.configuration.assertionAttributes.role }}'
+      url: '{{ response.authentication.saml.configuration.idpMetadata.url }}'
+      xml: '{{ response.authentication.saml.configuration.idpMetadata.xml }}'
+      loginValidityDuration: '{{ response.authentication.saml.configuration.loginValidityDuration }}'
+      status: '{{ response.authentication.saml.status }}'
+- discovery_id: aws.grafana.describe_workspace_configuration
+  calls:
+  - action: describe_workspace_configuration
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      configuration: '{{ response.configuration }}'
+      grafanaVersion: '{{ response.grafanaVersion }}'
+- discovery_id: aws.grafana.list_permissions
+  calls:
+  - action: list_permissions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.permissions }}'
+    item:
+      role: '{{ item.role }}'
+      user: '{{ item.user }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.grafana.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.grafana.list_workspace_service_account_tokens
+  calls:
+  - action: list_workspace_service_account_tokens
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.serviceAccountTokens }}'
+    item:
+      createdAt: '{{ item.createdAt }}'
+      expiresAt: '{{ item.expiresAt }}'
+      id: '{{ item.id }}'
+      lastUsedAt: '{{ item.lastUsedAt }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+      serviceAccountId: '{{ response.serviceAccountId }}'
+      workspaceId: '{{ response.workspaceId }}'
+- discovery_id: aws.grafana.list_workspace_service_accounts
+  calls:
+  - action: list_workspace_service_accounts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.serviceAccounts }}'
+    item:
+      grafanaRole: '{{ item.grafanaRole }}'
+      id: '{{ item.id }}'
+      isDisabled: '{{ item.isDisabled }}'
+      name: '{{ item.name }}'
+      nextToken: '{{ response.nextToken }}'
+      workspaceId: '{{ response.workspaceId }}'

@@ -1,0 +1,289 @@
+version: '1.0'
+provider: aws
+service: evidently
+services:
+  client: evidently
+  module: boto3.client
+discovery:
+- discovery_id: aws.evidently.list_projects
+  calls:
+  - action: list_projects
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.projects }}'
+    item:
+      activeExperimentCount: '{{ item.activeExperimentCount }}'
+      activeLaunchCount: '{{ item.activeLaunchCount }}'
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      experimentCount: '{{ item.experimentCount }}'
+      featureCount: '{{ item.featureCount }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      launchCount: '{{ item.launchCount }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.evidently.list_segments
+  calls:
+  - action: list_segments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.segments }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      experimentCount: '{{ item.experimentCount }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      launchCount: '{{ item.launchCount }}'
+      name: '{{ item.name }}'
+      pattern: '{{ item.pattern }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.evidently.get_experiment
+  calls:
+  - action: get_experiment
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.experiment.arn }}'
+      createdTime: '{{ response.experiment.createdTime }}'
+      description: '{{ response.experiment.description }}'
+      execution: '{{ response.experiment.execution }}'
+      experiment: '{{ response.experiment.experiment }}'
+      lastUpdatedTime: '{{ response.experiment.lastUpdatedTime }}'
+      metricGoals: '{{ response.experiment.metricGoals }}'
+      name: '{{ response.experiment.name }}'
+      onlineAbDefinition: '{{ response.experiment.onlineAbDefinition }}'
+      project: '{{ response.experiment.project }}'
+      randomizationSalt: '{{ response.experiment.randomizationSalt }}'
+      samplingRate: '{{ response.experiment.samplingRate }}'
+      schedule: '{{ response.experiment.schedule }}'
+      segment: '{{ response.experiment.segment }}'
+      status: '{{ response.experiment.status }}'
+      statusReason: '{{ response.experiment.statusReason }}'
+      tags: '{{ response.experiment.tags }}'
+      treatments: '{{ response.experiment.treatments[].name }}'
+      type: '{{ response.experiment.type }}'
+      endedTime: '{{ response.experiment.execution.endedTime }}'
+      startedTime: '{{ response.experiment.execution.startedTime }}'
+      controlTreatmentName: '{{ response.experiment.onlineAbDefinition.controlTreatmentName }}'
+      treatmentWeights: '{{ response.experiment.onlineAbDefinition.treatmentWeights }}'
+      analysisCompleteTime: '{{ response.experiment.schedule.analysisCompleteTime }}'
+- discovery_id: aws.evidently.get_experiment_results
+  calls:
+  - action: get_experiment_results
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.reports }}'
+    item:
+      content: '{{ item.content }}'
+      metricName: '{{ item.metricName }}'
+      reportName: '{{ item.reportName }}'
+      reports: '{{ item.reports }}'
+      resultsData: '{{ item.resultsData }}'
+      timestamps: '{{ item.timestamps }}'
+      treatmentName: '{{ item.treatmentName }}'
+      details: '{{ response.details }}'
+- discovery_id: aws.evidently.get_feature
+  calls:
+  - action: get_feature
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.feature.arn }}'
+      createdTime: '{{ response.feature.createdTime }}'
+      defaultVariation: '{{ response.feature.defaultVariation }}'
+      description: '{{ response.feature.description }}'
+      entityOverrides: '{{ response.feature.entityOverrides }}'
+      evaluationRules: '{{ response.feature.evaluationRules[].type }}'
+      evaluationStrategy: '{{ response.feature.evaluationStrategy }}'
+      lastUpdatedTime: '{{ response.feature.lastUpdatedTime }}'
+      name: '{{ response.feature.name }}'
+      project: '{{ response.feature.project }}'
+      status: '{{ response.feature.status }}'
+      tags: '{{ response.feature.tags }}'
+      valueType: '{{ response.feature.valueType }}'
+      variations: '{{ response.feature.variations }}'
+- discovery_id: aws.evidently.get_launch
+  calls:
+  - action: get_launch
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.launch.arn }}'
+      createdTime: '{{ response.launch.createdTime }}'
+      description: '{{ response.launch.description }}'
+      execution: '{{ response.launch.execution }}'
+      groups: '{{ response.launch.groups }}'
+      lastUpdatedTime: '{{ response.launch.lastUpdatedTime }}'
+      metricMonitors: '{{ response.launch.metricMonitors }}'
+      name: '{{ response.launch.name }}'
+      project: '{{ response.launch.project }}'
+      randomizationSalt: '{{ response.launch.randomizationSalt }}'
+      scheduledSplitsDefinition: '{{ response.launch.scheduledSplitsDefinition }}'
+      status: '{{ response.launch.status }}'
+      statusReason: '{{ response.launch.statusReason }}'
+      tags: '{{ response.launch.tags }}'
+      type: '{{ response.launch.type }}'
+      endedTime: '{{ response.launch.execution.endedTime }}'
+      startedTime: '{{ response.launch.execution.startedTime }}'
+- discovery_id: aws.evidently.get_project
+  calls:
+  - action: get_project
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      activeExperimentCount: '{{ response.project.activeExperimentCount }}'
+      activeLaunchCount: '{{ response.project.activeLaunchCount }}'
+      appConfigResource: '{{ response.project.appConfigResource }}'
+      arn: '{{ response.project.arn }}'
+      createdTime: '{{ response.project.createdTime }}'
+      dataDelivery: '{{ response.project.dataDelivery }}'
+      description: '{{ response.project.description }}'
+      experimentCount: '{{ response.project.experimentCount }}'
+      featureCount: '{{ response.project.featureCount }}'
+      lastUpdatedTime: '{{ response.project.lastUpdatedTime }}'
+      launchCount: '{{ response.project.launchCount }}'
+      name: '{{ response.project.name }}'
+      status: '{{ response.project.status }}'
+      tags: '{{ response.project.tags }}'
+      applicationId: '{{ response.project.appConfigResource.applicationId }}'
+      configurationProfileId: '{{ response.project.appConfigResource.configurationProfileId }}'
+      environmentId: '{{ response.project.appConfigResource.environmentId }}'
+      logGroup: '{{ response.project.dataDelivery.cloudWatchLogs.logGroup }}'
+      bucket: '{{ response.project.dataDelivery.s3Destination.bucket }}'
+      prefix: '{{ response.project.dataDelivery.s3Destination.prefix }}'
+- discovery_id: aws.evidently.get_segment
+  calls:
+  - action: get_segment
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.segment.arn }}'
+      createdTime: '{{ response.segment.createdTime }}'
+      description: '{{ response.segment.description }}'
+      experimentCount: '{{ response.segment.experimentCount }}'
+      lastUpdatedTime: '{{ response.segment.lastUpdatedTime }}'
+      launchCount: '{{ response.segment.launchCount }}'
+      name: '{{ response.segment.name }}'
+      pattern: '{{ response.segment.pattern }}'
+      tags: '{{ response.segment.tags }}'
+- discovery_id: aws.evidently.list_experiments
+  calls:
+  - action: list_experiments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.experiments }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      execution: '{{ item.execution }}'
+      experiment: '{{ item.experiment }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      metricGoals: '{{ item.metricGoals }}'
+      name: '{{ item.name }}'
+      onlineAbDefinition: '{{ item.onlineAbDefinition }}'
+      project: '{{ item.project }}'
+      randomizationSalt: '{{ item.randomizationSalt }}'
+      samplingRate: '{{ item.samplingRate }}'
+      schedule: '{{ item.schedule }}'
+      segment: '{{ item.segment }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      tags: '{{ item.tags }}'
+      treatments: '{{ item.treatments }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.evidently.list_features
+  calls:
+  - action: list_features
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.features }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      defaultVariation: '{{ item.defaultVariation }}'
+      evaluationRules: '{{ item.evaluationRules }}'
+      evaluationStrategy: '{{ item.evaluationStrategy }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      name: '{{ item.name }}'
+      project: '{{ item.project }}'
+      status: '{{ item.status }}'
+      tags: '{{ item.tags }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.evidently.list_launches
+  calls:
+  - action: list_launches
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.launches }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdTime: '{{ item.createdTime }}'
+      description: '{{ item.description }}'
+      execution: '{{ item.execution }}'
+      groups: '{{ item.groups }}'
+      lastUpdatedTime: '{{ item.lastUpdatedTime }}'
+      metricMonitors: '{{ item.metricMonitors }}'
+      name: '{{ item.name }}'
+      project: '{{ item.project }}'
+      randomizationSalt: '{{ item.randomizationSalt }}'
+      scheduledSplitsDefinition: '{{ item.scheduledSplitsDefinition }}'
+      status: '{{ item.status }}'
+      statusReason: '{{ item.statusReason }}'
+      tags: '{{ item.tags }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.evidently.list_segment_references
+  calls:
+  - action: list_segment_references
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.referencedBy }}'
+    item:
+      arn: '{{ item.arn }}'
+      endTime: '{{ item.endTime }}'
+      lastUpdatedOn: '{{ item.lastUpdatedOn }}'
+      name: '{{ item.name }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      type: '{{ item.type }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.evidently.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

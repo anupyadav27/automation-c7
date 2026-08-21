@@ -1,0 +1,1789 @@
+version: '1.0'
+provider: aws
+service: connect
+services:
+  client: connect
+  module: boto3.client
+discovery:
+- discovery_id: aws.connect.list_instances
+  calls:
+  - action: list_instances
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.InstanceSummaryList }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      ReplicationConfiguration: '{{ item.ReplicationConfiguration }}'
+      ServiceRole: '{{ item.ServiceRole }}'
+      AccessToken: '{{ item.AccessToken }}'
+      AccessTokenExpiration: '{{ item.AccessTokenExpiration }}'
+      AgentStatus: '{{ item.AgentStatus }}'
+      AllowedAccessControlTags: '{{ item.AllowedAccessControlTags }}'
+      AllowedIps: '{{ item.AllowedIps }}'
+      ApproximateTotalCount: '{{ item.ApproximateTotalCount }}'
+      AuthenticationProfile: '{{ item.AuthenticationProfile }}'
+      AutoEvaluationConfiguration: '{{ item.AutoEvaluationConfiguration }}'
+      BlockedIps: '{{ item.BlockedIps }}'
+      Collections: '{{ item.Collections }}'
+      Constraints: '{{ item.Constraints }}'
+      ContactFlow: '{{ item.ContactFlow }}'
+      ContactFlowId: '{{ item.ContactFlowId }}'
+      ContactFlowModule: '{{ item.ContactFlowModule }}'
+      ContactFlowModuleAlias: '{{ item.ContactFlowModuleAlias }}'
+      CreateTimestamp: '{{ item.CreateTimestamp }}'
+      DataSetId: '{{ item.DataSetId }}'
+      DataSetName: '{{ item.DataSetName }}'
+      DataSnapshotTime: '{{ item.DataSnapshotTime }}'
+      Dimensions: '{{ item.Dimensions }}'
+      EffectiveHoursOfOperationList: '{{ item.EffectiveHoursOfOperationList }}'
+      EvaluationForm: '{{ item.EvaluationForm }}'
+      Fields: '{{ item.Fields }}'
+      HierarchyGroup: '{{ item.HierarchyGroup }}'
+      HierarchyRestrictedResources: '{{ item.HierarchyRestrictedResources }}'
+      HierarchyStructure: '{{ item.HierarchyStructure }}'
+      HoursOfOperation: '{{ item.HoursOfOperation }}'
+      HoursOfOperationOverride: '{{ item.HoursOfOperationOverride }}'
+      IdentityManagementType: '{{ item.IdentityManagementType }}'
+      InboundCallsEnabled: '{{ item.InboundCallsEnabled }}'
+      Instance: '{{ item.Instance }}'
+      InstanceAccessUrl: '{{ item.InstanceAccessUrl }}'
+      InstanceAlias: '{{ item.InstanceAlias }}'
+      InstanceStatus: '{{ item.InstanceStatus }}'
+      Items: '{{ item.Items }}'
+      Key: '{{ item.Key }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      LevelFive: '{{ item.LevelFive }}'
+      LevelFour: '{{ item.LevelFour }}'
+      LevelOne: '{{ item.LevelOne }}'
+      LevelThree: '{{ item.LevelThree }}'
+      LevelTwo: '{{ item.LevelTwo }}'
+      LexBot: '{{ item.LexBot }}'
+      LexRegion: '{{ item.LexRegion }}'
+      LexV2Bot: '{{ item.LexV2Bot }}'
+      Locked: '{{ item.Locked }}'
+      MaxSessionDuration: '{{ item.MaxSessionDuration }}'
+      MetricResults: '{{ item.MetricResults }}'
+      ModifiedTimestamp: '{{ item.ModifiedTimestamp }}'
+      Namespace: '{{ item.Namespace }}'
+      OutboundCallsEnabled: '{{ item.OutboundCallsEnabled }}'
+      PeriodicSessionDuration: '{{ item.PeriodicSessionDuration }}'
+      PredefinedAttribute: '{{ item.PredefinedAttribute }}'
+      PublishStatus: '{{ item.PublishStatus }}'
+      QuickConnect: '{{ item.QuickConnect }}'
+      RefreshToken: '{{ item.RefreshToken }}'
+      RefreshTokenExpiration: '{{ item.RefreshTokenExpiration }}'
+      ResourceShareArn: '{{ item.ResourceShareArn }}'
+      ResourceShareId: '{{ item.ResourceShareId }}'
+      ResourceShareStatus: '{{ item.ResourceShareStatus }}'
+      ScoringStrategy: '{{ item.ScoringStrategy }}'
+      SecurityProfile: '{{ item.SecurityProfile }}'
+      SelfAssignFlowId: '{{ item.SelfAssignFlowId }}'
+      SessionInactivityDuration: '{{ item.SessionInactivityDuration }}'
+      SessionInactivityHandlingEnabled: '{{ item.SessionInactivityHandlingEnabled
+        }}'
+      SignInUrl: '{{ item.SignInUrl }}'
+      SingleSelectOptions: '{{ item.SingleSelectOptions }}'
+      StatusReason: '{{ item.StatusReason }}'
+      TagRestrictedResources: '{{ item.TagRestrictedResources }}'
+      TargetAccountId: '{{ item.TargetAccountId }}'
+      UserArn: '{{ item.UserArn }}'
+- discovery_id: aws.connect.list_phone_numbers_v2
+  calls:
+  - action: list_phone_numbers_v2
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ListPhoneNumbersSummaryList }}'
+    item:
+      PhoneNumberArn: '{{ item.PhoneNumberArn }}'
+      PhoneNumberDescription: '{{ item.PhoneNumberDescription }}'
+      PhoneNumberId: '{{ item.PhoneNumberId }}'
+      SourcePhoneNumberArn: '{{ item.SourcePhoneNumberArn }}'
+      TargetArn: '{{ item.TargetArn }}'
+- discovery_id: aws.connect.list_traffic_distribution_groups
+  calls:
+  - action: list_traffic_distribution_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TrafficDistributionGroupSummaryList }}'
+    item:
+      InstanceArn: '{{ item.InstanceArn }}'
+      TrafficDistributionGroup: '{{ item.TrafficDistributionGroup }}'
+- discovery_id: aws.connect.describe_agent_status
+  calls:
+  - action: describe_agent_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AgentStatus: '{{ response.AgentStatus.AgentStatusId }}'
+      AgentStatusARN: '{{ response.AgentStatus.AgentStatusARN }}'
+      AgentStatusId: '{{ response.AgentStatus.AgentStatusId }}'
+      Description: '{{ response.AgentStatus.Description }}'
+      DisplayOrder: '{{ response.AgentStatus.DisplayOrder }}'
+      LastModifiedRegion: '{{ response.AgentStatus.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.AgentStatus.LastModifiedTime }}'
+      Name: '{{ response.AgentStatus.Name }}'
+      State: '{{ response.AgentStatus.State }}'
+      Tags: '{{ response.AgentStatus.Tags }}'
+      Type: '{{ response.AgentStatus.Type }}'
+- discovery_id: aws.connect.describe_authentication_profile
+  calls:
+  - action: describe_authentication_profile
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AllowedIps: '{{ response.AuthenticationProfile.AllowedIps }}'
+      AuthenticationProfile: '{{ response.AuthenticationProfile.AuthenticationProfile
+        }}'
+      BlockedIps: '{{ response.AuthenticationProfile.BlockedIps }}'
+      MaxSessionDuration: '{{ response.AuthenticationProfile.MaxSessionDuration }}'
+      PeriodicSessionDuration: '{{ response.AuthenticationProfile.PeriodicSessionDuration
+        }}'
+      SessionInactivityDuration: '{{ response.AuthenticationProfile.MaxSessionDuration
+        }}'
+      SessionInactivityHandlingEnabled: '{{ response.AuthenticationProfile.SessionInactivityHandlingEnabled
+        }}'
+      Arn: '{{ response.AuthenticationProfile.Arn }}'
+      CreatedTime: '{{ response.AuthenticationProfile.CreatedTime }}'
+      Description: '{{ response.AuthenticationProfile.Description }}'
+      Id: '{{ response.AuthenticationProfile.Id }}'
+      IsDefault: '{{ response.AuthenticationProfile.IsDefault }}'
+      LastModifiedRegion: '{{ response.AuthenticationProfile.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.AuthenticationProfile.LastModifiedTime }}'
+      Name: '{{ response.AuthenticationProfile.Name }}'
+- discovery_id: aws.connect.describe_contact
+  calls:
+  - action: describe_contact
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AdditionalEmailRecipients: '{{ response.Contact.AdditionalEmailRecipients }}'
+      AnsweringMachineDetectionStatus: '{{ response.Contact.AnsweringMachineDetectionStatus
+        }}'
+      Attributes: '{{ response.Contact.Attributes }}'
+      Campaign: '{{ response.Contact.Campaign }}'
+      ChatMetrics: '{{ response.Contact.ChatMetrics }}'
+      ConnectedToSystemTimestamp: '{{ response.Contact.ConnectedToSystemTimestamp
+        }}'
+      Contact: '{{ response.Contact.Contact }}'
+      ContactAssociationId: '{{ response.Contact.ContactAssociationId }}'
+      ContactDetails: '{{ response.Contact.ContactDetails.Name }}'
+      ContactEvaluations: '{{ response.Contact.ContactEvaluations }}'
+      Customer: '{{ response.Contact.CustomerId }}'
+      CustomerEndpoint: '{{ response.Contact.CustomerEndpoint.Type }}'
+      CustomerId: '{{ response.Contact.CustomerId }}'
+      CustomerVoiceActivity: '{{ response.Contact.CustomerVoiceActivity }}'
+      DisconnectDetails: '{{ response.Contact.DisconnectReason }}'
+      DisconnectReason: '{{ response.Contact.DisconnectReason }}'
+      LastPausedTimestamp: '{{ response.Contact.LastPausedTimestamp }}'
+      LastResumedTimestamp: '{{ response.Contact.LastResumedTimestamp }}'
+      LastUpdateTimestamp: '{{ response.Contact.LastUpdateTimestamp }}'
+      OutboundStrategy: '{{ response.Contact.OutboundStrategy.Type }}'
+      QualityMetrics: '{{ response.Contact.QualityMetrics }}'
+      QueuePriority: '{{ response.Contact.QueuePriority }}'
+      QueueTimeAdjustmentSeconds: '{{ response.Contact.QueueTimeAdjustmentSeconds
+        }}'
+      Recordings: '{{ response.Contact.Recordings }}'
+      RelatedContactId: '{{ response.Contact.RelatedContactId }}'
+      RingStartTimestamp: '{{ response.Contact.Recordings[].StartTimestamp }}'
+      SystemEndpoint: '{{ response.Contact.SystemEndpoint.Type }}'
+      TaskTemplateInfo: '{{ response.Contact.TaskTemplateInfo.Arn }}'
+      TotalPauseCount: '{{ response.Contact.TotalPauseCount }}'
+      TotalPauseDurationInSeconds: '{{ response.Contact.TotalPauseDurationInSeconds
+        }}'
+      WisdomInfo: '{{ response.Contact.WisdomInfo }}'
+      AfterContactWorkDuration: '{{ response.Contact.AgentInfo.AfterContactWorkDuration
+        }}'
+      AfterContactWorkEndTimestamp: '{{ response.Contact.AgentInfo.AfterContactWorkEndTimestamp
+        }}'
+      AfterContactWorkStartTimestamp: '{{ response.Contact.AgentInfo.AfterContactWorkStartTimestamp
+        }}'
+      AgentInitiatedHoldDuration: '{{ response.Contact.AgentInfo.AgentInitiatedHoldDuration
+        }}'
+      AgentPauseDurationInSeconds: '{{ response.Contact.AgentInfo.AgentPauseDurationInSeconds
+        }}'
+      ScreenShare: '{{ response.Contact.AgentInfo.Capabilities.ScreenShare }}'
+      Video: '{{ response.Contact.AgentInfo.Capabilities.Video }}'
+      ConnectedToAgentTimestamp: '{{ response.Contact.AgentInfo.ConnectedToAgentTimestamp
+        }}'
+      OperatingSystem: '{{ response.Contact.AgentInfo.DeviceInfo.OperatingSystem }}'
+      PlatformName: '{{ response.Contact.AgentInfo.DeviceInfo.PlatformName }}'
+      PlatformVersion: '{{ response.Contact.AgentInfo.DeviceInfo.PlatformVersion }}'
+      Arn: '{{ response.Contact.AgentInfo.HierarchyGroups.Level1.Arn }}'
+      Id: '{{ response.Contact.AgentInfo.Id }}'
+      CampaignId: '{{ response.Contact.Campaign.CampaignId }}'
+      Channel: '{{ response.Contact.Channel }}'
+      Description: '{{ response.Contact.ContactDetails.Description }}'
+      Name: '{{ response.Contact.ContactDetails.Name }}'
+      Address: '{{ response.Contact.CustomerEndpoint.Address }}'
+      DisplayName: '{{ response.Contact.CustomerEndpoint.DisplayName }}'
+      Type: '{{ response.Contact.CustomerEndpoint.Type }}'
+      GreetingEndTimestamp: '{{ response.Contact.CustomerVoiceActivity.GreetingEndTimestamp
+        }}'
+      GreetingStartTimestamp: '{{ response.Contact.CustomerVoiceActivity.GreetingStartTimestamp
+        }}'
+      PotentialDisconnectIssue: '{{ response.Contact.DisconnectDetails.PotentialDisconnectIssue
+        }}'
+      DisconnectTimestamp: '{{ response.Contact.DisconnectTimestamp }}'
+      InitialContactId: '{{ response.Contact.InitialContactId }}'
+      InitiationMethod: '{{ response.Contact.InitiationMethod }}'
+      InitiationTimestamp: '{{ response.Contact.InitiationTimestamp }}'
+      PreviousContactId: '{{ response.Contact.PreviousContactId }}'
+      QualityScore: '{{ response.Contact.QualityMetrics.Agent.Audio.QualityScore }}'
+      EnqueueTimestamp: '{{ response.Contact.QueueInfo.EnqueueTimestamp }}'
+      ActivationTimestamp: '{{ response.Contact.RoutingCriteria.ActivationTimestamp
+        }}'
+      Index: '{{ response.Contact.RoutingCriteria.Index }}'
+      ScheduledTimestamp: '{{ response.Contact.ScheduledTimestamp }}'
+      SegmentAttributes: '{{ response.Contact.SegmentAttributes }}'
+      Tags: '{{ response.Contact.Tags }}'
+      SessionArn: '{{ response.Contact.WisdomInfo.SessionArn }}'
+      AcceptedByAgentTimestamp: '{{ response.Contact.AgentInfo.AcceptedByAgentTimestamp
+        }}'
+      PreviewEndTimestamp: '{{ response.Contact.AgentInfo.PreviewEndTimestamp }}'
+      ConversationAbandon: '{{ response.Contact.ChatMetrics.AgentMetrics.ConversationAbandon
+        }}'
+      LastMessageTimestamp: '{{ response.Contact.ChatMetrics.AgentMetrics.LastMessageTimestamp
+        }}'
+      MaxResponseTimeInMillis: '{{ response.Contact.ChatMetrics.AgentMetrics.MaxResponseTimeInMillis
+        }}'
+      MessageLengthInChars: '{{ response.Contact.ChatMetrics.AgentMetrics.MessageLengthInChars
+        }}'
+      MessagesSent: '{{ response.Contact.ChatMetrics.AgentMetrics.MessagesSent }}'
+      NumResponses: '{{ response.Contact.ChatMetrics.AgentMetrics.NumResponses }}'
+      ParticipantId: '{{ response.Contact.ChatMetrics.AgentMetrics.ParticipantId }}'
+      ParticipantType: '{{ response.Contact.ChatMetrics.AgentMetrics.ParticipantType
+        }}'
+      TotalResponseTimeInMillis: '{{ response.Contact.ChatMetrics.AgentMetrics.TotalResponseTimeInMillis
+        }}'
+      AgentFirstResponseTimeInMillis: '{{ response.Contact.ChatMetrics.ChatContactMetrics.AgentFirstResponseTimeInMillis
+        }}'
+      AgentFirstResponseTimestamp: '{{ response.Contact.ChatMetrics.ChatContactMetrics.AgentFirstResponseTimestamp
+        }}'
+      ConversationCloseTimeInMillis: '{{ response.Contact.ChatMetrics.ChatContactMetrics.ConversationCloseTimeInMillis
+        }}'
+      ConversationTurnCount: '{{ response.Contact.ChatMetrics.ChatContactMetrics.ConversationTurnCount
+        }}'
+      MultiParty: '{{ response.Contact.ChatMetrics.ChatContactMetrics.MultiParty }}'
+      TotalBotMessageLengthInChars: '{{ response.Contact.ChatMetrics.ChatContactMetrics.TotalBotMessageLengthInChars
+        }}'
+      TotalBotMessages: '{{ response.Contact.ChatMetrics.ChatContactMetrics.TotalBotMessages
+        }}'
+      TotalMessages: '{{ response.Contact.ChatMetrics.ChatContactMetrics.TotalMessages
+        }}'
+- discovery_id: aws.connect.describe_contact_evaluation
+  calls:
+  - action: describe_contact_evaluation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Answers: '{{ response.Evaluation.Answers }}'
+      EvaluationForm: '{{ response.Evaluation.EvaluationArn }}'
+      Notes: '{{ response.Evaluation.Notes }}'
+      Scores: '{{ response.Evaluation.Scores }}'
+      Description: '{{ response.EvaluationForm.Description }}'
+      EvaluationFormArn: '{{ response.EvaluationForm.EvaluationFormArn }}'
+      EvaluationFormId: '{{ response.EvaluationForm.EvaluationFormId }}'
+      EvaluationFormVersion: '{{ response.EvaluationForm.EvaluationFormVersion }}'
+      Mode: '{{ response.EvaluationForm.ScoringStrategy.Mode }}'
+      Status: '{{ response.EvaluationForm.ScoringStrategy.Status }}'
+      Title: '{{ response.EvaluationForm.Title }}'
+      CreatedTime: '{{ response.Evaluation.CreatedTime }}'
+      EvaluationArn: '{{ response.Evaluation.EvaluationArn }}'
+      EvaluationId: '{{ response.Evaluation.EvaluationId }}'
+      LastModifiedTime: '{{ response.Evaluation.LastModifiedTime }}'
+      ContactAgentId: '{{ response.Evaluation.Metadata.ContactAgentId }}'
+      ContactId: '{{ response.Evaluation.Metadata.ContactId }}'
+      EvaluatorArn: '{{ response.Evaluation.Metadata.EvaluatorArn }}'
+      AutomaticFail: '{{ response.Evaluation.Metadata.Score.AutomaticFail }}'
+      NotApplicable: '{{ response.Evaluation.Metadata.Score.NotApplicable }}'
+      Percentage: '{{ response.Evaluation.Metadata.Score.Percentage }}'
+      Tags: '{{ response.Evaluation.Tags }}'
+      Enabled: '{{ response.EvaluationForm.AutoEvaluationConfiguration.Enabled }}'
+      EvaluationType: '{{ response.Evaluation.EvaluationType }}'
+      AcknowledgedBy: '{{ response.Evaluation.Metadata.Acknowledgement.AcknowledgedBy
+        }}'
+      AcknowledgedTime: '{{ response.Evaluation.Metadata.Acknowledgement.AcknowledgedTime
+        }}'
+      AcknowledgerComment: '{{ response.Evaluation.Metadata.Acknowledgement.AcknowledgerComment
+        }}'
+      AutoEvaluationEnabled: '{{ response.Evaluation.Metadata.AutoEvaluation.AutoEvaluationEnabled
+        }}'
+      AutoEvaluationStatus: '{{ response.Evaluation.Metadata.AutoEvaluation.AutoEvaluationStatus
+        }}'
+      CalibrationSessionId: '{{ response.Evaluation.Metadata.CalibrationSessionId
+        }}'
+- discovery_id: aws.connect.describe_contact_flow
+  calls:
+  - action: describe_contact_flow
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ContactFlow: '{{ response.ContactFlow.ContactFlow }}'
+      Arn: '{{ response.ContactFlow.Arn }}'
+      Content: '{{ response.ContactFlow.Content }}'
+      Description: '{{ response.ContactFlow.Description }}'
+      FlowContentSha256: '{{ response.ContactFlow.FlowContentSha256 }}'
+      Id: '{{ response.ContactFlow.Id }}'
+      LastModifiedRegion: '{{ response.ContactFlow.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.ContactFlow.LastModifiedTime }}'
+      Name: '{{ response.ContactFlow.Name }}'
+      State: '{{ response.ContactFlow.State }}'
+      Status: '{{ response.ContactFlow.Status }}'
+      Tags: '{{ response.ContactFlow.Tags }}'
+      Type: '{{ response.ContactFlow.Type }}'
+      Version: '{{ response.ContactFlow.Version }}'
+      VersionDescription: '{{ response.ContactFlow.VersionDescription }}'
+- discovery_id: aws.connect.describe_contact_flow_module
+  calls:
+  - action: describe_contact_flow_module
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ContactFlowModule: '{{ response.ContactFlowModule.ContactFlowModule }}'
+      DestinationArn: '{{ response.ContactFlowModule.Description }}'
+      Enabled: '{{ response.ContactFlowModule.Name }}'
+      Format: '{{ response.ContactFlowModule.State }}'
+      Arn: '{{ response.ContactFlowModule.Arn }}'
+      Content: '{{ response.ContactFlowModule.Content }}'
+      Description: '{{ response.ContactFlowModule.Description }}'
+      Id: '{{ response.ContactFlowModule.Id }}'
+      Name: '{{ response.ContactFlowModule.Name }}'
+      State: '{{ response.ContactFlowModule.State }}'
+      Status: '{{ response.ContactFlowModule.Status }}'
+      Tags: '{{ response.ContactFlowModule.Tags }}'
+      FlowModuleContentSha256: '{{ response.ContactFlowModule.FlowModuleContentSha256
+        }}'
+      Settings: '{{ response.ContactFlowModule.Settings }}'
+      Version: '{{ response.ContactFlowModule.Version }}'
+      VersionDescription: '{{ response.ContactFlowModule.VersionDescription }}'
+- discovery_id: aws.connect.describe_contact_flow_module_alias
+  calls:
+  - action: describe_contact_flow_module_alias
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AliasId: '{{ response.ContactFlowModuleAlias.AliasId }}'
+      ContactFlowModuleAlias: '{{ response.ContactFlowModuleAlias.ContactFlowModuleArn
+        }}'
+      ContactFlowModuleArn: '{{ response.ContactFlowModuleAlias.ContactFlowModuleArn
+        }}'
+      ContactFlowModuleId: '{{ response.ContactFlowModuleAlias.ContactFlowModuleId
+        }}'
+      Description: '{{ response.ContactFlowModuleAlias.Description }}'
+      LastModifiedRegion: '{{ response.ContactFlowModuleAlias.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.ContactFlowModuleAlias.LastModifiedTime }}'
+      Name: '{{ response.ContactFlowModuleAlias.Name }}'
+      Version: '{{ response.ContactFlowModuleAlias.Version }}'
+- discovery_id: aws.connect.describe_email_address
+  calls:
+  - action: describe_email_address
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AliasConfigurations }}'
+    item:
+      CreateTimestamp: '{{ item.CreateTimestamp }}'
+      ModifiedTimestamp: '{{ item.ModifiedTimestamp }}'
+      Description: '{{ response.Description }}'
+      DisplayName: '{{ response.DisplayName }}'
+      EmailAddress: '{{ response.EmailAddress }}'
+      EmailAddressArn: '{{ response.EmailAddressArn }}'
+      EmailAddressId: '{{ response.EmailAddressId }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.connect.describe_evaluation_form
+  calls:
+  - action: describe_evaluation_form
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AutoEvaluationConfiguration: '{{ response.EvaluationForm.AutoEvaluationConfiguration.Enabled
+        }}'
+      Items: '{{ response.EvaluationForm.Title }}'
+      Locked: '{{ response.EvaluationForm.Locked }}'
+      ScoringStrategy: '{{ response.EvaluationForm.ScoringStrategy.Mode }}'
+      CreatedBy: '{{ response.EvaluationForm.CreatedBy }}'
+      CreatedTime: '{{ response.EvaluationForm.CreatedTime }}'
+      Description: '{{ response.EvaluationForm.Description }}'
+      EvaluationFormArn: '{{ response.EvaluationForm.EvaluationFormArn }}'
+      EvaluationFormId: '{{ response.EvaluationForm.EvaluationFormId }}'
+      EvaluationFormVersion: '{{ response.EvaluationForm.EvaluationFormVersion }}'
+      LastModifiedBy: '{{ response.EvaluationForm.LastModifiedBy }}'
+      LastModifiedTime: '{{ response.EvaluationForm.LastModifiedTime }}'
+      Mode: '{{ response.EvaluationForm.ScoringStrategy.Mode }}'
+      Status: '{{ response.EvaluationForm.ScoringStrategy.Status }}'
+      Tags: '{{ response.EvaluationForm.Tags }}'
+      Title: '{{ response.EvaluationForm.Title }}'
+      Enabled: '{{ response.EvaluationForm.AutoEvaluationConfiguration.Enabled }}'
+- discovery_id: aws.connect.describe_hours_of_operation
+  calls:
+  - action: describe_hours_of_operation
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      HoursOfOperation: '{{ response.HoursOfOperation.HoursOfOperationId }}'
+      Description: '{{ response.HoursOfOperation.Description }}'
+      HoursOfOperationArn: '{{ response.HoursOfOperation.HoursOfOperationArn }}'
+      HoursOfOperationId: '{{ response.HoursOfOperation.HoursOfOperationId }}'
+      LastModifiedRegion: '{{ response.HoursOfOperation.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.HoursOfOperation.LastModifiedTime }}'
+      Name: '{{ response.HoursOfOperation.Name }}'
+      Tags: '{{ response.HoursOfOperation.Tags }}'
+      TimeZone: '{{ response.HoursOfOperation.TimeZone }}'
+- discovery_id: aws.connect.describe_hours_of_operation_override
+  calls:
+  - action: describe_hours_of_operation_override
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      HoursOfOperationOverride: '{{ response.HoursOfOperationOverride.HoursOfOperationOverrideId
+        }}'
+      Description: '{{ response.HoursOfOperationOverride.Description }}'
+      EffectiveFrom: '{{ response.HoursOfOperationOverride.EffectiveFrom }}'
+      EffectiveTill: '{{ response.HoursOfOperationOverride.EffectiveTill }}'
+      HoursOfOperationArn: '{{ response.HoursOfOperationOverride.HoursOfOperationArn
+        }}'
+      HoursOfOperationId: '{{ response.HoursOfOperationOverride.HoursOfOperationId
+        }}'
+      HoursOfOperationOverrideId: '{{ response.HoursOfOperationOverride.HoursOfOperationOverrideId
+        }}'
+      Name: '{{ response.HoursOfOperationOverride.Name }}'
+- discovery_id: aws.connect.describe_instance
+  calls:
+  - action: describe_instance
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ReplicationConfiguration: '{{ response.Instance.ReplicationConfiguration }}'
+      ServiceRole: '{{ response.Instance.ServiceRole }}'
+      IdentityManagementType: '{{ response.Instance.IdentityManagementType }}'
+      InboundCallsEnabled: '{{ response.Instance.InboundCallsEnabled }}'
+      Instance: '{{ response.Instance.InstanceAlias }}'
+      InstanceAccessUrl: '{{ response.Instance.InstanceAccessUrl }}'
+      InstanceAlias: '{{ response.Instance.InstanceAlias }}'
+      InstanceStatus: '{{ response.Instance.InstanceStatus }}'
+      OutboundCallsEnabled: '{{ response.Instance.OutboundCallsEnabled }}'
+      StatusReason: '{{ response.Instance.StatusReason }}'
+      Arn: '{{ response.Instance.Arn }}'
+      CreatedTime: '{{ response.Instance.CreatedTime }}'
+      Id: '{{ response.Instance.Id }}'
+      Message: '{{ response.Instance.StatusReason.Message }}'
+      Tags: '{{ response.Instance.Tags }}'
+      GlobalSignInEndpoint: '{{ response.ReplicationConfiguration.GlobalSignInEndpoint
+        }}'
+      SourceRegion: '{{ response.ReplicationConfiguration.SourceRegion }}'
+- discovery_id: aws.connect.describe_instance_attribute
+  calls:
+  - action: describe_instance_attribute
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Attribute: '{{ response.Attribute.AttributeType }}'
+      AttributeType: '{{ response.Attribute.AttributeType }}'
+      Value: '{{ response.Attribute.Value }}'
+- discovery_id: aws.connect.describe_instance_storage_config
+  calls:
+  - action: describe_instance_storage_config
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AssociationId: '{{ response.StorageConfig.AssociationId }}'
+      KinesisFirehoseConfig: '{{ response.StorageConfig.KinesisFirehoseConfig.FirehoseArn
+        }}'
+      KinesisStreamConfig: '{{ response.StorageConfig.KinesisStreamConfig.StreamArn
+        }}'
+      KinesisVideoStreamConfig: '{{ response.StorageConfig.KinesisVideoStreamConfig.Prefix
+        }}'
+      S3Config: '{{ response.StorageConfig.S3Config }}'
+      StorageType: '{{ response.StorageConfig.StorageType }}'
+      FirehoseArn: '{{ response.StorageConfig.KinesisFirehoseConfig.FirehoseArn }}'
+      StreamArn: '{{ response.StorageConfig.KinesisStreamConfig.StreamArn }}'
+      EncryptionType: '{{ response.StorageConfig.KinesisVideoStreamConfig.EncryptionConfig.EncryptionType
+        }}'
+      KeyId: '{{ response.StorageConfig.KinesisVideoStreamConfig.EncryptionConfig.KeyId
+        }}'
+      Prefix: '{{ response.StorageConfig.KinesisVideoStreamConfig.Prefix }}'
+      RetentionPeriodHours: '{{ response.StorageConfig.KinesisVideoStreamConfig.RetentionPeriodHours
+        }}'
+      BucketName: '{{ response.StorageConfig.S3Config.BucketName }}'
+      BucketPrefix: '{{ response.StorageConfig.S3Config.BucketPrefix }}'
+- discovery_id: aws.connect.describe_phone_number
+  for_each: aws.connect.list_phone_numbers_v2
+  calls:
+  - action: describe_phone_number
+    params:
+      PhoneNumberId: '{{ item.PhoneNumberId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      PhoneNumberArn: '{{ response.ClaimedPhoneNumberSummary.PhoneNumberArn }}'
+      PhoneNumberDescription: '{{ response.ClaimedPhoneNumberSummary.PhoneNumberDescription
+        }}'
+      PhoneNumberId: '{{ response.ClaimedPhoneNumberSummary.PhoneNumberId }}'
+      PhoneNumberStatus: '{{ response.ClaimedPhoneNumberSummary.PhoneNumber }}'
+      SourcePhoneNumberArn: '{{ response.ClaimedPhoneNumberSummary.SourcePhoneNumberArn
+        }}'
+      TargetArn: '{{ response.ClaimedPhoneNumberSummary.TargetArn }}'
+      InstanceId: '{{ response.ClaimedPhoneNumberSummary.InstanceId }}'
+      PhoneNumber: '{{ response.ClaimedPhoneNumberSummary.PhoneNumber }}'
+      PhoneNumberCountryCode: '{{ response.ClaimedPhoneNumberSummary.PhoneNumberCountryCode
+        }}'
+      Message: '{{ response.ClaimedPhoneNumberSummary.PhoneNumberStatus.Message }}'
+      Status: '{{ response.ClaimedPhoneNumberSummary.PhoneNumberStatus.Status }}'
+      PhoneNumberType: '{{ response.ClaimedPhoneNumberSummary.PhoneNumberType }}'
+      Tags: '{{ response.ClaimedPhoneNumberSummary.Tags }}'
+- discovery_id: aws.connect.describe_predefined_attribute
+  calls:
+  - action: describe_predefined_attribute
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      PredefinedAttribute: '{{ response.PredefinedAttribute.PredefinedAttribute }}'
+      LastModifiedRegion: '{{ response.PredefinedAttribute.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.PredefinedAttribute.LastModifiedTime }}'
+      Name: '{{ response.PredefinedAttribute.Name }}'
+      EnableValueValidationOnAssociation: '{{ response.PredefinedAttribute.AttributeConfiguration.EnableValueValidationOnAssociation
+        }}'
+      IsReadOnly: '{{ response.PredefinedAttribute.AttributeConfiguration.IsReadOnly
+        }}'
+- discovery_id: aws.connect.describe_prompt
+  calls:
+  - action: describe_prompt
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Prompt: '{{ response.Prompt.PromptId }}'
+      Description: '{{ response.Prompt.Description }}'
+      LastModifiedRegion: '{{ response.Prompt.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.Prompt.LastModifiedTime }}'
+      Name: '{{ response.Prompt.Name }}'
+      PromptARN: '{{ response.Prompt.PromptARN }}'
+      PromptId: '{{ response.Prompt.PromptId }}'
+      Tags: '{{ response.Prompt.Tags }}'
+- discovery_id: aws.connect.describe_queue
+  calls:
+  - action: describe_queue
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Queue: '{{ response.Queue.QueueId }}'
+      Description: '{{ response.Queue.Description }}'
+      HoursOfOperationId: '{{ response.Queue.HoursOfOperationId }}'
+      LastModifiedRegion: '{{ response.Queue.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.Queue.LastModifiedTime }}'
+      MaxContacts: '{{ response.Queue.MaxContacts }}'
+      Name: '{{ response.Queue.Name }}'
+      OutboundCallerIdName: '{{ response.Queue.OutboundCallerConfig.OutboundCallerIdName
+        }}'
+      OutboundCallerIdNumberId: '{{ response.Queue.OutboundCallerConfig.OutboundCallerIdNumberId
+        }}'
+      OutboundFlowId: '{{ response.Queue.OutboundCallerConfig.OutboundFlowId }}'
+      OutboundEmailAddressId: '{{ response.Queue.OutboundEmailConfig.OutboundEmailAddressId
+        }}'
+      QueueArn: '{{ response.Queue.QueueArn }}'
+      QueueId: '{{ response.Queue.QueueId }}'
+      Status: '{{ response.Queue.Status }}'
+      Tags: '{{ response.Queue.Tags }}'
+- discovery_id: aws.connect.describe_quick_connect
+  calls:
+  - action: describe_quick_connect
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      QuickConnect: '{{ response.QuickConnect.QuickConnectId }}'
+      Description: '{{ response.QuickConnect.Description }}'
+      LastModifiedRegion: '{{ response.QuickConnect.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.QuickConnect.LastModifiedTime }}'
+      Name: '{{ response.QuickConnect.Name }}'
+      QuickConnectARN: '{{ response.QuickConnect.QuickConnectARN }}'
+      PhoneNumber: '{{ response.QuickConnect.QuickConnectConfig.PhoneConfig.PhoneNumber
+        }}'
+      ContactFlowId: '{{ response.QuickConnect.QuickConnectConfig.QueueConfig.ContactFlowId
+        }}'
+      QueueId: '{{ response.QuickConnect.QuickConnectConfig.QueueConfig.QueueId }}'
+      QuickConnectType: '{{ response.QuickConnect.QuickConnectConfig.QuickConnectType
+        }}'
+      UserId: '{{ response.QuickConnect.QuickConnectConfig.UserConfig.UserId }}'
+      QuickConnectId: '{{ response.QuickConnect.QuickConnectId }}'
+      Tags: '{{ response.QuickConnect.Tags }}'
+- discovery_id: aws.connect.describe_routing_profile
+  calls:
+  - action: describe_routing_profile
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AgentAvailabilityTimer: '{{ response.RoutingProfile.AgentAvailabilityTimer }}'
+      DefaultOutboundQueueId: '{{ response.RoutingProfile.DefaultOutboundQueueId }}'
+      Description: '{{ response.RoutingProfile.Description }}'
+      InstanceId: '{{ response.RoutingProfile.InstanceId }}'
+      IsDefault: '{{ response.RoutingProfile.IsDefault }}'
+      LastModifiedRegion: '{{ response.RoutingProfile.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.RoutingProfile.LastModifiedTime }}'
+      Name: '{{ response.RoutingProfile.Name }}'
+      NumberOfAssociatedQueues: '{{ response.RoutingProfile.NumberOfAssociatedQueues
+        }}'
+      NumberOfAssociatedUsers: '{{ response.RoutingProfile.NumberOfAssociatedUsers
+        }}'
+      RoutingProfileArn: '{{ response.RoutingProfile.RoutingProfileArn }}'
+      RoutingProfileId: '{{ response.RoutingProfile.RoutingProfileId }}'
+      Tags: '{{ response.RoutingProfile.Tags }}'
+      NumberOfAssociatedManualAssignmentQueues: '{{ response.RoutingProfile.NumberOfAssociatedManualAssignmentQueues
+        }}'
+- discovery_id: aws.connect.describe_rule
+  calls:
+  - action: describe_rule
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Actions: '{{ response.Rule.Actions }}'
+      Function: '{{ response.Rule.Function }}'
+      LastUpdatedBy: '{{ response.Rule.LastUpdatedBy }}'
+      Rule: '{{ response.Rule.RuleId }}'
+      RuleArn: '{{ response.Rule.RuleArn }}'
+      RuleId: '{{ response.Rule.RuleId }}'
+      TriggerEventSource: '{{ response.Rule.TriggerEventSource }}'
+      CreatedTime: '{{ response.Rule.CreatedTime }}'
+      LastUpdatedTime: '{{ response.Rule.LastUpdatedTime }}'
+      Name: '{{ response.Rule.Name }}'
+      PublishStatus: '{{ response.Rule.PublishStatus }}'
+      Tags: '{{ response.Rule.Tags }}'
+      EventSourceName: '{{ response.Rule.TriggerEventSource.EventSourceName }}'
+      IntegrationAssociationId: '{{ response.Rule.TriggerEventSource.IntegrationAssociationId
+        }}'
+- discovery_id: aws.connect.describe_security_profile
+  calls:
+  - action: describe_security_profile
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AllowedAccessControlHierarchyGroupId: '{{ response.SecurityProfile.AllowedAccessControlHierarchyGroupId
+        }}'
+      AllowedAccessControlTags: '{{ response.SecurityProfile.AllowedAccessControlTags
+        }}'
+      HierarchyRestrictedResources: '{{ response.SecurityProfile.HierarchyRestrictedResources
+        }}'
+      SecurityProfile: '{{ response.SecurityProfile.SecurityProfileName }}'
+      TagRestrictedResources: '{{ response.SecurityProfile.TagRestrictedResources
+        }}'
+      Arn: '{{ response.SecurityProfile.Arn }}'
+      Description: '{{ response.SecurityProfile.Description }}'
+      Id: '{{ response.SecurityProfile.Id }}'
+      LastModifiedRegion: '{{ response.SecurityProfile.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.SecurityProfile.LastModifiedTime }}'
+      OrganizationResourceId: '{{ response.SecurityProfile.OrganizationResourceId
+        }}'
+      SecurityProfileName: '{{ response.SecurityProfile.SecurityProfileName }}'
+      Tags: '{{ response.SecurityProfile.Tags }}'
+- discovery_id: aws.connect.describe_traffic_distribution_group
+  calls:
+  - action: describe_traffic_distribution_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      InstanceArn: '{{ response.TrafficDistributionGroup.InstanceArn }}'
+      TrafficDistributionGroup: '{{ response.TrafficDistributionGroup.TrafficDistributionGroup
+        }}'
+      Arn: '{{ response.TrafficDistributionGroup.Arn }}'
+      Description: '{{ response.TrafficDistributionGroup.Description }}'
+      Id: '{{ response.TrafficDistributionGroup.Id }}'
+      IsDefault: '{{ response.TrafficDistributionGroup.IsDefault }}'
+      Name: '{{ response.TrafficDistributionGroup.Name }}'
+      Status: '{{ response.TrafficDistributionGroup.Status }}'
+      Tags: '{{ response.TrafficDistributionGroup.Tags }}'
+- discovery_id: aws.connect.describe_user
+  calls:
+  - action: describe_user
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.User.Arn }}'
+      DirectoryUserId: '{{ response.User.DirectoryUserId }}'
+      HierarchyGroupId: '{{ response.User.HierarchyGroupId }}'
+      Id: '{{ response.User.Id }}'
+      Email: '{{ response.User.IdentityInfo.Email }}'
+      FirstName: '{{ response.User.IdentityInfo.FirstName }}'
+      LastName: '{{ response.User.IdentityInfo.LastName }}'
+      Mobile: '{{ response.User.IdentityInfo.Mobile }}'
+      SecondaryEmail: '{{ response.User.IdentityInfo.SecondaryEmail }}'
+      LastModifiedRegion: '{{ response.User.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.User.LastModifiedTime }}'
+      AfterContactWorkTimeLimit: '{{ response.User.PhoneConfig.AfterContactWorkTimeLimit
+        }}'
+      AutoAccept: '{{ response.User.PhoneConfig.AutoAccept }}'
+      DeskPhoneNumber: '{{ response.User.PhoneConfig.DeskPhoneNumber }}'
+      PhoneType: '{{ response.User.PhoneConfig.PhoneType }}'
+      RoutingProfileId: '{{ response.User.RoutingProfileId }}'
+      Tags: '{{ response.User.Tags }}'
+      Username: '{{ response.User.Username }}'
+      PersistentConnection: '{{ response.User.PhoneConfig.PersistentConnection }}'
+- discovery_id: aws.connect.describe_user_hierarchy_group
+  calls:
+  - action: describe_user_hierarchy_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      HierarchyGroup: '{{ response.HierarchyGroup.HierarchyGroup }}'
+      Arn: '{{ response.HierarchyGroup.Arn }}'
+      Id: '{{ response.HierarchyGroup.HierarchyPath.LevelFive.Id }}'
+      LastModifiedRegion: '{{ response.HierarchyGroup.HierarchyPath.LevelFive.LastModifiedRegion
+        }}'
+      LastModifiedTime: '{{ response.HierarchyGroup.HierarchyPath.LevelFive.LastModifiedTime
+        }}'
+      Name: '{{ response.HierarchyGroup.HierarchyPath.LevelFive.Name }}'
+      LevelId: '{{ response.HierarchyGroup.LevelId }}'
+      Tags: '{{ response.HierarchyGroup.Tags }}'
+- discovery_id: aws.connect.describe_user_hierarchy_structure
+  calls:
+  - action: describe_user_hierarchy_structure
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      HierarchyStructure: '{{ response.HierarchyStructure.HierarchyStructure }}'
+      LevelFive: '{{ response.HierarchyStructure.LevelFive.Id }}'
+      LevelFour: '{{ response.HierarchyStructure.LevelFour.Id }}'
+      LevelOne: '{{ response.HierarchyStructure.LevelOne.Id }}'
+      LevelThree: '{{ response.HierarchyStructure.LevelThree.Id }}'
+      LevelTwo: '{{ response.HierarchyStructure.LevelTwo.Id }}'
+      Arn: '{{ response.HierarchyStructure.LevelFive.Arn }}'
+      Id: '{{ response.HierarchyStructure.LevelFive.Id }}'
+      LastModifiedRegion: '{{ response.HierarchyStructure.LevelFive.LastModifiedRegion
+        }}'
+      LastModifiedTime: '{{ response.HierarchyStructure.LevelFive.LastModifiedTime
+        }}'
+      Name: '{{ response.HierarchyStructure.LevelFive.Name }}'
+- discovery_id: aws.connect.describe_view
+  calls:
+  - action: describe_view
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ViewContentSha256: '{{ response.View.ViewContentSha256 }}'
+      Arn: '{{ response.View.Arn }}'
+      InputSchema: '{{ response.View.Content.InputSchema }}'
+      Template: '{{ response.View.Content.Template }}'
+      CreatedTime: '{{ response.View.CreatedTime }}'
+      Description: '{{ response.View.Description }}'
+      Id: '{{ response.View.Id }}'
+      LastModifiedTime: '{{ response.View.LastModifiedTime }}'
+      Name: '{{ response.View.Name }}'
+      Status: '{{ response.View.Status }}'
+      Tags: '{{ response.View.Tags }}'
+      Type: '{{ response.View.Type }}'
+      Version: '{{ response.View.Version }}'
+      VersionDescription: '{{ response.View.VersionDescription }}'
+- discovery_id: aws.connect.describe_vocabulary
+  calls:
+  - action: describe_vocabulary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Vocabulary: '{{ response.Vocabulary.Vocabulary }}'
+      Arn: '{{ response.Vocabulary.Arn }}'
+      Content: '{{ response.Vocabulary.Content }}'
+      FailureReason: '{{ response.Vocabulary.FailureReason }}'
+      Id: '{{ response.Vocabulary.Id }}'
+      LanguageCode: '{{ response.Vocabulary.LanguageCode }}'
+      LastModifiedTime: '{{ response.Vocabulary.LastModifiedTime }}'
+      Name: '{{ response.Vocabulary.Name }}'
+      State: '{{ response.Vocabulary.State }}'
+      Tags: '{{ response.Vocabulary.Tags }}'
+- discovery_id: aws.connect.get_attached_file
+  calls:
+  - action: get_attached_file
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AWSIdentityArn: '{{ response.CreatedBy.AWSIdentityArn }}'
+      ConnectUserArn: '{{ response.CreatedBy.ConnectUserArn }}'
+      AssociatedResourceArn: '{{ response.AssociatedResourceArn }}'
+      CreationTime: '{{ response.CreationTime }}'
+      Url: '{{ response.DownloadUrlMetadata.Url }}'
+      UrlExpiry: '{{ response.DownloadUrlMetadata.UrlExpiry }}'
+      FileArn: '{{ response.FileArn }}'
+      FileId: '{{ response.FileId }}'
+      FileName: '{{ response.FileName }}'
+      FileSizeInBytes: '{{ response.FileSizeInBytes }}'
+      FileStatus: '{{ response.FileStatus }}'
+      FileUseCaseType: '{{ response.FileUseCaseType }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.connect.get_contact_attributes
+  calls:
+  - action: get_contact_attributes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Attributes: '{{ response.Attributes }}'
+- discovery_id: aws.connect.get_contact_metrics
+  calls:
+  - action: get_contact_metrics
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MetricResults }}'
+    item:
+      MetricResults: '{{ item.MetricResults }}'
+      Value: '{{ item.Value }}'
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+- discovery_id: aws.connect.get_current_metric_data
+  calls:
+  - action: get_current_metric_data
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MetricResults }}'
+    item:
+      ApproximateTotalCount: '{{ item.ApproximateTotalCount }}'
+      Collections: '{{ item.Collections }}'
+      DataSnapshotTime: '{{ item.DataSnapshotTime }}'
+      Dimensions: '{{ item.Dimensions }}'
+      MetricResults: '{{ item.MetricResults }}'
+- discovery_id: aws.connect.get_current_user_data
+  calls:
+  - action: get_current_user_data
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UserDataList }}'
+    item:
+      ActiveSlotsByChannel: '{{ item.ActiveSlotsByChannel }}'
+      ApproximateTotalCount: '{{ item.ApproximateTotalCount }}'
+      AvailableSlotsByChannel: '{{ item.AvailableSlotsByChannel }}'
+      Contacts: '{{ item.Contacts }}'
+      MaxSlotsByChannel: '{{ item.MaxSlotsByChannel }}'
+      NextStatus: '{{ item.NextStatus }}'
+      RoutingProfile: '{{ item.RoutingProfile }}'
+      User: '{{ item.User }}'
+      UserDataList: '{{ item.UserDataList }}'
+- discovery_id: aws.connect.get_effective_hours_of_operations
+  calls:
+  - action: get_effective_hours_of_operations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EffectiveHoursOfOperationList }}'
+    item:
+      Date: '{{ item.Date }}'
+      EffectiveHoursOfOperationList: '{{ item.EffectiveHoursOfOperationList[].Date
+        }}'
+      OperationalHours: '{{ item.OperationalHours }}'
+      TimeZone: '{{ response.TimeZone }}'
+- discovery_id: aws.connect.get_federation_token
+  calls:
+  - action: get_federation_token
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccessToken: '{{ response.Credentials.AccessToken }}'
+      AccessTokenExpiration: '{{ response.Credentials.AccessTokenExpiration }}'
+      Credentials: '{{ response.Credentials.Credentials }}'
+      RefreshToken: '{{ response.Credentials.RefreshToken }}'
+      RefreshTokenExpiration: '{{ response.Credentials.RefreshTokenExpiration }}'
+      SignInUrl: '{{ response.Credentials.SignInUrl }}'
+      UserArn: '{{ response.UserArn }}'
+      UserId: '{{ response.UserId }}'
+- discovery_id: aws.connect.get_flow_association
+  calls:
+  - action: get_flow_association
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ResourceId: '{{ response.ResourceId }}'
+      FlowId: '{{ response.FlowId }}'
+      ResourceType: '{{ response.ResourceType }}'
+- discovery_id: aws.connect.get_metric_data
+  calls:
+  - action: get_metric_data
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MetricResults }}'
+    item:
+      Collections: '{{ item.Collections }}'
+      Dimensions: '{{ item.Dimensions }}'
+- discovery_id: aws.connect.get_metric_data_v2
+  calls:
+  - action: get_metric_data_v2
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MetricResults }}'
+    item:
+      Collections: '{{ item.Collections }}'
+      Dimensions: '{{ item.Dimensions }}'
+      MetricInterval: '{{ item.MetricInterval }}'
+- discovery_id: aws.connect.get_prompt_file
+  calls:
+  - action: get_prompt_file
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+      LastModifiedRegion: '{{ response.LastModifiedRegion }}'
+      PromptPresignedUrl: '{{ response.PromptPresignedUrl }}'
+- discovery_id: aws.connect.get_task_template
+  calls:
+  - action: get_task_template
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Fields }}'
+    item:
+      Constraints: '{{ item.Constraints }}'
+      Defaults: '{{ item.Defaults }}'
+      Fields: '{{ item.Fields }}'
+      SelfAssignFlowId: '{{ item.SelfAssignFlowId }}'
+      SingleSelectOptions: '{{ item.SingleSelectOptions }}'
+      Arn: '{{ response.Arn }}'
+      ContactFlowId: '{{ response.ContactFlowId }}'
+      CreatedTime: '{{ response.CreatedTime }}'
+      Description: '{{ response.Description }}'
+      Id: '{{ response.Id }}'
+      InstanceId: '{{ response.InstanceId }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+      Name: '{{ response.Name }}'
+      Status: '{{ response.Status }}'
+      Tags: '{{ response.Tags }}'
+- discovery_id: aws.connect.get_traffic_distribution
+  calls:
+  - action: get_traffic_distribution
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Distributions: '{{ response.TelephonyConfig.Distributions[].Region }}'
+      Arn: '{{ response.Arn }}'
+      Id: '{{ response.Id }}'
+- discovery_id: aws.connect.list_agent_statuses
+  calls:
+  - action: list_agent_statuses
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AgentStatusSummaryList }}'
+    item:
+      AgentStatus: '{{ item.AgentStatus }}'
+- discovery_id: aws.connect.list_analytics_data_associations
+  calls:
+  - action: list_analytics_data_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Results }}'
+    item:
+      DataSetId: '{{ item.DataSetId }}'
+      ResourceShareArn: '{{ item.ResourceShareArn }}'
+      ResourceShareId: '{{ item.ResourceShareId }}'
+      ResourceShareStatus: '{{ item.ResourceShareStatus }}'
+      TargetAccountId: '{{ item.TargetAccountId }}'
+- discovery_id: aws.connect.list_analytics_data_lake_data_sets
+  calls:
+  - action: list_analytics_data_lake_data_sets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Results }}'
+    item:
+      DataSetId: '{{ item.DataSetId }}'
+      DataSetName: '{{ item.DataSetName }}'
+- discovery_id: aws.connect.list_approved_origins
+  calls:
+  - action: list_approved_origins
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Origins }}'
+- discovery_id: aws.connect.list_associated_contacts
+  calls:
+  - action: list_associated_contacts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ContactSummaryList }}'
+    item:
+      Contact: '{{ item.Contact }}'
+      ContactArn: '{{ item.ContactArn }}'
+      ContactId: '{{ item.ContactId }}'
+      RelatedContactId: '{{ item.RelatedContactId }}'
+- discovery_id: aws.connect.list_authentication_profiles
+  calls:
+  - action: list_authentication_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AuthenticationProfileSummaryList }}'
+    item:
+      AuthenticationProfile: '{{ item.AuthenticationProfile }}'
+- discovery_id: aws.connect.list_bots
+  calls:
+  - action: list_bots
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LexBots }}'
+    item:
+      LexBot: '{{ item.LexBot }}'
+      LexV2Bot: '{{ item.LexV2Bot }}'
+- discovery_id: aws.connect.list_contact_evaluations
+  calls:
+  - action: list_contact_evaluations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EvaluationSummaryList }}'
+    item:
+      Acknowledgement: '{{ item.Acknowledgement }}'
+      AutoEvaluationStatus: '{{ item.AutoEvaluationStatus }}'
+      CalibrationSessionId: '{{ item.CalibrationSessionId }}'
+      EvaluationForm: '{{ item.EvaluationForm }}'
+      EvaluationFormTitle: '{{ item.EvaluationFormTitle }}'
+      EvaluatorArn: '{{ item.EvaluatorArn }}'
+      Score: '{{ item.Score }}'
+- discovery_id: aws.connect.list_contact_flow_module_aliases
+  calls:
+  - action: list_contact_flow_module_aliases
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ContactFlowModuleAliasSummaryList }}'
+    item:
+      AliasDescription: '{{ item.AliasDescription }}'
+      AliasId: '{{ item.AliasId }}'
+      AliasName: '{{ item.AliasName }}'
+      ContactFlow: '{{ item.ContactFlow }}'
+      ContactFlowModule: '{{ item.ContactFlowModule }}'
+      ContactFlowModuleAlias: '{{ item.ContactFlowModuleAlias }}'
+- discovery_id: aws.connect.list_contact_flow_module_versions
+  calls:
+  - action: list_contact_flow_module_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ContactFlowModuleVersionSummaryList }}'
+- discovery_id: aws.connect.list_contact_flow_modules
+  calls:
+  - action: list_contact_flow_modules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ContactFlowModulesSummaryList }}'
+- discovery_id: aws.connect.list_contact_flow_versions
+  calls:
+  - action: list_contact_flow_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ContactFlowVersionSummaryList }}'
+- discovery_id: aws.connect.list_contact_flows
+  calls:
+  - action: list_contact_flows
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ContactFlowSummaryList }}'
+    item:
+      ContactFlow: '{{ item.ContactFlow }}'
+      ContactFlowId: '{{ item.ContactFlowId }}'
+      ContactFlowState: '{{ item.ContactFlowState }}'
+      ContactFlowStatus: '{{ item.ContactFlowStatus }}'
+      ContactFlowType: '{{ item.ContactFlowType }}'
+      SelfAssignFlowId: '{{ item.SelfAssignFlowId }}'
+- discovery_id: aws.connect.list_contact_references
+  calls:
+  - action: list_contact_references
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ReferenceSummaryList }}'
+    item:
+      Attachment: '{{ item.Attachment }}'
+      Date: '{{ item.Date }}'
+      Email: '{{ item.Email }}'
+      EmailMessage: '{{ item.EmailMessage }}'
+      Number: '{{ item.Number }}'
+      String: '{{ item.String }}'
+      Url: '{{ item.Url }}'
+- discovery_id: aws.connect.list_default_vocabularies
+  calls:
+  - action: list_default_vocabularies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DefaultVocabularyList }}'
+    item:
+      VocabularyId: '{{ item.VocabularyId }}'
+      VocabularyName: '{{ item.VocabularyName }}'
+- discovery_id: aws.connect.list_evaluation_form_versions
+  calls:
+  - action: list_evaluation_form_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EvaluationFormVersionSummaryList }}'
+    item:
+      Locked: '{{ item.Locked }}'
+- discovery_id: aws.connect.list_evaluation_forms
+  calls:
+  - action: list_evaluation_forms
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EvaluationFormSummaryList }}'
+    item:
+      EvaluationForm: '{{ item.EvaluationForm }}'
+- discovery_id: aws.connect.list_flow_associations
+  calls:
+  - action: list_flow_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.FlowAssociationSummaryList }}'
+    item:
+      ResourceId: '{{ item.ResourceId }}'
+      FlowId: '{{ item.FlowId }}'
+      ResourceType: '{{ item.ResourceType }}'
+- discovery_id: aws.connect.list_hours_of_operation_overrides
+  calls:
+  - action: list_hours_of_operation_overrides
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HoursOfOperationOverrideList }}'
+    item:
+      HoursOfOperation: '{{ item.HoursOfOperation }}'
+      HoursOfOperationOverride: '{{ item.HoursOfOperationOverride }}'
+      LastModifiedRegion: '{{ response.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+- discovery_id: aws.connect.list_hours_of_operations
+  calls:
+  - action: list_hours_of_operations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HoursOfOperationSummaryList }}'
+    item:
+      HoursOfOperation: '{{ item.HoursOfOperation }}'
+- discovery_id: aws.connect.list_instance_attributes
+  calls:
+  - action: list_instance_attributes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Attributes }}'
+    item:
+      Attribute: '{{ item.Attribute }}'
+      AttributeType: '{{ item.AttributeType }}'
+      Value: '{{ item.Value }}'
+- discovery_id: aws.connect.list_instance_storage_configs
+  calls:
+  - action: list_instance_storage_configs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.StorageConfigs }}'
+    item:
+      AssociationId: '{{ item.AssociationId }}'
+      KinesisFirehoseConfig: '{{ item.KinesisFirehoseConfig }}'
+      KinesisStreamConfig: '{{ item.KinesisStreamConfig }}'
+      KinesisVideoStreamConfig: '{{ item.KinesisVideoStreamConfig }}'
+      S3Config: '{{ item.S3Config }}'
+      StorageType: '{{ item.StorageType }}'
+- discovery_id: aws.connect.list_integration_associations
+  calls:
+  - action: list_integration_associations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.IntegrationAssociationSummaryList }}'
+    item:
+      IntegrationArn: '{{ item.IntegrationArn }}'
+      IntegrationAssociationArn: '{{ item.IntegrationAssociationArn }}'
+      IntegrationAssociationId: '{{ item.IntegrationAssociationId }}'
+      IntegrationType: '{{ item.IntegrationType }}'
+      SourceApplicationName: '{{ item.SourceApplicationName }}'
+      SourceApplicationUrl: '{{ item.SourceApplicationUrl }}'
+      SourceType: '{{ item.SourceType }}'
+- discovery_id: aws.connect.list_lambda_functions
+  calls:
+  - action: list_lambda_functions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LambdaFunctions }}'
+- discovery_id: aws.connect.list_lex_bots
+  calls:
+  - action: list_lex_bots
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.LexBots }}'
+    item:
+      LexRegion: '{{ item.LexRegion }}'
+- discovery_id: aws.connect.list_phone_numbers
+  calls:
+  - action: list_phone_numbers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PhoneNumberSummaryList }}'
+- discovery_id: aws.connect.list_predefined_attributes
+  calls:
+  - action: list_predefined_attributes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PredefinedAttributeSummaryList }}'
+    item:
+      PredefinedAttribute: '{{ item.PredefinedAttribute }}'
+- discovery_id: aws.connect.list_prompts
+  calls:
+  - action: list_prompts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PromptSummaryList }}'
+    item:
+      Prompt: '{{ item.Prompt }}'
+- discovery_id: aws.connect.list_queue_quick_connects
+  calls:
+  - action: list_queue_quick_connects
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.QuickConnectSummaryList }}'
+    item:
+      Queue: '{{ item.Queue }}'
+      QuickConnect: '{{ item.QuickConnect }}'
+      QuickConnectType: '{{ item.QuickConnectType }}'
+      LastModifiedRegion: '{{ response.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+- discovery_id: aws.connect.list_queues
+  calls:
+  - action: list_queues
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.QueueSummaryList }}'
+    item:
+      QueueType: '{{ item.QueueType }}'
+- discovery_id: aws.connect.list_quick_connects
+  calls:
+  - action: list_quick_connects
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.QuickConnectSummaryList }}'
+    item:
+      QuickConnect: '{{ item.QuickConnect }}'
+      QuickConnectType: '{{ item.QuickConnectType }}'
+- discovery_id: aws.connect.list_realtime_contact_analysis_segments_v2
+  calls:
+  - action: list_realtime_contact_analysis_segments_v2
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Segments }}'
+    item:
+      Attachments: '{{ item.Attachments }}'
+      Categories: '{{ item.Categories }}'
+      Event: '{{ item.Event }}'
+      Issues: '{{ item.Issues }}'
+      PostContactSummary: '{{ item.PostContactSummary }}'
+      Transcript: '{{ item.Transcript }}'
+      Channel: '{{ response.Channel }}'
+      Status: '{{ response.Status }}'
+- discovery_id: aws.connect.list_routing_profile_manual_assignment_queues
+  calls:
+  - action: list_routing_profile_manual_assignment_queues
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RoutingProfileManualAssignmentQueueConfigSummaryList }}'
+    item:
+      QueueName: '{{ item.QueueName }}'
+      LastModifiedRegion: '{{ response.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+- discovery_id: aws.connect.list_routing_profile_queues
+  calls:
+  - action: list_routing_profile_queues
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RoutingProfileQueueConfigSummaryList }}'
+    item:
+      Delay: '{{ item.Delay }}'
+      Priority: '{{ item.Priority }}'
+      QueueName: '{{ item.QueueName }}'
+      LastModifiedRegion: '{{ response.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+- discovery_id: aws.connect.list_routing_profiles
+  calls:
+  - action: list_routing_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RoutingProfileSummaryList }}'
+- discovery_id: aws.connect.list_rules
+  calls:
+  - action: list_rules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RuleSummaryList }}'
+    item:
+      ActionSummaries: '{{ item.ActionSummaries }}'
+      EventSourceName: '{{ item.EventSourceName }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+      PublishStatus: '{{ item.PublishStatus }}'
+      Rule: '{{ item.Rule }}'
+      RuleArn: '{{ item.RuleArn }}'
+      RuleId: '{{ item.RuleId }}'
+- discovery_id: aws.connect.list_security_keys
+  calls:
+  - action: list_security_keys
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SecurityKeys }}'
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      AssociationId: '{{ item.AssociationId }}'
+      Key: '{{ item.Key }}'
+- discovery_id: aws.connect.list_security_profile_applications
+  calls:
+  - action: list_security_profile_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Applications }}'
+    item:
+      ApplicationPermissions: '{{ item.ApplicationPermissions }}'
+      Namespace: '{{ item.Namespace }}'
+      SecurityProfile: '{{ item.SecurityProfile }}'
+      LastModifiedRegion: '{{ response.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+- discovery_id: aws.connect.list_security_profile_permissions
+  calls:
+  - action: list_security_profile_permissions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Permissions }}'
+    item:
+      LastModifiedRegion: '{{ response.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+- discovery_id: aws.connect.list_security_profiles
+  calls:
+  - action: list_security_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SecurityProfileSummaryList }}'
+    item:
+      SecurityProfile: '{{ item.SecurityProfile }}'
+- discovery_id: aws.connect.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.connect.list_task_templates
+  calls:
+  - action: list_task_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TaskTemplates }}'
+    item:
+      Constraints: '{{ item.Constraints }}'
+      Defaults: '{{ item.Defaults }}'
+      Fields: '{{ item.Fields }}'
+      SelfAssignFlowId: '{{ item.SelfAssignFlowId }}'
+- discovery_id: aws.connect.list_traffic_distribution_group_users
+  calls:
+  - action: list_traffic_distribution_group_users
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.TrafficDistributionGroupUserSummaryList }}'
+    item:
+      UserId: '{{ item.UserId }}'
+- discovery_id: aws.connect.list_use_cases
+  calls:
+  - action: list_use_cases
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UseCaseSummaryList }}'
+    item:
+      UseCaseArn: '{{ item.UseCaseArn }}'
+      UseCaseId: '{{ item.UseCaseId }}'
+      UseCaseType: '{{ item.UseCaseType }}'
+- discovery_id: aws.connect.list_user_hierarchy_groups
+  calls:
+  - action: list_user_hierarchy_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UserHierarchyGroupSummaryList }}'
+    item:
+      HierarchyGroup: '{{ item.HierarchyGroup }}'
+- discovery_id: aws.connect.list_user_proficiencies
+  calls:
+  - action: list_user_proficiencies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UserProficiencyList }}'
+    item:
+      AttributeName: '{{ item.AttributeName }}'
+      AttributeValue: '{{ item.AttributeValue }}'
+      Level: '{{ item.Level }}'
+      LastModifiedRegion: '{{ response.LastModifiedRegion }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+- discovery_id: aws.connect.list_users
+  calls:
+  - action: list_users
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UserSummaryList }}'
+    item:
+      UserArn: '{{ item.UserArn }}'
+- discovery_id: aws.connect.list_view_versions
+  calls:
+  - action: list_view_versions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ViewVersionSummaryList }}'
+- discovery_id: aws.connect.list_views
+  calls:
+  - action: list_views
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ViewsSummaryList }}'
+- discovery_id: aws.connect.search_agent_statuses
+  calls:
+  - action: search_agent_statuses
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AgentStatuses }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_available_phone_numbers
+  calls:
+  - action: search_available_phone_numbers
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AvailableNumbersList }}'
+- discovery_id: aws.connect.search_contact_evaluations
+  calls:
+  - action: search_contact_evaluations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EvaluationSearchSummaryList }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_contact_flow_modules
+  calls:
+  - action: search_contact_flow_modules
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ContactFlowModules }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_contact_flows
+  calls:
+  - action: search_contact_flows
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ContactFlows }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_contacts
+  calls:
+  - action: search_contacts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Contacts }}'
+    item:
+      TotalCount: '{{ response.TotalCount }}'
+- discovery_id: aws.connect.search_email_addresses
+  calls:
+  - action: search_email_addresses
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EmailAddresses }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_evaluation_forms
+  calls:
+  - action: search_evaluation_forms
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.EvaluationFormSearchSummaryList }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_hours_of_operation_overrides
+  calls:
+  - action: search_hours_of_operation_overrides
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HoursOfOperationOverrides }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_hours_of_operations
+  calls:
+  - action: search_hours_of_operations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.HoursOfOperations }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_predefined_attributes
+  calls:
+  - action: search_predefined_attributes
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.PredefinedAttributes }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_prompts
+  calls:
+  - action: search_prompts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Prompts }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_queues
+  calls:
+  - action: search_queues
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Queues }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_quick_connects
+  calls:
+  - action: search_quick_connects
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.QuickConnects }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_resource_tags
+  calls:
+  - action: search_resource_tags
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+- discovery_id: aws.connect.search_routing_profiles
+  calls:
+  - action: search_routing_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RoutingProfiles }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_security_profiles
+  calls:
+  - action: search_security_profiles
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SecurityProfiles }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_user_hierarchy_groups
+  calls:
+  - action: search_user_hierarchy_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.UserHierarchyGroups }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_users
+  calls:
+  - action: search_users
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Users }}'
+    item:
+      ApproximateTotalCount: '{{ response.ApproximateTotalCount }}'
+- discovery_id: aws.connect.search_vocabularies
+  calls:
+  - action: search_vocabularies
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.VocabularySummaryList }}'

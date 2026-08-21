@@ -1,0 +1,316 @@
+version: '1.0'
+provider: aws
+service: migrationhuborchestrator
+services:
+  client: migrationhuborchestrator
+  module: boto3.client
+discovery:
+- discovery_id: aws.migrationhuborchestrator.list_plugins
+  calls:
+  - action: list_plugins
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.plugins }}'
+    item:
+      hostname: '{{ item.hostname }}'
+      ipAddress: '{{ item.ipAddress }}'
+      pluginId: '{{ item.pluginId }}'
+      registeredTime: '{{ item.registeredTime }}'
+      status: '{{ item.status }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.migrationhuborchestrator.list_templates
+  calls:
+  - action: list_templates
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.templateSummary }}'
+    item:
+      arn: '{{ item.arn }}'
+      description: '{{ item.description }}'
+      id: '{{ item.id }}'
+      inputs: '{{ item.inputs }}'
+      name: '{{ item.name }}'
+      tags: '{{ item.tags }}'
+      templateArn: '{{ item.templateArn }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.migrationhuborchestrator.list_workflows
+  calls:
+  - action: list_workflows
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.migrationWorkflowSummary }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      adsApplicationConfigurationName: '{{ item.adsApplicationConfigurationName }}'
+      completedSteps: '{{ item.completedSteps }}'
+      creationTime: '{{ item.creationTime }}'
+      endTime: '{{ item.endTime }}'
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      templateId: '{{ item.templateId }}'
+      totalSteps: '{{ item.totalSteps }}'
+      workflowId: '{{ item.workflowId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.migrationhuborchestrator.get_template
+  for_each: aws.migrationhuborchestrator.list_templates
+  calls:
+  - action: get_template
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.inputs }}'
+    item:
+      dataType: '{{ item.dataType }}'
+      inputName: '{{ item.inputName }}'
+      inputs: '{{ item.inputs }}'
+      required: '{{ item.required }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      owner: '{{ response.owner }}'
+      status: '{{ response.status }}'
+      statusMessage: '{{ response.statusMessage }}'
+      tags: '{{ response.tags }}'
+      templateArn: '{{ response.templateArn }}'
+      templateClass: '{{ response.templateClass }}'
+- discovery_id: aws.migrationhuborchestrator.get_template_step
+  for_each: aws.migrationhuborchestrator.list_templates
+  calls:
+  - action: get_template_step
+    params:
+      id: '{{ item.id }}'
+      templateId: '{{ item.templateId }}'
+      stepGroupId: '{{ item.stepGroupId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.previous }}'
+    item:
+      outputs: '{{ item.outputs }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      name: '{{ response.name }}'
+      stepActionType: '{{ response.stepActionType }}'
+      linux: '{{ response.stepAutomationConfiguration.command.linux }}'
+      windows: '{{ response.stepAutomationConfiguration.command.windows }}'
+      runEnvironment: '{{ response.stepAutomationConfiguration.runEnvironment }}'
+      scriptLocationS3Bucket: '{{ response.stepAutomationConfiguration.scriptLocationS3Bucket }}'
+      targetType: '{{ response.stepAutomationConfiguration.targetType }}'
+      stepGroupId: '{{ response.stepGroupId }}'
+      templateId: '{{ response.templateId }}'
+- discovery_id: aws.migrationhuborchestrator.get_template_step_group
+  for_each: aws.migrationhuborchestrator.list_templates
+  calls:
+  - action: get_template_step_group
+    params:
+      templateId: '{{ item.templateId }}'
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tools }}'
+    item:
+      name: '{{ item.name }}'
+      url: '{{ item.url }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      id: '{{ response.id }}'
+      lastModifiedTime: '{{ response.lastModifiedTime }}'
+      status: '{{ response.status }}'
+      templateId: '{{ response.templateId }}'
+- discovery_id: aws.migrationhuborchestrator.get_workflow
+  for_each: aws.migrationhuborchestrator.list_templates
+  calls:
+  - action: get_workflow
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tools }}'
+    item:
+      name: '{{ item.name }}'
+      url: '{{ item.url }}'
+      adsApplicationConfigurationId: '{{ response.adsApplicationConfigurationId }}'
+      adsApplicationName: '{{ response.adsApplicationName }}'
+      arn: '{{ response.arn }}'
+      completedSteps: '{{ response.completedSteps }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      endTime: '{{ response.endTime }}'
+      id: '{{ response.id }}'
+      lastModifiedTime: '{{ response.lastModifiedTime }}'
+      lastStartTime: '{{ response.lastStartTime }}'
+      lastStopTime: '{{ response.lastStopTime }}'
+      status: '{{ response.status }}'
+      statusMessage: '{{ response.statusMessage }}'
+      tags: '{{ response.tags }}'
+      templateId: '{{ response.templateId }}'
+      totalSteps: '{{ response.totalSteps }}'
+      workflowBucket: '{{ response.workflowBucket }}'
+      workflowInputs: '{{ response.workflowInputs }}'
+- discovery_id: aws.migrationhuborchestrator.get_workflow_step
+  for_each: aws.migrationhuborchestrator.list_templates
+  calls:
+  - action: get_workflow_step
+    params:
+      workflowId: '{{ item.workflowId }}'
+      stepGroupId: '{{ item.stepGroupId }}'
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.stepTarget }}'
+    item:
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      endTime: '{{ response.endTime }}'
+      lastStartTime: '{{ response.lastStartTime }}'
+      name: '{{ response.name }}'
+      noOfSrvCompleted: '{{ response.noOfSrvCompleted }}'
+      noOfSrvFailed: '{{ response.noOfSrvFailed }}'
+      owner: '{{ response.owner }}'
+      scriptOutputLocation: '{{ response.scriptOutputLocation }}'
+      status: '{{ response.status }}'
+      statusMessage: '{{ response.statusMessage }}'
+      stepActionType: '{{ response.stepActionType }}'
+      stepGroupId: '{{ response.stepGroupId }}'
+      stepId: '{{ response.stepId }}'
+      totalNoOfSrv: '{{ response.totalNoOfSrv }}'
+      workflowId: '{{ response.workflowId }}'
+      linux: '{{ response.workflowStepAutomationConfiguration.command.linux }}'
+      windows: '{{ response.workflowStepAutomationConfiguration.command.windows }}'
+      runEnvironment: '{{ response.workflowStepAutomationConfiguration.runEnvironment }}'
+      scriptLocationS3Bucket: '{{ response.workflowStepAutomationConfiguration.scriptLocationS3Bucket }}'
+      targetType: '{{ response.workflowStepAutomationConfiguration.targetType }}'
+- discovery_id: aws.migrationhuborchestrator.get_workflow_step_group
+  for_each: aws.migrationhuborchestrator.list_templates
+  calls:
+  - action: get_workflow_step_group
+    params:
+      id: '{{ item.id }}'
+      workflowId: '{{ item.workflowId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tools }}'
+    item:
+      name: '{{ item.name }}'
+      url: '{{ item.url }}'
+      creationTime: '{{ response.creationTime }}'
+      description: '{{ response.description }}'
+      endTime: '{{ response.endTime }}'
+      id: '{{ response.id }}'
+      lastModifiedTime: '{{ response.lastModifiedTime }}'
+      owner: '{{ response.owner }}'
+      status: '{{ response.status }}'
+      workflowId: '{{ response.workflowId }}'
+- discovery_id: aws.migrationhuborchestrator.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'
+- discovery_id: aws.migrationhuborchestrator.list_template_step_groups
+  for_each: aws.migrationhuborchestrator.list_workflows
+  calls:
+  - action: list_template_step_groups
+    params:
+      templateId: '{{ item.templateId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.templateStepGroupSummary }}'
+    item:
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      next: '{{ item.next }}'
+      outputs: '{{ item.outputs }}'
+      previous: '{{ item.previous }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.migrationhuborchestrator.list_template_steps
+  for_each: aws.migrationhuborchestrator.list_workflows
+  calls:
+  - action: list_template_steps
+    params:
+      templateId: '{{ item.templateId }}'
+      stepGroupId: '{{ item.stepGroupId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.templateStepSummaryList }}'
+    item:
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      next: '{{ item.next }}'
+      owner: '{{ item.owner }}'
+      previous: '{{ item.previous }}'
+      stepActionType: '{{ item.stepActionType }}'
+      stepGroupId: '{{ item.stepGroupId }}'
+      targetType: '{{ item.targetType }}'
+      templateId: '{{ item.templateId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.migrationhuborchestrator.list_workflow_step_groups
+  calls:
+  - action: list_workflow_step_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workflowStepGroupsSummary }}'
+    item:
+      id: '{{ item.id }}'
+      name: '{{ item.name }}'
+      next: '{{ item.next }}'
+      owner: '{{ item.owner }}'
+      previous: '{{ item.previous }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.migrationhuborchestrator.list_workflow_steps
+  calls:
+  - action: list_workflow_steps
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.workflowStepsSummary }}'
+    item:
+      description: '{{ item.description }}'
+      name: '{{ item.name }}'
+      next: '{{ item.next }}'
+      noOfSrvCompleted: '{{ item.noOfSrvCompleted }}'
+      noOfSrvFailed: '{{ item.noOfSrvFailed }}'
+      owner: '{{ item.owner }}'
+      previous: '{{ item.previous }}'
+      scriptLocation: '{{ item.scriptLocation }}'
+      status: '{{ item.status }}'
+      statusMessage: '{{ item.statusMessage }}'
+      stepActionType: '{{ item.stepActionType }}'
+      stepId: '{{ item.stepId }}'
+      totalNoOfSrv: '{{ item.totalNoOfSrv }}'
+      nextToken: '{{ response.nextToken }}'

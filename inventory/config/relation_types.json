@@ -1,0 +1,386 @@
+{
+  "version": "2.0",
+  "description": "Comprehensive relation types for CSPM asset graph. Extensible across clouds while preserving stable IDs used by the runtime.",
+  "metadata": {
+    "last_updated": "2026-01-23",
+    "total_relations": 35,
+    "coverage": ["AWS", "Azure", "GCP", "Multi-Cloud"]
+  },
+  "relation_types": [
+    {
+      "id": "contained_by",
+      "category": "network",
+      "direction": "outbound",
+      "inverse": "contains",
+      "description": "Resource is contained within another.",
+      "examples": ["subnet → vpc", "eni → subnet", "resource_group → subscription (Azure)", "project → organization (GCP)"],
+      "cardinality": "many-to-one"
+    },
+    {
+      "id": "connected_to",
+      "category": "network",
+      "direction": "bidirectional",
+      "inverse": "connected_to",
+      "description": "Network connectivity between resources.",
+      "examples": ["vpc ↔ vpc (peering)", "vpc ↔ transit_gateway", "vnet ↔ vnet (Azure)", "on_premise ↔ vpc (Direct Connect/VPN)"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "routes_to",
+      "category": "network",
+      "direction": "outbound",
+      "inverse": "routed_from",
+      "description": "Traffic routing relationship.",
+      "examples": ["route_table → internet_gateway", "route_table → nat_gateway", "route_table → vpc_endpoint", "route_table → transit_gateway"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "attached_to",
+      "category": "security",
+      "direction": "outbound",
+      "inverse": "attached_on",
+      "description": "Security or resource attachment.",
+      "examples": ["security_group → instance", "security_group → eni", "nacl → subnet", "waf → alb", "nsg → nic (Azure)"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "allows_traffic_from",
+      "category": "security",
+      "direction": "inbound",
+      "inverse": "allows_traffic_to",
+      "description": "Security rule allowing traffic.",
+      "examples": ["security_group_rule → cidr_block", "security_group_rule → security_group", "firewall_rule → ip_range (GCP)"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "uses",
+      "category": "identity",
+      "direction": "outbound",
+      "inverse": "used_by",
+      "description": "Resource uses another resource or identity.",
+      "examples": ["ec2_instance → instance_profile", "lambda_function → execution_role", "ecs_task → task_role", "instance_profile → iam_role"],
+      "cardinality": "many-to-one"
+    },
+    {
+      "id": "assumes",
+      "category": "identity",
+      "direction": "outbound",
+      "inverse": "assumed_by",
+      "description": "Principal assumes a role.",
+      "examples": ["service → iam_role", "federated_user → iam_role", "cross_account → iam_role"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "member_of",
+      "category": "identity",
+      "direction": "outbound",
+      "inverse": "has_member",
+      "description": "Identity membership in a group.",
+      "examples": ["iam_user → iam_group", "service_principal → group (Azure AD)", "user → organizational_unit"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "has_policy",
+      "category": "identity",
+      "direction": "inbound",
+      "inverse": "policy_attached_to",
+      "description": "IAM policy attachment.",
+      "examples": ["iam_role → iam_policy", "iam_user → iam_policy", "iam_group → iam_policy", "s3_bucket → bucket_policy"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "grants_access_to",
+      "category": "identity",
+      "direction": "outbound",
+      "inverse": "accessible_by",
+      "description": "Policy grants access to a resource.",
+      "examples": ["iam_policy → s3_bucket", "iam_policy → dynamodb_table", "rbac_role → resource (Azure)"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "controlled_by",
+      "category": "identity",
+      "direction": "outbound",
+      "inverse": "controls",
+      "description": "Resource controlled/owned by a principal.",
+      "examples": ["resource → creator_identity", "resource → owner_tag"],
+      "cardinality": "many-to-one"
+    },
+    {
+      "id": "encrypted_by",
+      "category": "data",
+      "direction": "outbound",
+      "inverse": "encrypts",
+      "description": "Resource encrypted by key.",
+      "examples": ["ebs_volume → kms_key", "s3_bucket → kms_key", "rds_instance → kms_key", "storage_account → key_vault_key (Azure)"],
+      "cardinality": "many-to-one"
+    },
+    {
+      "id": "stores_data_in",
+      "category": "data",
+      "direction": "outbound",
+      "inverse": "stores_data_from",
+      "description": "Data storage relationship.",
+      "examples": ["application → s3_bucket", "application → rds_database", "lambda → dynamodb_table"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "backs_up_to",
+      "category": "data",
+      "direction": "outbound",
+      "inverse": "backup_of",
+      "description": "Backup relationship.",
+      "examples": ["ebs_volume → ebs_snapshot", "rds_instance → rds_snapshot", "ec2_instance → ami", "vm → recovery_vault (Azure)"],
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "replicates_to",
+      "category": "data",
+      "direction": "outbound",
+      "inverse": "replica_of",
+      "description": "Data replication relationship.",
+      "examples": ["s3_bucket → s3_bucket (cross-region)", "rds_instance → rds_read_replica", "dynamodb_table → dynamodb_global_table"],
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "logging_enabled_to",
+      "category": "monitoring",
+      "direction": "outbound",
+      "inverse": "receives_logs_from",
+      "description": "Logging destination.",
+      "examples": ["cloudtrail → s3_bucket", "vpc_flow_logs → cloudwatch_log_group", "alb → s3_bucket", "diagnostic_settings → log_analytics (Azure)"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "monitored_by",
+      "category": "monitoring",
+      "direction": "outbound",
+      "inverse": "monitors",
+      "description": "Monitoring relationship.",
+      "examples": ["resource → cloudwatch_alarm", "application → x-ray", "resource → azure_monitor"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "triggers",
+      "category": "compute",
+      "direction": "outbound",
+      "inverse": "triggered_by",
+      "description": "Event triggering relationship.",
+      "examples": ["s3_event → lambda_function", "eventbridge_rule → lambda_function", "sns_topic → lambda_function", "cloudwatch_alarm → sns_topic"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "invokes",
+      "category": "compute",
+      "direction": "outbound",
+      "inverse": "invoked_by",
+      "description": "Service invocation.",
+      "examples": ["step_function → lambda_function", "api_gateway → lambda_function", "lambda_function → lambda_function"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "serves_traffic_for",
+      "category": "compute",
+      "direction": "outbound",
+      "inverse": "receives_traffic_from",
+      "description": "Load balancing relationship.",
+      "examples": ["alb → target_group", "target_group → ec2_instance", "nlb → target_group", "load_balancer → backend_pool (Azure)"],
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "runs_on",
+      "category": "compute",
+      "direction": "outbound",
+      "inverse": "hosts",
+      "description": "Workload hosting relationship.",
+      "examples": ["container → ecs_task", "ecs_task → ec2_instance", "pod → kubernetes_node", "app_service → app_service_plan (Azure)"],
+      "cardinality": "many-to-one"
+    },
+    {
+      "id": "scales_with",
+      "category": "compute",
+      "direction": "outbound",
+      "inverse": "scaling_for",
+      "description": "Auto-scaling relationship.",
+      "examples": ["auto_scaling_group → launch_template", "ecs_service → auto_scaling_policy", "vmss → scaling_policy (Azure)"],
+      "cardinality": "many-to-one"
+    },
+    {
+      "id": "cached_by",
+      "category": "compute",
+      "direction": "outbound",
+      "inverse": "caches",
+      "description": "Caching relationship.",
+      "examples": ["application → elasticache", "api_gateway → cache", "cdn → origin"],
+      "cardinality": "many-to-one"
+    },
+    {
+      "id": "exposed_through",
+      "category": "exposure",
+      "direction": "outbound",
+      "inverse": "exposes",
+      "description": "External exposure mechanism.",
+      "examples": ["service → api_gateway", "service → cloudfront", "application → app_gateway (Azure)"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "internet_connected",
+      "category": "exposure",
+      "direction": "outbound",
+      "inverse": null,
+      "aliases": ["internet_accessible"],
+      "description": "Resource has internet exposure.",
+      "examples": ["ec2_instance → internet (public IP)", "s3_bucket → internet (public access)", "rds_instance → internet (publicly accessible)"],
+      "cardinality": "many-to-one"
+    }
+    ,
+    {
+      "id": "manages",
+      "category": "management",
+      "direction": "outbound",
+      "inverse": "managed_by",
+      "description": "Management relationship.",
+      "examples": ["systems_manager → ec2_instance", "config_rule → resource", "azure_policy → resource"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "deployed_by",
+      "category": "management",
+      "direction": "outbound",
+      "inverse": "deploys",
+      "description": "Deployment mechanism.",
+      "examples": ["resource → cloudformation_stack", "resource → terraform_state", "resource → arm_template (Azure)"],
+      "cardinality": "many-to-one"
+    },
+    {
+      "id": "depends_on",
+      "category": "dependency",
+      "direction": "outbound",
+      "inverse": "dependency_of",
+      "description": "Generic dependency relationship.",
+      "examples": ["application → database", "microservice → microservice", "resource → resource (IaC dependency)"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "publishes_to",
+      "category": "messaging",
+      "direction": "outbound",
+      "inverse": "receives_from",
+      "description": "Message publishing relationship.",
+      "examples": ["application → sns_topic", "lambda → sqs_queue", "service → event_hub (Azure)"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "subscribes_to",
+      "category": "messaging",
+      "direction": "outbound",
+      "inverse": "subscribed_by",
+      "description": "Message subscription relationship.",
+      "examples": ["lambda → sns_topic", "sqs_queue → sns_topic", "function → service_bus (Azure)"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "resolves_to",
+      "category": "network",
+      "direction": "outbound",
+      "inverse": "resolved_by",
+      "description": "DNS resolution relationship.",
+      "examples": ["route53_record → alb", "route53_record → cloudfront", "dns_record → public_ip (Azure)"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "authenticated_by",
+      "category": "identity",
+      "direction": "outbound",
+      "inverse": "authenticates",
+      "description": "Authentication provider relationship.",
+      "examples": ["application → cognito_user_pool", "api → cognito_identity_pool", "app → azure_ad_b2c"],
+      "cardinality": "many-to-one"
+    },
+    {
+      "id": "protected_by",
+      "category": "security",
+      "direction": "outbound",
+      "inverse": "protects",
+      "description": "Security protection relationship.",
+      "examples": ["resource → guardduty", "application → shield", "workload → security_center (Azure)"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "scanned_by",
+      "category": "security",
+      "direction": "outbound",
+      "inverse": "scans",
+      "description": "Security scanning relationship.",
+      "examples": ["container_image → ecr_scan", "ec2_instance → inspector", "code → code_guru"],
+      "cardinality": "many-to-many"
+    },
+    {
+      "id": "complies_with",
+      "category": "compliance",
+      "direction": "outbound",
+      "inverse": "compliance_for",
+      "description": "Compliance framework relationship.",
+      "examples": ["resource → config_rule", "resource → compliance_standard", "resource → policy_assignment (Azure)"],
+      "cardinality": "many-to-many"
+    }
+  ],
+  "categories": {
+    "network": {
+      "description": "Network topology and connectivity",
+      "relations": ["contained_by", "connected_to", "routes_to", "resolves_to"]
+    },
+    "security": {
+      "description": "Security controls and protections",
+      "relations": ["attached_to", "allows_traffic_from", "protected_by", "scanned_by"]
+    },
+    "identity": {
+      "description": "Identity and access management",
+      "relations": ["uses", "assumes", "member_of", "has_policy", "grants_access_to", "controlled_by", "authenticated_by"]
+    },
+    "data": {
+      "description": "Data storage, encryption, and replication",
+      "relations": ["encrypted_by", "stores_data_in", "backs_up_to", "replicates_to"]
+    },
+    "monitoring": {
+      "description": "Logging and monitoring",
+      "relations": ["logging_enabled_to", "monitored_by"]
+    },
+    "compute": {
+      "description": "Compute resources and orchestration",
+      "relations": ["triggers", "invokes", "serves_traffic_for", "runs_on", "scales_with", "cached_by"]
+    },
+    "exposure": {
+      "description": "Internet and external exposure",
+      "relations": ["exposed_through", "internet_connected"]
+    },
+    "management": {
+      "description": "Resource management and deployment",
+      "relations": ["manages", "deployed_by"]
+    },
+    "dependency": {
+      "description": "Application and service dependencies",
+      "relations": ["depends_on"]
+    },
+    "messaging": {
+      "description": "Event-driven and messaging patterns",
+      "relations": ["publishes_to", "subscribes_to"]
+    },
+    "compliance": {
+      "description": "Compliance and governance",
+      "relations": ["complies_with"]
+    }
+  },
+  "usage_guidelines": {
+    "relation_selection": "Choose the most specific relation type that describes the relationship. Fall back to 'depends_on' only when no specific type applies.",
+    "direction": "Always use the defined direction. Use inverse relation if querying from the opposite direction.",
+    "cardinality": "Validate relationship cardinality during graph construction to catch modeling errors.",
+    "multi_cloud": "Use the same relation types across AWS/Azure/GCP for consistency in cross-cloud analysis."
+  },
+  "query_patterns": {
+    "blast_radius": "Find all resources connected through any relation within N hops",
+    "attack_path": "Traverse identity → security → network → exposure relations",
+    "compliance_check": "Follow specific relation patterns (e.g., encrypted_by, logging_enabled_to)",
+    "cost_attribution": "Trace controlled_by → depends_on → uses relationships"
+  }
+}

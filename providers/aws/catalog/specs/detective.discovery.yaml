@@ -1,0 +1,79 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: detective
+# 3 ops (3 from checks, +0 for inventory)
+version: '1.0'
+provider: aws
+service: detective
+discovery:
+  - calls:
+    - action: list_graphs
+      on_error: continue
+      save_as: response
+    discovery_id: aws.detective.list_graphs
+    emit:
+      as: item
+      item:
+        Arn: '{{ item.Arn }}'
+        AutoEnable: '{{ item.AutoEnable }}'
+        CreatedTime: '{{ item.CreatedTime }}'
+        GraphList: '{{ item }}'
+        MemberDetails: '{{ item.MemberDetails }}'
+        ScopeEndTime: '{{ item.ScopeEndTime }}'
+        ScopeStartTime: '{{ item.ScopeStartTime }}'
+      items_for: '{{ response.GraphList }}'
+  - calls:
+    - action: list_invitations
+      on_error: continue
+      save_as: response
+    discovery_id: aws.detective.list_invitations
+    emit:
+      as: item
+      item:
+        AccountId: '{{ item.AccountId }}'
+        AdministratorId: '{{ item.AdministratorId }}'
+        DatasourcePackageIngestStates: '{{ item.DatasourcePackageIngestStates }}'
+        DisabledReason: '{{ item.DisabledReason }}'
+        EmailAddress: '{{ item.EmailAddress }}'
+        GraphArn: '{{ item.GraphArn }}'
+        InvitationType: '{{ item.InvitationType }}'
+        InvitedTime: '{{ item.InvitedTime }}'
+        MasterId: '{{ item.MasterId }}'
+        PercentOfGraphUtilization: '{{ item.PercentOfGraphUtilization }}'
+        PercentOfGraphUtilizationUpdatedTime: '{{ item.PercentOfGraphUtilizationUpdatedTime
+          }}'
+        Status: '{{ item.Status }}'
+        UpdatedTime: '{{ item.UpdatedTime }}'
+        VolumeUsageByDatasourcePackage: '{{ item.VolumeUsageByDatasourcePackage }}'
+        VolumeUsageInBytes: '{{ item.VolumeUsageInBytes }}'
+        VolumeUsageUpdatedTime: '{{ item.VolumeUsageUpdatedTime }}'
+      items_for: '{{ response.Invitations }}'
+  - calls:
+    - action: list_members
+      on_error: continue
+      params:
+        GraphArn: '{{ item.GraphArn }}'
+      save_as: response
+    discovery_id: aws.detective.list_members
+    emit:
+      as: item
+      item:
+        AccountId: '{{ item.AccountId }}'
+        AdministratorId: '{{ item.AdministratorId }}'
+        DatasourcePackageIngestStates: '{{ item.DatasourcePackageIngestStates }}'
+        DisabledReason: '{{ item.DisabledReason }}'
+        EmailAddress: '{{ item.EmailAddress }}'
+        GraphArn: '{{ item.GraphArn }}'
+        InvitationType: '{{ item.InvitationType }}'
+        InvitedTime: '{{ item.InvitedTime }}'
+        MasterId: '{{ item.MasterId }}'
+        MemberDetails: '{{ item.MemberDetails }}'
+        PercentOfGraphUtilization: '{{ item.PercentOfGraphUtilization }}'
+        PercentOfGraphUtilizationUpdatedTime: '{{ item.PercentOfGraphUtilizationUpdatedTime
+          }}'
+        Status: '{{ item.Status }}'
+        UpdatedTime: '{{ item.UpdatedTime }}'
+        VolumeUsageByDatasourcePackage: '{{ item.VolumeUsageByDatasourcePackage }}'
+        VolumeUsageInBytes: '{{ item.VolumeUsageInBytes }}'
+        VolumeUsageUpdatedTime: '{{ item.VolumeUsageUpdatedTime }}'
+      items_for: '{{ response.MemberDetails }}'
+    for_each: aws.detective.list_invitations

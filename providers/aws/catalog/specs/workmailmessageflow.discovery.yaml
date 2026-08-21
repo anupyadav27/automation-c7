@@ -1,0 +1,23 @@
+# ============================================================
+# Discovery YAML — workmailmessageflow (AWS)
+# Generated: 2026-02-21T04:57:00Z
+# Actions use boto3 SDK snake_case method names
+# ============================================================
+version: '1.0'
+provider: aws
+service: workmailmessageflow
+services:
+  client: workmailmessageflow
+  module: boto3.client
+discovery:
+  # ── Dependent read operations (require identifiers) ──
+  # ── GetRawMessageContent ──
+  - discovery_id: aws.workmailmessageflow.get_raw_message_content
+    calls:
+      - action: get_raw_message_content
+        save_as: response
+        on_error: continue
+    emit:
+      as: item
+      item:
+        messageContent: '{{ response.messageContent }}'

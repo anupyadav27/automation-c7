@@ -1,0 +1,12 @@
+resource_key,category,reason
+polly.voice,catalogue,AWS's text-to-speech voice catalogue. Identical in every account.
+translate.language,catalogue,The list of languages AWS Translate supports. Not an asset.
+elbv2.ssl_policy,catalogue,AWS's predefined SSL negotiation policies. The same list everywhere.
+eks.access_policy,catalogue,AWS-managed EKS access policies. A cluster's own associations are a different type.
+codestar-notifications.event_type,catalogue,The catalogue of notification event types AWS publishes.
+personalize.recipe,catalogue,Amazon Personalize's built-in algorithm recipes.
+appstream.image,catalogue,"DescribeImages returns AWS's public AppStream base images alongside any of ours. 48 rows here, none of them ours."
+resourcegroupstaggingapi.resource,duplicate,"A meta-API that re-lists resources already collected under their own types. Every row is a duplicate carrying less detail."
+amplifybackend.s3_bucket,duplicate,A lookup helper on the Amplify API rather than a bucket. Real buckets come from s3.bucket.
+logs.log_stream,telemetry,"A log stream is a rotating destination for log lines, not infrastructure. 731 of them dominated a 1478-asset inventory while telling us nothing about architecture. The log GROUP is the asset and is still collected."
+securityhub.securityhub_finding,telemetry,"A finding is an assessment of an asset, not an asset. Findings belong to the c7n side of this repo."

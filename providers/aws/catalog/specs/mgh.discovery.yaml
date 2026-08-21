@@ -1,0 +1,142 @@
+version: '1.0'
+provider: aws
+service: mgh
+services:
+  client: mgh
+  module: boto3.client
+discovery:
+- discovery_id: aws.mgh.list_application_states
+  calls:
+  - action: list_application_states
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ApplicationStateList }}'
+    item:
+      ApplicationId: '{{ item.ApplicationId }}'
+      ApplicationStatus: '{{ item.ApplicationStatus }}'
+      LastUpdatedTime: '{{ item.LastUpdatedTime }}'
+- discovery_id: aws.mgh.list_migration_tasks
+  calls:
+  - action: list_migration_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MigrationTaskSummaryList }}'
+    item:
+      Status: '{{ item.Status }}'
+      MigrationTask: '{{ item.MigrationTask }}'
+      MigrationTaskName: '{{ item.MigrationTaskName }}'
+      ProgressPercent: '{{ item.ProgressPercent }}'
+      ProgressUpdateStream: '{{ item.ProgressUpdateStream }}'
+      StatusDetail: '{{ item.StatusDetail }}'
+      UpdateDateTime: '{{ item.UpdateDateTime }}'
+- discovery_id: aws.mgh.list_progress_update_streams
+  calls:
+  - action: list_progress_update_streams
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ProgressUpdateStreamSummaryList }}'
+    item:
+      ProgressUpdateStreamName: '{{ item.ProgressUpdateStreamName }}'
+- discovery_id: aws.mgh.describe_application_state
+  for_each: aws.mgh.list_application_states
+  calls:
+  - action: describe_application_state
+    params:
+      ApplicationId: '{{ item.ApplicationId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      ApplicationStatus: '{{ response.ApplicationStatus }}'
+      LastUpdatedTime: '{{ response.LastUpdatedTime }}'
+- discovery_id: aws.mgh.describe_migration_task
+  for_each: aws.mgh.list_migration_tasks
+  calls:
+  - action: describe_migration_task
+    params:
+      ProgressUpdateStream: '{{ item.ProgressUpdateStream }}'
+      MigrationTaskName: '{{ item.MigrationTaskName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      MigrationTask: '{{ response.MigrationTask.MigrationTaskName }}'
+      MigrationTaskName: '{{ response.MigrationTask.MigrationTaskName }}'
+      ProgressUpdateStream: '{{ response.MigrationTask.ProgressUpdateStream }}'
+      ResourceAttributeList: '{{ response.MigrationTask.ResourceAttributeList[].Type }}'
+      Task: '{{ response.MigrationTask.Task }}'
+      UpdateDateTime: '{{ response.MigrationTask.UpdateDateTime }}'
+      ProgressPercent: '{{ response.MigrationTask.Task.ProgressPercent }}'
+      Status: '{{ response.MigrationTask.Task.Status }}'
+      StatusDetail: '{{ response.MigrationTask.Task.StatusDetail }}'
+- discovery_id: aws.mgh.list_created_artifacts
+  for_each: aws.mgh.list_migration_tasks
+  calls:
+  - action: list_created_artifacts
+    params:
+      ProgressUpdateStream: '{{ item.ProgressUpdateStream }}'
+      MigrationTaskName: '{{ item.MigrationTaskName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CreatedArtifactList }}'
+    item:
+      Name: '{{ item.Name }}'
+      Description: '{{ item.Description }}'
+- discovery_id: aws.mgh.list_discovered_resources
+  for_each: aws.mgh.list_migration_tasks
+  calls:
+  - action: list_discovered_resources
+    params:
+      ProgressUpdateStream: '{{ item.ProgressUpdateStream }}'
+      MigrationTaskName: '{{ item.MigrationTaskName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.DiscoveredResourceList }}'
+    item:
+      ConfigurationId: '{{ item.ConfigurationId }}'
+      Description: '{{ item.Description }}'
+      Enabled: '{{ item.Enabled }}'
+- discovery_id: aws.mgh.list_migration_task_updates
+  for_each: aws.mgh.list_migration_tasks
+  calls:
+  - action: list_migration_task_updates
+    params:
+      ProgressUpdateStream: '{{ item.ProgressUpdateStream }}'
+      MigrationTaskName: '{{ item.MigrationTaskName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.MigrationTaskUpdateList }}'
+    item:
+      MigrationTaskState: '{{ item.MigrationTaskState }}'
+      UpdateDateTime: '{{ item.UpdateDateTime }}'
+      UpdateType: '{{ item.UpdateType }}'
+- discovery_id: aws.mgh.list_source_resources
+  for_each: aws.mgh.list_migration_tasks
+  calls:
+  - action: list_source_resources
+    params:
+      ProgressUpdateStream: '{{ item.ProgressUpdateStream }}'
+      MigrationTaskName: '{{ item.MigrationTaskName }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.SourceResourceList }}'
+    item:
+      Name: '{{ item.Name }}'
+      Description: '{{ item.Description }}'
+      StatusDetail: '{{ item.StatusDetail }}'

@@ -1,0 +1,156 @@
+version: '1.0'
+provider: aws
+service: waf
+discovery:
+- calls:
+  - action: list_rule_groups
+    on_error: continue
+    save_as: response
+  discovery_id: aws.waf.list_rule_groups
+  emit:
+    as: item
+    item:
+      Name: '{{ item.Name }}'
+      RuleGroupId: '{{ item.RuleGroupId }}'
+    items_for: '{{ response.RuleGroups }}'
+- calls:
+  - action: list_web_ac_ls
+    on_error: continue
+    save_as: response
+  discovery_id: aws.waf.list_web_ac_ls
+  emit:
+    as: item
+    item:
+      Name: '{{ item.Name }}'
+      Policy: '{{ item.Policy }}'
+      WebACLId: '{{ item.WebACLId }}'
+    items_for: '{{ response.WebACLs }}'
+- calls:
+  - action: get_web_acl
+    on_error: continue
+    params:
+      WebACLId: '{{ item.WebACLId }}'
+    save_as: response
+  discovery_id: aws.waf.get_web_acl
+  emit:
+    as: item
+    item:
+      DefaultAction: '{{ response.WebACL.DefaultAction }}'
+      MetricName: '{{ response.WebACL.MetricName }}'
+      Name: '{{ response.WebACL.Name }}'
+      Policy: '{{ response.WebACL.Policy }}'
+      Rules: '{{ response.WebACL.Rules }}'
+      WebACLArn: '{{ response.WebACL.WebACLArn }}'
+      WebACLId: '{{ response.WebACL.WebACLId }}'
+  for_each: aws.waf.list_web_ac_ls
+- calls:
+  - action: get_rule_group
+    on_error: continue
+    params:
+      RuleGroupId: '{{ item.RuleGroupId }}'
+    save_as: response
+  discovery_id: aws.waf.get_rule_group
+  emit:
+    as: item
+    item:
+      MetricName: '{{ response.RuleGroup.MetricName }}'
+      Name: '{{ response.RuleGroup.Name }}'
+      RuleGroupId: '{{ response.RuleGroup.RuleGroupId }}'
+      VisibilityConfig: '{{ response.RuleGroup.VisibilityConfig }}'
+  for_each: aws.waf.list_rule_groups
+- calls:
+  - action: list_ip_sets
+    on_error: continue
+    save_as: response
+  discovery_id: aws.waf.list_ip_sets
+  emit:
+    as: item
+    item:
+      IPSetId: '{{ item.IPSetId }}'
+      Name: '{{ item.Name }}'
+    items_for: '{{ response.IPSets }}'
+- calls:
+  - action: get_ip_set
+    on_error: continue
+    params:
+      IPSetId: '{{ item.IPSetId }}'
+    save_as: response
+  discovery_id: aws.waf.get_ip_set
+  emit:
+    as: item
+    item:
+      Addresses: '{{ response.IPSet.IPSetDescriptors }}'
+      IPSetDescriptors: '{{ response.IPSet.IPSetDescriptors }}'
+      IPSetId: '{{ response.IPSet.IPSetId }}'
+      Name: '{{ response.IPSet.Name }}'
+  for_each: aws.waf.list_ip_sets
+- calls:
+  - action: list_logging_configurations
+    on_error: continue
+    save_as: response
+  discovery_id: aws.waf.list_logging_configurations
+  emit:
+    as: item
+    item:
+      Enabled: '{{ item.Enabled }}'
+      LogDestinationConfigs: '{{ item.LogDestinationConfigs }}'
+      RedactedFields: '{{ item.RedactedFields }}'
+      ResourceArn: '{{ item.ResourceArn }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.LoggingConfigurations }}'
+- calls:
+  - action: get_logging_configuration
+    on_error: continue
+    params:
+      ResourceArn: '{{ item.ResourceArn }}'
+    save_as: response
+  discovery_id: aws.waf.get_logging_configuration
+  emit:
+    as: item
+    item:
+      LogDestinationConfigs: '{{ response.LoggingConfiguration.LogDestinationConfigs }}'
+      RedactedFields: '{{ response.LoggingConfiguration.RedactedFields[].Type }}'
+      ResourceArn: '{{ response.LoggingConfiguration.ResourceArn }}'
+  for_each: aws.waf.list_logging_configurations
+- calls:
+  - action: list_regex_pattern_sets
+    on_error: continue
+    save_as: response
+  discovery_id: aws.waf.list_regex_pattern_sets
+  emit:
+    as: item
+    item:
+      Name: '{{ item.Name }}'
+      RegexPatternSetId: '{{ item.RegexPatternSetId }}'
+    items_for: '{{ response.RegexPatternSets }}'
+- calls:
+  - action: get_regex_pattern_set
+    on_error: continue
+    params:
+      RegexPatternSetId: '{{ item.RegexPatternSetId }}'
+    save_as: response
+  discovery_id: aws.waf.get_regex_pattern_set
+  emit:
+    as: item
+    item:
+      Name: '{{ response.RegexPatternSet.Name }}'
+      RegexPatternSetId: '{{ response.RegexPatternSet.RegexPatternSetId }}'
+      RegexPatternStrings: '{{ response.RegexPatternSet.RegexPatternSetId }}'
+      RegularExpressionList: '{{ response.RegexPatternSet.RegexPatternSetId }}'
+  for_each: aws.waf.list_regex_pattern_sets
+- calls:
+  - action: list_activated_rules_in_rule_group
+    on_error: continue
+    save_as: response
+  discovery_id: aws.waf.list_activated_rules_in_rule_group
+  emit:
+    as: item
+    item:
+      Action: '{{ item.Action }}'
+      ExcludedRules: '{{ item.ExcludedRules }}'
+      OverrideAction: '{{ item.OverrideAction }}'
+      Priority: '{{ item.Priority }}'
+      RuleId: '{{ item.RuleId }}'
+      Rules: '{{ item }}'
+      Type: '{{ item.Type }}'
+    items_for: '{{ response.ActivatedRules }}'

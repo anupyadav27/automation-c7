@@ -1,0 +1,231 @@
+version: '1.0'
+provider: aws
+service: neptunedata
+services:
+  client: neptunedata
+  module: boto3.client
+discovery:
+- discovery_id: aws.neptunedata.get_engine_status
+  calls:
+  - action: get_engine_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      dbEngineVersion: '{{ response.dbEngineVersion }}'
+      dfeQueryEngine: '{{ response.dfeQueryEngine }}'
+      features: '{{ response.features }}'
+      gremlin: '{{ response.gremlin }}'
+      labMode: '{{ response.labMode }}'
+      opencypher: '{{ response.opencypher }}'
+      role: '{{ response.role }}'
+      rollingBackTrxCount: '{{ response.rollingBackTrxCount }}'
+      rollingBackTrxEarliestStartTime: '{{ response.rollingBackTrxEarliestStartTime }}'
+      settings: '{{ response.settings }}'
+      sparql: '{{ response.sparql }}'
+      startTime: '{{ response.startTime }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.neptunedata.get_propertygraph_statistics
+  calls:
+  - action: get_propertygraph_statistics
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      payload: '{{ response.payload }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.neptunedata.get_propertygraph_stream
+  calls:
+  - action: get_propertygraph_stream
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.records }}'
+- discovery_id: aws.neptunedata.get_propertygraph_summary
+  calls:
+  - action: get_propertygraph_summary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      payload: '{{ response.payload }}'
+      statusCode: '{{ response.statusCode }}'
+- discovery_id: aws.neptunedata.get_rdf_graph_summary
+  calls:
+  - action: get_rdf_graph_summary
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      payload: '{{ response.payload }}'
+      statusCode: '{{ response.statusCode }}'
+- discovery_id: aws.neptunedata.get_sparql_statistics
+  calls:
+  - action: get_sparql_statistics
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      payload: '{{ response.payload }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.neptunedata.get_sparql_stream
+  calls:
+  - action: get_sparql_stream
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.records }}'
+- discovery_id: aws.neptunedata.list_gremlin_queries
+  calls:
+  - action: list_gremlin_queries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.queries }}'
+- discovery_id: aws.neptunedata.list_loader_jobs
+  calls:
+  - action: list_loader_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      payload: '{{ response.payload }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.neptunedata.list_ml_data_processing_jobs
+  calls:
+  - action: list_ml_data_processing_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ids }}'
+- discovery_id: aws.neptunedata.list_ml_endpoints
+  calls:
+  - action: list_ml_endpoints
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ids }}'
+- discovery_id: aws.neptunedata.list_ml_model_training_jobs
+  calls:
+  - action: list_ml_model_training_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ids }}'
+- discovery_id: aws.neptunedata.list_ml_model_transform_jobs
+  calls:
+  - action: list_ml_model_transform_jobs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ids }}'
+- discovery_id: aws.neptunedata.list_open_cypher_queries
+  calls:
+  - action: list_open_cypher_queries
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.queries }}'
+- discovery_id: aws.neptunedata.get_gremlin_query_status
+  for_each: aws.neptunedata.list_gremlin_queries
+  calls:
+  - action: get_gremlin_query_status
+    params:
+      queryId: '{{ item.queryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      queryEvalStats: '{{ response.queryEvalStats }}'
+      queryId: '{{ response.queryId }}'
+      queryString: '{{ response.queryString }}'
+- discovery_id: aws.neptunedata.get_loader_job_status
+  calls:
+  - action: get_loader_job_status
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      payload: '{{ response.payload }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.neptunedata.get_ml_data_processing_job
+  for_each: aws.neptunedata.list_ml_data_processing_jobs
+  calls:
+  - action: get_ml_data_processing_job
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      id: '{{ response.id }}'
+      processingJob: '{{ response.processingJob }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.neptunedata.get_ml_endpoint
+  for_each: aws.neptunedata.list_ml_endpoints
+  calls:
+  - action: get_ml_endpoint
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      endpoint: '{{ response.endpoint }}'
+      endpointConfig: '{{ response.endpointConfig }}'
+      id: '{{ response.id }}'
+      status: '{{ response.status }}'
+- discovery_id: aws.neptunedata.get_ml_model_training_job
+  for_each: aws.neptunedata.list_ml_model_training_jobs
+  calls:
+  - action: get_ml_model_training_job
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.mlModels }}'
+- discovery_id: aws.neptunedata.get_ml_model_transform_job
+  for_each: aws.neptunedata.list_ml_model_transform_jobs
+  calls:
+  - action: get_ml_model_transform_job
+    params:
+      id: '{{ item.id }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.models }}'
+- discovery_id: aws.neptunedata.get_open_cypher_query_status
+  for_each: aws.neptunedata.list_gremlin_queries
+  calls:
+  - action: get_open_cypher_query_status
+    params:
+      queryId: '{{ item.queryId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      queryEvalStats: '{{ response.queryEvalStats }}'
+      queryId: '{{ response.queryId }}'
+      queryString: '{{ response.queryString }}'

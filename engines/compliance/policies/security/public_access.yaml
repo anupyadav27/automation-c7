@@ -1,0 +1,25 @@
+policies:
+
+  # ---------------------------------------------------------------
+  # Lambda functions with resource-based policy allowing public invoke
+  # ---------------------------------------------------------------
+  - name: lambda-public-invoke-policy
+    resource: lambda
+    description: >
+      Lambda functions whose resource-based policy allows invocation
+      from Principal '*' or from all AWS accounts. This grants
+      unauthenticated or cross-account invoke access.
+    filters:
+      - type: cross-account
+    actions:
+      - type: tag
+        key: c7n:security
+        value: "cross-account-invoke-review"
+      - type: notify
+        template: default.html
+        subject: "[c7n] Lambda has cross-account or public invoke policy — review"
+        to:
+          - your-team@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.{region}.amazonaws.com/{account_id}/c7n-notifications

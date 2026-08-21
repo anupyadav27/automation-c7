@@ -1,0 +1,357 @@
+version: '1.0'
+provider: aws
+service: codedeploy
+services:
+  client: codedeploy
+  module: boto3.client
+discovery:
+- discovery_id: aws.codedeploy.list_applications
+  calls:
+  - action: list_applications
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.applications }}'
+    item:
+      application: '{{ item.application }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codedeploy.list_deployment_configs
+  calls:
+  - action: list_deployment_configs
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.deploymentConfigsList }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codedeploy.list_deployments
+  calls:
+  - action: list_deployments
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.deployments }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codedeploy.list_git_hub_account_token_names
+  calls:
+  - action: list_git_hub_account_token_names
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tokenNameList }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codedeploy.list_on_premises_instances
+  calls:
+  - action: list_on_premises_instances
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.instanceNames }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codedeploy.get_application
+  calls:
+  - action: get_application
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      application: '{{ response.application.applicationId }}'
+      applicationId: '{{ response.application.applicationId }}'
+      applicationName: '{{ response.application.applicationName }}'
+      computePlatform: '{{ response.application.computePlatform }}'
+      createTime: '{{ response.application.createTime }}'
+      gitHubAccountName: '{{ response.application.gitHubAccountName }}'
+      linkedToGitHub: '{{ response.application.linkedToGitHub }}'
+- discovery_id: aws.codedeploy.get_application_revision
+  calls:
+  - action: get_application_revision
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      appSpecContent: '{{ response.revision.appSpecContent.sha256 }}'
+      gitHubLocation: '{{ response.revision.gitHubLocation }}'
+      revisionType: '{{ response.revision.revisionType }}'
+      s3Location: '{{ response.revision.s3Location.key }}'
+      string: '{{ response.revision.string }}'
+      applicationName: '{{ response.applicationName }}'
+      description: '{{ response.revisionInfo.description }}'
+      firstUsedTime: '{{ response.revisionInfo.firstUsedTime }}'
+      lastUsedTime: '{{ response.revisionInfo.lastUsedTime }}'
+      registerTime: '{{ response.revisionInfo.registerTime }}'
+      content: '{{ response.revision.appSpecContent.content }}'
+      sha256: '{{ response.revision.appSpecContent.sha256 }}'
+      commitId: '{{ response.revision.gitHubLocation.commitId }}'
+      repository: '{{ response.revision.gitHubLocation.repository }}'
+      bucket: '{{ response.revision.s3Location.bucket }}'
+      bundleType: '{{ response.revision.s3Location.bundleType }}'
+      eTag: '{{ response.revision.s3Location.eTag }}'
+      key: '{{ response.revision.s3Location.key }}'
+      version: '{{ response.revision.s3Location.version }}'
+- discovery_id: aws.codedeploy.get_deployment
+  calls:
+  - action: get_deployment
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      additionalDeploymentStatusInfo: '{{ response.deploymentInfo.additionalDeploymentStatusInfo }}'
+      applicationName: '{{ response.deploymentInfo.applicationName }}'
+      autoRollbackConfiguration: '{{ response.deploymentInfo.autoRollbackConfiguration.enabled }}'
+      blueGreenDeploymentConfiguration: '{{ response.deploymentInfo.blueGreenDeploymentConfiguration }}'
+      completeTime: '{{ response.deploymentInfo.completeTime }}'
+      computePlatform: '{{ response.deploymentInfo.computePlatform }}'
+      createTime: '{{ response.deploymentInfo.createTime }}'
+      creator: '{{ response.deploymentInfo.creator }}'
+      deploymentConfigName: '{{ response.deploymentInfo.deploymentConfigName }}'
+      deploymentGroupName: '{{ response.deploymentInfo.deploymentGroupName }}'
+      deploymentId: '{{ response.deploymentInfo.deploymentId }}'
+      deploymentOverview: '{{ response.deploymentInfo.deploymentOverview.Ready }}'
+      deploymentStatusMessages: '{{ response.deploymentInfo.deploymentStatusMessages }}'
+      deploymentStyle: '{{ response.deploymentInfo.deploymentId }}'
+      description: '{{ response.deploymentInfo.description }}'
+      errorInformation: '{{ response.deploymentInfo.errorInformation.code }}'
+      externalId: '{{ response.deploymentInfo.externalId }}'
+      fileExistsBehavior: '{{ response.deploymentInfo.fileExistsBehavior }}'
+      ignoreApplicationStopFailures: '{{ response.deploymentInfo.ignoreApplicationStopFailures }}'
+      instanceTerminationWaitTimeStarted: '{{ response.deploymentInfo.instanceTerminationWaitTimeStarted }}'
+      loadBalancerInfo: '{{ response.deploymentInfo.loadBalancerInfo }}'
+      overrideAlarmConfiguration: '{{ response.deploymentInfo.overrideAlarmConfiguration.enabled }}'
+      previousRevision: '{{ response.deploymentInfo.previousRevision }}'
+      relatedDeployments: '{{ response.deploymentInfo.relatedDeployments }}'
+      revision: '{{ response.deploymentInfo.revision }}'
+      rollbackInfo: '{{ response.deploymentInfo.rollbackInfo }}'
+      startTime: '{{ response.deploymentInfo.startTime }}'
+      status: '{{ response.deploymentInfo.status }}'
+      targetInstances: '{{ response.deploymentInfo.targetInstances }}'
+      updateOutdatedInstancesOnly: '{{ response.deploymentInfo.updateOutdatedInstancesOnly }}'
+      enabled: '{{ response.deploymentInfo.autoRollbackConfiguration.enabled }}'
+      actionOnTimeout: '{{ response.deploymentInfo.blueGreenDeploymentConfiguration.deploymentReadyOption.actionOnTimeout }}'
+      waitTimeInMinutes: '{{ response.deploymentInfo.blueGreenDeploymentConfiguration.deploymentReadyOption.waitTimeInMinutes }}'
+      action: '{{ response.deploymentInfo.blueGreenDeploymentConfiguration.greenFleetProvisioningOption.action }}'
+      terminationWaitTimeInMinutes: '{{ response.deploymentInfo.blueGreenDeploymentConfiguration.terminateBlueInstancesOnDeploymentSuccess.terminationWaitTimeInMinutes }}'
+      Failed: '{{ response.deploymentInfo.deploymentOverview.Failed }}'
+      InProgress: '{{ response.deploymentInfo.deploymentOverview.InProgress }}'
+      Pending: '{{ response.deploymentInfo.deploymentOverview.Pending }}'
+      Ready: '{{ response.deploymentInfo.deploymentOverview.Ready }}'
+      Skipped: '{{ response.deploymentInfo.deploymentOverview.Skipped }}'
+      Succeeded: '{{ response.deploymentInfo.deploymentOverview.Succeeded }}'
+      deploymentOption: '{{ response.deploymentInfo.deploymentStyle.deploymentOption }}'
+      deploymentType: '{{ response.deploymentInfo.deploymentStyle.deploymentType }}'
+      code: '{{ response.deploymentInfo.errorInformation.code }}'
+      message: '{{ response.deploymentInfo.errorInformation.message }}'
+      ignorePollAlarmFailure: '{{ response.deploymentInfo.overrideAlarmConfiguration.ignorePollAlarmFailure }}'
+      content: '{{ response.deploymentInfo.previousRevision.appSpecContent.content }}'
+      sha256: '{{ response.deploymentInfo.previousRevision.appSpecContent.sha256 }}'
+      commitId: '{{ response.deploymentInfo.previousRevision.gitHubLocation.commitId }}'
+      repository: '{{ response.deploymentInfo.previousRevision.gitHubLocation.repository }}'
+      revisionType: '{{ response.deploymentInfo.previousRevision.revisionType }}'
+      bucket: '{{ response.deploymentInfo.previousRevision.s3Location.bucket }}'
+      bundleType: '{{ response.deploymentInfo.previousRevision.s3Location.bundleType }}'
+      eTag: '{{ response.deploymentInfo.previousRevision.s3Location.eTag }}'
+      key: '{{ response.deploymentInfo.previousRevision.s3Location.key }}'
+      version: '{{ response.deploymentInfo.previousRevision.s3Location.version }}'
+      autoUpdateOutdatedInstancesRootDeploymentId: '{{ response.deploymentInfo.relatedDeployments.autoUpdateOutdatedInstancesRootDeploymentId }}'
+      rollbackDeploymentId: '{{ response.deploymentInfo.rollbackInfo.rollbackDeploymentId }}'
+      rollbackMessage: '{{ response.deploymentInfo.rollbackInfo.rollbackMessage }}'
+      rollbackTriggeringDeploymentId: '{{ response.deploymentInfo.rollbackInfo.rollbackTriggeringDeploymentId }}'
+- discovery_id: aws.codedeploy.get_deployment_config
+  calls:
+  - action: get_deployment_config
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      computePlatform: '{{ response.deploymentConfigInfo.computePlatform }}'
+      createTime: '{{ response.deploymentConfigInfo.createTime }}'
+      deploymentConfigId: '{{ response.deploymentConfigInfo.deploymentConfigId }}'
+      deploymentConfigName: '{{ response.deploymentConfigInfo.deploymentConfigName }}'
+      minimumHealthyHosts: '{{ response.deploymentConfigInfo.minimumHealthyHosts.type }}'
+      trafficRoutingConfig: '{{ response.deploymentConfigInfo.trafficRoutingConfig.type }}'
+      zonalConfig: '{{ response.deploymentConfigInfo.zonalConfig }}'
+      type: '{{ response.deploymentConfigInfo.minimumHealthyHosts.type }}'
+      value: '{{ response.deploymentConfigInfo.minimumHealthyHosts.value }}'
+      canaryInterval: '{{ response.deploymentConfigInfo.trafficRoutingConfig.timeBasedCanary.canaryInterval }}'
+      canaryPercentage: '{{ response.deploymentConfigInfo.trafficRoutingConfig.timeBasedCanary.canaryPercentage }}'
+      linearInterval: '{{ response.deploymentConfigInfo.trafficRoutingConfig.timeBasedLinear.linearInterval }}'
+      linearPercentage: '{{ response.deploymentConfigInfo.trafficRoutingConfig.timeBasedLinear.linearPercentage }}'
+      firstZoneMonitorDurationInSeconds: '{{ response.deploymentConfigInfo.zonalConfig.firstZoneMonitorDurationInSeconds }}'
+      monitorDurationInSeconds: '{{ response.deploymentConfigInfo.zonalConfig.monitorDurationInSeconds }}'
+- discovery_id: aws.codedeploy.get_deployment_group
+  calls:
+  - action: get_deployment_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      alarmConfiguration: '{{ response.deploymentGroupInfo.alarmConfiguration.enabled }}'
+      applicationName: '{{ response.deploymentGroupInfo.applicationName }}'
+      autoRollbackConfiguration: '{{ response.deploymentGroupInfo.autoRollbackConfiguration.enabled }}'
+      autoScalingGroups: '{{ response.deploymentGroupInfo.autoScalingGroups[].name }}'
+      blueGreenDeploymentConfiguration: '{{ response.deploymentGroupInfo.blueGreenDeploymentConfiguration }}'
+      computePlatform: '{{ response.deploymentGroupInfo.computePlatform }}'
+      deploymentConfigName: '{{ response.deploymentGroupInfo.deploymentConfigName }}'
+      deploymentGroupId: '{{ response.deploymentGroupInfo.deploymentGroupId }}'
+      deploymentGroupName: '{{ response.deploymentGroupInfo.deploymentGroupName }}'
+      deploymentStyle: '{{ response.deploymentGroupInfo.deploymentStyle }}'
+      ec2TagFilters: '{{ response.deploymentGroupInfo.ec2TagFilters[].Key }}'
+      ec2TagSet: '{{ response.deploymentGroupInfo.ec2TagSet }}'
+      ecsServices: '{{ response.deploymentGroupInfo.ecsServices }}'
+      lastAttemptedDeployment: '{{ response.deploymentGroupInfo.lastAttemptedDeployment.status }}'
+      lastSuccessfulDeployment: '{{ response.deploymentGroupInfo.lastSuccessfulDeployment.status }}'
+      loadBalancerInfo: '{{ response.deploymentGroupInfo.loadBalancerInfo }}'
+      onPremisesInstanceTagFilters: '{{ response.deploymentGroupInfo.onPremisesInstanceTagFilters[].Key }}'
+      onPremisesTagSet: '{{ response.deploymentGroupInfo.onPremisesTagSet }}'
+      outdatedInstancesStrategy: '{{ response.deploymentGroupInfo.outdatedInstancesStrategy }}'
+      serviceRoleArn: '{{ response.deploymentGroupInfo.serviceRoleArn }}'
+      targetRevision: '{{ response.deploymentGroupInfo.targetRevision }}'
+      terminationHookEnabled: '{{ response.deploymentGroupInfo.terminationHookEnabled }}'
+      triggerConfigurations: '{{ response.deploymentGroupInfo.triggerConfigurations[].triggerName }}'
+      enabled: '{{ response.deploymentGroupInfo.alarmConfiguration.enabled }}'
+      ignorePollAlarmFailure: '{{ response.deploymentGroupInfo.alarmConfiguration.ignorePollAlarmFailure }}'
+      actionOnTimeout: '{{ response.deploymentGroupInfo.blueGreenDeploymentConfiguration.deploymentReadyOption.actionOnTimeout }}'
+      waitTimeInMinutes: '{{ response.deploymentGroupInfo.blueGreenDeploymentConfiguration.deploymentReadyOption.waitTimeInMinutes }}'
+      action: '{{ response.deploymentGroupInfo.blueGreenDeploymentConfiguration.greenFleetProvisioningOption.action }}'
+      terminationWaitTimeInMinutes: '{{ response.deploymentGroupInfo.blueGreenDeploymentConfiguration.terminateBlueInstancesOnDeploymentSuccess.terminationWaitTimeInMinutes }}'
+      deploymentOption: '{{ response.deploymentGroupInfo.deploymentStyle.deploymentOption }}'
+      deploymentType: '{{ response.deploymentGroupInfo.deploymentStyle.deploymentType }}'
+      createTime: '{{ response.deploymentGroupInfo.lastAttemptedDeployment.createTime }}'
+      deploymentId: '{{ response.deploymentGroupInfo.lastAttemptedDeployment.deploymentId }}'
+      endTime: '{{ response.deploymentGroupInfo.lastAttemptedDeployment.endTime }}'
+      status: '{{ response.deploymentGroupInfo.lastAttemptedDeployment.status }}'
+      content: '{{ response.deploymentGroupInfo.targetRevision.appSpecContent.content }}'
+      sha256: '{{ response.deploymentGroupInfo.targetRevision.appSpecContent.sha256 }}'
+      commitId: '{{ response.deploymentGroupInfo.targetRevision.gitHubLocation.commitId }}'
+      repository: '{{ response.deploymentGroupInfo.targetRevision.gitHubLocation.repository }}'
+      revisionType: '{{ response.deploymentGroupInfo.targetRevision.revisionType }}'
+      bucket: '{{ response.deploymentGroupInfo.targetRevision.s3Location.bucket }}'
+      bundleType: '{{ response.deploymentGroupInfo.targetRevision.s3Location.bundleType }}'
+      eTag: '{{ response.deploymentGroupInfo.targetRevision.s3Location.eTag }}'
+      key: '{{ response.deploymentGroupInfo.targetRevision.s3Location.key }}'
+      version: '{{ response.deploymentGroupInfo.targetRevision.s3Location.version }}'
+- discovery_id: aws.codedeploy.get_deployment_instance
+  calls:
+  - action: get_deployment_instance
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      deploymentId: '{{ response.instanceSummary.deploymentId }}'
+      instanceId: '{{ response.instanceSummary.instanceId }}'
+      instanceSummary: '{{ response.instanceSummary.instanceSummary }}'
+      instanceType: '{{ response.instanceSummary.instanceType }}'
+      lastUpdatedAt: '{{ response.instanceSummary.lastUpdatedAt }}'
+      lifecycleEvents: '{{ response.instanceSummary.lifecycleEvents[].status }}'
+      status: '{{ response.instanceSummary.status }}'
+- discovery_id: aws.codedeploy.get_deployment_target
+  calls:
+  - action: get_deployment_target
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      cloudFormationTarget: '{{ response.deploymentTarget.cloudFormationTarget.status }}'
+      deploymentTargetType: '{{ response.deploymentTarget.deploymentTargetType }}'
+      ecsTarget: '{{ response.deploymentTarget.ecsTarget.status }}'
+      instanceTarget: '{{ response.deploymentTarget.instanceTarget.status }}'
+      lambdaTarget: '{{ response.deploymentTarget.lambdaTarget.status }}'
+      deploymentId: '{{ response.deploymentTarget.cloudFormationTarget.deploymentId }}'
+      lastUpdatedAt: '{{ response.deploymentTarget.cloudFormationTarget.lastUpdatedAt }}'
+      resourceType: '{{ response.deploymentTarget.cloudFormationTarget.resourceType }}'
+      status: '{{ response.deploymentTarget.cloudFormationTarget.status }}'
+      targetId: '{{ response.deploymentTarget.cloudFormationTarget.targetId }}'
+      targetVersionWeight: '{{ response.deploymentTarget.cloudFormationTarget.targetVersionWeight }}'
+      targetArn: '{{ response.deploymentTarget.ecsTarget.targetArn }}'
+      instanceLabel: '{{ response.deploymentTarget.instanceTarget.instanceLabel }}'
+      currentVersion: '{{ response.deploymentTarget.lambdaTarget.lambdaFunctionInfo.currentVersion }}'
+      functionAlias: '{{ response.deploymentTarget.lambdaTarget.lambdaFunctionInfo.functionAlias }}'
+      functionName: '{{ response.deploymentTarget.lambdaTarget.lambdaFunctionInfo.functionName }}'
+      targetVersion: '{{ response.deploymentTarget.lambdaTarget.lambdaFunctionInfo.targetVersion }}'
+- discovery_id: aws.codedeploy.get_on_premises_instance
+  calls:
+  - action: get_on_premises_instance
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      deregisterTime: '{{ response.instanceInfo.deregisterTime }}'
+      iamSessionArn: '{{ response.instanceInfo.iamSessionArn }}'
+      iamUserArn: '{{ response.instanceInfo.iamUserArn }}'
+      instanceArn: '{{ response.instanceInfo.instanceArn }}'
+      instanceName: '{{ response.instanceInfo.instanceName }}'
+      registerTime: '{{ response.instanceInfo.registerTime }}'
+      tags: '{{ response.instanceInfo.tags[].Key }}'
+- discovery_id: aws.codedeploy.list_application_revisions
+  calls:
+  - action: list_application_revisions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.revisions }}'
+    item:
+      appSpecContent: '{{ item.appSpecContent }}'
+      gitHubLocation: '{{ item.gitHubLocation }}'
+      revisionType: '{{ item.revisionType }}'
+      s3Location: '{{ item.s3Location }}'
+      string: '{{ item.string }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codedeploy.list_deployment_groups
+  calls:
+  - action: list_deployment_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.deploymentGroups }}'
+    item:
+      applicationName: '{{ response.applicationName }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codedeploy.list_deployment_instances
+  calls:
+  - action: list_deployment_instances
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.instancesList }}'
+    item:
+      instanceSummary: '{{ item.instanceSummary }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codedeploy.list_deployment_targets
+  calls:
+  - action: list_deployment_targets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.targetIds }}'
+    item:
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codedeploy.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Tags }}'
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'

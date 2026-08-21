@@ -1,0 +1,99 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: acm
+# 3 ops (3 from checks, +0 for inventory)
+version: '1.0'
+provider: aws
+service: acm
+discovery:
+  - calls:
+    - action: get_account_configuration
+      on_error: continue
+      save_as: response
+    discovery_id: aws.acm.get_account_configuration
+    emit:
+      as: item
+      item:
+        DaysBeforeExpiry: '{{ response.ExpiryEvents.DaysBeforeExpiry }}'
+        ExpiryEvents: '{{ response.ExpiryEvents.ExpiryEvents }}'
+  - calls:
+    - action: list_certificates
+      on_error: continue
+      save_as: response
+    discovery_id: aws.acm.list_certificates
+    emit:
+      as: item
+      item:
+        Certificate: '{{ item.Certificate }}'
+        CertificateArn: '{{ item.CertificateArn }}'
+        CertificateChain: '{{ item.CertificateChain }}'
+        CreatedAt: '{{ item.CreatedAt }}'
+        DomainName: '{{ item.DomainName }}'
+        DomainValidationOptions: '{{ item.DomainValidationOptions }}'
+        ExportOption: '{{ item.ExportOption }}'
+        Exported: '{{ item.Exported }}'
+        ExtendedKeyUsages: '{{ item.ExtendedKeyUsages }}'
+        FailureReason: '{{ item.FailureReason }}'
+        HasAdditionalSubjectAlternativeNames: '{{ item.HasAdditionalSubjectAlternativeNames
+          }}'
+        ImportedAt: '{{ item.ImportedAt }}'
+        InUse: '{{ item.InUse }}'
+        InUseBy: '{{ item.InUseBy }}'
+        IssuedAt: '{{ item.IssuedAt }}'
+        Issuer: '{{ item.Issuer }}'
+        KeyAlgorithm: '{{ item.KeyAlgorithm }}'
+        KeyUsages: '{{ item.KeyUsages }}'
+        ManagedBy: '{{ item.ManagedBy }}'
+        NotAfter: '{{ item.NotAfter }}'
+        NotBefore: '{{ item.NotBefore }}'
+        Options: '{{ item.Options }}'
+        RenewalEligibility: '{{ item.RenewalEligibility }}'
+        RenewalSummary: '{{ item.RenewalSummary }}'
+        RevocationReason: '{{ item.RevocationReason }}'
+        RevokedAt: '{{ item.RevokedAt }}'
+        Serial: '{{ item.Serial }}'
+        SignatureAlgorithm: '{{ item.SignatureAlgorithm }}'
+        Status: '{{ item.Status }}'
+        Subject: '{{ item.Subject }}'
+        SubjectAlternativeNameSummaries: '{{ item.SubjectAlternativeNameSummaries }}'
+        SubjectAlternativeNames: '{{ item.SubjectAlternativeNames }}'
+        Type: '{{ item.Type }}'
+      items_for: '{{ response.CertificateSummaryList }}'
+  - calls:
+    - action: describe_certificate
+      on_error: continue
+      params:
+        CertificateArn: '{{ item.CertificateArn }}'
+      save_as: response
+    discovery_id: aws.acm.describe_certificate
+    emit:
+      as: item
+      item:
+        Certificate: '{{ response.Certificate.Certificate }}'
+        CertificateArn: '{{ response.Certificate.CertificateArn }}'
+        CertificateAuthorityArn: '{{ response.Certificate.CertificateAuthorityArn }}'
+        CreatedAt: '{{ response.Certificate.CreatedAt }}'
+        DomainName: '{{ response.Certificate.DomainName }}'
+        DomainValidationOptions: '{{ response.Certificate.DomainValidationOptions }}'
+        ExtendedKeyUsages: '{{ response.Certificate.ExtendedKeyUsages }}'
+        FailureReason: '{{ response.Certificate.FailureReason }}'
+        ImportedAt: '{{ response.Certificate.ImportedAt }}'
+        InUseBy: '{{ response.Certificate.InUseBy }}'
+        IssuedAt: '{{ response.Certificate.IssuedAt }}'
+        Issuer: '{{ response.Certificate.Issuer }}'
+        KeyAlgorithm: '{{ response.Certificate.KeyAlgorithm }}'
+        KeyUsages: '{{ response.Certificate.KeyUsages }}'
+        ManagedBy: '{{ response.Certificate.ManagedBy }}'
+        NotAfter: '{{ response.Certificate.NotAfter }}'
+        NotBefore: '{{ response.Certificate.NotBefore }}'
+        Options: '{{ response.Certificate.Options }}'
+        RenewalEligibility: '{{ response.Certificate.RenewalEligibility }}'
+        RenewalSummary: '{{ response.Certificate.RenewalSummary }}'
+        RevocationReason: '{{ response.Certificate.RevocationReason }}'
+        RevokedAt: '{{ response.Certificate.RevokedAt }}'
+        Serial: '{{ response.Certificate.Serial }}'
+        SignatureAlgorithm: '{{ response.Certificate.SignatureAlgorithm }}'
+        Status: '{{ response.Certificate.Status }}'
+        Subject: '{{ response.Certificate.Subject }}'
+        SubjectAlternativeNames: '{{ response.Certificate.SubjectAlternativeNames }}'
+        Type: '{{ response.Certificate.Type }}'
+    for_each: aws.acm.list_certificates

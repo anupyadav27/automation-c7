@@ -1,0 +1,395 @@
+version: '1.0'
+provider: aws
+service: comprehend
+discovery:
+- calls:
+  - action: list_datasets
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_datasets
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      DatasetArn: '{{ item.DatasetArn }}'
+      DatasetName: '{{ item.DatasetName }}'
+      DatasetProperties: '{{ item.DatasetProperties }}'
+      DatasetS3Uri: '{{ item.DatasetS3Uri }}'
+      DatasetType: '{{ item.DatasetType }}'
+      Description: '{{ item.Description }}'
+      EndTime: '{{ item.EndTime }}'
+      Message: '{{ item.Message }}'
+      NumberOfDocuments: '{{ item.NumberOfDocuments }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.DatasetPropertiesList }}'
+- calls:
+  - action: list_document_classification_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_document_classification_jobs
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      DocumentClassificationJobProperties: '{{ item.DocumentClassificationJobPropertiesList[].JobId }}'
+      DocumentClassifierArn: '{{ item.DocumentClassifierArn }}'
+      EndTime: '{{ item.EndTime }}'
+      FlywheelArn: '{{ item.FlywheelArn }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobArn: '{{ item.JobArn }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      Message: '{{ item.Message }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      SecurityGroupIds: '{{ item.SecurityGroupIds }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      SubnetIds: '{{ item.SubnetIds }}'
+      VolumeKmsKeyId: '{{ item.VolumeKmsKeyId }}'
+      VpcConfig: '{{ item.VpcConfig }}'
+    items_for: '{{ response.DocumentClassificationJobPropertiesList }}'
+- calls:
+  - action: list_document_classifier_summaries
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_document_classifier_summaries
+  emit:
+    as: item
+    item:
+      DocumentClassifierName: '{{ item.DocumentClassifierName }}'
+      DocumentClassifierProperties: '{{ item.DocumentClassifierProperties }}'
+      LatestVersionCreatedAt: '{{ item.LatestVersionCreatedAt }}'
+      LatestVersionName: '{{ item.LatestVersionName }}'
+      LatestVersionStatus: '{{ item.LatestVersionStatus }}'
+      NumberOfVersions: '{{ item.NumberOfVersions }}'
+    items_for: '{{ response.DocumentClassifierSummariesList }}'
+- calls:
+  - action: list_document_classifiers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_document_classifiers
+  emit:
+    as: item
+    item:
+      ClassifierMetadata: '{{ item.ClassifierMetadata }}'
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      DocumentClassifierArn: '{{ item.DocumentClassifierArn }}'
+      DocumentClassifierProperties: '{{ item.DocumentClassifierProperties }}'
+      EndTime: '{{ item.EndTime }}'
+      FlywheelArn: '{{ item.FlywheelArn }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      Message: '{{ item.Message }}'
+      Mode: '{{ item.Mode }}'
+      ModelKmsKeyId: '{{ item.ModelKmsKeyId }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      SourceModelArn: '{{ item.SourceModelArn }}'
+      Status: '{{ item.Status }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      TrainingEndTime: '{{ item.TrainingEndTime }}'
+      TrainingStartTime: '{{ item.TrainingStartTime }}'
+      VersionName: '{{ item.VersionName }}'
+      VolumeKmsKeyId: '{{ item.VolumeKmsKeyId }}'
+      VpcConfig: '{{ item.VpcConfig }}'
+    items_for: '{{ response.DocumentClassifierPropertiesList }}'
+- calls:
+  - action: list_dominant_language_detection_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_dominant_language_detection_jobs
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      DominantLanguageDetectionJobProperties: '{{ item.DominantLanguageDetectionJobPropertiesList[].JobId }}'
+      EndTime: '{{ item.EndTime }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobArn: '{{ item.JobArn }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      Message: '{{ item.Message }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      VolumeKmsKeyId: '{{ item.VolumeKmsKeyId }}'
+      VpcConfig: '{{ item.VpcConfig }}'
+    items_for: '{{ response.DominantLanguageDetectionJobPropertiesList }}'
+- calls:
+  - action: list_endpoints
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_endpoints
+  emit:
+    as: item
+    item:
+      CreationTime: '{{ item.CreationTime }}'
+      CurrentInferenceUnits: '{{ item.CurrentInferenceUnits }}'
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      DesiredDataAccessRoleArn: '{{ item.DesiredDataAccessRoleArn }}'
+      DesiredInferenceUnits: '{{ item.DesiredInferenceUnits }}'
+      DesiredModelArn: '{{ item.DesiredModelArn }}'
+      EndpointArn: '{{ item.EndpointArn }}'
+      EndpointProperties: '{{ item.EndpointProperties }}'
+      FlywheelArn: '{{ item.FlywheelArn }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      Message: '{{ item.Message }}'
+      ModelArn: '{{ item.ModelArn }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.EndpointPropertiesList }}'
+- calls:
+  - action: list_entities_detection_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_entities_detection_jobs
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      EndTime: '{{ item.EndTime }}'
+      EntitiesDetectionJobProperties: '{{ item.EntitiesDetectionJobProperties }}'
+      EntityRecognizerArn: '{{ item.EntityRecognizerArn }}'
+      FlywheelArn: '{{ item.FlywheelArn }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobArn: '{{ item.JobArn }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      Message: '{{ item.Message }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      VolumeKmsKeyId: '{{ item.VolumeKmsKeyId }}'
+      VpcConfig: '{{ item.VpcConfig }}'
+    items_for: '{{ response.EntitiesDetectionJobPropertiesList }}'
+- calls:
+  - action: list_entity_recognizer_summaries
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_entity_recognizer_summaries
+  emit:
+    as: item
+    item:
+      EntityRecognizerProperties: '{{ item.EntityRecognizerProperties }}'
+      LatestVersionCreatedAt: '{{ item.LatestVersionCreatedAt }}'
+      LatestVersionName: '{{ item.LatestVersionName }}'
+      LatestVersionStatus: '{{ item.LatestVersionStatus }}'
+      NumberOfVersions: '{{ item.NumberOfVersions }}'
+      RecognizerName: '{{ item.RecognizerName }}'
+    items_for: '{{ response.EntityRecognizerSummariesList }}'
+- calls:
+  - action: list_entity_recognizers
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_entity_recognizers
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      EndTime: '{{ item.EndTime }}'
+      EntityRecognizerArn: '{{ item.EntityRecognizerArn }}'
+      EntityRecognizerProperties: '{{ item.EntityRecognizerProperties }}'
+      FlywheelArn: '{{ item.FlywheelArn }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      Message: '{{ item.Message }}'
+      ModelKmsKeyId: '{{ item.ModelKmsKeyId }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      RecognizerMetadata: '{{ item.RecognizerMetadata }}'
+      SourceModelArn: '{{ item.SourceModelArn }}'
+      Status: '{{ item.Status }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      TrainingEndTime: '{{ item.TrainingEndTime }}'
+      TrainingStartTime: '{{ item.TrainingStartTime }}'
+      VersionName: '{{ item.VersionName }}'
+      VolumeKmsKeyId: '{{ item.VolumeKmsKeyId }}'
+      VpcConfig: '{{ item.VpcConfig }}'
+    items_for: '{{ response.EntityRecognizerPropertiesList }}'
+- calls:
+  - action: list_events_detection_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_events_detection_jobs
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      EndTime: '{{ item.EndTime }}'
+      EventsDetectionJobProperties: '{{ item.EventsDetectionJobProperties }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobArn: '{{ item.JobArn }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      Message: '{{ item.Message }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      TargetEventTypes: '{{ item.TargetEventTypes }}'
+    items_for: '{{ response.EventsDetectionJobPropertiesList }}'
+- calls:
+  - action: list_flywheels
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_flywheels
+  emit:
+    as: item
+    item:
+      ActiveModelArn: '{{ item.ActiveModelArn }}'
+      CreationTime: '{{ item.CreationTime }}'
+      DataLakeS3Uri: '{{ item.DataLakeS3Uri }}'
+      FlywheelArn: '{{ item.FlywheelArn }}'
+      LastModifiedTime: '{{ item.LastModifiedTime }}'
+      LatestFlywheelIteration: '{{ item.LatestFlywheelIteration }}'
+      Message: '{{ item.Message }}'
+      ModelType: '{{ item.ModelType }}'
+      Status: '{{ item.Status }}'
+    items_for: '{{ response.FlywheelSummaryList }}'
+- calls:
+  - action: list_key_phrases_detection_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_key_phrases_detection_jobs
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      EndTime: '{{ item.EndTime }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobArn: '{{ item.JobArn }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      KeyPhrasesDetectionJobProperties: '{{ item.KeyPhrasesDetectionJobProperties }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      Message: '{{ item.Message }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      VolumeKmsKeyId: '{{ item.VolumeKmsKeyId }}'
+      VpcConfig: '{{ item.VpcConfig }}'
+    items_for: '{{ response.KeyPhrasesDetectionJobPropertiesList }}'
+- calls:
+  - action: list_pii_entities_detection_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_pii_entities_detection_jobs
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      DocumentClassificationJobProperties: '{{ item.DocumentClassificationJobProperties }}'
+      EndTime: '{{ item.EndTime }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobArn: '{{ item.JobArn }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      Message: '{{ item.Message }}'
+      Mode: '{{ item.Mode }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      PiiEntitiesDetectionJobProperties: '{{ item.PiiEntitiesDetectionJobPropertiesList[].Mode }}'
+      RedactionConfig: '{{ item.RedactionConfig }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+    items_for: '{{ response.PiiEntitiesDetectionJobPropertiesList }}'
+- calls:
+  - action: list_sentiment_detection_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_sentiment_detection_jobs
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      DominantLanguageDetectionJobProperties: '{{ item.DominantLanguageDetectionJobProperties }}'
+      EndTime: '{{ item.EndTime }}'
+      EntitiesDetectionJobProperties: '{{ item.EntitiesDetectionJobProperties }}'
+      EventsDetectionJobProperties: '{{ item.EventsDetectionJobProperties }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobArn: '{{ item.JobArn }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      KeyPhrasesDetectionJobProperties: '{{ item.KeyPhrasesDetectionJobProperties }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      Message: '{{ item.Message }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      PiiEntitiesDetectionJobProperties: '{{ item.PiiEntitiesDetectionJobProperties }}'
+      SentimentDetectionJobProperties: '{{ item.SentimentDetectionJobProperties }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      TargetedSentimentDetectionJobProperties: '{{ item.TargetedSentimentDetectionJobProperties }}'
+      TopicsDetectionJobProperties: '{{ item.TopicsDetectionJobProperties }}'
+      VolumeKmsKeyId: '{{ item.VolumeKmsKeyId }}'
+      VpcConfig: '{{ item.VpcConfig }}'
+    items_for: '{{ response.SentimentDetectionJobPropertiesList }}'
+- calls:
+  - action: list_targeted_sentiment_detection_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_targeted_sentiment_detection_jobs
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      EndTime: '{{ item.EndTime }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobArn: '{{ item.JobArn }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      LanguageCode: '{{ item.LanguageCode }}'
+      Message: '{{ item.Message }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      TargetedSentimentDetectionJobProperties: '{{ item.TargetedSentimentDetectionJobPropertiesList[].JobId }}'
+      VolumeKmsKeyId: '{{ item.VolumeKmsKeyId }}'
+      VpcConfig: '{{ item.VpcConfig }}'
+    items_for: '{{ response.TargetedSentimentDetectionJobPropertiesList }}'
+- calls:
+  - action: list_topics_detection_jobs
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_topics_detection_jobs
+  emit:
+    as: item
+    item:
+      DataAccessRoleArn: '{{ item.DataAccessRoleArn }}'
+      EndTime: '{{ item.EndTime }}'
+      InputDataConfig: '{{ item.InputDataConfig }}'
+      JobArn: '{{ item.JobArn }}'
+      JobId: '{{ item.JobId }}'
+      JobName: '{{ item.JobName }}'
+      JobStatus: '{{ item.JobStatus }}'
+      Message: '{{ item.Message }}'
+      NumberOfTopics: '{{ item.NumberOfTopics }}'
+      OutputDataConfig: '{{ item.OutputDataConfig }}'
+      SubmitTime: '{{ item.SubmitTime }}'
+      TopicsDetectionJobProperties: '{{ item.TopicsDetectionJobProperties }}'
+      VolumeKmsKeyId: '{{ item.VolumeKmsKeyId }}'
+      VpcConfig: '{{ item.VpcConfig }}'
+    items_for: '{{ response.TopicsDetectionJobPropertiesList }}'
+- calls:
+  - action: describe_resource_policy
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.describe_resource_policy
+  emit:
+    as: item
+    item:
+      Statement: '{{ response.Statement }}'
+      Version: '{{ response.Version }}'
+      CreationTime: '{{ response.CreationTime }}'
+      LastModifiedTime: '{{ response.LastModifiedTime }}'
+      PolicyRevisionId: '{{ response.PolicyRevisionId }}'
+      ResourcePolicy: '{{ response.ResourcePolicy }}'
+- calls:
+  - action: list_tags_for_resource
+    on_error: continue
+    save_as: response
+  discovery_id: aws.comprehend.list_tags_for_resource
+  emit:
+    as: item
+    item:
+      Key: '{{ item.Key }}'
+      Value: '{{ item.Value }}'
+      ResourceArn: '{{ response.ResourceArn }}'
+    items_for: '{{ response.Tags }}'

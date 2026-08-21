@@ -1,0 +1,317 @@
+version: '1.0'
+provider: aws
+service: codepipeline
+services:
+  client: codepipeline
+  module: boto3.client
+discovery:
+- discovery_id: aws.codepipeline.list_action_types
+  calls:
+  - action: list_action_types
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.actionTypes }}'
+    item:
+      Status: '{{ item.Status }}'
+      DestinationArn: '{{ item.DestinationArn }}'
+      Enabled: '{{ item.Enabled }}'
+      Format: '{{ item.Format }}'
+      Level: '{{ item.Level }}'
+      actionConfigurationProperties: '{{ item.actionConfigurationProperties }}'
+      id: '{{ item.id }}'
+      inputArtifactDetails: '{{ item.inputArtifactDetails }}'
+      outputArtifactDetails: '{{ item.outputArtifactDetails }}'
+      settings: '{{ item.settings }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codepipeline.list_pipelines
+  calls:
+  - action: list_pipelines
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.pipelines }}'
+    item:
+      created: '{{ item.created }}'
+      executionMode: '{{ item.executionMode }}'
+      metadata: '{{ item.metadata }}'
+      name: '{{ item.name }}'
+      pipelineType: '{{ item.pipelineType }}'
+      updated: '{{ item.updated }}'
+      version: '{{ item.version }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codepipeline.list_webhooks
+  calls:
+  - action: list_webhooks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.webhooks }}'
+    item:
+      arn: '{{ item.arn }}'
+      definition: '{{ item.definition }}'
+      errorCode: '{{ item.errorCode }}'
+      errorMessage: '{{ item.errorMessage }}'
+      lastTriggered: '{{ item.lastTriggered }}'
+      tags: '{{ item.tags }}'
+      url: '{{ item.url }}'
+- discovery_id: aws.codepipeline.get_action_type
+  for_each: aws.codepipeline.list_pipelines
+  calls:
+  - action: get_action_type
+    params:
+      category: '{{ item.category }}'
+      owner: '{{ item.owner }}'
+      provider: '{{ item.provider }}'
+      version: '{{ item.version }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      description: '{{ response.actionType.description }}'
+      executor: '{{ response.actionType.executor.type }}'
+      id: '{{ response.actionType.id }}'
+      inputArtifactDetails: '{{ response.actionType.inputArtifactDetails }}'
+      outputArtifactDetails: '{{ response.actionType.outputArtifactDetails }}'
+      permissions: '{{ response.actionType.permissions }}'
+      properties: '{{ response.actionType.properties[].key }}'
+      urls: '{{ response.actionType.urls }}'
+      lambdaFunctionArn: '{{ response.actionType.executor.configuration.lambdaExecutorConfiguration.lambdaFunctionArn }}'
+      jobTimeout: '{{ response.actionType.executor.jobTimeout }}'
+      policyStatementsTemplate: '{{ response.actionType.executor.policyStatementsTemplate }}'
+      type: '{{ response.actionType.executor.type }}'
+      category: '{{ response.actionType.id.category }}'
+      owner: '{{ response.actionType.id.owner }}'
+      provider: '{{ response.actionType.id.provider }}'
+      version: '{{ response.actionType.id.version }}'
+      maximumCount: '{{ response.actionType.inputArtifactDetails.maximumCount }}'
+      minimumCount: '{{ response.actionType.inputArtifactDetails.minimumCount }}'
+      configurationUrl: '{{ response.actionType.urls.configurationUrl }}'
+      entityUrlTemplate: '{{ response.actionType.urls.entityUrlTemplate }}'
+      executionUrlTemplate: '{{ response.actionType.urls.executionUrlTemplate }}'
+      revisionUrlTemplate: '{{ response.actionType.urls.revisionUrlTemplate }}'
+- discovery_id: aws.codepipeline.get_job_details
+  calls:
+  - action: get_job_details
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      accountId: '{{ response.jobDetails.accountId }}'
+      data: '{{ response.jobDetails.id }}'
+      id: '{{ response.jobDetails.id }}'
+      jobDetails: '{{ response.jobDetails.jobDetails }}'
+      configuration: '{{ response.jobDetails.data.actionConfiguration.configuration }}'
+      category: '{{ response.jobDetails.data.actionTypeId.category }}'
+      owner: '{{ response.jobDetails.data.actionTypeId.owner }}'
+      provider: '{{ response.jobDetails.data.actionTypeId.provider }}'
+      version: '{{ response.jobDetails.data.actionTypeId.version }}'
+      accessKeyId: '{{ response.jobDetails.data.artifactCredentials.accessKeyId }}'
+      secretAccessKey: '{{ response.jobDetails.data.artifactCredentials.secretAccessKey }}'
+      sessionToken: '{{ response.jobDetails.data.artifactCredentials.sessionToken }}'
+      continuationToken: '{{ response.jobDetails.data.continuationToken }}'
+      type: '{{ response.jobDetails.data.encryptionKey.type }}'
+      actionExecutionId: '{{ response.jobDetails.data.pipelineContext.action.actionExecutionId }}'
+      name: '{{ response.jobDetails.data.pipelineContext.action.name }}'
+      pipelineArn: '{{ response.jobDetails.data.pipelineContext.pipelineArn }}'
+      pipelineExecutionId: '{{ response.jobDetails.data.pipelineContext.pipelineExecutionId }}'
+      pipelineName: '{{ response.jobDetails.data.pipelineContext.pipelineName }}'
+- discovery_id: aws.codepipeline.get_pipeline
+  for_each: aws.codepipeline.list_pipelines
+  calls:
+  - action: get_pipeline
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      artifactStore: '{{ response.pipeline.artifactStores }}'
+      artifactStores: '{{ response.pipeline.artifactStores }}'
+      executionMode: '{{ response.pipeline.executionMode }}'
+      metadata: '{{ response.pipeline.metadata }}'
+      name: '{{ response.pipeline.name }}'
+      pipelineType: '{{ response.pipeline.pipelineType }}'
+      roleArn: '{{ response.pipeline.roleArn }}'
+      stages: '{{ response.pipeline.stages }}'
+      triggers: '{{ response.pipeline.triggers }}'
+      variables: '{{ response.pipeline.variables }}'
+      version: '{{ response.pipeline.version }}'
+      created: '{{ response.metadata.created }}'
+      pipelineArn: '{{ response.metadata.pipelineArn }}'
+      pollingDisabledAt: '{{ response.metadata.pollingDisabledAt }}'
+      updated: '{{ response.metadata.updated }}'
+      id: '{{ response.pipeline.artifactStore.encryptionKey.id }}'
+      type: '{{ response.pipeline.artifactStore.encryptionKey.type }}'
+      location: '{{ response.pipeline.artifactStore.location }}'
+- discovery_id: aws.codepipeline.get_pipeline_execution
+  calls:
+  - action: get_pipeline_execution
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      artifactRevisions: '{{ response.pipelineExecution.artifactRevisions[].name }}'
+      executionMode: '{{ response.pipelineExecution.executionMode }}'
+      executionType: '{{ response.pipelineExecution.executionType }}'
+      pipelineExecutionId: '{{ response.pipelineExecution.pipelineExecutionId }}'
+      pipelineName: '{{ response.pipelineExecution.pipelineName }}'
+      pipelineVersion: '{{ response.pipelineExecution.pipelineVersion }}'
+      rollbackMetadata: '{{ response.pipelineExecution.rollbackMetadata }}'
+      status: '{{ response.pipelineExecution.status }}'
+      statusSummary: '{{ response.pipelineExecution.statusSummary }}'
+      trigger: '{{ response.pipelineExecution.trigger }}'
+      variables: '{{ response.pipelineExecution.variables[].name }}'
+      rollbackTargetPipelineExecutionId: '{{ response.pipelineExecution.rollbackMetadata.rollbackTargetPipelineExecutionId }}'
+      triggerDetail: '{{ response.pipelineExecution.trigger.triggerDetail }}'
+      triggerType: '{{ response.pipelineExecution.trigger.triggerType }}'
+- discovery_id: aws.codepipeline.get_pipeline_state
+  for_each: aws.codepipeline.list_pipelines
+  calls:
+  - action: get_pipeline_state
+    params:
+      name: '{{ item.name }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.stageStates }}'
+    item:
+      actionStates: '{{ item.actionStates }}'
+      beforeEntryConditionState: '{{ item.beforeEntryConditionState }}'
+      inboundExecution: '{{ item.inboundExecution }}'
+      inboundExecutions: '{{ item.inboundExecutions }}'
+      inboundTransitionState: '{{ item.inboundTransitionState }}'
+      latestExecution: '{{ item.latestExecution }}'
+      onFailureConditionState: '{{ item.onFailureConditionState }}'
+      onSuccessConditionState: '{{ item.onSuccessConditionState }}'
+      retryStageMetadata: '{{ item.retryStageMetadata }}'
+      stageName: '{{ item.stageName }}'
+      created: '{{ response.created }}'
+      pipelineName: '{{ response.pipelineName }}'
+      pipelineVersion: '{{ response.pipelineVersion }}'
+      updated: '{{ response.updated }}'
+- discovery_id: aws.codepipeline.get_third_party_job_details
+  calls:
+  - action: get_third_party_job_details
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      data: '{{ response.jobDetails.id }}'
+      id: '{{ response.jobDetails.id }}'
+      nonce: '{{ response.jobDetails.nonce }}'
+      configuration: '{{ response.jobDetails.data.actionConfiguration.configuration }}'
+      category: '{{ response.jobDetails.data.actionTypeId.category }}'
+      owner: '{{ response.jobDetails.data.actionTypeId.owner }}'
+      provider: '{{ response.jobDetails.data.actionTypeId.provider }}'
+      version: '{{ response.jobDetails.data.actionTypeId.version }}'
+      accessKeyId: '{{ response.jobDetails.data.artifactCredentials.accessKeyId }}'
+      secretAccessKey: '{{ response.jobDetails.data.artifactCredentials.secretAccessKey }}'
+      sessionToken: '{{ response.jobDetails.data.artifactCredentials.sessionToken }}'
+      continuationToken: '{{ response.jobDetails.data.continuationToken }}'
+      type: '{{ response.jobDetails.data.encryptionKey.type }}'
+      actionExecutionId: '{{ response.jobDetails.data.pipelineContext.action.actionExecutionId }}'
+      name: '{{ response.jobDetails.data.pipelineContext.action.name }}'
+      pipelineArn: '{{ response.jobDetails.data.pipelineContext.pipelineArn }}'
+      pipelineExecutionId: '{{ response.jobDetails.data.pipelineContext.pipelineExecutionId }}'
+      pipelineName: '{{ response.jobDetails.data.pipelineContext.pipelineName }}'
+- discovery_id: aws.codepipeline.list_action_executions
+  calls:
+  - action: list_action_executions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.actionExecutionDetails }}'
+    item:
+      actionExecutionId: '{{ item.actionExecutionId }}'
+      actionName: '{{ item.actionName }}'
+      input: '{{ item.input }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      output: '{{ item.output }}'
+      pipelineExecutionId: '{{ item.pipelineExecutionId }}'
+      pipelineVersion: '{{ item.pipelineVersion }}'
+      stageName: '{{ item.stageName }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      updatedBy: '{{ item.updatedBy }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codepipeline.list_deploy_action_execution_targets
+  calls:
+  - action: list_deploy_action_execution_targets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.targets }}'
+    item:
+      endTime: '{{ item.endTime }}'
+      events: '{{ item.events }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      targetId: '{{ item.targetId }}'
+      targetType: '{{ item.targetType }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codepipeline.list_pipeline_executions
+  calls:
+  - action: list_pipeline_executions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.pipelineExecutionSummaries }}'
+    item:
+      executionMode: '{{ item.executionMode }}'
+      executionType: '{{ item.executionType }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      pipelineExecutionId: '{{ item.pipelineExecutionId }}'
+      rollbackMetadata: '{{ item.rollbackMetadata }}'
+      sourceRevisions: '{{ item.sourceRevisions }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      statusSummary: '{{ item.statusSummary }}'
+      stopTrigger: '{{ item.stopTrigger }}'
+      trigger: '{{ item.trigger }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codepipeline.list_rule_executions
+  calls:
+  - action: list_rule_executions
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.ruleExecutionDetails }}'
+    item:
+      input: '{{ item.input }}'
+      lastUpdateTime: '{{ item.lastUpdateTime }}'
+      output: '{{ item.output }}'
+      pipelineExecutionId: '{{ item.pipelineExecutionId }}'
+      pipelineVersion: '{{ item.pipelineVersion }}'
+      ruleExecutionId: '{{ item.ruleExecutionId }}'
+      ruleName: '{{ item.ruleName }}'
+      stageName: '{{ item.stageName }}'
+      startTime: '{{ item.startTime }}'
+      status: '{{ item.status }}'
+      updatedBy: '{{ item.updatedBy }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.codepipeline.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.tags }}'
+    item:
+      key: '{{ item.key }}'
+      value: '{{ item.value }}'
+      nextToken: '{{ response.nextToken }}'

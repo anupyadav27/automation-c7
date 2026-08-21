@@ -1,0 +1,327 @@
+version: '1.0'
+provider: aws
+service: outposts
+services:
+  client: outposts
+  module: boto3.client
+discovery:
+- discovery_id: aws.outposts.list_capacity_tasks
+  calls:
+  - action: list_capacity_tasks
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.CapacityTasks }}'
+    item:
+      CreationDate: '{{ item.CreationDate }}'
+      AssetId: '{{ item.AssetId }}'
+      CapacityTaskId: '{{ item.CapacityTaskId }}'
+      CapacityTaskStatus: '{{ item.CapacityTaskStatus }}'
+      CompletionDate: '{{ item.CompletionDate }}'
+      InstanceTypes: '{{ item.InstanceTypes }}'
+      LastModifiedDate: '{{ item.LastModifiedDate }}'
+      LineItems: '{{ item.LineItems }}'
+      OrderId: '{{ item.OrderId }}'
+      OutpostId: '{{ item.OutpostId }}'
+      PaymentOption: '{{ item.PaymentOption }}'
+      PaymentTerm: '{{ item.PaymentTerm }}'
+      VCPUs: '{{ item.VCPUs }}'
+- discovery_id: aws.outposts.list_orders
+  calls:
+  - action: list_orders
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Orders }}'
+    item:
+      Status: '{{ item.Status }}'
+      LineItemCountsByStatus: '{{ item.LineItemCountsByStatus }}'
+      OrderFulfilledDate: '{{ item.OrderFulfilledDate }}'
+      OrderId: '{{ item.OrderId }}'
+      OrderSubmissionDate: '{{ item.OrderSubmissionDate }}'
+      OrderType: '{{ item.OrderType }}'
+      OutpostId: '{{ item.OutpostId }}'
+- discovery_id: aws.outposts.list_outposts
+  calls:
+  - action: list_outposts
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Outposts }}'
+    item:
+      Name: '{{ item.Name }}'
+      OwnerId: '{{ item.OwnerId }}'
+      Tags: '{{ item.Tags }}'
+      AvailabilityZone: '{{ item.AvailabilityZone }}'
+      AvailabilityZoneId: '{{ item.AvailabilityZoneId }}'
+      Description: '{{ item.Description }}'
+      LifeCycleStatus: '{{ item.LifeCycleStatus }}'
+      OutpostArn: '{{ item.OutpostArn }}'
+      OutpostId: '{{ item.OutpostId }}'
+      Site: '{{ item.Site }}'
+      SiteArn: '{{ item.SiteArn }}'
+      SiteId: '{{ item.SiteId }}'
+      SupportedHardwareType: '{{ item.SupportedHardwareType }}'
+- discovery_id: aws.outposts.list_sites
+  calls:
+  - action: list_sites
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Sites }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      Name: '{{ item.Name }}'
+      Tags: '{{ item.Tags }}'
+      Description: '{{ item.Description }}'
+      Notes: '{{ item.Notes }}'
+      OperatingAddressCity: '{{ item.OperatingAddressCity }}'
+      OperatingAddressCountryCode: '{{ item.Sites[].OperatingAddressCountryCode }}'
+      OperatingAddressStateOrRegion: '{{ item.Sites[].OperatingAddressStateOrRegion }}'
+      RackPhysicalProperties: '{{ item.RackPhysicalProperties }}'
+      SiteArn: '{{ item.SiteArn }}'
+      SiteId: '{{ item.SiteId }}'
+- discovery_id: aws.outposts.get_capacity_task
+  for_each: aws.outposts.list_capacity_tasks
+  calls:
+  - action: get_capacity_task
+    params:
+      CapacityTaskId: '{{ item.CapacityTaskId }}'
+      OutpostIdentifier: '{{ item.OutpostIdentifier }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.RequestedInstancePools }}'
+    item:
+      InstanceType: '{{ item.InstanceType }}'
+      AssetId: '{{ response.AssetId }}'
+      CapacityTaskId: '{{ response.CapacityTaskId }}'
+      CapacityTaskStatus: '{{ response.CapacityTaskStatus }}'
+      CompletionDate: '{{ response.CompletionDate }}'
+      CreationDate: '{{ response.CreationDate }}'
+      DryRun: '{{ response.DryRun }}'
+      Reason: '{{ response.Failed.Reason }}'
+      Type: '{{ response.Failed.Type }}'
+      LastModifiedDate: '{{ response.LastModifiedDate }}'
+      OrderId: '{{ response.OrderId }}'
+      OutpostId: '{{ response.OutpostId }}'
+      TaskActionOnBlockingInstances: '{{ response.TaskActionOnBlockingInstances }}'
+- discovery_id: aws.outposts.get_connection
+  calls:
+  - action: get_connection
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AllowedIps: '{{ response.ConnectionDetails.AllowedIps }}'
+      ClientPublicKey: '{{ response.ConnectionDetails.ClientPublicKey }}'
+      ClientTunnelAddress: '{{ response.ConnectionDetails.ClientTunnelAddress }}'
+      ServerEndpoint: '{{ response.ConnectionDetails.ServerEndpoint }}'
+      ServerPublicKey: '{{ response.ConnectionDetails.ServerPublicKey }}'
+      ServerTunnelAddress: '{{ response.ConnectionDetails.ServerTunnelAddress }}'
+      ConnectionId: '{{ response.ConnectionId }}'
+- discovery_id: aws.outposts.get_order
+  for_each: aws.outposts.list_capacity_tasks
+  calls:
+  - action: get_order
+    params:
+      OrderId: '{{ item.OrderId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Status: '{{ response.Order.Status }}'
+      LineItems: '{{ response.Order.LineItems }}'
+      OrderFulfilledDate: '{{ response.Order.OrderFulfilledDate }}'
+      OrderId: '{{ response.Order.OrderId }}'
+      OrderSubmissionDate: '{{ response.Order.OrderSubmissionDate }}'
+      OrderType: '{{ response.Order.OrderType }}'
+      OutpostId: '{{ response.Order.OutpostId }}'
+      PaymentOption: '{{ response.Order.PaymentOption }}'
+      PaymentTerm: '{{ response.Order.PaymentTerm }}'
+- discovery_id: aws.outposts.get_outpost
+  for_each: aws.outposts.list_capacity_tasks
+  calls:
+  - action: get_outpost
+    params:
+      OutpostId: '{{ item.OutpostId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Name: '{{ response.Outpost.Name }}'
+      OwnerId: '{{ response.Outpost.OwnerId }}'
+      Tags: '{{ response.Outpost.Tags }}'
+      AvailabilityZone: '{{ response.Outpost.AvailabilityZone }}'
+      AvailabilityZoneId: '{{ response.Outpost.AvailabilityZoneId }}'
+      Description: '{{ response.Outpost.Description }}'
+      LifeCycleStatus: '{{ response.Outpost.LifeCycleStatus }}'
+      OutpostArn: '{{ response.Outpost.OutpostArn }}'
+      OutpostId: '{{ response.Outpost.OutpostId }}'
+      SiteArn: '{{ response.Outpost.SiteArn }}'
+      SiteId: '{{ response.Outpost.SiteId }}'
+      SupportedHardwareType: '{{ response.Outpost.SupportedHardwareType }}'
+- discovery_id: aws.outposts.get_outpost_billing_information
+  calls:
+  - action: get_outpost_billing_information
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Subscriptions }}'
+    item:
+      BeginDate: '{{ item.BeginDate }}'
+      EndDate: '{{ item.EndDate }}'
+      MonthlyRecurringPrice: '{{ item.MonthlyRecurringPrice }}'
+      OrderIds: '{{ item.OrderIds }}'
+      SubscriptionId: '{{ item.SubscriptionId }}'
+      SubscriptionStatus: '{{ item.SubscriptionStatus }}'
+      SubscriptionType: '{{ item.SubscriptionType }}'
+      Subscriptions: '{{ item.Subscriptions }}'
+      UpfrontPrice: '{{ item.UpfrontPrice }}'
+- discovery_id: aws.outposts.get_outpost_instance_types
+  for_each: aws.outposts.list_capacity_tasks
+  calls:
+  - action: get_outpost_instance_types
+    params:
+      OutpostId: '{{ item.OutpostId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.InstanceTypes }}'
+    item:
+      InstanceType: '{{ item.InstanceType }}'
+      InstanceTypes: '{{ item.InstanceTypes }}'
+      VCPUs: '{{ item.VCPUs }}'
+      OutpostArn: '{{ response.OutpostArn }}'
+      OutpostId: '{{ response.OutpostId }}'
+- discovery_id: aws.outposts.get_outpost_supported_instance_types
+  calls:
+  - action: get_outpost_supported_instance_types
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.InstanceTypes }}'
+    item:
+      InstanceType: '{{ item.InstanceType }}'
+      VCPUs: '{{ item.VCPUs }}'
+- discovery_id: aws.outposts.get_site
+  for_each: aws.outposts.list_outposts
+  calls:
+  - action: get_site
+    params:
+      SiteId: '{{ item.SiteId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccountId: '{{ response.Site.AccountId }}'
+      Name: '{{ response.Site.Name }}'
+      Tags: '{{ response.Site.Tags }}'
+      Description: '{{ response.Site.Description }}'
+      Notes: '{{ response.Site.Notes }}'
+      OperatingAddressCity: '{{ response.Site.OperatingAddressCity }}'
+      OperatingAddressCountryCode: '{{ response.Site.OperatingAddressCountryCode }}'
+      OperatingAddressStateOrRegion: '{{ response.Site.OperatingAddressStateOrRegion }}'
+      RackPhysicalProperties: '{{ response.Site.RackPhysicalProperties }}'
+      SiteArn: '{{ response.Site.SiteArn }}'
+      SiteId: '{{ response.Site.SiteId }}'
+      FiberOpticCableType: '{{ response.Site.RackPhysicalProperties.FiberOpticCableType }}'
+      MaximumSupportedWeightLbs: '{{ response.Site.RackPhysicalProperties.MaximumSupportedWeightLbs }}'
+      OpticalStandard: '{{ response.Site.RackPhysicalProperties.OpticalStandard }}'
+      PowerConnector: '{{ response.Site.RackPhysicalProperties.PowerConnector }}'
+      PowerDrawKva: '{{ response.Site.RackPhysicalProperties.PowerDrawKva }}'
+      PowerFeedDrop: '{{ response.Site.RackPhysicalProperties.PowerFeedDrop }}'
+      PowerPhase: '{{ response.Site.RackPhysicalProperties.PowerPhase }}'
+      UplinkCount: '{{ response.Site.RackPhysicalProperties.UplinkCount }}'
+      UplinkGbps: '{{ response.Site.RackPhysicalProperties.UplinkGbps }}'
+- discovery_id: aws.outposts.get_site_address
+  for_each: aws.outposts.list_outposts
+  calls:
+  - action: get_site_address
+    params:
+      SiteId: '{{ item.SiteId }}'
+      AddressType: '{{ item.AddressType }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Address: '{{ response.Address }}'
+      AddressLine1: '{{ response.AddressLine1 }}'
+      AddressLine2: '{{ response.AddressLine2 }}'
+      AddressLine3: '{{ response.AddressLine3 }}'
+      City: '{{ response.City }}'
+      ContactName: '{{ response.ContactName }}'
+      ContactPhoneNumber: '{{ response.ContactPhoneNumber }}'
+      CountryCode: '{{ response.CountryCode }}'
+      DistrictOrCounty: '{{ response.DistrictOrCounty }}'
+      Municipality: '{{ response.Municipality }}'
+      PostalCode: '{{ response.PostalCode }}'
+      StateOrRegion: '{{ response.StateOrRegion }}'
+      AddressType: '{{ response.AddressType }}'
+      SiteId: '{{ response.SiteId }}'
+- discovery_id: aws.outposts.list_asset_instances
+  calls:
+  - action: list_asset_instances
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.AssetInstances }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      AssetId: '{{ item.AssetId }}'
+      AwsServiceName: '{{ item.AwsServiceName }}'
+      InstanceId: '{{ item.InstanceId }}'
+      InstanceType: '{{ item.InstanceType }}'
+- discovery_id: aws.outposts.list_assets
+  calls:
+  - action: list_assets
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.Assets }}'
+    item:
+      AssetId: '{{ item.AssetId }}'
+      AssetLocation: '{{ item.AssetLocation }}'
+      AssetType: '{{ item.AssetType }}'
+      ComputeAttributes: '{{ item.ComputeAttributes }}'
+      RackId: '{{ item.RackId }}'
+- discovery_id: aws.outposts.list_blocking_instances_for_capacity_task
+  for_each: aws.outposts.list_capacity_tasks
+  calls:
+  - action: list_blocking_instances_for_capacity_task
+    params:
+      OutpostIdentifier: '{{ item.OutpostIdentifier }}'
+      CapacityTaskId: '{{ item.CapacityTaskId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.BlockingInstances }}'
+    item:
+      AccountId: '{{ item.AccountId }}'
+      AwsServiceName: '{{ item.AwsServiceName }}'
+      InstanceId: '{{ item.InstanceId }}'
+- discovery_id: aws.outposts.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Tags: '{{ response.Tags }}'

@@ -1,0 +1,37 @@
+# Auto-generated: minimum discoveries for check rules + inventory identifiers
+# Sources: eventschemas (backed by schemas)
+# 2 ops (from checks)
+# Generated: 2026-04-14
+version: '1.0'
+provider: aws
+service: eventschemas
+services:
+  client: schemas
+  module: boto3.client
+discovery:
+  - discovery_id: aws.eventschemas.list_discoverers
+    calls:
+    - action: list_discoverers
+      save_as: response
+      on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Discoverers }}'
+      item:
+        State: '{{ item.State }}'
+        Tags: '{{ item.Tags }}'
+        CrossAccount: '{{ item.CrossAccount }}'
+        DiscovererArn: '{{ item.DiscovererArn }}'
+        DiscovererId: '{{ item.DiscovererId }}'
+        SourceArn: '{{ item.SourceArn }}'
+  - discovery_id: aws.eventschemas.list_registries
+    calls:
+    - action: list_registries
+      save_as: response
+      on_error: continue
+    emit:
+      as: item
+      items_for: '{{ response.Registries }}'
+      item:
+        Tags: '{{ item.Tags }}'
+        RegistryArn: '{{ item.RegistryArn }}'

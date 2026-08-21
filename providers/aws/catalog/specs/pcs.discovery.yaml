@@ -1,0 +1,140 @@
+version: '1.0'
+provider: aws
+service: pcs
+services:
+  client: pcs
+  module: boto3.client
+discovery:
+- discovery_id: aws.pcs.list_clusters
+  calls:
+  - action: list_clusters
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.clusters }}'
+    item:
+      arn: '{{ item.arn }}'
+      createdAt: '{{ item.createdAt }}'
+      id: '{{ item.id }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.pcs.get_cluster
+  calls:
+  - action: get_cluster
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.cluster.arn }}'
+      createdAt: '{{ response.cluster.createdAt }}'
+      endpoints: '{{ response.cluster.endpoints }}'
+      errorInfo: '{{ response.cluster.errorInfo }}'
+      id: '{{ response.cluster.id }}'
+      modifiedAt: '{{ response.cluster.modifiedAt }}'
+      name: '{{ response.cluster.name }}'
+      networking: '{{ response.cluster.networking }}'
+      scheduler: '{{ response.cluster.scheduler.type }}'
+      size: '{{ response.cluster.size }}'
+      slurmConfiguration: '{{ response.cluster.slurmConfiguration }}'
+      status: '{{ response.cluster.status }}'
+      type: '{{ response.cluster.scheduler.type }}'
+      version: '{{ response.cluster.scheduler.version }}'
+      defaultPurgeTimeInDays: '{{ response.cluster.slurmConfiguration.accounting.defaultPurgeTimeInDays }}'
+      mode: '{{ response.cluster.slurmConfiguration.accounting.mode }}'
+      secretArn: '{{ response.cluster.slurmConfiguration.authKey.secretArn }}'
+      secretVersion: '{{ response.cluster.slurmConfiguration.authKey.secretVersion }}'
+      scaleDownIdleTimeInSeconds: '{{ response.cluster.slurmConfiguration.scaleDownIdleTimeInSeconds }}'
+- discovery_id: aws.pcs.get_compute_node_group
+  calls:
+  - action: get_compute_node_group
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      amiId: '{{ response.computeNodeGroup.amiId }}'
+      arn: '{{ response.computeNodeGroup.arn }}'
+      clusterId: '{{ response.computeNodeGroup.clusterId }}'
+      createdAt: '{{ response.computeNodeGroup.createdAt }}'
+      customLaunchTemplate: '{{ response.computeNodeGroup.customLaunchTemplate.id }}'
+      errorInfo: '{{ response.computeNodeGroup.errorInfo[].code }}'
+      iamInstanceProfileArn: '{{ response.computeNodeGroup.iamInstanceProfileArn }}'
+      id: '{{ response.computeNodeGroup.id }}'
+      instanceConfigs: '{{ response.computeNodeGroup.instanceConfigs }}'
+      modifiedAt: '{{ response.computeNodeGroup.modifiedAt }}'
+      name: '{{ response.computeNodeGroup.name }}'
+      purchaseOption: '{{ response.computeNodeGroup.purchaseOption }}'
+      scalingConfiguration: '{{ response.computeNodeGroup.scalingConfiguration }}'
+      slurmConfiguration: '{{ response.computeNodeGroup.slurmConfiguration }}'
+      spotOptions: '{{ response.computeNodeGroup.spotOptions }}'
+      status: '{{ response.computeNodeGroup.status }}'
+      subnetIds: '{{ response.computeNodeGroup.subnetIds }}'
+      version: '{{ response.computeNodeGroup.customLaunchTemplate.version }}'
+      maxInstanceCount: '{{ response.computeNodeGroup.scalingConfiguration.maxInstanceCount }}'
+      minInstanceCount: '{{ response.computeNodeGroup.scalingConfiguration.minInstanceCount }}'
+      allocationStrategy: '{{ response.computeNodeGroup.spotOptions.allocationStrategy }}'
+- discovery_id: aws.pcs.get_queue
+  calls:
+  - action: get_queue
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      arn: '{{ response.queue.arn }}'
+      clusterId: '{{ response.queue.clusterId }}'
+      computeNodeGroupConfigurations: '{{ response.queue.computeNodeGroupConfigurations }}'
+      createdAt: '{{ response.queue.createdAt }}'
+      errorInfo: '{{ response.queue.errorInfo }}'
+      id: '{{ response.queue.id }}'
+      modifiedAt: '{{ response.queue.modifiedAt }}'
+      name: '{{ response.queue.name }}'
+      slurmConfiguration: '{{ response.queue.slurmConfiguration }}'
+      status: '{{ response.queue.status }}'
+- discovery_id: aws.pcs.list_compute_node_groups
+  calls:
+  - action: list_compute_node_groups
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.computeNodeGroups }}'
+    item:
+      arn: '{{ item.arn }}'
+      clusterId: '{{ item.clusterId }}'
+      createdAt: '{{ item.createdAt }}'
+      id: '{{ item.id }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.pcs.list_queues
+  calls:
+  - action: list_queues
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.queues }}'
+    item:
+      arn: '{{ item.arn }}'
+      clusterId: '{{ item.clusterId }}'
+      createdAt: '{{ item.createdAt }}'
+      id: '{{ item.id }}'
+      modifiedAt: '{{ item.modifiedAt }}'
+      name: '{{ item.name }}'
+      status: '{{ item.status }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.pcs.list_tags_for_resource
+  calls:
+  - action: list_tags_for_resource
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      tags: '{{ response.tags }}'

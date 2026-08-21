@@ -1,0 +1,49 @@
+version: '1.0'
+provider: aws
+service: support-app
+services:
+  client: support-app
+  module: boto3.client
+discovery:
+- discovery_id: aws.support-app.get_account_alias
+  calls:
+  - action: get_account_alias
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      accountAlias: '{{ response.accountAlias }}'
+- discovery_id: aws.support-app.list_slack_channel_configurations
+  calls:
+  - action: list_slack_channel_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.slackChannelConfigurations }}'
+    item:
+      Status: '{{ item.Status }}'
+      Enabled: '{{ item.Enabled }}'
+      channelId: '{{ item.channelId }}'
+      channelName: '{{ item.channelName }}'
+      channelRoleArn: '{{ item.channelRoleArn }}'
+      notifyOnAddCorrespondenceToCase: '{{ item.notifyOnAddCorrespondenceToCase }}'
+      notifyOnCaseSeverity: '{{ item.notifyOnCaseSeverity }}'
+      notifyOnCreateOrReopenCase: '{{ item.notifyOnCreateOrReopenCase }}'
+      notifyOnResolveCase: '{{ item.notifyOnResolveCase }}'
+      teamId: '{{ item.teamId }}'
+      nextToken: '{{ response.nextToken }}'
+- discovery_id: aws.support-app.list_slack_workspace_configurations
+  calls:
+  - action: list_slack_workspace_configurations
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    items_for: '{{ response.slackWorkspaceConfigurations }}'
+    item:
+      allowOrganizationMemberAccount: '{{ item.allowOrganizationMemberAccount }}'
+      teamId: '{{ item.teamId }}'
+      teamName: '{{ item.teamName }}'
+      nextToken: '{{ response.nextToken }}'

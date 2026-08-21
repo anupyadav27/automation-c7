@@ -1,0 +1,77 @@
+version: '1.0'
+provider: aws
+service: sts
+services:
+  client: sts
+  module: boto3.client
+discovery:
+- discovery_id: aws.sts.get_caller_identity
+  calls:
+  - action: get_caller_identity
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Arn: '{{ response.Arn }}'
+      Account: '{{ response.Account }}'
+      UserId: '{{ response.UserId }}'
+- discovery_id: aws.sts.get_session_token
+  calls:
+  - action: get_session_token
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccessKeyId: '{{ response.Credentials.AccessKeyId }}'
+      Credentials: '{{ response.Credentials.Credentials }}'
+      Expiration: '{{ response.Credentials.Expiration }}'
+      SecretAccessKey: '{{ response.Credentials.SecretAccessKey }}'
+      SessionToken: '{{ response.Credentials.SessionToken }}'
+- discovery_id: aws.sts.get_access_key_info
+  for_each: aws.sts.get_session_token
+  calls:
+  - action: get_access_key_info
+    params:
+      AccessKeyId: '{{ item.AccessKeyId }}'
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Account: '{{ response.Account }}'
+- discovery_id: aws.sts.get_delegated_access_token
+  calls:
+  - action: get_delegated_access_token
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccessKeyId: '{{ response.Credentials.AccessKeyId }}'
+      Expiration: '{{ response.Credentials.Expiration }}'
+      SecretAccessKey: '{{ response.Credentials.SecretAccessKey }}'
+      SessionToken: '{{ response.Credentials.SessionToken }}'
+- discovery_id: aws.sts.get_federation_token
+  calls:
+  - action: get_federation_token
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      AccessKeyId: '{{ response.Credentials.AccessKeyId }}'
+      Expiration: '{{ response.Credentials.Expiration }}'
+      SecretAccessKey: '{{ response.Credentials.SecretAccessKey }}'
+      SessionToken: '{{ response.Credentials.SessionToken }}'
+- discovery_id: aws.sts.get_web_identity_token
+  calls:
+  - action: get_web_identity_token
+    save_as: response
+    on_error: continue
+  emit:
+    as: item
+    item:
+      Expiration: '{{ response.Expiration }}'
+      WebIdentityToken: '{{ response.WebIdentityToken }}'
